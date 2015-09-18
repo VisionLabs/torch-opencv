@@ -8,7 +8,7 @@ void createVideoWriter(const char* name, int w, int h, float framerate);
 void addFrame(THFloatTensor *t);
 void releaseVideoWriter();
 ]]
-local C = ffi.load'build/libfilters.so'
+local C = ffi.load 'lib/libfilters.so'
 
 function bilateralFilter(im, d, sigmaColor, sigmaSpace)
   assert(im:nDimension() == 3)
