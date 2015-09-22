@@ -1,35 +1,35 @@
 #include <TypeConversion.hpp>
 
-// Although we don't yet care about real THTensor type (always using
-// float), gaps between rows are (hopefully) handled correctly.
+cv::Mat tensorToMat(TensorWrapper tensor) {
 
-cv::Mat tensorToMat(THFloatTensor *tensor) {
+    THByteTensor *tensorPtr = static_cast<THByteTensor *>(tensor.tensorPtr);
 
-    int numberOfDims = tensor->nDimension;
+    int numberOfDims = tensorPtr->nDimension;
     // THTensor stores its dimensions sizes under long *.
     // In a constructor for cv::Mat, we need const int *.
     // We can't guarantee int and long to be equal.
     // So we somehow need to static_cast THTensor sizes.
     // TODO: we should somehow get rid of array allocation
     std::array<int, 3> size;
-    std::copy(tensor->size, tensor->size + tensor->nDimension, size.begin());
+    std::copy(tensorPtr->size, tensorPtr->size + tensorPtr->nDimension, size.begin());
 
     // Same thing for stride values.
     std::array<size_t, 3> stride;
-    std::copy(tensor->stride, tensor->stride + tensor->nDimension, stride.begin());
+    std::copy(tensorPtr->stride, tensorPtr->stride + tensorPtr->nDimension, stride.begin());
 
-    int depth = CV_32F; // TODO: detect this from Tensor type!
+    int depth = tensor.tensorType;
+
     // Determine the number of channels.
     int numChannels;
     // cv::Mat() takes stride values in bytes, so we have to multiply by the element size:
     size_t sizeMultiplier = cv::getElemSize(depth);
 
-    if (tensor->nDimension <= 2) {
+    if (tensorPtr->nDimension <= 2) {
         // If such tensor is passed, assume that it is single-channel:
         numChannels = 1;
     } else {
         // Otherwise depend on the 3rd dimension:
-        numChannels = tensor->size[2];
+        numChannels = tensorPtr->size[2];
         numberOfDims = 2;
     }
 
@@ -41,61 +41,64 @@ cv::Mat tensorToMat(THFloatTensor *tensor) {
             numberOfDims,
             size.data(),
             CV_MAKE_TYPE(depth, numChannels),
-            tensor->storage->data,
+            tensorPtr->storage->data,
             stride.data()
     );
 }
 
-void matToTensor(cv::Mat & mat, THFloatTensor * output) {
+void matToTensor(cv::Mat & mat, TensorWrapper output) {
 
     // This is awful: we first allocate this space in Lua,
     // then deallocate it here, and then allocate again.
     // But it works though.
     // TODO: avoid extra allocations!
 
+    outputPtr = static_cast<THByteTensor *>(output.tensorPtr);
+
     // Build new storage on top of the Mat
-    output->storage = THFloatStorage_newWithData(
-            reinterpret_cast<float *>(mat.data),
-            (mat.step[0] * mat.rows) / sizeof(float)
+    outputPtr->storage = THByteStorage_newWithData(
+            reinterpret_cast<unsigned char *>(mat.data),
+            mat.step[0] * mat.rows
     );
 
     int sizeMultiplier;
     if (mat.channels() == 1) {
-        output->nDimension = mat.dims;
-        sizeMultiplier = sizeof(float);
+        outputPtr->nDimension = mat.dims;
+        sizeMultiplier = mat.elemSize1() / mat.numChannels();
     } else {
-        output->nDimension = mat.dims + 1;
+        outputPtr->nDimension = mat.dims + 1;
         sizeMultiplier = mat.elemSize1();
     }
 
-    output->size = static_cast<long *>(THRealloc(
-            output->size,
-            sizeof(long) * output->nDimension));
-    output->stride = static_cast<long *>(THRealloc(
-            output->stride,
-            sizeof(long) * output->nDimension));
+    outputPtr->size = static_cast<long *>(THRealloc(
+            outputPtr->size,
+            sizeof(long) * outputPtr->nDimension));
+    outputPtr->stride = static_cast<long *>(THRealloc(
+            outputPtr->stride,
+            sizeof(long) * outputPtr->nDimension));
 
     if (mat.channels() > 1) {
-        output->size[output->nDimension - 1] = mat.channels();
-        output->stride[output->nDimension - 1] = sizeof(float);
+        outputPtr->size[outputPtr->nDimension - 1] = mat.channels();
+        outputPtr->stride[outputPtr->nDimension - 1] = sizeof(float);
     }
 
     for (int i = 0; i < mat.dims; ++i) {
-        output->size[i] = mat.size[i];
-        output->stride[i] = mat.step[i] / sizeMultiplier;
+        outputPtr->size[i] = mat.size[i];
+        outputPtr->stride[i] = mat.step[i] / sizeMultiplier;
     }
-}
 
-extern "C"
-void test_tensor_to_mat(THFloatTensor *input) {
-    cv::Mat temp = tensorToMat(input);
-    std::cout << temp * 10. << std::endl;
-}
-
-extern "C"
-void test_mat_to_tensor(THFloatTensor *output) {
-    cv::Mat outputMat = cv::Mat::eye(5, 5, CV_32FC1) * 7.;
     // Prevent OpenCV from deallocating Mat at the end of the scope
     outputMat.addref();
-    matToTensor(outputMat, output);
+}
+
+extern "C"
+void test_mat_to_tensor(TensorWrapper tensor) {
+    cv::Mat outputMat = cv::Mat::eye(5, 5, CV_32FC1) * 7.;
+    matToTensor(outputMat, tensor);
+}
+
+extern "C"
+void test_tensor_to_mat(TensorWrapper tensor) {
+    cv::Mat temp = tensorToMat(tensor);
+    std::cout << temp * 10. << std::endl;
 }
