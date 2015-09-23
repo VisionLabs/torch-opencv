@@ -1,3 +1,5 @@
+-- This file contains common vars and funcs
+
 local ffi = require 'ffi'
 
 ffi.cdef[[
@@ -10,6 +12,8 @@ void transfer_tensor(void *destination, void *source);
 ]]
 
 local C = ffi.load 'lib/libCommon.so'
+
+cv = {}
 
 local tensor_CV_code_by_letter = {
     [66] = 0, -- Byte   -> CV_8U
@@ -34,7 +38,7 @@ function empty_tensor_of_type(code)
 end
 
 -- torch.RealTensor ---> struct TensorWrapper
-function wrap_tensor(tensor)
+function cv.wrap_tensor(tensor)
     -- get the first letter of Tensor type
     local tensor_type = tensor:type():byte(7)
     
@@ -47,7 +51,7 @@ function wrap_tensor(tensor)
 end
 
 -- struct TensorWrapper ---> torch.RealTensor
-function unwrap_tensor(tensor_wrapper)
+function cv.unwrap_tensor(tensor_wrapper)
     retval = empty_tensor_of_type(tensor_wrapper.typeCode)
     C.transfer_tensor(
         retval:cdata(),
@@ -55,3 +59,5 @@ function unwrap_tensor(tensor_wrapper)
     )
     return retval
 end
+
+return cv

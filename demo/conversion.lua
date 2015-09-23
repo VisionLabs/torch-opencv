@@ -3,7 +3,7 @@
 
 -- Run this from project root: "th tests/test_conversion.lua"
 
-require 'cv.common'
+local cv = require 'cv'
 
 local ffi = require 'ffi'
 
@@ -17,13 +17,15 @@ local C = ffi.load 'lib/libTests.so'
 -- prints Tensor from OpenCV
 function test_tensor_to_mat(tensor)
     assert(tensor:dim() <= 2 or tensor:dim() == 3 and tensor:size(3) <= 4)
-    C.test_tensor_to_mat(wrap_tensor(tensor))
+    C.test_tensor_to_mat(cv.wrap_tensor(tensor))
 end
 
 -- creates a Mat and returns it as a Tensor
 function test_mat_to_tensor()
-    return unwrap_tensor(C.test_mat_to_tensor())
+    return cv.unwrap_tensor(C.test_mat_to_tensor())
 end
+
+-- *************** testing ***************
 
 tensor_a = torch.IntTensor(2, 2, 2)
 tensor_a[1][1][1] = 1
