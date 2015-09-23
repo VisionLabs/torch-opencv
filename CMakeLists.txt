@@ -13,3 +13,11 @@ INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 ADD_LIBRARY(TypeConversion SHARED "${SOURCE_DIR}/TypeConversion.cpp")
 TARGET_LINK_LIBRARIES(TypeConversion TH ${OpenCV_LIBS})
+
+SET(BUILD_TESTS ON)
+
+if (BUILD_TESTS)
+  file(GLOB Tests_SRC "${SOURCE_DIR}/tests/*.cpp")
+  ADD_LIBRARY(Tests SHARED ${Tests_SRC})
+  TARGET_LINK_LIBRARIES(Tests TypeConversion)
+endif()
