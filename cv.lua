@@ -9,7 +9,7 @@ struct TensorWrapper {
 void transfer_tensor(void *destination, void *source);
 ]]
 
-local C = ffi.load 'lib/libTypeConversion.so'
+local C = ffi.load 'lib/libCommon.so'
 
 local tensor_CV_code_by_letter = {
     [66] = 0, -- Byte   -> CV_8U

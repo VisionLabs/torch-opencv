@@ -1,19 +1,4 @@
-#include <opencv2/core/core.hpp>
-
-extern "C" {
-#include <TH/TH.h>
-}
-
-#include <iostream>
-#include <array>
-
-struct TensorWrapper {
-    void *tensorPtr;
-    char typeCode;
-};
-
-TensorWrapper matToTensor(cv::Mat & mat);
-cv::Mat tensorToMat(TensorWrapper tensor);
+#include <Common.hpp>
 
 inline
 std::string typeStr(cv::Mat & mat) {
