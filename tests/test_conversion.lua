@@ -3,7 +3,7 @@
 
 -- Run this from project root: "th tests/test_conversion.lua"
 
-require 'cv'
+require 'cv.common'
 
 local ffi = require 'ffi'
 
