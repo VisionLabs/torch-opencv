@@ -63,7 +63,7 @@ TensorWrapper matToTensor(cv::Mat & mat) {
     int sizeMultiplier;
     if (mat.channels() == 1) {
         outputPtr->nDimension = mat.dims;
-        sizeMultiplier = mat.depth();
+        sizeMultiplier = cv::getElemSize(mat.depth());
     } else {
         outputPtr->nDimension = mat.dims + 1;
         sizeMultiplier = mat.elemSize1();

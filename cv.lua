@@ -15,6 +15,8 @@ local C = ffi.load 'lib/libCommon.so'
 
 cv = {}
 
+require 'cv.constants'
+
 local tensor_CV_code_by_letter = {
     [66] = 0, -- Byte   -> CV_8U
     [70] = 5, -- Float  -> CV_32F
