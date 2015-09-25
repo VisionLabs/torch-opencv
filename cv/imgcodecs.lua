@@ -3,7 +3,7 @@ require 'cv'
 local ffi = require 'ffi'
 
 ffi.cdef[[
-struct TensorWrapper imread(const char * filename, int flags);
+struct TensorWrapper imread(const char *filename, int flags);
 ]]
 
 local C = ffi.load 'lib/libimgcodecs.so'
@@ -16,5 +16,5 @@ cv.IMREAD_ANYCOLOR   = 4
 cv.IMREAD_LOAD_GDAL  = 8 
 
 function cv.imread(filename, flags)
-    return cv.unwrap_tensor(C.imread(filename, flags or cv.IMREAD_COLOR))
+    return cv.unwrap_tensors(C.imread(filename, flags or cv.IMREAD_COLOR))
 end

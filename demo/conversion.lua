@@ -17,12 +17,12 @@ local C = ffi.load 'lib/libTests.so'
 -- prints Tensor from OpenCV
 function test_tensor_to_mat(tensor)
     assert(tensor:dim() <= 2 or tensor:dim() == 3 and tensor:size(3) <= 4)
-    C.test_tensor_to_mat(cv.wrap_tensor(tensor))
+    C.test_tensor_to_mat(cv.wrap_tensors(tensor))
 end
 
 -- creates a Mat and returns it as a Tensor
 function test_mat_to_tensor()
-    return cv.unwrap_tensor(C.test_mat_to_tensor())
+    return cv.unwrap_tensors(C.test_mat_to_tensor())
 end
 
 -- *************** testing ***************

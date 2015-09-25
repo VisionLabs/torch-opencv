@@ -10,7 +10,7 @@ int waitKey(int delay);
 local C = ffi.load 'lib/libhighgui.so'
 
 function cv.imshow(winname, image)
-    C.imshow(winname, cv.wrap_tensor(image))
+    C.imshow(winname, cv.wrap_tensors(image))
 end
 
 function cv.waitKey(delay)

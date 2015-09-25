@@ -1,56 +1,10 @@
-#include <TypeConversion.hpp>
+#include <Common.hpp>
 
-cv::Mat tensorToMat(TensorWrapper tensor) {
+TensorWrapper::TensorWrapper() {}
 
-    THByteTensor *tensorPtr = static_cast<THByteTensor *>(tensor.tensorPtr);
+TensorWrapper::TensorWrapper(cv::Mat & mat) {
 
-    int numberOfDims = tensorPtr->nDimension;
-    // THTensor stores its dimensions sizes under long *.
-    // In a constructor for cv::Mat, we need const int *.
-    // We can't guarantee int and long to be equal.
-    // So we somehow need to static_cast THTensor sizes.
-    // TODO: we should somehow get rid of array allocation
-
-    std::array<int, 3> size;
-    std::copy(tensorPtr->size, tensorPtr->size + tensorPtr->nDimension, size.begin());
-
-    // Same thing for stride values.
-    std::array<size_t, 3> stride;
-    std::copy(tensorPtr->stride, tensorPtr->stride + tensorPtr->nDimension, stride.begin());
-
-    int depth = tensor.typeCode;
-
-    // Determine the number of channels.
-    int numChannels;
-    // cv::Mat() takes stride values in bytes, so we have to multiply by the element size:
-    size_t sizeMultiplier = cv::getElemSize(depth);
-
-    if (tensorPtr->nDimension <= 2) {
-        // If such tensor is passed, assume that it is single-channel:
-        numChannels = 1;
-    } else {
-        // Otherwise depend on the 3rd dimension:
-        numChannels = tensorPtr->size[2];
-        numberOfDims = 2;
-    }
-
-    std::for_each(stride.begin(),
-                  stride.end(),
-                  [sizeMultiplier] (size_t & x) { x *= sizeMultiplier; });
-
-    return cv::Mat(
-            numberOfDims,
-            size.data(),
-            CV_MAKE_TYPE(depth, numChannels),
-            tensorPtr->storage->data,
-            stride.data()
-    );
-}
-
-TensorWrapper matToTensor(cv::Mat & mat) {
-
-    TensorWrapper returnValue;
-    returnValue.typeCode = static_cast<char>(mat.depth());
+    this->typeCode = static_cast<char>(mat.depth());
 
     THByteTensor *outputPtr = new THByteTensor;
 
@@ -85,8 +39,54 @@ TensorWrapper matToTensor(cv::Mat & mat) {
     // Prevent OpenCV from deallocating Mat data
     mat.addref();
 
-    returnValue.tensorPtr = outputPtr;
-    return returnValue;
+    this->tensorPtr = outputPtr;
+}
+
+cv::Mat TensorWrapper::toMat() {
+
+    THByteTensor *tensorPtr = static_cast<THByteTensor *>(this->tensorPtr);
+
+    int numberOfDims = tensorPtr->nDimension;
+    // THTensor stores its dimensions sizes under long *.
+    // In a constructor for cv::Mat, we need const int *.
+    // We can't guarantee int and long to be equal.
+    // So we somehow need to static_cast THTensor sizes.
+    // TODO: we should somehow get rid of array allocation
+
+    std::array<int, 3> size;
+    std::copy(tensorPtr->size, tensorPtr->size + tensorPtr->nDimension, size.begin());
+
+    // Same thing for stride values.
+    std::array<size_t, 3> stride;
+    std::copy(tensorPtr->stride, tensorPtr->stride + tensorPtr->nDimension, stride.begin());
+
+    int depth = this->typeCode;
+
+    // Determine the number of channels.
+    int numChannels;
+    // cv::Mat() takes stride values in bytes, so we have to multiply by the element size:
+    size_t sizeMultiplier = cv::getElemSize(depth);
+
+    if (tensorPtr->nDimension <= 2) {
+        // If such tensor is passed, assume that it is single-channel:
+        numChannels = 1;
+    } else {
+        // Otherwise depend on the 3rd dimension:
+        numChannels = tensorPtr->size[2];
+        numberOfDims = 2;
+    }
+
+    std::for_each(stride.begin(),
+                  stride.end(),
+                  [sizeMultiplier] (size_t & x) { x *= sizeMultiplier; });
+
+    return cv::Mat(
+            numberOfDims,
+            size.data(),
+            CV_MAKE_TYPE(depth, numChannels),
+            tensorPtr->storage->data,
+            stride.data()
+    );
 }
 
 // Kill "destination" and assign "source" data to it.
@@ -112,12 +112,12 @@ void transfer_tensor(void *destination, void *source) {
 extern "C"
 TensorWrapper test_mat_to_tensor() {
     cv::Mat outputMat = cv::Mat::ones(3, 3, CV_8SC1) * 7.;
-    return matToTensor(outputMat);
+    return TensorWrapper(outputMat);
 }
 
 extern "C"
 void test_tensor_to_mat(TensorWrapper tensor) {
-    cv::Mat temp = tensorToMat(tensor);
+    cv::Mat temp = tensor.toMat();
     std::cout << "This is a " << temp.channels() <<
             "-channel Mat of type " << typeStr(temp) << std::endl;
     std::cout << temp * 10. << std::endl;
