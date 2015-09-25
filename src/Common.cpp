@@ -89,6 +89,24 @@ cv::Mat TensorWrapper::toMat() {
     );
 }
 
+MultipleTensorWrapper::MultipleTensorWrapper(std::vector<cv::Mat> & matList):
+        tensors(static_cast<TensorWrapper *>(malloc(matList.size() * sizeof(TensorWrapper)))),
+        size(matList.size())
+{
+    for (size_t i = 0; i < matList.size(); ++i) {
+        // invoke the constructor, memory is already allocated
+        new (tensors + i) TensorWrapper(matList[i]);
+    }
+}
+
+std::vector<cv::Mat> MultipleTensorWrapper::toMat() {
+    std::vector<cv::Mat> retval(this->size);
+    for (int i = 0; i < this->size; ++i) {
+        retval[i] = this->tensors[i].toMat();
+    }
+    return retval;
+}
+
 // Kill "destination" and assign "source" data to it.
 extern "C"
 void transfer_tensor(void *destination, void *source) {
@@ -119,6 +137,6 @@ extern "C"
 void test_tensor_to_mat(TensorWrapper tensor) {
     cv::Mat temp = tensor.toMat();
     std::cout << "This is a " << temp.channels() <<
-            "-channel Mat of type " << typeStr(temp) << std::endl;
+    "-channel Mat of type " << typeStr(temp) << std::endl;
     std::cout << temp * 10. << std::endl;
 }

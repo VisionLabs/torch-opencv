@@ -20,15 +20,8 @@ struct MultipleTensorWrapper {
     struct TensorWrapper *tensors;
     short size;
 
-    MultipleTensorWrapper(std::vector<cv::Mat> & matList):
-            tensors(static_cast<TensorWrapper *>(malloc(matList.size() * sizeof(TensorWrapper)))),
-            size(matList.size())
-    {
-        for (size_t i = 0; i < matList.size(); ++i) {
-            // invoke the constructor, memory is already allocated
-            new (tensors + i) TensorWrapper(matList[i]);
-        }
-    }
+    MultipleTensorWrapper(std::vector<cv::Mat> & matList);
+    std::vector<cv::Mat> toMat();
 };
 
 inline
