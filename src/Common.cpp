@@ -140,3 +140,13 @@ void test_tensor_to_mat(TensorWrapper tensor) {
     "-channel Mat of type " << typeStr(temp) << std::endl;
     std::cout << temp * 10. << std::endl;
 }
+
+extern "C"
+cv::Algorithm *createAlgorithm() {
+    return new cv::Algorithm();
+}
+
+extern "C"
+void destroyAlgorithm(cv::Algorithm *ptr) {
+    delete ptr;
+}

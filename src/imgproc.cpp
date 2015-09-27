@@ -19,3 +19,12 @@ struct MultipleTensorWrapper getDerivKernels(
 
     return MultipleTensorWrapper(output);
 }
+
+extern "C"
+struct TensorWrapper getGaborKernel(int ksize_rows, int ksize_cols, double sigma, double theta,
+                                    double lambd, double gamma, double psi, int ktype)
+{
+    cv::Mat retval = cv::getGaborKernel(cv::Size(ksize_rows, ksize_cols), sigma,
+                                        theta, lambd, gamma, psi, ktype);
+    return TensorWrapper(retval);
+}

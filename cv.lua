@@ -17,6 +17,10 @@ void *malloc(size_t size);
 void free(void *ptr);
 
 void transfer_tensor(void *destination, void *source);
+
+struct Algorithm;
+struct Algorithm *createAlgorithm();
+void destroyAlgorithm(struct Algorithm *ptr);
 ]]
 
 local C = ffi.load 'lib/libCommon.so'
@@ -24,6 +28,8 @@ local C = ffi.load 'lib/libCommon.so'
 cv = {}
 
 require 'cv.constants'
+
+--- ***************** Tensor <=> Mat conversion *****************
 
 local tensor_CV_code_by_letter = {
     [66] = cv.CV_8U , -- Byte
@@ -98,6 +104,21 @@ function cv.unwrap_tensors(wrapper)
 
         C.free(wrapper.tensors)
         return unpack(retval)
+    end
+end
+
+--- ***************** Common base classes *****************
+
+do
+    -- TODO this: how to RAII?
+    local Algorithm = torch.class('cv.Algorithm')
+    
+    function Algorithm:destroy()
+        C.destroyAlgorithm(self.ptr);
+    end
+
+    function Algorithm:__init()
+        --self.ptr = C.createAlgorithm();
     end
 end
 
