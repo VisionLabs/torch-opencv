@@ -49,7 +49,7 @@ local tensor_type_by_CV_code = {
     [cv.CV_8S ] = "Char"
 }
 
-local EMPTY_WRAPPER = ffi.new("struct TensorWrapper")
+cv.EMPTY_WRAPPER = ffi.new("struct TensorWrapper")
 
 local
 function empty_tensor_of_type(code)
@@ -72,7 +72,7 @@ end
 -- torch.RealTensor ---> struct TensorWrapper/struct MultipleTensorWrapper
 function cv.wrap_tensors(...)
     if not ... then
-        return EMPTY_WRAPPER
+        return cv.EMPTY_WRAPPER
     end
 
     local args = {...}
