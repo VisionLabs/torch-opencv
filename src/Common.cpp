@@ -39,7 +39,14 @@ TensorWrapper::TensorWrapper(cv::Mat & mat) {
     // Prevent OpenCV from deallocating Mat data
     mat.addref();
 
+    outputPtr->refcount = 0;
+
     this->tensorPtr = outputPtr;
+}
+
+TensorWrapper::TensorWrapper(cv::Mat && mat) {
+    // invokes TensorWrapper(cv::Mat & mat)
+    new (this) TensorWrapper(mat);
 }
 
 cv::Mat TensorWrapper::toMat() {
@@ -108,6 +115,7 @@ std::vector<cv::Mat> MultipleTensorWrapper::toMat() {
 }
 
 // Kill "destination" and assign "source" data to it.
+// "destination" is always supposed to be an empty Tensor
 extern "C"
 void transfer_tensor(void *destination, void *source) {
     THByteTensor * s = static_cast<THByteTensor *>(source);
@@ -124,7 +132,7 @@ void transfer_tensor(void *destination, void *source) {
     d->size = s->size;
     d->stride = s->stride;
     d->nDimension = s->nDimension;
-    // Don't change refcount!
+    ++d->refcount;
 }
 
 extern "C"

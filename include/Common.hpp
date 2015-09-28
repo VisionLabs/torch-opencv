@@ -13,6 +13,7 @@ struct TensorWrapper {
 
     TensorWrapper();
     TensorWrapper(cv::Mat & mat);
+    TensorWrapper(cv::Mat && mat);
     cv::Mat toMat();
 };
 
