@@ -85,27 +85,27 @@ struct TensorWrapper preCornerDetect(
 
 
 struct TensorWrapper HoughLines(
-        struct TensorWrapper image, struct TensorWrapper lines,
+        struct TensorWrapper image,
         double rho, double theta, int threshold, double srn, double stn,
         double min_theta, double max_theta);
 
 struct TensorWrapper HoughLinesP(
-        struct TensorWrapper image, struct TensorWrapper lines, double rho,
+        struct TensorWrapper image, double rho,
         double theta, int threshold, double minLineLength, double maxLineGap);
 
 
 struct TensorWrapper HoughCircles(
-        struct TensorWrapper image, struct TensorWrapper circles,
+        struct TensorWrapper image,
         int method, double dp, double minDist, double param1, double param2,
         int minRadius, int maxRadius);
 
-struct TensorWrapper cornerSubPix(
+void cornerSubPix(
         struct TensorWrapper image, struct TensorWrapper corners,
         int winSize_x, int winSize_y, int zeroZone_x, int zeroZone_y,
-        int crit_type, int crit_max_iter, double crit_eps);
+        struct TermCriteriaWrapper criteria);
 
 struct TensorWrapper goodFeaturesToTrack(
-        struct TensorWrapper image, struct TensorWrapper corners,
+        struct TensorWrapper image,
         int maxCorners, double qualityLevel, double minDistance,
         struct TensorWrapper mask, int blockSize, bool useHarrisDetector, double k);
 ]]
@@ -167,7 +167,17 @@ function cv.medianBlur(t)
     local dst =   assert(t.dst)
     local ksize = assert(t.ksize)
 
-    if dst and src ~= dst then
+    local srcChannels = src:size()[3]
+    assert(srcChannels == 1 or srcChannels == 3 or srcChannels == 4)
+
+    local srcType = cv.tensorType(src)
+    if ksize == 3 or ksize == 5 then
+        assert(srcType == cv.CV_8U or srcType == cv.CV_32F)
+    else
+        assert(srcType == cv.CV_8U)
+    end
+
+    if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
     end
 
@@ -184,7 +194,9 @@ function cv.GaussianBlur(t)
     local sigmaY =     t.sigmaY or 0
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
-    if dst and src ~= dst then
+    assert(cv.tensorType(src) ~= cv.CV_8S and
+           cv.tensorType(src) ~= cv.CV_32S)
+    if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
     end
 
@@ -202,8 +214,13 @@ function cv.bilateralFilter(t)
     local sigmaSpace = assert(t.sigmaSpace)
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
-    if dst and src ~= dst then
-        assert(dst:type() == src:type() and src:isSameSizeAs(dst))
+    assert(src:nDimension() == 2 or src:size()[3] == 3)
+
+    local srcType = cv.tensorType(src)
+    assert(srcType == cv.CV_8U or srcType == cv.CV_32F)
+
+    if dst then
+        assert(src ~= dst and dst:type() == src:type() and src:isSameSizeAs(dst))
     end
 
     return cv.unwrap_tensors(
@@ -223,7 +240,7 @@ function cv.boxFilter(t)
     local normalize =  t.normalize or true
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
-    if dst and src ~= dst then
+    if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
     end
 
@@ -244,7 +261,7 @@ function cv.sqrBoxFilter(t)
     local normalize = t.normalize or true
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
-    if dst and src ~= dst then
+    if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
     end
 
@@ -262,7 +279,9 @@ function cv.blur(t)
     local anchor = t.anchor or {-1,-1}
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
-    if dst and src ~= dst then
+    assert(cv.tensorType(src) ~= cv.CV_8S and
+           cv.tensorType(src) ~= cv.CV_32S)
+    if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
     end
 
@@ -281,8 +300,9 @@ function cv.filter2D(t)
     local delta = t.delta or 0
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
-    if dst and src ~= dst then
-        assert(dst:type() == src:type() and src:isSameSizeAs(dst))
+    assert(cv.checkFilterCombination(src, ddepth))
+    if dst then
+        assert(src:isSameSizeAs(dst))
     end
 
     return cv.unwrap_tensors(
@@ -301,8 +321,9 @@ function cv.sepFilter2D(t)
     local delta = t.delta or 0
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
-    if dst and src ~= dst then
-        assert(dst:type() == src:type() and src:isSameSizeAs(dst))
+    assert(cv.checkFilterCombination(src, ddepth))
+    if dst then
+        assert(src:isSameSizeAs(dst))
     end
 
     return cv.unwrap_tensors(
@@ -322,8 +343,9 @@ function cv.Sobel(t)
     local delta = t.delta or 0
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
-    if dst and src ~= dst then
-        assert(dst:type() == src:type() and src:isSameSizeAs(dst))
+    assert(cv.checkFilterCombination(src, ddepth))
+    if dst then
+        assert(src:isSameSizeAs(dst))
     end
 
     return cv.unwrap_tensors(
@@ -342,8 +364,9 @@ function cv.Scharr(t)
     local delta = t.delta or 0
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
-    if dst and src ~= dst then
-        assert(dst:type() == src:type() and src:isSameSizeAs(dst))
+    assert(cv.checkFilterCombination(src, ddepth))
+    if dst then
+        assert(src:isSameSizeAs(dst))
     end
 
     return cv.unwrap_tensors(
@@ -361,8 +384,9 @@ function cv.Laplacian(t)
     local delta = t.delta or 0
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
-    if dst and src ~= dst then
-        assert(dst:type() == src:type() and src:isSameSizeAs(dst))
+    assert(cv.checkFilterCombination(src, ddepth))
+    if dst then
+        assert(src:isSameSizeAs(dst))
     end
 
     return cv.unwrap_tensors(
@@ -379,8 +403,12 @@ function cv.Canny(t)
     local apertureSize = t.apertureSize or 3
     local L2gradient = t.L2gradient or false
 
-    if edges and image ~= edges then
-        assert(edges:type() == image:type() and image:isSameSizeAs(edges))
+    assert(cv.tensorType(image) == cv.CV_8U)
+
+    if edges then
+        assert(edges:nDimension() == 2 and
+               edges:size()[1] == image:size()[1] and
+               edges:size()[2] == image:size()[2])
     end
 
     return cv.unwrap_tensors(
@@ -396,8 +424,10 @@ function cv.cornerMinEigenVal(t)
     local ksize = t.ksize or 3
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
-    if dst and src ~= dst then
-        assert(dst:type() == src:type() and src:isSameSizeAs(dst))
+    local srcType = cv.tensorType(src)
+    assert(src:nDimension() == 2 and (srcType == cv.CV_8U or srcType == cv.CV_32F))
+    if dst then
+        assert(dst:isSameSizeAs(src) and cv.tensorType(dst) == cv.CV_32F)
     end
 
     return cv.unwrap_tensors(
@@ -414,8 +444,11 @@ function cv.cornerHarris(t)
     local k = assert(t.k)
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
-    if dst and src ~= dst then
-        assert(dst:type() == src:type() and src:isSameSizeAs(dst))
+    local srcType = cv.tensorType(src)
+    assert(src:nDimension() == 2 and (srcType == cv.CV_8U or srcType == cv.CV_32F))
+
+    if dst then
+        assert(dst:isSameSizeAs(src) and cv.tensorType(dst) == cv.CV_32F)
     end
 
     return cv.unwrap_tensors(
@@ -431,8 +464,15 @@ function cv.cornerEigenValsAndVecs(t)
     local ksize = assert(t.ksize)
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
-    if dst and src ~= dst then
-        assert(dst:type() == src:type() and src:isSameSizeAs(dst))
+    local srcType = cv.tensorType(src)
+    assert(src:nDimension() == 2 and (srcType == cv.CV_8U or srcType == cv.CV_32F))
+
+    if dst then
+        assert(dst:nDimension() == 3 and
+               cv.tensorType(dst) == cv.CV_32F and
+               dst:size()[1] == src:size()[1] and
+               dst:size()[2] == src:size()[2] and
+               dst:size()[3] == 6)
     end
 
     return cv.unwrap_tensors(
@@ -447,8 +487,11 @@ function cv.preCornerDetect(t)
     local ksize = assert(t.ksize)
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
-    if dst and src ~= dst then
-        assert(dst:type() == src:type() and src:isSameSizeAs(dst))
+    local srcType = cv.tensorType(src)
+    assert(src:nDimension() == 2 and (srcType == cv.CV_8U or srcType == cv.CV_32F))
+
+    if dst then
+        assert(cv.tensorType(dst) == cv.CV_32F and src:isSameSizeAs(dst))
     end
 
     return cv.unwrap_tensors(
@@ -459,7 +502,6 @@ end
 
 function cv.HoughLines(t)
     local image = assert(t.image)
-    local lines = t.lines
     local rho = assert(t.rho)
     local theta = assert(t.theta)
     local threshold = assert(t.threshold)
@@ -468,38 +510,32 @@ function cv.HoughLines(t)
     local min_theta = t.min_theta or 0
     local max_theta = t.max_theta or cv.CV_PI
 
-    if lines and image ~= lines then
-        assert(lines:type() == image:type() and image:isSameSizeAs(lines))
-    end
+    assert(image:nDimension() == 2 and cv.tensorType(image) == cv.CV_8U)
 
     return cv.unwrap_tensors(
         C.HoughLines(
-            cv.wrap_tensors(image), cv.wrap_tensors(lines), rho, theta, threshold, srn, stn, min_theta, max_theta))
+            cv.wrap_tensors(image), rho, theta, threshold, srn, stn, min_theta, max_theta))
 end
 
 
 function cv.HoughLinesP(t)
     local image = assert(t.image)
-    local lines = t.lines
     local rho = assert(t.rho)
     local theta = assert(t.theta)
     local threshold = assert(t.threshold)
     local minLineLength = t.minLineLength or 0
     local maxLineGap = t.maxLineGap or 0
 
-    if lines and image ~= lines then
-        assert(lines:type() == image:type() and image:isSameSizeAs(lines))
-    end
+    assert(image:nDimension() == 2 and cv.tensorType(image) == cv.CV_8U)
 
     return cv.unwrap_tensors(
         C.HoughLinesP(
-            cv.wrap_tensors(image), cv.wrap_tensors(lines), rho, theta, threshold, minLineLength, maxLineGap))
+            cv.wrap_tensors(image), rho, theta, threshold, minLineLength, maxLineGap))
 end
 
 
 function cv.HoughCircles(t)
     local image = assert(t.image)
-    local circles = t.circles
     local method = assert(t.method)
     local dp = assert(t.dp)
     local minDist = assert(t.minDist)
@@ -508,52 +544,50 @@ function cv.HoughCircles(t)
     local minRadius = t.minRadius or 0
     local maxRadius = t.maxRadius or 0
 
-    if circles and image ~= circles then
-        assert(circles:type() == image:type() and image:isSameSizeAs(circles))
-    end
+    assert(image:nDimension() == 2 and cv.tensorType(image) == cv.CV_8U)
 
     return cv.unwrap_tensors(
         C.HoughCircles(
-            cv.wrap_tensors(image), cv.wrap_tensors(circles), method, dp, minDist, param1, param2, minRadius, maxRadius))
+            cv.wrap_tensors(image), method, dp, minDist, param1, param2, minRadius, maxRadius))
 end
 
 
 function cv.cornerSubPix(t)
     local image = assert(t.image)
-    local corners = t.corners
+    local corners = assert(t.corners)
     local winSize = t.winSize
     assert(#winSize == 2)
     local zeroZone = t.zeroZone
     assert(#zeroZone == 2)
-    local TermCriteria = assert(t.TermCriteria)
-    local criteria = assert(t.criteria)
+    local criteria = ffi.new('struct TermCriteriaWrapper', assert(t.criteria))
 
-    if corners and image ~= corners then
-        assert(corners:type() == image:type() and image:isSameSizeAs(corners))
-    end
+    assert(image:nDimension() == 2)
+    assert(corners:size()[2] == 2 and cv.tensorType(corners) == cv.CV_32F)
 
-    return cv.unwrap_tensors(
-        C.cornerSubPix(
-            cv.wrap_tensors(image), cv.wrap_tensors(corners), winSize[1], winSize[2], zeroZone[1], zeroZone[2], TermCriteria, criteria))
+    C.cornerSubPix(
+        cv.wrap_tensors(image), cv.wrap_tensors(corners), winSize[1], winSize[2],
+        zeroZone[1], zeroZone[2], criteria)
 end
 
 
 function cv.goodFeaturesToTrack(t)
     local image = assert(t.image)
-    local corners = t.corners
     local maxCorners = assert(t.maxCorners)
     local qualityLevel = assert(t.qualityLevel)
     local minDistance = assert(t.minDistance)
-    local mask = t.mask or cv.EMPTY_WRAPPER
+    local mask = t.mask
     local blockSize = t.blockSize or 3
     local useHarrisDetector = t.useHarrisDetector or false
     local k = t.k or 0.04
 
-    if corners and image ~= corners then
-        assert(corners:type() == image:type() and image:isSameSizeAs(corners))
+    local imgType = cv.tensorType(image)
+    assert(image:nDimension() == 2 and (imgType == cv.CV_32F or imgType == cv.CV_8U))
+
+    if mask then
+        assert(cv.tensorType(mask) == cv.CV_8U and mask:isSameSizeAs(image))
     end
 
     return cv.unwrap_tensors(
         C.goodFeaturesToTrack(
-            cv.wrap_tensors(image), cv.wrap_tensors(corners), maxCorners, qualityLevel, minDistance, cv.wrap_tensors(mask), blockSize, useHarrisDetector, k))
+            cv.wrap_tensors(image), maxCorners, qualityLevel, minDistance, cv.wrap_tensors(mask), blockSize, useHarrisDetector, k))
 end

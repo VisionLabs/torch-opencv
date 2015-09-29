@@ -135,6 +135,10 @@ void transfer_tensor(void *destination, void *source) {
     ++d->refcount;
 }
 
+cv::TermCriteria TermCriteriaWrapper::toCVTermCriteria() {
+    return cv::TermCriteria(type, maxCount, epsilon);
+}
+
 extern "C"
 TensorWrapper test_mat_to_tensor() {
     cv::Mat outputMat = cv::Mat::ones(3, 3, CV_8SC1) * 7.;

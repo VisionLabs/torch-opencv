@@ -316,7 +316,8 @@ struct TensorWrapper cornerMinEigenVal(
         cv::cornerMinEigenVal(src.toMat(), retval, blockSize, ksize, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
-        // in-place 
+        // in-place
+        std::cout << "inplace" << std::endl;
         cv::Mat source = src.toMat();
         cv::cornerMinEigenVal(source, source, blockSize, ksize, borderType);
     } else {
@@ -386,114 +387,57 @@ struct TensorWrapper preCornerDetect(
 
 extern "C"
 struct TensorWrapper HoughLines(
-        struct TensorWrapper image, struct TensorWrapper lines,
+        struct TensorWrapper image,
         double rho, double theta, int threshold, double srn, double stn,
         double min_theta, double max_theta)
 {
-    if (lines.tensorPtr == nullptr) {
-        cv::Mat retval;
-        cv::HoughLines(image.toMat(), retval, rho, theta, threshold, srn, stn,
+    cv::Mat retval;
+    cv::HoughLines(image.toMat(), retval, theta, threshold, srn, stn,
                 min_theta, max_theta);
-        return TensorWrapper(retval);
-    } else if (lines.tensorPtr == image.tensorPtr) {
-        // in-place 
-        cv::Mat source = image.toMat();
-        cv::HoughLines(source, source, rho, theta, threshold, srn, stn,
-                min_theta, max_theta);
-    } else {
-        cv::HoughLines(image.toMat(), lines.toMat(), rho, theta, threshold, srn, stn,
-                min_theta, max_theta);
-    }
-    return lines;
+    return TensorWrapper(retval);
 }
 
 extern "C"
 struct TensorWrapper HoughLinesP(
-        struct TensorWrapper image, struct TensorWrapper lines, double rho,
+        struct TensorWrapper image, double rho,
         double theta, int threshold, double minLineLength, double maxLineGap)
 {
-    if (lines.tensorPtr == nullptr) {
-        cv::Mat retval;
-        cv::HoughLinesP(image.toMat(), retval, rho,
+    cv::Mat retval;
+    cv::HoughLinesP(image.toMat(), retval, rho,
                 theta, threshold, minLineLength, maxLineGap);
-        return TensorWrapper(retval);
-    } else if (lines.tensorPtr == image.tensorPtr) {
-        // in-place 
-        cv::Mat source = image.toMat();
-        cv::HoughLinesP(source, source, rho,
-                theta, threshold, minLineLength, maxLineGap);
-    } else {
-        cv::HoughLinesP(image.toMat(), lines.toMat(), rho,
-                theta, threshold, minLineLength, maxLineGap);
-    }
-    return lines;
+    return TensorWrapper(retval);
 }
 
 extern "C"
 struct TensorWrapper HoughCircles(
-        struct TensorWrapper image, struct TensorWrapper circles,
+        struct TensorWrapper image,
         int method, double dp, double minDist, double param1, double param2,
         int minRadius, int maxRadius)
 {
-    if (circles.tensorPtr == nullptr) {
-        cv::Mat retval;
-        cv::HoughCircles(image.toMat(), retval, method, dp, minDist, param1, param2,
-                minRadius, maxRadius);
-        return TensorWrapper(retval);
-    } else if (circles.tensorPtr == image.tensorPtr) {
-        // in-place 
-        cv::Mat source = image.toMat();
-        cv::HoughCircles(source, source, method, dp, minDist, param1, param2,
-                minRadius, maxRadius);
-    } else {
-        cv::HoughCircles(image.toMat(), circles.toMat(), method, dp, minDist, param1, param2,
-                minRadius, maxRadius);
-    }
-    return circles;
+    cv::Mat retval;
+    cv::HoughCircles(image.toMat(), retval, method, dp, minDist, param1, param2,
+            minRadius, maxRadius);
+    return TensorWrapper(retval);
 }
 
 extern "C"
-struct TensorWrapper cornerSubPix(
+void cornerSubPix(
         struct TensorWrapper image, struct TensorWrapper corners,
         int winSize_x, int winSize_y, int zeroZone_x, int zeroZone_y,
-        int crit_type, int crit_max_iter, double crit_eps)
+        struct TermCriteriaWrapper criteria)
 {
-    if (corners.tensorPtr == nullptr) {
-        cv::Mat retval;
-        cv::cornerSubPix(image.toMat(), retval, cv::Size(winSize_x, winSize_y), cv::Size(zeroZone_x, zeroZone_y),
-                cv::TermCriteria(crit_type, crit_max_iter, crit_eps));
-        return TensorWrapper(retval);
-    } else if (corners.tensorPtr == image.tensorPtr) {
-        // in-place
-        cv::Mat source = image.toMat();
-        cv::cornerSubPix(source, source, cv::Size(winSize_x, winSize_y), cv::Size(zeroZone_x, zeroZone_y),
-                cv::TermCriteria(crit_type, crit_max_iter, crit_eps));
-    } else {
-        cv::cornerSubPix(image.toMat(), corners.toMat(), cv::Size(winSize_x, winSize_y), cv::Size(zeroZone_x, zeroZone_y),
-                cv::TermCriteria(crit_type, crit_max_iter, crit_eps));
-    }
-    return corners;
+    cv::cornerSubPix(image.toMat(), corners.toMat(), cv::Size(winSize_x, winSize_y), cv::Size(zeroZone_x, zeroZone_y),
+                criteria.toCVTermCriteria());
 }
 
 extern "C"
 struct TensorWrapper goodFeaturesToTrack(
-        struct TensorWrapper image, struct TensorWrapper corners,
+        struct TensorWrapper image,
         int maxCorners, double qualityLevel, double minDistance,
         struct TensorWrapper mask, int blockSize, bool useHarrisDetector, double k)
 {
-    if (corners.tensorPtr == nullptr) {
-        cv::Mat retval;
-        cv::goodFeaturesToTrack(image.toMat(), retval, maxCorners, qualityLevel, minDistance,
-        mask.toMat(), blockSize, useHarrisDetector, k);
-        return TensorWrapper(retval);
-    } else if (corners.tensorPtr == image.tensorPtr) {
-        // in-place 
-        cv::Mat source = image.toMat();
-        cv::goodFeaturesToTrack(source, source, maxCorners, qualityLevel, minDistance,
-        mask.toMat(), blockSize, useHarrisDetector, k);
-    } else {
-        cv::goodFeaturesToTrack(image.toMat(), corners.toMat(), maxCorners, qualityLevel, minDistance,
-        mask.toMat(), blockSize, useHarrisDetector, k);
-    }
-    return corners;
+    cv::Mat retval;
+    cv::goodFeaturesToTrack(image.toMat(), retval, maxCorners, qualityLevel, minDistance,
+        mask.tensorPtr ? mask.toMat() : cv::noArray(), blockSize, useHarrisDetector, k);
+    return retval;
 }

@@ -25,6 +25,13 @@ struct MultipleTensorWrapper {
     std::vector<cv::Mat> toMat();
 };
 
+struct TermCriteriaWrapper {
+    int type, maxCount;
+    double epsilon;
+
+    cv::TermCriteria toCVTermCriteria();
+};
+
 inline
 std::string typeStr(cv::Mat & mat) {
     switch (mat.depth()) {

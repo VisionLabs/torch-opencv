@@ -80,25 +80,25 @@ extern "C" struct TensorWrapper preCornerDetect(
         struct TensorWrapper src, struct TensorWrapper dst, int ksize, int borderType);
 
 extern "C" struct TensorWrapper HoughLines(
-        struct TensorWrapper image, struct TensorWrapper lines,
+        struct TensorWrapper image,
         double rho, double theta, int threshold, double srn, double stn,
         double min_theta, double max_theta);
 
 extern "C" struct TensorWrapper HoughLinesP(
-        struct TensorWrapper image, struct TensorWrapper lines, double rho,
+        struct TensorWrapper image, double rho,
         double theta, int threshold, double minLineLength, double maxLineGap);
 
 extern "C" struct TensorWrapper HoughCircles(
-        struct TensorWrapper image, struct TensorWrapper circles,
+        struct TensorWrapper image,
         int method, double dp, double minDist, double param1, double param2,
         int minRadius, int maxRadius);
 
-extern "C" struct TensorWrapper cornerSubPix(
+extern "C" void cornerSubPix(
         struct TensorWrapper image, struct TensorWrapper corners,
         int winSize_x, int winSize_y, int zeroZone_x, int zeroZone_y,
-        int crit_type, int crit_max_iter, double crit_eps);
+        struct TermCriteriaWrapper criteria);
 
 extern "C" struct TensorWrapper goodFeaturesToTrack(
-        struct TensorWrapper image, struct TensorWrapper corners,
+        struct TensorWrapper image,
         int maxCorners, double qualityLevel, double minDistance,
         struct TensorWrapper mask, int blockSize, bool useHarrisDetector, double k);

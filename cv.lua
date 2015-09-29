@@ -18,6 +18,11 @@ void free(void *ptr);
 
 void transfer_tensor(void *destination, void *source);
 
+struct TermCriteriaWrapper {
+    int type, maxCount;
+    double epsilon;
+};
+
 struct Algorithm;
 struct Algorithm *createAlgorithm();
 void destroyAlgorithm(struct Algorithm *ptr);
@@ -51,22 +56,30 @@ local tensor_type_by_CV_code = {
 
 cv.EMPTY_WRAPPER = ffi.new("struct TensorWrapper")
 
+function cv.tensorType(tensor)
+    -- get the first letter of Tensor type
+    local letter = tensor:type():byte(7)
+
+    if letter == 76 then
+        error("Sorry, LongTensors aren't supported. Consider using IntTensor")
+    end
+
+    return tensor_CV_code_by_letter[letter]
+end
+
 local
 function empty_tensor_of_type(code)
+    if code == cv.CV_16U then
+        error("Sorry, cv::Mats of type CV_16U aren't supported.")
+    end
+
     return torch[tensor_type_by_CV_code[code] .. "Tensor"]()
 end
 
 -- torch.RealTensor ---> tensor:cdata(), tensor_type_CV_code
 local 
 function prepare_for_wrapping(tensor)
-    -- get the first letter of Tensor type
-    local tensor_type = tensor:type():byte(7)
-
-    if tensor_type == 76 then
-        error("Mats of type long are not supported. Consider using int")
-    end
-
-    return tensor:cdata(), tensor_CV_code_by_letter[tensor_type]
+    return tensor:cdata(), cv.tensorType(tensor)
 end
 
 -- torch.RealTensor ---> struct TensorWrapper/struct MultipleTensorWrapper
@@ -113,10 +126,24 @@ function cv.unwrap_tensors(wrapper)
     end
 end
 
+-- see opencv2/imgproc.hpp, line 73 (as of 29.09.2015)
+function cv.checkFilterCombination(src, ddepth)
+    local srcType = cv.tensorType(src)
+    if srcType == cv.CV_8U then
+        return ddepth == cv.CV_16S or ddepth >= cv.CV_32F or ddepth == -1
+    elseif srcType == cv.CV_16S or srcType == cv.CV_32F then
+        return ddepth >= cv.CV_32F or ddepth == -1
+    elseif srcType == cv.CV_64F then
+        return ddepth == cv.CV_64F or ddepth == -1
+    else
+        return false
+    end
+end
+
 --- ***************** Common base classes *****************
 
 do
-    -- TODO this: how to RAII?
+    -- TODO this: implement RAII via :__gc()
     local Algorithm = torch.class('cv.Algorithm')
     
     function Algorithm:destroy()
