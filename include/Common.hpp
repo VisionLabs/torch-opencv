@@ -57,3 +57,7 @@ struct ScalarWrapper {
 
     cv::Scalar toCV();
 };
+
+struct Vec3d {
+    double v0, v1, v2;
+};

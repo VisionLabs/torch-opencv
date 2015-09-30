@@ -157,6 +157,53 @@ struct MultipleTensorWrapper convertMaps(
 
 struct TensorWrapper getRotationMatrix2D(
         double center_x, double center_y, double angle, double scale);
+        
+struct TensorWrapper getPerspectiveTransform(
+        struct TensorWrapper src, struct TensorWrapper dst);
+
+struct TensorWrapper getAffineTransform(
+        struct TensorWrapper src, struct TensorWrapper dst);
+
+struct TensorWrapper getRectSubPix(
+        struct TensorWrapper image, int patchSize_x, int patchsize_y,
+        double center_x, double center_y, struct TensorWrapper patch,
+        int patchType);
+        
+struct TensorWrapper logPolar(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        float center_x, float center_y, double M, int flags);
+
+struct TensorWrapper linearPolar(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        float center_x, float center_y, double maxRadius, int flags);
+
+struct TensorWrapper integral(
+        struct TensorWrapper src, struct TensorWrapper sum, int sdepth);
+
+struct MultipleTensorWrapper integralN(
+        struct TensorWrapper src, struct TensorWrapper sum,
+        struct TensorWrapper sqsum, struct TensorWrapper tilted,
+        int sdepth, int sqdepth);
+
+void accumulate(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper mask);
+
+void accumulateSquare(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper mask);
+
+void accumulateProduct(
+        struct TensorWrapper src1, struct TensorWrapper src2,
+        struct TensorWrapper dst, struct TensorWrapper mask);
+
+void accumulateWeighted(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        double alpha, struct TensorWrapper mask);
+
+struct Vec3d phaseCorrelate(
+        struct TensorWrapper src1, struct TensorWrapper src2,
+        struct TensorWrapper window);
 ]]
 
 
@@ -783,3 +830,170 @@ function cv.getRotationMatrix2D(t)
     return cv.unwrap_tensors(
         C.getRotationMatrix2D(center[1], center[2], angle, scale))
 end
+
+
+function cv.invertAffineTransform(t)
+    local M = assert(t.M)
+    local iM = t.iM
+
+    return cv.unwrap_tensors(
+        C.invertAffineTransform(cv.wrap_tensors(M), cv.wrap_tensors(iM)))
+end
+
+
+function cv.getPerspectiveTransform(t)
+    local src = assert(t.src)
+    local dst = assert(t.dst)
+
+    return cv.unwrap_tensors(
+        C.getPerspectiveTransform(cv.wrap_tensors(src), cv.wrap_tensors(dst)))
+end
+
+
+function cv.getAffineTransform(t)
+    local src = assert(t.src)
+    local dst = assert(t.dst)
+
+    return cv.unwrap_tensors(
+        C.getAffineTransform(cv.wrap_tensors(src), cv.wrap_tensors(dst)))
+end
+
+
+function cv.getRectSubPix(t)
+    local image = assert(t.src)
+    local patchSize = assert(t.patchSize)
+    assert(#patchSize == 2)
+    local center = assert(t.center)
+    assert(#center == 2)
+    local patch = t.patch
+    local patchType = t.patchType or -1
+
+    return cv.unwrap_tensors(
+        C.getRectSubPix(cv.wrap_tensors(image), patchSize[1], patchSize[2], center[1], center[2],
+                        cv.wrap_tensors(patch), patchType))
+end
+
+
+function cv.getRectSubPix(t)
+    local image = assert(t.src)
+    local patchSize = assert(t.patchSize)
+    assert(#patchSize == 2)
+    local center = assert(t.center)
+    assert(#center == 2)
+    local patch = t.patch
+    local patchType = t.patchType or -1
+
+    return cv.unwrap_tensors(
+        C.getRectSubPix(cv.wrap_tensors(image), patchSize[1], patchSize[2], center[1], center[2],
+            cv.wrap_tensors(patch), patchType))
+end
+
+
+function cv.logPolar(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local center = assert(t.center)
+    assert(#center == 2)
+    local M = assert(t.M)
+    local flags = assert(t.flags)
+
+    return cv.unwrap_tensors(
+        C.logPolar(cv.wrap_tensors(src), cv.wrap_tensors(dst), center[1], center[2], M, flags))
+end
+
+
+function cv.linearPolar(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local center = assert(t.center)
+    assert(#center == 2)
+    local maxRadius = assert(t.maxRadius)
+    local flags = assert(t.flags)
+
+    return cv.unwrap_tensors(
+        C.linearPolar(cv.wrap_tensors(src), cv.wrap_tensors(dst), center[1], center[2], maxRadius, flags))
+end
+
+
+function cv.integral(t)
+    local src = assert(t.src)
+    local sum = t.sum
+    local sdepth = t.sdepth or -1
+
+    return cv.unwrap_tensors(
+        C.integral(cv.wrap_tensors(src), cv.wrap_tensors(sum), sdepth))
+end
+
+
+function cv.integral2(t)
+    local src = assert(t.src)
+    local sum = t.sum
+    local sqsum = t.sqsum
+    local sdepth = t.sdepth or -1
+    local sqdepth = t.sqdepth or -1
+
+    return cv.unwrap_tensors(
+        C.integralN(cv.wrap_tensors(src), cv.wrap_tensors(sum, sqsum), sdepth, sqdepth))
+end
+
+
+function cv.integral3(t)
+    local src = assert(t.src)
+    local sum = t.sum
+    local sqsum = t.sqsum
+    local tilted = t.tilted
+    local sdepth = t.sdepth or -1
+    local sqdepth = t.sqdepth or -1
+
+    return cv.unwrap_tensors(
+        C.integralN(cv.wrap_tensors(src), cv.wrap_tensors(sum, sqsum, tilted), sdepth, sqdepth))
+end
+
+
+function cv.accumulate(t)
+    local src = assert(t.src)
+    local sum = assert(t.sum)
+    local mask = t.mask
+
+    C.accumulate(cv.wrap_tensors(src), cv.wrap_tensors(sum), cv.wrap_tensors(mask))
+end
+
+
+function cv.accumulateSquare(t)
+    local src = assert(t.src)
+    local sum = assert(t.sum)
+    local mask = t.mask
+
+    C.accumulateSquare(cv.wrap_tensors(src), cv.wrap_tensors(sum), cv.wrap_tensors(mask))
+end
+
+
+function cv.accumulateProduct(t)
+    local src1 = assert(t.src1)
+    local src2 = assert(t.src2)
+    local sum = assert(t.sum)
+    local mask = t.mask
+
+    C.accumulateSquare(cv.wrap_tensors(src1), cv.wrap_tensors(src2), cv.wrap_tensors(sum), cv.wrap_tensors(mask))
+end
+
+
+function cv.accumulateWeighted(t)
+    local src = assert(t.src)
+    local sum = assert(t.sum)
+    local alpha = assert(t.alpha)
+    local mask = t.mask
+
+    C.accumulateWeighted(cv.wrap_tensors(src), cv.wrap_tensors(sum), alpha, cv.wrap_tensors(mask))
+end
+
+
+function cv.phaseCorrelate(t)
+    local src1 = assert(t.src1)
+    local src2 = assert(t.src2)
+    local window = t.window
+
+    local result = C.phaseCorrelate(cv.wrap_tensors(src1), cv.wrap_tensors(src2), cv.wrap_tensors(window))
+    return {x=result.v0, y=result.v1}, result.v2
+end
+

@@ -1,5 +1,7 @@
 #include <imgproc.hpp>
 
+// Ехали медведи, на велосипеде
+
 extern "C"
 struct TensorWrapper getGaussianKernel(int ksize, double sigma, int ktype)
 {
@@ -602,17 +604,183 @@ struct MultipleTensorWrapper convertMaps(
         std::vector<cv::Mat> retval(2);
         cv::convertMaps(map1.toMat(), map2.toMat(), retval[0], retval[1], dstmap1type, nninterpolation);
         return MultipleTensorWrapper(retval);
-    } else {
+    }
+    if (!dstmap1.isNull() and !dstmap2.isNull()) {
         // try to output to the given Tensors
         cv::convertMaps(map1.toMat(), map2.toMat(), dstmap1.toMat(), dstmap2.toMat(), dstmap1type, nninterpolation);
         return MultipleTensorWrapper();
     }
+    THError("convertMaps: please specify either both or none of the dstmaps");
 }
 
 extern "C"
 struct TensorWrapper getRotationMatrix2D(
-        double center_x, double center_y, double angle, double scale)
+        float center_x, float center_y, double angle, double scale)
 {
     return TensorWrapper(cv::getRotationMatrix2D(cv::Point2f(center_x, center_y), angle, scale));
 }
 
+extern "C"
+struct TensorWrapper invertAffineTransform(
+        struct TensorWrapper M, struct TensorWrapper iM)
+{
+    if (iM.isNull()) {
+        cv::Mat retval;
+        cv::invertAffineTransform(M.toMat(), retval);
+        return TensorWrapper(retval);
+    } else if (iM.tensorPtr == M.tensorPtr) {
+        // in-place
+        cv::Mat source = M.toMat();
+        cv::invertAffineTransform(source, source);
+    } else {
+        cv::invertAffineTransform(M.toMat(), iM.toMat());
+    }
+    return iM;
+}
+
+extern "C" struct TensorWrapper getPerspectiveTransform(
+        struct TensorWrapper src, struct TensorWrapper dst)
+{
+    return TensorWrapper(cv::getPerspectiveTransform(src.toMat(), dst.toMat()));
+}
+
+extern "C" struct TensorWrapper getAffineTransform(
+        struct TensorWrapper src, struct TensorWrapper dst)
+{
+    return TensorWrapper(cv::getAffineTransform(src.toMat(), dst.toMat()));
+}
+
+extern "C" struct TensorWrapper getRectSubPix(
+        struct TensorWrapper image, int patchSize_x, int patchsize_y,
+        float center_x, float center_y, struct TensorWrapper patch, int patchType)
+{
+    if (patch.isNull()) {
+        cv::Mat retval;
+        cv::getRectSubPix(image.toMat(), cv::Size(patchSize_x, patchsize_y),
+                          cv::Point2f(center_x, center_y), retval, patchType);
+        return TensorWrapper(retval);
+    } else if (image.tensorPtr == patch.tensorPtr) {
+        // in-place
+        THError("In-place isn't possible");
+    } else {
+        cv::getRectSubPix(image.toMat(), cv::Size(patchSize_x, patchsize_y),
+                          cv::Point2f(center_x, center_y), patch.toMat(), patchType);
+    }
+    return patch;
+}
+
+extern "C" 
+struct TensorWrapper logPolar(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        float center_x, float center_y, double M, int flags)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        cv::logPolar(src.toMat(), retval, cv::Point2f(center_x, center_y), M, flags);
+        return TensorWrapper(retval);
+    } else if (src.tensorPtr == dst.tensorPtr) {
+        // in-place
+        THError("In-place isn't possible");
+    } else {
+        cv::logPolar(src.toMat(), dst.toMat(), cv::Point2f(center_x, center_y), M, flags);
+    }
+    return dst;
+}
+
+extern "C"
+struct TensorWrapper linearPolar(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        float center_x, float center_y, double maxRadius, int flags)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        cv::linearPolar(src.toMat(), retval, cv::Point2f(center_x, center_y), maxRadius, flags);
+        return TensorWrapper(retval);
+    } else if (src.tensorPtr == dst.tensorPtr) {
+        // in-place
+        THError("In-place isn't possible");
+    } else {
+        cv::linearPolar(src.toMat(), dst.toMat(), cv::Point2f(center_x, center_y), maxRadius, flags);
+    }
+    return dst;
+}
+
+extern "C" 
+struct TensorWrapper integral(
+        struct TensorWrapper src, struct TensorWrapper sum, int sdepth)
+{
+    if (sum.isNull()) {
+        cv::Mat retval;
+        cv::integral(src.toMat(), retval, sdepth);
+        return TensorWrapper(retval);
+    } else if (sum.tensorPtr == src.tensorPtr) {
+        // in-place 
+        cv::Mat source = src.toMat();
+        cv::integral(source, source, sdepth);
+    } else {
+        cv::integral(src.toMat(), sum.toMat(), sdepth);
+    }
+    return sum;
+}
+
+extern "C" struct MultipleTensorWrapper integralN(
+        struct TensorWrapper src, struct MultipleTensorWrapper sums, int sdepth, int sqdepth)
+{
+    // sums.size == 2 or 3
+    std::vector<cv::Mat> retval(sums.size);
+
+    for (short i = 0; i < sums.size; ++i) {
+        if (!sums.tensors[i].isNull()) {
+            retval[i] = sums.tensors[i].toMat();
+        }
+    }
+    cv::integral(src.toMat(), retval[0], retval[1], sdepth, sqdepth);
+
+    return MultipleTensorWrapper(retval);
+}
+
+extern "C"
+void accumulate(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper mask)
+{
+    cv::accumulate(src.toMat(), dst.toMat(), mask.isNull() ? cv::noArray() : mask.toMat());
+}
+
+extern "C"
+void accumulateSquare(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper mask)
+{
+    cv::accumulateSquare(src.toMat(), dst.toMat(), mask.isNull() ? cv::noArray() : mask.toMat());
+}
+
+extern "C"
+void accumulateProduct(
+        struct TensorWrapper src1, struct TensorWrapper src2,
+        struct TensorWrapper dst, struct TensorWrapper mask)
+{
+    cv::accumulateProduct(src1.toMat(), src2.toMat(), dst.toMat(), mask.isNull() ? cv::noArray() : mask.toMat());
+}
+
+extern "C"
+void accumulateWeighted(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        double alpha, struct TensorWrapper mask)
+{
+    cv::accumulateWeighted(src.toMat(), dst.toMat(), alpha, mask.isNull() ? cv::noArray() : mask.toMat());
+}
+
+extern "C"
+struct Vec3d phaseCorrelate(
+        struct TensorWrapper src1, struct TensorWrapper src2,
+        struct TensorWrapper window)
+{
+    Vec3d retval;
+    cv::Point2d result =
+            cv::phaseCorrelate(src1.toMat(), src2.toMat(),
+                               window.isNull() ? cv::noArray() : window.toMat(), &retval.v2);
+    retval.v0 = result.x;
+    retval.v1 = result.y;
+    return retval;
+}

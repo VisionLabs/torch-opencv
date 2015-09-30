@@ -145,4 +145,51 @@ extern "C" struct MultipleTensorWrapper convertMaps(
         int dstmap1type, bool nninterpolation);
 
 extern "C" struct TensorWrapper getRotationMatrix2D(
-        double center_x, double center_y, double angle, double scale);
+        float center_x, float center_y, double angle, double scale);
+
+extern "C" struct TensorWrapper getPerspectiveTransform(
+        struct TensorWrapper src, struct TensorWrapper dst);
+
+extern "C" struct TensorWrapper getAffineTransform(
+        struct TensorWrapper src, struct TensorWrapper dst);
+
+extern "C" struct TensorWrapper getRectSubPix(
+        struct TensorWrapper image, int patchSize_x, int patchsize_y,
+        float center_x, float center_y, struct TensorWrapper patch,
+        int patchType);
+
+extern "C" struct TensorWrapper logPolar(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        float center_x, float center_y, double M, int flags);
+
+extern "C" struct TensorWrapper linearPolar(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        float center_x, float center_y, double maxRadius, int flags);
+
+extern "C" struct TensorWrapper integral(
+        struct TensorWrapper src, struct TensorWrapper sum, int sdepth);
+
+extern "C" struct MultipleTensorWrapper integralN(
+        struct TensorWrapper src, struct TensorWrapper sum,
+        struct TensorWrapper sqsum, struct TensorWrapper tilted,
+        int sdepth, int sqdepth);
+
+extern "C" void accumulate(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper mask);
+
+extern "C" void accumulateSquare(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper mask);
+
+extern "C" void accumulateProduct(
+        struct TensorWrapper src1, struct TensorWrapper src2,
+        struct TensorWrapper dst, struct TensorWrapper mask);
+
+extern "C" void accumulateWeighted(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        double alpha, struct TensorWrapper mask);
+
+extern "C" struct Vec3d phaseCorrelate(
+        struct TensorWrapper src1, struct TensorWrapper src2,
+        struct TensorWrapper window);

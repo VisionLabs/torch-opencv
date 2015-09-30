@@ -1,7 +1,7 @@
 imgproc module branch
 =====================
 
-**Roughly 25% completed**
+**Roughly 35% completed**
 
 *To be implemented:*
 
@@ -15,22 +15,6 @@ imgproc module branch
 * LineIterator
 
 **Separate functions (filters, detectors, ...):**
-* getPerspectiveTransform
-* getAffineTransform
-* invertAffineTransform
-* getPerspectiveTransform
-* getAffineTransform
-* getRectSubPix
-* logPolar
-* linearPolar
-* integral
-* integral2
-* integral3
-* accumulate
-* accumulateSquare
-* accumulateProduct
-* accumulateWeighted
-* phaseCorrelate
 * createHanningWindow
 * threshold
 * adaptiveThreshold
@@ -136,3 +120,19 @@ imgproc module branch
 * remap
 * convertMaps
 * getRotationMatrix2D
+* getPerspectiveTransform
+* getAffineTransform
+* invertAffineTransform
+* getRectSubPix
+* logPolar
+* linearPolar
+* integral
+* integral2
+* integral3
+* accumulate
+* accumulateSquare
+* accumulateProduct
+* accumulateWeighted
+* phaseCorrelate
+
+48/139

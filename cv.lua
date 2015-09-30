@@ -27,6 +27,10 @@ struct ScalarWrapper {
     double v0, v1, v2, v3;
 };
 
+struct Vec3d {
+    double v0, v1, v2;
+};
+
 struct Algorithm;
 struct Algorithm *createAlgorithm();
 void destroyAlgorithm(struct Algorithm *ptr);
