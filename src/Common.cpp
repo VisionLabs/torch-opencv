@@ -1,5 +1,7 @@
 #include <Common.hpp>
 
+/***************** Tensor <=> Mat conversion *****************/
+
 TensorWrapper::TensorWrapper() {}
 
 TensorWrapper::TensorWrapper(cv::Mat & mat) {
@@ -135,22 +137,14 @@ void transfer_tensor(void *destination, void *source) {
     ++d->refcount;
 }
 
-cv::TermCriteria TermCriteriaWrapper::toCVTermCriteria() {
+/***************** Wrappers for small classes *****************/
+
+cv::TermCriteria TermCriteriaWrapper::toCV() {
     return cv::TermCriteria(type, maxCount, epsilon);
 }
 
-extern "C"
-TensorWrapper test_mat_to_tensor() {
-    cv::Mat outputMat = cv::Mat::ones(3, 3, CV_8SC1) * 7.;
-    return TensorWrapper(outputMat);
-}
-
-extern "C"
-void test_tensor_to_mat(TensorWrapper tensor) {
-    cv::Mat temp = tensor.toMat();
-    std::cout << "This is a " << temp.channels() <<
-    "-channel Mat of type " << typeStr(temp) << std::endl;
-    std::cout << temp * 10. << std::endl;
+cv::Scalar ScalarWrapper::toCV() {
+    return cv::Scalar(v0, v1, v2, v3);
 }
 
 extern "C"

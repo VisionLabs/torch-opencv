@@ -7,6 +7,8 @@ extern "C" {
 #include <iostream>
 #include <array>
 
+/***************** Tensor <=> Mat conversion *****************/
+
 struct TensorWrapper {
     void *tensorPtr;
     char typeCode;
@@ -25,13 +27,6 @@ struct MultipleTensorWrapper {
     std::vector<cv::Mat> toMat();
 };
 
-struct TermCriteriaWrapper {
-    int type, maxCount;
-    double epsilon;
-
-    cv::TermCriteria toCVTermCriteria();
-};
-
 inline
 std::string typeStr(cv::Mat & mat) {
     switch (mat.depth()) {
@@ -44,3 +39,18 @@ std::string typeStr(cv::Mat & mat) {
         default: ; // TODO: raise an error
     }
 }
+
+/***************** Wrappers for small classes *****************/
+
+struct TermCriteriaWrapper {
+    int type, maxCount;
+    double epsilon;
+
+    cv::TermCriteria toCV();
+};
+
+struct ScalarWrapper {
+    double v0, v1, v2, v3;
+
+    cv::Scalar toCV();
+};

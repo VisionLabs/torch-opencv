@@ -1,7 +1,7 @@
 imgproc module branch
 =====================
 
-**Roughly 19% completed**
+**Roughly 24% completed**
 
 *To be implemented:*
 
@@ -15,10 +15,6 @@ imgproc module branch
 * LineIterator
 
 **Separate functions (filters, detectors, ...):**
-* erode
-* dilate
-* morphologyEx
-* resize
 * warpAffine
 * warpPerspective
 * remap
@@ -136,4 +132,7 @@ imgproc module branch
 * HoughLines
 * HoughLinesP
 * HoughCircles
-
+* erode
+* dilate
+* morphologyEx
+* resize

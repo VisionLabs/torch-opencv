@@ -426,8 +426,8 @@ void cornerSubPix(
         int winSize_x, int winSize_y, int zeroZone_x, int zeroZone_y,
         struct TermCriteriaWrapper criteria)
 {
-    cv::cornerSubPix(image.toMat(), corners.toMat(), cv::Size(winSize_x, winSize_y), cv::Size(zeroZone_x, zeroZone_y),
-                criteria.toCVTermCriteria());
+    cv::cornerSubPix(image.toMat(), corners.toMat(), cv::Size(winSize_x, winSize_y),
+                     cv::Size(zeroZone_x, zeroZone_y), criteria.toCV());
 }
 
 extern "C"
@@ -440,4 +440,93 @@ struct TensorWrapper goodFeaturesToTrack(
     cv::goodFeaturesToTrack(image.toMat(), retval, maxCorners, qualityLevel, minDistance,
         mask.tensorPtr ? mask.toMat() : cv::noArray(), blockSize, useHarrisDetector, k);
     return retval;
+}
+
+extern "C"
+struct TensorWrapper erode(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        int iterations, int borderType, struct ScalarWrapper borderValue)
+{
+    if (dst.tensorPtr == nullptr) {
+        cv::Mat retval;
+        cv::erode(src.toMat(), retval, kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+                  borderType, isnan(borderValue.v0) ? cv::morphologyDefaultBorderValue() : borderValue.toCV());
+        return TensorWrapper(retval);
+    } else if (dst.tensorPtr == src.tensorPtr) {
+        // in-place
+        cv::Mat source = src.toMat();
+        cv::erode(source, source, kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+                  borderType, isnan(borderValue.v0) ? cv::morphologyDefaultBorderValue() : borderValue.toCV());
+    } else {
+        cv::erode(src.toMat(), dst.toMat(), kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+                  borderType, isnan(borderValue.v0) ? cv::morphologyDefaultBorderValue() : borderValue.toCV());
+    }
+    return dst;
+}
+
+extern "C"
+struct TensorWrapper dilate(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        int iterations, int borderType, struct ScalarWrapper borderValue)
+{
+    if (dst.tensorPtr == nullptr) {
+        cv::Mat retval;
+        cv::dilate(src.toMat(), retval, kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+                  borderType, isnan(borderValue.v0) ? cv::morphologyDefaultBorderValue() : borderValue.toCV());
+        return TensorWrapper(retval);
+    } else if (dst.tensorPtr == src.tensorPtr) {
+        // in-place
+        cv::Mat source = src.toMat();
+        cv::dilate(source, source, kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+                  borderType, isnan(borderValue.v0) ? cv::morphologyDefaultBorderValue() : borderValue.toCV());
+    } else {
+        cv::dilate(src.toMat(), dst.toMat(), kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+                  borderType, isnan(borderValue.v0) ? cv::morphologyDefaultBorderValue() : borderValue.toCV());
+    }
+    return dst;
+}
+
+extern "C"
+struct TensorWrapper morphologyEx(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int op, struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        int iterations, int borderType, struct ScalarWrapper borderValue)
+{
+    if (dst.tensorPtr == nullptr) {
+        cv::Mat retval;
+        cv::morphologyEx(src.toMat(), retval, op, kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+                   borderType, isnan(borderValue.v0) ? cv::morphologyDefaultBorderValue() : borderValue.toCV());
+        return TensorWrapper(retval);
+    } else if (dst.tensorPtr == src.tensorPtr) {
+        // in-place
+        cv::Mat source = src.toMat();
+        cv::morphologyEx(source, source, op, kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+                   borderType, isnan(borderValue.v0) ? cv::morphologyDefaultBorderValue() : borderValue.toCV());
+    } else {
+        cv::morphologyEx(src.toMat(), dst.toMat(), op, kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+                   borderType, isnan(borderValue.v0) ? cv::morphologyDefaultBorderValue() : borderValue.toCV());
+    }
+    return dst;
+}
+
+extern "C"
+struct TensorWrapper resize(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int dsize_x, int dsize_y, double fx, double fy,
+        int interpolation)
+{
+    if (dst.tensorPtr == nullptr) {
+        cv::Mat retval;
+        cv::resize(src.toMat(), retval, cv::Size(dsize_x, dsize_y), fx, fy, interpolation);
+        return TensorWrapper(retval);
+    } else if (dst.tensorPtr == src.tensorPtr) {
+        // in-place
+        cv::Mat source = src.toMat();
+        cv::resize(source, source, cv::Size(dsize_x, dsize_y), fx, fy, interpolation);
+    } else {
+        cv::resize(src.toMat(), dst.toMat(), cv::Size(dsize_x, dsize_y), fx, fy, interpolation);
+    }
+    return dst;
 }

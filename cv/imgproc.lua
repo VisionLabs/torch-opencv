@@ -559,7 +559,7 @@ function cv.cornerSubPix(t)
     assert(#winSize == 2)
     local zeroZone = t.zeroZone
     assert(#zeroZone == 2)
-    local criteria = ffi.new('struct TermCriteriaWrapper', assert(t.criteria))
+    local criteria = cv.TermCriteria(assert(t.criteria))
 
     assert(image:nDimension() == 2)
     assert(corners:size()[2] == 2 and cv.tensorType(corners) == cv.CV_32F)
@@ -591,3 +591,71 @@ function cv.goodFeaturesToTrack(t)
         C.goodFeaturesToTrack(
             cv.wrap_tensors(image), maxCorners, qualityLevel, minDistance, cv.wrap_tensors(mask), blockSize, useHarrisDetector, k))
 end
+
+
+function cv.erode(t)
+    local src =        assert(t.src)
+    local dst =        t.dst
+    local kernel = assert(t.kernel)
+    local iterations = 1
+    local anchor = t.anchor or {-1, -1}
+    assert(#anchor == 2)
+    local borderType = t.borderType or cv.BORDER_CONSTANT
+    local borderValue = cv.Scalar(t.borderValue or {0/0}) -- pass nan to detect default value
+
+    return cv.unwrap_tensors(
+        C.erode(
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(kernel), anchor[1], anchor[2],
+            iterations, borderType, borderValue))
+end
+
+
+function cv.dilate(t)
+    local src =        assert(t.src)
+    local dst =        t.dst
+    local kernel = assert(t.kernel)
+    local iterations = 1
+    local anchor = t.anchor or {-1, -1}
+    assert(#anchor == 2)
+    local borderType = t.borderType or cv.BORDER_CONSTANT
+    local borderValue = cv.Scalar(t.borderValue or {0/0}) -- pass nan to detect default value
+
+    return cv.unwrap_tensors(
+        C.dilate(
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(kernel), anchor[1], anchor[2],
+            iterations, borderType, borderValue))
+end
+
+
+function cv.morphologyEx(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local op = assert(t.op)
+    local kernel = assert(t.kernel)
+    local iterations = 1
+    local anchor = t.anchor or {-1, -1}
+    assert(#anchor == 2)
+    local borderType = t.borderType or cv.BORDER_CONSTANT
+    local borderValue = cv.Scalar(t.borderValue or {0/0}) -- pass nan to detect default value
+
+    return cv.unwrap_tensors(
+        C.morphologyEx(
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), op, cv.wrap_tensors(kernel), anchor[1], anchor[2],
+            iterations, borderType, borderValue))
+end
+
+
+function cv.resize(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local dsize = assert(t.dsize)
+    assert(#dsize == 2)
+    local fx = t.fx or 0
+    local fy = t.fy or 0
+    local interpolation = t.interpolation or cv.INTER_LINEAR
+
+    return cv.unwrap_tensors(
+        C.resize(
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), dsize[1], dsize[2], fx, fy, interpolation))
+end
+

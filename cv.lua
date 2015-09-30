@@ -23,6 +23,10 @@ struct TermCriteriaWrapper {
     double epsilon;
 };
 
+struct ScalarWrapper {
+    double v0, v1, v2, v3;
+};
+
 struct Algorithm;
 struct Algorithm *createAlgorithm();
 void destroyAlgorithm(struct Algorithm *ptr);
@@ -138,6 +142,16 @@ function cv.checkFilterCombination(src, ddepth)
     else
         return false
     end
+end
+
+--- ***************** Wrappers for small classes *****************
+
+function cv.TermCriteria(criteria)
+    return ffi.new('struct TermCriteriaWrapper', criteria)
+end
+
+function cv.Scalar(values)
+    return ffi.new('struct ScalarWrapper', values)
 end
 
 --- ***************** Common base classes *****************

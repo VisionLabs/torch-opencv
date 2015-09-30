@@ -102,3 +102,24 @@ extern "C" struct TensorWrapper goodFeaturesToTrack(
         struct TensorWrapper image,
         int maxCorners, double qualityLevel, double minDistance,
         struct TensorWrapper mask, int blockSize, bool useHarrisDetector, double k);
+
+extern "C" struct TensorWrapper erode(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        int iterations, int borderType, struct ScalarWrapper borderValue);
+
+extern "C" struct TensorWrapper dilate(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        int iterations, int borderType, struct ScalarWrapper borderValue);
+
+extern "C" struct TensorWrapper morphologyEx(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int op, struct TensorWrapper kernel,
+        int anchor_x, int anchor_y, int iterations,
+        int borderType, ScalarWrapper borderValue);
+
+extern "C" struct TensorWrapper resize(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int dsize_x, int dsize_y, double fx, double fy,
+        int interpolation);
