@@ -1,7 +1,7 @@
 imgproc module branch
 =====================
 
-**Roughly 24% completed**
+**Roughly 25% completed**
 
 *To be implemented:*
 
@@ -15,11 +15,6 @@ imgproc module branch
 * LineIterator
 
 **Separate functions (filters, detectors, ...):**
-* warpAffine
-* warpPerspective
-* remap
-* convertMaps
-* getRotationMatrix2D
 * getPerspectiveTransform
 * getAffineTransform
 * invertAffineTransform
@@ -136,3 +131,8 @@ imgproc module branch
 * dilate
 * morphologyEx
 * resize
+* warpAffine
+* warpPerspective
+* remap
+* convertMaps
+* getRotationMatrix2D

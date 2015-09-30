@@ -108,6 +108,55 @@ struct TensorWrapper goodFeaturesToTrack(
         struct TensorWrapper image,
         int maxCorners, double qualityLevel, double minDistance,
         struct TensorWrapper mask, int blockSize, bool useHarrisDetector, double k);
+        
+struct TensorWrapper erode(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        int iterations, int borderType, struct ScalarWrapper borderValue);
+
+struct TensorWrapper dilate(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        int iterations, int borderType, struct ScalarWrapper borderValue);
+
+struct TensorWrapper morphologyEx(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int op, struct TensorWrapper kernel,
+        int anchor_x, int anchor_y, int iterations,
+        int borderType, struct ScalarWrapper borderValue);
+
+struct TensorWrapper resize(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int dsize_x, int dsize_y, double fx, double fy,
+        int interpolation);
+        
+struct TensorWrapper resize(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int dsize_x, int dsize_y, double fx, double fy,
+        int interpolation);
+
+struct TensorWrapper warpAffine(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper M, int dsize_x, int dsize_y, 
+        int flags, int borderMode, struct ScalarWrapper borderValue);
+
+struct TensorWrapper warpPerspective(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper M, int dsize_x, int dsize_y,
+        int flags, int borderMode, struct ScalarWrapper borderValue);
+
+struct TensorWrapper remap(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper map1, struct TensorWrapper map2,
+        int interpolation, int borderMode, struct ScalarWrapper borderValue);
+
+struct MultipleTensorWrapper convertMaps(
+        struct TensorWrapper map1, struct TensorWrapper map2,
+        struct TensorWrapper dstmap1, struct TensorWrapper dstmap2,
+        int dstmap1type, bool nninterpolation);
+
+struct TensorWrapper getRotationMatrix2D(
+        double center_x, double center_y, double angle, double scale);
 ]]
 
 
@@ -648,7 +697,7 @@ end
 function cv.resize(t)
     local src = assert(t.src)
     local dst = t.dst
-    local dsize = assert(t.dsize)
+    local dsize = t.dsize or {0, 0}
     assert(#dsize == 2)
     local fx = t.fx or 0
     local fy = t.fy or 0
@@ -659,3 +708,78 @@ function cv.resize(t)
             cv.wrap_tensors(src), cv.wrap_tensors(dst), dsize[1], dsize[2], fx, fy, interpolation))
 end
 
+
+function cv.warpAffine(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local M = assert(t.M)
+    local dsize = t.dsize or {0, 0}
+    assert(#dsize == 2)
+    local flags = t.flags or cv.INTER_LINEAR
+    local borderMode = t.borderMode or cv.BORDER_CONSTANT
+    local borderValue = cv.Scalar(t.borderValue or {0/0}) -- pass nan to detect default value
+
+    return cv.unwrap_tensors(
+        C.warpAffine(
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(M), dsize[1], dsize[2],
+            flags, borderMode, borderValue))
+end
+
+
+function cv.warpPerspective(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local M = assert(t.M)
+    local dsize = t.dsize or {0, 0}
+    assert(#dsize == 2)
+    local flags = t.flags or cv.INTER_LINEAR
+    local borderMode = t.borderMode or cv.BORDER_CONSTANT
+    local borderValue = cv.Scalar(t.borderValue or {0/0}) -- pass nan to detect default value
+
+    return cv.unwrap_tensors(
+        C.warpPerspective(
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(M), dsize[1], dsize[2],
+            flags, borderMode, borderValue))
+end
+
+
+function cv.remap(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local map1 = assert(t.map1)
+    local map2 = assert(t.map2)
+    local interpolation = assert(t.interpolation)
+    local borderMode = t.borderMode or cv.BORDER_CONSTANT
+    local borderValue = cv.Scalar(t.borderValue or {0, 0, 0, 0})
+
+    return cv.unwrap_tensors(
+        C.remap(
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(map1), cv.wrap_tensors(map2),
+            interpolation, borderMode, borderValue))
+end
+
+
+function cv.convertMaps(t)
+    local map1 = assert(t.map1)
+    local map2 = t.map2
+    local dstmap1 = assert(t.dstmap1)
+    local dstmap2 = assert(t.dstmap2)
+    local dstmap1type = assert(t.dstmap1type)
+    local nninterpolation = t.nninterpolation or false
+
+    return cv.unwrap_tensors(
+        C.convertMaps(
+            cv.wrap_tensors(map1), cv.wrap_tensors(map2), cv.wrap_tensors(dstmap1),
+            cv.wrap_tensors(dstmap2), dstmap1type, nninterpolation))
+end
+
+
+function cv.getRotationMatrix2D(t)
+    local center = assert(t.center)
+    assert(#center == 2)
+    local angle = assert(t.angle)
+    local scale = assert(t.scale)
+
+    return cv.unwrap_tensors(
+        C.getRotationMatrix2D(center[1], center[2], angle, scale))
+end

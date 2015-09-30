@@ -2,7 +2,7 @@
 
 /***************** Tensor <=> Mat conversion *****************/
 
-TensorWrapper::TensorWrapper() {}
+TensorWrapper::TensorWrapper(): tensorPtr(nullptr) {}
 
 TensorWrapper::TensorWrapper(cv::Mat & mat) {
 
@@ -97,6 +97,8 @@ cv::Mat TensorWrapper::toMat() {
             stride.data()
     );
 }
+
+MultipleTensorWrapper::MultipleTensorWrapper(): tensors(nullptr) {}
 
 MultipleTensorWrapper::MultipleTensorWrapper(std::vector<cv::Mat> & matList):
         tensors(static_cast<TensorWrapper *>(malloc(matList.size() * sizeof(TensorWrapper)))),

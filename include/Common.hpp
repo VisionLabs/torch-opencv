@@ -17,12 +17,15 @@ struct TensorWrapper {
     TensorWrapper(cv::Mat & mat);
     TensorWrapper(cv::Mat && mat);
     cv::Mat toMat();
+
+    inline bool isNull() { return tensorPtr == nullptr; }
 };
 
 struct MultipleTensorWrapper {
     struct TensorWrapper *tensors;
     short size;
 
+    MultipleTensorWrapper();
     MultipleTensorWrapper(std::vector<cv::Mat> & matList);
     std::vector<cv::Mat> toMat();
 };

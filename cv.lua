@@ -118,6 +118,11 @@ function cv.unwrap_tensors(wrapper)
         return retval
     else
         -- handle multiple tensors
+        if wrapper.tensors == nil then
+            -- return nothing in case of a nullptr
+            return
+        end
+
         retval = {}
         for i = 0,wrapper.size-1 do
             temp_tensor = empty_tensor_of_type(wrapper.tensors[i].typeCode)

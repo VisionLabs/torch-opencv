@@ -117,9 +117,32 @@ extern "C" struct TensorWrapper morphologyEx(
         struct TensorWrapper src, struct TensorWrapper dst,
         int op, struct TensorWrapper kernel,
         int anchor_x, int anchor_y, int iterations,
-        int borderType, ScalarWrapper borderValue);
+        int borderType, struct ScalarWrapper borderValue);
 
 extern "C" struct TensorWrapper resize(
         struct TensorWrapper src, struct TensorWrapper dst,
         int dsize_x, int dsize_y, double fx, double fy,
         int interpolation);
+
+extern "C" struct TensorWrapper warpAffine(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper M, int dsize_x, int dsize_y,
+        int flags, int borderMode, struct ScalarWrapper borderValue);
+
+extern "C" struct TensorWrapper warpPerspective(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper M, int dsize_x, int dsize_y,
+        int flags, int borderMode, struct ScalarWrapper borderValue);
+
+extern "C" struct TensorWrapper remap(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper map1, struct TensorWrapper map2,
+        int interpolation, int borderMode, struct ScalarWrapper borderValue);
+
+extern "C" struct MultipleTensorWrapper convertMaps(
+        struct TensorWrapper map1, struct TensorWrapper map2,
+        struct TensorWrapper dstmap1, struct TensorWrapper dstmap2,
+        int dstmap1type, bool nninterpolation);
+
+extern "C" struct TensorWrapper getRotationMatrix2D(
+        double center_x, double center_y, double angle, double scale);
