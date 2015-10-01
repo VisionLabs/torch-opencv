@@ -27,7 +27,9 @@ struct MultipleTensorWrapper {
 
     MultipleTensorWrapper();
     MultipleTensorWrapper(std::vector<cv::Mat> & matList);
-    std::vector<cv::Mat> toMat();
+    std::vector<cv::Mat> toMatList();
+
+    inline bool isNull() { return tensors == nullptr; }
 };
 
 inline
@@ -58,6 +60,11 @@ struct ScalarWrapper {
     cv::Scalar toCV();
 };
 
-struct Vec3d {
+struct TWPlusDouble {
+    TensorWrapper tensor;
+    double val;
+};
+
+struct Vec3dWrapper {
     double v0, v1, v2;
 };

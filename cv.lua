@@ -27,7 +27,7 @@ struct ScalarWrapper {
     double v0, v1, v2, v3;
 };
 
-struct Vec3d {
+struct Vec3dWrapper {
     double v0, v1, v2;
 };
 
@@ -63,6 +63,7 @@ local tensor_type_by_CV_code = {
 }
 
 cv.EMPTY_WRAPPER = ffi.new("struct TensorWrapper")
+cv.EMPTY_MULTI_WRAPPER = ffi.new("struct MultipleTensorWrapper")
 
 function cv.tensorType(tensor)
     -- get the first letter of Tensor type
@@ -97,6 +98,9 @@ function cv.wrap_tensors(...)
     end
 
     local args = {...}
+    if type(args[1]) == "table" then
+        args = args[1]
+    end
 
     if #args == 1 then
         return ffi.new("struct TensorWrapper", prepare_for_wrapping(args[1]))
@@ -114,7 +118,7 @@ function cv.wrap_tensors(...)
 end
 
 -- struct TensorWrapper(s) ---> torch.RealTensor
-function cv.unwrap_tensors(wrapper)
+function cv.unwrap_tensors(wrapper, toTable)
     if ffi.typeof(wrapper) == ffi.typeof("struct TensorWrapper") then
         -- handle single tensor
         retval = empty_tensor_of_type(wrapper.typeCode)
@@ -135,7 +139,11 @@ function cv.unwrap_tensors(wrapper)
         end
 
         C.free(wrapper.tensors)
-        return unpack(retval)
+        if toTable then
+            return retval
+        else
+            return unpack(retval)
+        end
     end
 end
 

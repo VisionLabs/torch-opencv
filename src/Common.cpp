@@ -110,7 +110,7 @@ MultipleTensorWrapper::MultipleTensorWrapper(std::vector<cv::Mat> & matList):
     }
 }
 
-std::vector<cv::Mat> MultipleTensorWrapper::toMat() {
+std::vector<cv::Mat> MultipleTensorWrapper::toMatList() {
     std::vector<cv::Mat> retval(this->size);
     for (int i = 0; i < this->size; ++i) {
         retval[i] = this->tensors[i].toMat();

@@ -201,16 +201,40 @@ void accumulateWeighted(
         struct TensorWrapper src, struct TensorWrapper dst,
         double alpha, struct TensorWrapper mask);
 
-struct Vec3d phaseCorrelate(
+struct Vec3dWrapper phaseCorrelate(
         struct TensorWrapper src1, struct TensorWrapper src2,
         struct TensorWrapper window);
+
+struct TensorWrapper createHanningWindow(
+        struct TensorWrapper dst, int winSize_x, int winSize_y, int type);
+
+extern "C" struct TWPlusDouble threshold(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        double thresh, double maxval, int type);
+
+extern "C" struct TensorWrapper adaptiveThreshold(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        double maxValue, int adaptiveMethod, int thresholdType,
+        int blockSize, double C);
+
+extern "C" struct TensorWrapper pyrDown(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int dstSize_x, int dstSize_y, int borderType);
+
+extern "C" struct TensorWrapper pyrUp(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int dstSize_x, int dstSize_y, int borderType);
+
+extern "C" struct MultipleTensorWrapper buildPyramid(
+        struct TensorWrapper src, struct MultipleTensorWrapper dst,
+        int maxlevel, int borderType);
 ]]
 
 
 local C = ffi.load 'lib/libimgproc.so'
 
 
-function cv.getGaussianKernel(ksize, sigma, ktype)
+function cv.getGaussianKernel(t)
     local ksize = assert(t.ksize)
     local sigma = assert(t.sigma)
     local ktype = t.ktype or cv.CV_64F
@@ -218,12 +242,12 @@ function cv.getGaussianKernel(ksize, sigma, ktype)
 end
 
 
-function cv.getDerivKernels(dx, dy, ksize, normalize, ktype)
+function cv.getDerivKernels(t)
     local dx        = assert(t.dx)
     local dy        = assert(t.dy)
     local ksize     = assert(t.ksize)
-    local ktype     = ktype or cv.CV_32F
-    local normalize = normalize or false
+    local ktype     = t.ktype or cv.CV_32F
+    local normalize = t.normalize or false
 
     return cv.unwrap_tensors(C.getDerivKernels(dx, dy, ksize, normalize, ktype))
 end
@@ -333,7 +357,8 @@ function cv.boxFilter(t)
     assert(#ksize == 2)
     local anchor = t.anchor or {-1, -1}
     assert(#anchor == 2)
-    local normalize =  t.normalize or true
+    local normalize =  t.normalize
+    if normalize == nil then normalize = true end
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
     if dst then
@@ -354,7 +379,8 @@ function cv.sqrBoxFilter(t)
     local ksize = t.ksize
     assert(#ksize == 2)
     local anchor = t.anchor or {-1,-1}
-    local normalize = t.normalize or true
+    local normalize =  t.normalize
+    if normalize == nil then normalize = true end
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
     if dst then
@@ -996,4 +1022,119 @@ function cv.phaseCorrelate(t)
     local result = C.phaseCorrelate(cv.wrap_tensors(src1), cv.wrap_tensors(src2), cv.wrap_tensors(window))
     return {x=result.v0, y=result.v1}, result.v2
 end
+
+
+function cv.createHanningWindow(t)
+    local dst = t.dst
+    local winSize = assert(t.winSize)
+    assert(#winSize == 2)
+    local type = assert(t.type)
+
+    if dst then
+        assert(cv.tensorType(dst) == type)
+        assert(dst:size()[1] == winSize[1] and
+               dst:size()[2] == winSize[2])
+    end
+
+    return cv.unwrap_tensors(
+        C.createHanningWindow(cv.wrap_tensors(dst), winSize[1], winSize[2], type))
+end
+
+
+function cv.threshold(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local tresh = assert(t.tresh)
+    local maxval = assert(t.maxval)
+    local type = assert(t.type)
+
+    if dst then
+        assert(cv.tensorType(dst) == type)
+        assert(dst:isSameSizeAs(src))
+    end
+
+    result = C.threshold(cv.wrap_tensors(src), cv.wrap_tensors(dst),
+                    tresh, maxval, type)
+    return result.val, cv.unwrap_tensors(result.tensor)
+end
+
+
+function cv.adaptiveThreshold(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local maxValue = assert(t.maxValue)
+    local adaptiveMethod = assert(t.adaptiveMethod)
+    local thresholdType = assert(t.thresholdType)
+    local blockSize = assert(t.blockSize)
+    local C = assert(t.C)
+
+    if dst then
+        assert(dst:type() == src:type() and src:isSameSizeAs(dst))
+    end
+
+    return cv.unwrap_tensors(
+        C.adaptiveThreshold(
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), maxValue,
+                            adaptiveMethod, thresholdType, blockSize))
+end
+
+
+function cv.pyrDown(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local dstSize = t.dstSize or {0,0 }
+    assert(#dstSize == 2)
+    local borderType = t.borderType or cv.BORDER_DEFAULT
+
+    if dst then
+        assert(dst:type() == src:type())
+        assert(dst:size()[1] == dstSize[1] and
+               dst:size()[2] == dstSize[2])
+    end
+
+    return cv.unwrap_tensors(
+        C.pyrDown(
+            cv.wrap_tensors(src), cv.wrap_tensors(dst),
+            dstSize[1], dstSize[2], borderType))
+end
+
+
+function cv.pyrUp(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local dstSize = t.dstSize or {0,0 }
+    assert(#dstSize == 2)
+    local borderType = t.borderType or cv.BORDER_DEFAULT
+
+    if dst then
+        assert(dst:type() == src:type())
+        assert(dst:size()[1] == dstSize[1] and
+                dst:size()[2] == dstSize[2])
+    end
+
+    return cv.unwrap_tensors(
+        C.pyrUp(
+            cv.wrap_tensors(src), cv.wrap_tensors(dst),
+            dstSize[1], dstSize[2], borderType))
+end
+
+
+function cv.buildPyramid(t)
+    local src = assert(t.src)
+    local dst = t.dst or cv.EMPTY_MULTI_WRAPPER
+    local maxlevel = assert(t.maxlevel)
+    local borderType = t.borderType or cv.BORDER_DEFAULT
+
+    if dst then
+        assert(#dst == maxlevel + 1)
+        for i, tensor in ipairs(dst) do
+            assert(tensor:type() == src:type())
+        end
+    end
+
+    return cv.unwrap_tensors(
+        C.buildPyramid(cv.wrap_tensors(src), cv.wrap_tensors(dst), maxlevel, borderType), 
+        true)
+end
+
 

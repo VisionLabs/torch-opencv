@@ -772,15 +772,128 @@ void accumulateWeighted(
 }
 
 extern "C"
-struct Vec3d phaseCorrelate(
+struct Vec3dWrapper phaseCorrelate(
         struct TensorWrapper src1, struct TensorWrapper src2,
         struct TensorWrapper window)
 {
-    Vec3d retval;
+    Vec3dWrapper retval;
     cv::Point2d result =
             cv::phaseCorrelate(src1.toMat(), src2.toMat(),
                                window.isNull() ? cv::noArray() : window.toMat(), &retval.v2);
     retval.v0 = result.x;
     retval.v1 = result.y;
     return retval;
+}
+
+extern "C"
+struct TensorWrapper createHanningWindow(
+        struct TensorWrapper dst, int winSize_x, int winSize_y, int type)
+{
+    if (dst.isNull()) {
+        // output to retval
+        cv::Mat retval;
+        cv::createHanningWindow(retval, cv::Size(winSize_x, winSize_y), type);
+        return TensorWrapper(retval);
+    } else {
+        // try to output to dst
+        cv::Mat dstMat = dst.toMat();
+        cv::createHanningWindow(dstMat, cv::Size(winSize_x, winSize_y), type);
+        return dst;
+    }
+}
+
+extern "C"
+struct TWPlusDouble threshold(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        double thresh, double maxval, int type)
+{
+    TWPlusDouble retval;
+    if (dst.isNull()) {
+        // output to retval
+        cv::Mat result;
+        retval.val = cv::threshold(src.toMat(), result, thresh, maxval, type);
+        new (&retval.tensor) TensorWrapper(result);
+    } else if (dst.tensorPtr == src.tensorPtr) {
+        // in-place
+        cv::Mat source = src.toMat();
+        retval.val = cv::threshold(source, source, thresh, maxval, type);
+        retval.tensor = src;
+    } else {
+        // try to output to dst
+        retval.val = cv::threshold(src.toMat(), dst.toMat(), thresh, maxval, type);
+        retval.tensor = dst;
+    }
+    return retval;
+}
+
+extern "C"
+struct TensorWrapper adaptiveThreshold(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        double maxValue, int adaptiveMethod, int thresholdType,
+        int blockSize, double C)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        cv::adaptiveThreshold(src.toMat(), retval, maxValue, adaptiveMethod, thresholdType, blockSize, C);
+        return TensorWrapper(retval);
+    } else if (dst.tensorPtr == src.tensorPtr) {
+        // in-place 
+        cv::Mat source = src.toMat();
+        cv::adaptiveThreshold(source, source, maxValue, adaptiveMethod, thresholdType, blockSize, C);
+    } else {
+        cv::adaptiveThreshold(src.toMat(), dst.toMat(), maxValue, adaptiveMethod, thresholdType, blockSize, C);
+    }
+    return dst;
+}
+
+extern "C"
+struct TensorWrapper pyrDown(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int dstSize_x, int dstSize_y, int borderType)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        cv::pyrDown(src.toMat(), retval, cv::Size(dstSize_x, dstSize_y), borderType);
+        return TensorWrapper(retval);
+    } else if (dst.tensorPtr == src.tensorPtr) {
+        // in-place
+        cv::Mat source = src.toMat();
+        cv::pyrDown(source, source, cv::Size(dstSize_x, dstSize_y), borderType);
+    } else {
+        cv::pyrDown(src.toMat(), dst.toMat(), cv::Size(dstSize_x, dstSize_y), borderType);
+    }
+    return dst;
+}
+
+extern "C"
+struct TensorWrapper pyrUp(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int dstSize_x, int dstSize_y, int borderType)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        cv::pyrUp(src.toMat(), retval, cv::Size(dstSize_x, dstSize_y), borderType);
+        return TensorWrapper(retval);
+    } else if (dst.tensorPtr == src.tensorPtr) {
+        // in-place
+        cv::Mat source = src.toMat();
+        cv::pyrUp(source, source, cv::Size(dstSize_x, dstSize_y), borderType);
+    } else {
+        cv::pyrUp(src.toMat(), dst.toMat(), cv::Size(dstSize_x, dstSize_y), borderType);
+    }
+    return dst;
+}
+
+extern "C" struct MultipleTensorWrapper buildPyramid(
+        struct TensorWrapper src, struct MultipleTensorWrapper dst,
+        int maxlevel, int borderType)
+{
+    if (dst.isNull()) {
+        std::vector<cv::Mat> retval;
+        cv::buildPyramid(src.toMat(), retval, maxlevel, borderType);
+        return MultipleTensorWrapper(retval);
+    } else {
+        cv::buildPyramid(src.toMat(), dst.toMatList(), maxlevel, borderType);
+        return dst;
+    }
 }

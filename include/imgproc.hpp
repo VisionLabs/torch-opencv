@@ -170,9 +170,7 @@ extern "C" struct TensorWrapper integral(
         struct TensorWrapper src, struct TensorWrapper sum, int sdepth);
 
 extern "C" struct MultipleTensorWrapper integralN(
-        struct TensorWrapper src, struct TensorWrapper sum,
-        struct TensorWrapper sqsum, struct TensorWrapper tilted,
-        int sdepth, int sqdepth);
+        struct TensorWrapper src, struct MultipleTensorWrapper sums, int sdepth, int sqdepth);
 
 extern "C" void accumulate(
         struct TensorWrapper src, struct TensorWrapper dst,
@@ -190,6 +188,30 @@ extern "C" void accumulateWeighted(
         struct TensorWrapper src, struct TensorWrapper dst,
         double alpha, struct TensorWrapper mask);
 
-extern "C" struct Vec3d phaseCorrelate(
+extern "C" struct Vec3dWrapper phaseCorrelate(
         struct TensorWrapper src1, struct TensorWrapper src2,
         struct TensorWrapper window);
+
+extern "C" struct TensorWrapper createHanningWindow(
+        struct TensorWrapper dst, int winSize_x, int winSize_y, int type);
+
+extern "C" struct TWPlusDouble threshold(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        double thresh, double maxval, int type);
+
+extern "C" struct TensorWrapper adaptiveThreshold(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        double maxValue, int adaptiveMethod, int thresholdType,
+        int blockSize, double C);
+
+extern "C" struct TensorWrapper pyrDown(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int dstSize_x, int dstSize_y, int borderType);
+
+extern "C" struct TensorWrapper pyrUp(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int dstSize_x, int dstSize_y, int borderType);
+
+extern "C" struct MultipleTensorWrapper buildPyramid(
+        struct TensorWrapper src, struct MultipleTensorWrapper dst,
+        int maxlevel, int borderType);

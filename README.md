@@ -1,7 +1,7 @@
 imgproc module branch
 =====================
 
-**Roughly 35% completed**
+**Roughly 39% completed**
 
 *To be implemented:*
 
@@ -15,12 +15,6 @@ imgproc module branch
 * LineIterator
 
 **Separate functions (filters, detectors, ...):**
-* createHanningWindow
-* threshold
-* adaptiveThreshold
-* pyrDown
-* pyrUp
-* buildPyramid
 * undistort
 * initUndistortRectifyMap
 * initWideAngleProjMap
@@ -134,5 +128,11 @@ imgproc module branch
 * accumulateProduct
 * accumulateWeighted
 * phaseCorrelate
+* createHanningWindow
+* threshold
+* adaptiveThreshold
+* pyrDown
+* pyrUp
+* buildPyramid
 
-48/139
+54/139
