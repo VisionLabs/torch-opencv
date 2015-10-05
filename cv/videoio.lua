@@ -6,4 +6,4 @@ ffi.cdef[[
 
 ]]
 
-local C = ffi.load 'lib/libvideoio.so'
+local C = ffi.load(libPath('videoio'))

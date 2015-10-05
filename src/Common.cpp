@@ -141,14 +141,6 @@ void transfer_tensor(void *destination, void *source) {
 
 /***************** Wrappers for small classes *****************/
 
-cv::TermCriteria TermCriteriaWrapper::toCV() {
-    return cv::TermCriteria(type, maxCount, epsilon);
-}
-
-cv::Scalar ScalarWrapper::toCV() {
-    return cv::Scalar(v0, v1, v2, v3);
-}
-
 extern "C"
 cv::Algorithm *createAlgorithm() {
     return new cv::Algorithm();

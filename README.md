@@ -1,7 +1,7 @@
 imgproc module branch
 =====================
 
-**Roughly 39% completed**
+**Roughly 46% completed**
 
 *To be implemented:*
 
@@ -15,18 +15,9 @@ imgproc module branch
 * LineIterator
 
 **Separate functions (filters, detectors, ...):**
-* undistort
-* initUndistortRectifyMap
-* initWideAngleProjMap
-* getDefaultNewCameraMatrix
-* undistortPoints
-* calcHist (oh no! will need to implement SparseMat)
-* calcBackProject
-* compareHist
-* equalizeHist
-* EMD
-* watershed
-* pyrMeanShiftFiltering
+* calcHist (SparseMat overload)
+* calcBackProject (SparseMat overload)
+* compareHist (SparseMat overload)
 * grabCut
 * distanceTransformWithLabels
 * distanceTransform
@@ -134,5 +125,17 @@ imgproc module branch
 * pyrDown
 * pyrUp
 * buildPyramid
+* undistort
+* initUndistortRectifyMap
+* initWideAngleProjMap
+* getDefaultNewCameraMatrix
+* undistortPoints
+* calcHist
+* calcBackProject
+* compareHist
+* equalizeHist
+* EMD
+* watershed
+* pyrMeanShiftFiltering
 
-54/139
+66/142

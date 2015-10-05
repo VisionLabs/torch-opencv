@@ -2,6 +2,16 @@
 
 local ffi = require 'ffi'
 
+function libPath(libName)
+    if     ffi.os == 'Windows' then
+        return 'lib/' .. libName .. '.dll'
+    elseif ffi.os == 'OSX' then
+        return 'lib/lib' .. libName .. '.dylib'
+    else
+        return 'lib/lib' .. libName .. '.so'
+    end
+end
+
 ffi.cdef[[
 struct TensorWrapper {
     void *tensorPtr;
@@ -31,12 +41,33 @@ struct Vec3dWrapper {
     double v0, v1, v2;
 };
 
+struct TWPlusDouble {
+    struct TensorWrapper tensor;
+    double val;
+};
+
+struct MTWPlusFloat {
+    struct MultipleTensorWrapper tensors;
+    float val;
+};
+
+struct IntArray {
+    int *data;
+    int size;
+};
+
+struct FloatArrayOfArrays {
+    float **pointers;
+    float *realData;
+    int dims;
+};
+
 struct Algorithm;
 struct Algorithm *createAlgorithm();
 void destroyAlgorithm(struct Algorithm *ptr);
 ]]
 
-local C = ffi.load 'lib/libCommon.so'
+local C = ffi.load(libPath('Common'))
 
 cv = {}
 
@@ -62,8 +93,8 @@ local tensor_type_by_CV_code = {
     [cv.CV_8S ] = "Char"
 }
 
-cv.EMPTY_WRAPPER = ffi.new("struct TensorWrapper")
-cv.EMPTY_MULTI_WRAPPER = ffi.new("struct MultipleTensorWrapper")
+cv.EMPTY_WRAPPER = ffi.new("struct TensorWrapper", nil)
+cv.EMPTY_MULTI_WRAPPER = ffi.new("struct MultipleTensorWrapper", nil)
 
 function cv.tensorType(tensor)
     -- get the first letter of Tensor type
@@ -147,7 +178,7 @@ function cv.unwrap_tensors(wrapper, toTable)
     end
 end
 
--- see opencv2/imgproc.hpp, line 73 (as of 29.09.2015)
+-- see filter_depths in opencv2/imgproc.hpp
 function cv.checkFilterCombination(src, ddepth)
     local srcType = cv.tensorType(src)
     if srcType == cv.CV_8U then
@@ -161,7 +192,7 @@ function cv.checkFilterCombination(src, ddepth)
     end
 end
 
---- ***************** Wrappers for small classes *****************
+--- ***************** Wrappers for small OpenCV classes *****************
 
 function cv.TermCriteria(criteria)
     return ffi.new('struct TermCriteriaWrapper', criteria)
@@ -169,6 +200,60 @@ end
 
 function cv.Scalar(values)
     return ffi.new('struct ScalarWrapper', values)
+end
+
+--- ***************** Other helper structs *****************
+
+--[[
+Makes an <IntArray, FloatArray, ...> from a table of numbers.
+Generally, if you're calling a function that uses Array many
+times, consider reusing the retval of this function.
+
+Example (not very realistic):
+
+cv.calcHist{images=im, channels={3,3,1,3,4}, ......}
+
+OR
+
+ch = cv.newArray('Int', {3,3,1,3,4})
+for i = 1,1e6 do
+    cv.calcHist{images=im, channels=ch, ...}
+    ......
+--]]
+function cv.newArray(elemType, data)
+    retval = ffi.new('struct ' .. elemType .. 'Array')
+    retval.data = ffi.gc(C.malloc(#data * ffi.sizeof(elemType:lower())), C.free)
+    retval.size = #data
+    for i, value in ipairs(data) do
+        retval.data[i-1] = data[i]
+    end
+    return retval
+end
+
+-- table of tables of numbers ---> struct FloatArrayOfArrays
+function cv.FloatArrayOfArrays(data)
+    retval = ffi.new('struct FloatArrayOfArrays')
+
+    -- first, compute relative addresses
+    retval.pointers = ffi.gc(C.malloc(#data * ffi.sizeof('float*') + 1), C.free)
+    retval.pointers[0] = nil
+    
+    for i, row in ipairs(data) do
+        data[i] = data[i-1] + #row
+    end
+    retval.realData = ffi.gc(C.malloc(totalElemSize * ffi.sizeof('float')), C.free)
+
+    retval.pointers[0] = retval.realData
+    local counter = 0
+    for i, row in ipairs(data) do
+        -- fill data
+        for j, elem in ipairs(row) do
+            retval.realData[counter] = elem
+            counter = counter + 1
+        end
+        -- transform relative addresses to absolute
+        retval.pointers[i] = retval.pointers[i] + retval.realData
+    end
 end
 
 --- ***************** Common base classes *****************

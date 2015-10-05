@@ -6,4 +6,4 @@ ffi.cdef[[
 
 ]]
 
-local C = ffi.load 'lib/liboptflow.so'
+local C = ffi.load(libPath('optflow'))

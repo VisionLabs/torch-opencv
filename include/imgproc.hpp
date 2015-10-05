@@ -215,3 +215,58 @@ extern "C" struct TensorWrapper pyrUp(
 extern "C" struct MultipleTensorWrapper buildPyramid(
         struct TensorWrapper src, struct MultipleTensorWrapper dst,
         int maxlevel, int borderType);
+
+extern "C" struct TensorWrapper undistort(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+        struct TensorWrapper newCameraMatrix);
+
+extern "C" struct MultipleTensorWrapper initUndistortRectifyMap(
+        struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+        struct TensorWrapper R, struct TensorWrapper newCameraMatrix,
+        int size_x, int size_y, int m1type,
+        struct MultipleTensorWrapper maps);
+
+extern "C" struct MTWPlusFloat initWideAngleProjMap(
+        struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+        int imageSize_x, int imageSize_y, int destImageWidth,
+        int m1type, struct MultipleTensorWrapper maps,
+        int projType, double alpha);
+
+extern "C" struct TensorWrapper getDefaultNewCameraMatrix(
+        struct TensorWrapper cameraMatrix, int imgsize_x, int imgsize_y, bool centerPrincipalPoint);
+
+extern "C" struct TensorWrapper undistortPoints(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+        struct TensorWrapper R, struct TensorWrapper P);
+
+extern "C" struct TensorWrapper calcHist(
+        struct MultipleTensorWrapper images,
+        struct IntArray channels, struct TensorWrapper mask,
+        struct TensorWrapper hist, int dims, struct IntArray histSize,
+        struct FloatArrayOfArrays ranges, bool uniform, bool accumulate);
+
+extern "C" struct TensorWrapper calcBackProject(
+        struct MultipleTensorWrapper images, int nimages,
+        struct IntArray channels, struct TensorWrapper hist,
+        struct TensorWrapper backProject, struct FloatArrayOfArrays ranges,
+        double scale, bool uniform);
+
+extern "C" double compareHist(
+        struct TensorWrapper H1, struct TensorWrapper H2, int method);
+
+extern "C" struct TensorWrapper equalizeHist(
+        struct TensorWrapper src, struct TensorWrapper dst);
+
+extern "C" float EMD(
+        struct TensorWrapper signature1, struct TensorWrapper signature2,
+        int distType, struct TensorWrapper cost,
+        struct FloatArray lowerBound, struct TensorWrapper flow);
+
+extern "C" void watershed(
+        struct TensorWrapper image, struct TensorWrapper markers);
+
+extern "C" struct TensorWrapper pyrMeanShiftFiltering(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        double sp, double sr, int maxLevel, TermCriteriaWrapper termcrit);

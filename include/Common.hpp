@@ -9,6 +9,8 @@ extern "C" {
 
 /***************** Tensor <=> Mat conversion *****************/
 
+#define TO_MAT_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toMat())
+
 struct TensorWrapper {
     void *tensorPtr;
     char typeCode;
@@ -45,26 +47,61 @@ std::string typeStr(cv::Mat & mat) {
     }
 }
 
-/***************** Wrappers for small classes *****************/
+/***************** Wrappers for small OpenCV classes *****************/
 
 struct TermCriteriaWrapper {
     int type, maxCount;
     double epsilon;
 
-    cv::TermCriteria toCV();
+    inline cv::TermCriteria toCV() {
+        return cv::TermCriteria(type, maxCount, epsilon);
+    }
+    inline cv::TermCriteria toCVorDefault(cv::TermCriteria defaultVal) {
+        return (this->type == -1 ? defaultVal : this->toCV());
+    }
 };
 
 struct ScalarWrapper {
     double v0, v1, v2, v3;
 
-    cv::Scalar toCV();
+    inline cv::Scalar toCV() {
+        return cv::Scalar(v0, v1, v2, v3);
+    }
+    inline cv::Scalar toCVorDefault(cv::Scalar defaultVal) {
+        return (isnan(this->v0) ? defaultVal : this->toCV());
+    }
 };
+
+struct Vec3dWrapper {
+    double v0, v1, v2;
+};
+
+/***************** Helper wrappers for [OpenCV class + some primitive] *****************/
 
 struct TWPlusDouble {
     TensorWrapper tensor;
     double val;
 };
 
-struct Vec3dWrapper {
-    double v0, v1, v2;
+struct MTWPlusFloat {
+    MultipleTensorWrapper tensors;
+    float val;
+};
+
+/***************** Other helper structs *****************/
+
+struct IntArray {
+    int *data;
+    int size;
+};
+
+struct FloatArray {
+    float *data;
+    int size;
+};
+
+struct FloatArrayOfArrays {
+    float **pointers;
+    float *realData;
+    int dims;
 };

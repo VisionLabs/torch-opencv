@@ -6,4 +6,4 @@ ffi.cdef[[
 
 ]]
 
-local C = ffi.load 'lib/libsuperres.so'
+local C = ffi.load(libPath('superres'))

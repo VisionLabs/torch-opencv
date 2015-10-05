@@ -3,6 +3,7 @@ require 'cv'
 local ffi = require 'ffi'
 
 ffi.cdef[[
+
 struct TensorWrapper getGaussianKernel(
         int ksize, double sigma, int ktype);
 
@@ -208,26 +209,81 @@ struct Vec3dWrapper phaseCorrelate(
 struct TensorWrapper createHanningWindow(
         struct TensorWrapper dst, int winSize_x, int winSize_y, int type);
 
-extern "C" struct TWPlusDouble threshold(
+struct TWPlusDouble threshold(
         struct TensorWrapper src, struct TensorWrapper dst,
         double thresh, double maxval, int type);
 
-extern "C" struct TensorWrapper adaptiveThreshold(
+struct TensorWrapper adaptiveThreshold(
         struct TensorWrapper src, struct TensorWrapper dst,
         double maxValue, int adaptiveMethod, int thresholdType,
         int blockSize, double C);
 
-extern "C" struct TensorWrapper pyrDown(
+struct TensorWrapper pyrDown(
         struct TensorWrapper src, struct TensorWrapper dst,
         int dstSize_x, int dstSize_y, int borderType);
 
-extern "C" struct TensorWrapper pyrUp(
+struct TensorWrapper pyrUp(
         struct TensorWrapper src, struct TensorWrapper dst,
         int dstSize_x, int dstSize_y, int borderType);
 
-extern "C" struct MultipleTensorWrapper buildPyramid(
+struct MultipleTensorWrapper buildPyramid(
         struct TensorWrapper src, struct MultipleTensorWrapper dst,
         int maxlevel, int borderType);
+
+struct TensorWrapper undistort(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+        struct TensorWrapper newCameraMatrix);
+
+struct MultipleTensorWrapper initUndistortRectifyMap(
+        struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+        struct TensorWrapper R, struct TensorWrapper newCameraMatrix,
+        int size_x, int size_y, int m1type,
+        struct MultipleTensorWrapper maps);
+
+struct MTWPlusFloat initWideAngleProjMap(
+        struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+        int imageSize_x, int imageSize_y, int destImageWidth,
+        int m1type, struct MultipleTensorWrapper maps,
+        int projType, double alpha);
+
+struct TensorWrapper getDefaultNewCameraMatrix(
+        struct TensorWrapper cameraMatrix, int imgsize_x, int imgsize_y, bool centerPrincipalPoint);
+
+struct TensorWrapper undistortPoints(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+        struct TensorWrapper R, struct TensorWrapper P);
+
+struct TensorWrapper calcHist(
+        struct MultipleTensorWrapper images,
+        struct IntArray channels, struct TensorWrapper mask,
+        struct TensorWrapper hist, int dims, struct IntArray histSize,
+        struct FloatArrayOfArrays ranges, bool uniform, bool accumulate);
+
+struct TensorWrapper calcBackProject(
+        struct MultipleTensorWrapper images, int nimages,
+        struct IntArray channels, struct TensorWrapper hist,
+        struct TensorWrapper backProject, struct FloatArrayOfArrays ranges,
+        double scale, bool uniform);
+
+double compareHist(
+        struct TensorWrapper H1, struct TensorWrapper H2, int method);
+
+struct TensorWrapper equalizeHist(
+        struct TensorWrapper src, struct TensorWrapper dst);
+
+float EMD(
+        struct TensorWrapper signature1, struct TensorWrapper signature2,
+        int distType, struct TensorWrapper cost,
+        struct FloatArray lowerBound, struct TensorWrapper flow);
+
+void watershed(
+        struct TensorWrapper image, struct TensorWrapper markers);
+
+struct TensorWrapper pyrMeanShiftFiltering(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        double sp, double sr, int maxLevel, struct TermCriteriaWrapper termcrit);
 ]]
 
 
@@ -1121,7 +1177,7 @@ end
 
 function cv.buildPyramid(t)
     local src = assert(t.src)
-    local dst = t.dst or cv.EMPTY_MULTI_WRAPPER
+    local dst = t.dst or cv.wrap_tensors(dst)
     local maxlevel = assert(t.maxlevel)
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
@@ -1133,8 +1189,205 @@ function cv.buildPyramid(t)
     end
 
     return cv.unwrap_tensors(
-        C.buildPyramid(cv.wrap_tensors(src), cv.wrap_tensors(dst), maxlevel, borderType), 
+        C.buildPyramid(cv.wrap_tensors(src), dst, maxlevel, borderType), 
         true)
 end
 
 
+function cv.undistort(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local cameraMatrix = assert(t.cameraMatrix)
+    if type(cameraMatrix) == "table" then
+        cameraMatrix = torch.FloatTensor(cameraMatrix)
+    end
+    local distCoeffs = t.distCoeffs
+    if type(distCoeffs) == "table" then
+        distCoeffs = torch.FloatTensor(distCoeffs)
+    end
+    local newCameraMatrix = t.newCameraMatrix
+    if type(newCameraMatrix) == "table" then
+        newCameraMatrix = torch.FloatTensor(newCameraMatrix)
+    end
+
+    if dst then
+        assert(src:type() == dst:type())
+        assert(src:isSameSizeAs(dst))
+    end
+
+    return cv.unwrap_tensors(
+        C.undistort(cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(cameraMatrix), 
+                    cv.wrap_tensors(distCoeffs), cv.wrap_tensors(newCameraMatrix)))
+end
+
+
+
+function cv.initUndistortRectifyMap(t)
+    local cameraMatrix = assert(t.cameraMatrix)
+    if type(cameraMatrix) == "table" then
+        cameraMatrix = torch.FloatTensor(cameraMatrix)
+    end
+    local distCoeffs = t.distCoeffs
+    if type(distCoeffs) == "table" then
+        distCoeffs = torch.FloatTensor(distCoeffs)
+    end
+    local R = t.R
+    if type(R) == "table" then
+        R = torch.FloatTensor(R)
+    end
+    local newCameraMatrix = t.newCameraMatrix
+    if type(newCameraMatrix) == "table" then
+        newCameraMatrix = torch.FloatTensor(newCameraMatrix)
+    end
+    local size = assert(t.size)
+    assert(#size == 2)
+    local m1type = assert(t.m1type)
+    local maps = t.maps
+
+    return cv.unwrap_tensors(
+        C.initUndistortRectifyMap(
+            cv.wrap_tensors(cameraMatrix), cv.wrap_tensors(distCoeffs), 
+            cv.wrap_tensors(R), cv.wrap_tensors(newCameraMatrix),
+            size[1], size[2], m1type, cv.wrap_tensors(maps)))
+end
+
+
+function cv.initWideAngleProjMap(t)
+    local cameraMatrix = assert(t.cameraMatrix)
+    if type(cameraMatrix) == "table" then
+        cameraMatrix = torch.FloatTensor(cameraMatrix)
+    end
+    local distCoeffs = t.distCoeffs
+    if type(distCoeffs) == "table" then
+        distCoeffs = torch.FloatTensor(distCoeffs)
+    end
+    local imageSize = assert(t.imageSize)
+    assert(#imageSize == 2)
+    local destImageWidth = assert(t.destImageWidth)
+    local m1type = assert(t.m1type)
+    local maps = t.maps
+    local projType = assert(t.projType)
+    local alpha = assert(t.alpha)
+    
+    result = C.initWideAngleProjMap(
+        cv.wrap_tensors(cameraMatrix), cv.wrap_tensors(distCoeffs),
+        imageSize[1], imageSize[2], destImageWidth, m1type, cv.wrap_tensors(maps),
+        projType, alpha)
+    return result.val, cv.unwrap_tensors(result.tensors)
+end
+
+
+function cv.calcHist(t)
+    local images = assert(t.images)
+    assert(type(images) == "table")
+    local channels = assert(t.channels)
+    if type(channels) == "table" then
+        channels = cv.newArray('Int', channels)
+    end
+    local mask = t.mask
+    local hist = t.hist
+    local dims = assert(t.dims)
+    local histSize = assert(t.histSize)
+    if type(histSize) == "table" then
+        histSize = cv.newArray('Int', histSize)
+    end
+    local ranges = assert(t.ranges)
+    if type(ranges) == "table" then
+        ranges = cv.FloatArrayOfArrays(ranges)
+    end
+    local uniform = t.uniform
+    if uniform == nil then 
+        uniform = true 
+    end
+    local accumulate = t.accumulate or false
+    assert(hist or accumulate == false)
+
+    return cv.unwrap_tensors(
+        C.calcHist(
+            cv.wrap_tensors(images), channels, cv.wrap_tensors(mask),
+            cv.wrap_tensors(hist), dims, histSize, ranges, uniform, accumulate))
+end
+
+
+function cv.calcBackProject(t)
+    local images = assert(t.images)
+    assert(type(images) == "table")
+    local nimages = assert(t.nimages)
+    local channels = assert(t.channels)
+    if type(channels) == "table" then
+        channels = cv.newArray('Int', channels)
+    end
+    local hist = assert(t.hist)
+    local backProject = t.backProject
+    local ranges = assert(t.ranges)
+    if type(ranges) == "table" then
+        ranges = cv.FloatArrayOfArrays(ranges)
+    end
+    local scale = t.scale or 1
+    local uniform = t.uniform
+    if uniform == nil then 
+        uniform = true 
+    end
+    
+    return cv.unwrap_tensors(
+        C.calcBackProject(
+            cv.wrap_tensors(images), nimages, channels, cv.wrap_tensors(hist),
+            cv.wrap_tensors(backProject), ranges, scale, uniform))
+end
+
+
+function cv.compareHist(t)
+    local H1 = assert(t.H1)
+    local H2 = assert(t.H2)
+    local method = assert(t.method)
+
+    return C.compareHist(cv.wrap_tensors(H1), cv.wrap_tensors(H2), method)
+end
+
+
+function cv.equializeHist(t)
+    local src = assert(t.src)
+    local dst = t.dst
+
+    return cv.unwrap_tensors(
+        C.equializeHist(
+            cv.wrap_tensors(src), cv.wrap_tensors(dst)))
+end
+
+
+function cv.EMD(t)
+    local signature1 = assert(t.signature1)
+    local signature2 = assert(t.signature2)
+    local distType = assert(t.distType)
+    local cost = t.cost
+    local lowerBound = t.lowerBound or ffi.new('struct FloatArray', nil)
+    if type(lowerBound) == "table" then
+        lowerBound = cv.newArray(lowerBound)
+    end
+    local flow = t.flow
+
+    return C.EMD(
+        cv.wrap_tensors(signature1), cv.wrap_tensors(signature2), distType,
+        cv.wrap_tensors(cost), lowerBound, cv.wrap_tensors(flow))
+end
+
+
+function cv.watershed(t)
+    local image = assert(t.image)
+    local markers = assert(t.markers)
+
+    C.watershed(cv.wrap_tensors(image), cv.wrap_tensors(markers))
+end
+
+
+function cv.pyrMeanShiftFiltering(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local sp = assert(t.sp)
+    local sr = assert(t.sr)
+    local maxLevel = t.maxLevel or 1
+    local termcrit = cv.TermCriteria(t.termcrit)
+
+    return cv.unwrap_tensors(C.pyrMeanShiftFiltering(
+        cv.wrap_tensors(src), cv.wrap_tensors(dst), sp, sr, maxlevel, termcrit))
+end

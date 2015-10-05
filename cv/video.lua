@@ -6,4 +6,4 @@ ffi.cdef[[
 
 ]]
 
-local C = ffi.load 'lib/libvideo.so'
+local C = ffi.load(libPath('video'))
