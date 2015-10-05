@@ -1,6 +1,8 @@
 #include <Common.hpp>
 
-TensorWrapper::TensorWrapper() {}
+/***************** Tensor <=> Mat conversion *****************/
+
+TensorWrapper::TensorWrapper(): tensorPtr(nullptr) {}
 
 TensorWrapper::TensorWrapper(cv::Mat & mat) {
 
@@ -96,6 +98,8 @@ cv::Mat TensorWrapper::toMat() {
     );
 }
 
+MultipleTensorWrapper::MultipleTensorWrapper(): tensors(nullptr) {}
+
 MultipleTensorWrapper::MultipleTensorWrapper(std::vector<cv::Mat> & matList):
         tensors(static_cast<TensorWrapper *>(malloc(matList.size() * sizeof(TensorWrapper)))),
         size(matList.size())
@@ -106,7 +110,7 @@ MultipleTensorWrapper::MultipleTensorWrapper(std::vector<cv::Mat> & matList):
     }
 }
 
-std::vector<cv::Mat> MultipleTensorWrapper::toMat() {
+std::vector<cv::Mat> MultipleTensorWrapper::toMatList() {
     std::vector<cv::Mat> retval(this->size);
     for (int i = 0; i < this->size; ++i) {
         retval[i] = this->tensors[i].toMat();
@@ -135,19 +139,7 @@ void transfer_tensor(void *destination, void *source) {
     ++d->refcount;
 }
 
-extern "C"
-TensorWrapper test_mat_to_tensor() {
-    cv::Mat outputMat = cv::Mat::ones(3, 3, CV_8SC1) * 7.;
-    return TensorWrapper(outputMat);
-}
-
-extern "C"
-void test_tensor_to_mat(TensorWrapper tensor) {
-    cv::Mat temp = tensor.toMat();
-    std::cout << "This is a " << temp.channels() <<
-    "-channel Mat of type " << typeStr(temp) << std::endl;
-    std::cout << temp * 10. << std::endl;
-}
+/***************** Wrappers for small classes *****************/
 
 extern "C"
 cv::Algorithm *createAlgorithm() {

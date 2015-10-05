@@ -1,3 +1,5 @@
 *.idea
 *.so
 *~
+scripts/
+demo/1.lua

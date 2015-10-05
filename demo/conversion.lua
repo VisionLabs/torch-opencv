@@ -12,7 +12,7 @@ void test_tensor_to_mat(struct TensorWrapper tensor);
 struct TensorWrapper test_mat_to_tensor();
 ]]
 
-local C = ffi.load 'lib/libTests.so'
+local C = ffi.load(libPath('Tests'))
 
 -- prints Tensor from OpenCV
 function test_tensor_to_mat(tensor)

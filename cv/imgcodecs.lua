@@ -6,7 +6,7 @@ ffi.cdef[[
 struct TensorWrapper imread(const char *filename, int flags);
 ]]
 
-local C = ffi.load 'lib/libimgcodecs.so'
+local C = ffi.load(libPath('imgcodecs'))
 
 cv.IMREAD_UNCHANGED  = -1
 cv.IMREAD_GRAYSCALE  = 0
