@@ -55,6 +55,11 @@ struct MTWPlusFloat {
     float val;
 };
 
+struct RectPlusInt {
+    struct RectWrapper rect;
+    int val;
+};
+
 struct IntArray {
     int *data;
     int size;
@@ -201,8 +206,8 @@ end
 
 -- r = cv.Rect{10, 10, 15, 25}
 -- OR
--- r = cv.Rect{x=10, y=10, w=15, h=25}
--- same with most of the following wrappers
+-- r = cv.Rect{x=10, y=10, width=15, height=25}
+-- same with most of the following wrappers (see creation functions)
 function cv.Rect(rect)
     if not rect then
         return ffi.new('struct RectWrapper')
@@ -210,8 +215,8 @@ function cv.Rect(rect)
         return ffi.new('struct RectWrapper',
             rect[1] or rect.x,
             rect[2] or rect.y,
-            rect[3] or rect.w,
-            rect[4] or rect.h)
+            rect[3] or rect.width,
+            rect[4] or rect.height)
     end
 end
 

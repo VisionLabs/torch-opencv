@@ -1,7 +1,7 @@
 imgproc module branch
 =====================
 
-**Roughly 49% completed**
+**Roughly 50% completed**
 
 Functions to test:
 
@@ -23,8 +23,6 @@ Functions to test:
 * calcHist (SparseMat overload)
 * calcBackProject (SparseMat overload)
 * compareHist (SparseMat overload)
-* floodFill
-* cvtColor
 * demosaicing
 * moments
 * HuMoments
@@ -142,5 +140,7 @@ Functions to test:
 * grabCut
 * distanceTransformWithLabels
 * distanceTransform
+* floodFill
+* cvtColor
 
-69/142
+71/142

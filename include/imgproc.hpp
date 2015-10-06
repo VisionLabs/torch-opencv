@@ -284,3 +284,11 @@ extern "C" struct MultipleTensorWrapper distanceTransformWithLabels(
         struct TensorWrapper src, struct TensorWrapper dst,
         struct TensorWrapper labels, int distanceType, int maskSize,
         int labelType);
+
+extern "C" struct RectPlusInt floodFill(
+        struct TensorWrapper image, struct TensorWrapper mask,
+        int seedPoint_x, int seedPoint_y, struct ScalarWrapper newVal,
+        struct ScalarWrapper loDiff, struct ScalarWrapper upDiff, int flags);
+
+extern "C" struct TensorWrapper cvtColor(
+        struct TensorWrapper src, struct TensorWrapper dst, int code, int dstCn);

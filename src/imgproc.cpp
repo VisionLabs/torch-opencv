@@ -1161,3 +1161,40 @@ extern "C" struct MultipleTensorWrapper distanceTransformWithLabels(
         return MultipleTensorWrapper(retval);
     }
 }
+
+extern "C" struct RectPlusInt floodFill(
+        struct TensorWrapper image, struct TensorWrapper mask,
+        int seedPoint_x, int seedPoint_y, struct ScalarWrapper newVal,
+        struct ScalarWrapper loDiff, struct ScalarWrapper upDiff, int flags)
+{
+    RectPlusInt retval;
+    cv::Rect funcResult;
+    if (mask.isNull()) {
+        retval.val = cv::floodFill(
+                image.toMat(), cv::Point(seedPoint_x, seedPoint_y),
+                newVal.toCV(), &funcResult, loDiff.toCV(), upDiff.toCV(), flags);
+    } else {
+        retval.val = cv::floodFill(
+                image.toMat(), mask.toMat(), cv::Point(seedPoint_x, seedPoint_y),
+                newVal.toCV(), &funcResult, loDiff.toCV(), upDiff.toCV(), flags);
+    }
+    retval.rect = funcResult;
+    return retval;
+}
+
+extern "C" struct TensorWrapper cvtColor(
+        struct TensorWrapper src, struct TensorWrapper dst, int code, int dstCn)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        cv::cvtColor(src.toMat(), retval, code, dstCn);
+        return TensorWrapper(retval);
+    } else if (dst.tensorPtr == src.tensorPtr) {
+        // in-place
+        cv::Mat source = src.toMat();
+        cv::cvtColor(source, source, code, dstCn);
+    } else {
+        cv::cvtColor(src.toMat(), dst.toMat(), code, dstCn);
+    }
+    return dst;
+}

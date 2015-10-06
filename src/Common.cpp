@@ -141,12 +141,14 @@ void transfer_tensor(void *destination, void *source) {
 
 /***************** Wrappers for small classes *****************/
 
-extern "C"
-cv::Algorithm *createAlgorithm() {
-    return new cv::Algorithm();
-}
 
-extern "C"
-void destroyAlgorithm(cv::Algorithm *ptr) {
-    delete ptr;
+
+/***************** Helper wrappers for [OpenCV class + some primitive] *****************/
+
+RectWrapper & RectWrapper::operator=(cv::Rect & other) {
+    this->x = other.x;
+    this->y = other.y;
+    this->width = other.width;
+    this->height = other.height;
+    return *this;
 }

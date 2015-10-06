@@ -77,21 +77,27 @@ struct Vec3dWrapper {
 };
 
 struct RectWrapper {
-    int x, y, w, h;
+    int x, y, width, height;
 
-    inline cv::Rect toCV() { return cv::Rect(x, y, w, h); }
+    inline cv::Rect toCV() { return cv::Rect(x, y, width, height); }
+    RectWrapper & operator=(cv::Rect & other);
 };
 
 /***************** Helper wrappers for [OpenCV class + some primitive] *****************/
 
 struct TWPlusDouble {
-    TensorWrapper tensor;
+    struct TensorWrapper tensor;
     double val;
 };
 
 struct MTWPlusFloat {
-    MultipleTensorWrapper tensors;
+    struct MultipleTensorWrapper tensors;
     float val;
+};
+
+struct RectPlusInt {
+    struct RectWrapper rect;
+    int val;
 };
 
 /***************** Other helper structs *****************/

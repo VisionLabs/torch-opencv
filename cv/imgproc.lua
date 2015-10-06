@@ -1070,6 +1070,9 @@ function cv.accumulateWeighted(t)
 end
 
 
+-- point, response = cv.phaseCorrelate{...}
+-- point    -> Point
+-- response -> number
 function cv.phaseCorrelate(t)
     local src1 = assert(t.src1)
     local src2 = assert(t.src2)
@@ -1097,6 +1100,9 @@ function cv.createHanningWindow(t)
 end
 
 
+-- value, binarized = cv.threshold{...}
+-- value     -> number
+-- binarized -> Tensor
 function cv.threshold(t)
     local src = assert(t.src)
     local dst = t.dst
@@ -1251,7 +1257,12 @@ function cv.initUndistortRectifyMap(t)
             size[1], size[2], m1type, cv.wrap_tensors(maps)))
 end
 
-
+-- value = cv.initWideAngleProjMap{maps={map1, map2}, ...}
+-- OR
+-- value, map1, map2 = cv.initWideAngleProjMap{...}
+--
+-- value      -> number
+-- map1, map2 -> Tensor
 function cv.initWideAngleProjMap(t)
     local cameraMatrix = assert(t.cameraMatrix)
     if type(cameraMatrix) == "table" then
@@ -1409,7 +1420,7 @@ function cv.grabCut(t)
 end
 
 
-function distanceTransform(t)
+function cv.distanceTransform(t)
     local src = assert(t.src)
     local dst = t.dst
     local distanceType = assert(t.distanceType)
@@ -1422,7 +1433,7 @@ function distanceTransform(t)
 end
 
 
-function distanceTransformWithLabels(t)
+function cv.distanceTransformWithLabels(t)
     local src = assert(t.src)
     local dst = t.dst
     local labels = t.labels
@@ -1434,4 +1445,34 @@ function distanceTransformWithLabels(t)
         C.distanceTransformWithLabels(
             cv.wrap_tensors(src), cv.wrap_tensors(dst), 
             cv.wrap_tensors(labels), distanceType, maskSize, labelType)) 
+end
+
+-- area, boundingRect = cv.floodFill{...}
+-- area         -> number
+-- boundingRect -> RectWrapper
+function cv.floodFill(t)
+    local image = assert(t.image)
+    local mask = t.mask
+    local seedPoint = assert(t.seedPoint)
+    assert(#seedPoint == 2)
+    local newVal = cv.Scalar(assert(t.newVal))
+    local loDiff = cv.Scalar(t.loDiff or {0, 0, 0, 0})
+    local upDiff = cv.Scalar(t.upDiff or {0, 0, 0, 0})
+    local flags = t.flags or 4
+
+    local result = C.floodFill(
+        cv.wrap_tensors(image), cv.wrap_tensors(mask), seedPoint[1], 
+        seedPoint[2], newVal, loDiff, upDiff, flags)
+    return result.val, result.rect
+end
+
+
+function cv.cvtColor(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local code = assert(t.code)
+    local dstCn = t.dstCn or 0
+
+    return cv.unwrap_tensors(C.cvtColor(
+        cv.wrap_tensors(src), cv.wrap_tensors(dst), code, dstCn))
 end
