@@ -57,7 +57,7 @@ struct TermCriteriaWrapper {
         return cv::TermCriteria(type, maxCount, epsilon);
     }
     inline cv::TermCriteria toCVorDefault(cv::TermCriteria defaultVal) {
-        return (this->type == -1 ? defaultVal : this->toCV());
+        return (this->type == 0 ? defaultVal : this->toCV());
     }
 };
 
@@ -74,6 +74,12 @@ struct ScalarWrapper {
 
 struct Vec3dWrapper {
     double v0, v1, v2;
+};
+
+struct RectWrapper {
+    int x, y, w, h;
+
+    inline cv::Rect toCV() { return cv::Rect(x, y, w, h); }
 };
 
 /***************** Helper wrappers for [OpenCV class + some primitive] *****************/

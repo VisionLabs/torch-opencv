@@ -1391,3 +1391,47 @@ function cv.pyrMeanShiftFiltering(t)
     return cv.unwrap_tensors(C.pyrMeanShiftFiltering(
         cv.wrap_tensors(src), cv.wrap_tensors(dst), sp, sr, maxlevel, termcrit))
 end
+
+
+function cv.grabCut(t)
+    local img = assert(t.img)
+    local mask = assert(t.mask)
+    local rect = cv.Rect(t.rect)
+    local bgdModel = assert(t.bgdModel)
+    local fgdModel = assert(t.fgdModel)
+    local iterCount = assert(t.iterCount)
+    local mode = t.mode or cv.GC_EVAL
+    
+    C.grabCut(
+        cv.wrap_tensors(img), cv.wrap_tensors(mask), rect,
+        cv.wrap_tensors(bgdModel), cv.wrap_tensors(fgdModel),
+        iterCount, mode)
+end
+
+
+function distanceTransform(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local distanceType = assert(t.distanceType)
+    local maskSize = assert(t.maskSize)
+    local dstType = t.dstType or cv.CV_32F
+
+    return cv.unwrap_tensors(
+        C.distanceTransform(
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), distanceType, maskSize, dstType))
+end
+
+
+function distanceTransformWithLabels(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local labels = t.labels
+    local distanceType = assert(t.distanceType)
+    local maskSize = assert(t.maskSize)
+    local labelType = t.labelType or cv.DIST_LABEL_CCOMP
+
+    return cv.unwrap_tensors(
+        C.distanceTransformWithLabels(
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), 
+            cv.wrap_tensors(labels), distanceType, maskSize, labelType)) 
+end

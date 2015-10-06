@@ -1098,7 +1098,7 @@ extern "C" struct TensorWrapper pyrMeanShiftFiltering(
                 sp, sr, maxLevel,
                 termcrit.toCVorDefault(
                         cv::TermCriteria(
-                                cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS, 5, 1)))
+                                cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS, 5, 1)));
         return TensorWrapper(retval);
     } else {
         // output to dst
@@ -1107,7 +1107,57 @@ extern "C" struct TensorWrapper pyrMeanShiftFiltering(
                 sp, sr, maxLevel,
                 termcrit.toCVorDefault(
                         cv::TermCriteria(
-                                cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS, 5, 1)))
+                                cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS, 5, 1)));
         return dst;
+    }
+}
+
+extern "C" void grabCut(
+        struct TensorWrapper img, struct TensorWrapper mask,
+        RectWrapper rect, struct TensorWrapper bgdModel,
+        struct TensorWrapper fgdModel, int iterCount, int mode)
+{
+    cv::grabCut(
+            img.toMat(), mask.toMat(), rect.toCV(), bgdModel.toMat(),
+            fgdModel.toMat(), iterCount, mode);
+}
+
+extern "C" struct TensorWrapper distanceTransform(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int distanceType, int maskSize, int dstType)
+{
+    if (dst.isNull()) {
+        // output to retval
+        cv::Mat retval;
+        cv::distanceTransform(
+                src.toMat(), retval, distanceType, maskSize, dstType);
+        return TensorWrapper(retval);
+    } else {
+        // output to dst
+        cv::distanceTransform(
+                src.toMat(), dst.toMat(), distanceType, maskSize, dstType);
+        return dst;
+    }
+}
+
+extern "C" struct MultipleTensorWrapper distanceTransformWithLabels(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper labels, int distanceType, int maskSize,
+        int labelType)
+{
+    char outputVecSize = dst.isNull() + labels.isNull();
+    if (outputVecSize == 0) {
+        cv::distanceTransform(
+                src.toMat(), dst.toMat(), labels.toMat(),
+                distanceType, maskSize, labelType);
+        return MultipleTensorWrapper();
+    } else {
+        std::vector<cv::Mat> retval(outputVecSize);
+        cv::distanceTransform(
+                src.toMat(),
+                (dst.isNull() ? retval[0] : dst.toMat()),
+                (src.isNull() ? retval[dst.isNull()] : src.toMat()),
+                distanceType, maskSize, labelType);
+        return MultipleTensorWrapper(retval);
     }
 }

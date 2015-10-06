@@ -1,7 +1,12 @@
 imgproc module branch
 =====================
 
-**Roughly 46% completed**
+**Roughly 49% completed**
+
+Functions to test:
+
+1) undistort
+2) grabCut
 
 *To be implemented:*
 
@@ -18,9 +23,6 @@ imgproc module branch
 * calcHist (SparseMat overload)
 * calcBackProject (SparseMat overload)
 * compareHist (SparseMat overload)
-* grabCut
-* distanceTransformWithLabels
-* distanceTransform
 * floodFill
 * cvtColor
 * demosaicing
@@ -137,5 +139,8 @@ imgproc module branch
 * EMD
 * watershed
 * pyrMeanShiftFiltering
+* grabCut
+* distanceTransformWithLabels
+* distanceTransform
 
-66/142
+69/142

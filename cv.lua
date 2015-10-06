@@ -41,6 +41,10 @@ struct Vec3dWrapper {
     double v0, v1, v2;
 };
 
+struct RectWrapper {
+    int x, y, w, h;
+};
+
 struct TWPlusDouble {
     struct TensorWrapper tensor;
     double val;
@@ -193,9 +197,33 @@ function cv.checkFilterCombination(src, ddepth)
 end
 
 --- ***************** Wrappers for small OpenCV classes *****************
+-- Use these for passing into functions
+
+-- r = cv.Rect{10, 10, 15, 25}
+-- OR
+-- r = cv.Rect{x=10, y=10, w=15, h=25}
+-- same with most of the following wrappers
+function cv.Rect(rect)
+    if not rect then
+        return ffi.new('struct RectWrapper')
+    else
+        return ffi.new('struct RectWrapper',
+            rect[1] or rect.x,
+            rect[2] or rect.y,
+            rect[3] or rect.w,
+            rect[4] or rect.h)
+    end
+end
 
 function cv.TermCriteria(criteria)
-    return ffi.new('struct TermCriteriaWrapper', criteria)
+    if not criteria then
+        return ffi.new('struct TermCriteriaWrapper')
+    else
+        return ffi.new('struct TermCriteriaWrapper', 
+            criteria[1] or criteria.type,
+            criteria[2] or criteria.maxCount,
+            criteria[3] or criteria.epsilon)
+    end
 end
 
 function cv.Scalar(values)

@@ -270,3 +270,17 @@ extern "C" void watershed(
 extern "C" struct TensorWrapper pyrMeanShiftFiltering(
         struct TensorWrapper src, struct TensorWrapper dst,
         double sp, double sr, int maxLevel, TermCriteriaWrapper termcrit);
+
+extern "C" void grabCut(
+        struct TensorWrapper img, struct TensorWrapper mask,
+        RectWrapper rect, struct TensorWrapper bgdModel,
+        struct TensorWrapper fgdModel, int iterCount, int mode);
+
+extern "C" struct TensorWrapper distanceTransform(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int distanceType, int maskSize, int dstType);
+
+extern "C" struct MultipleTensorWrapper distanceTransformWithLabels(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper labels, int distanceType, int maskSize,
+        int labelType);
