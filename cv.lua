@@ -28,6 +28,14 @@ void free(void *ptr);
 
 void transfer_tensor(void *destination, void *source);
 
+struct SizeWrapper {
+    int width, height;
+};
+
+struct Size2fWrapper {
+    float width, height;
+};
+
 struct TermCriteriaWrapper {
     int type, maxCount;
     double epsilon;
@@ -42,7 +50,27 @@ struct Vec3dWrapper {
 };
 
 struct RectWrapper {
-    int x, y, w, h;
+    int x, y, width, height;
+};
+
+struct PointWrapper {
+    int x, y;
+};
+
+struct Point2fWrapper {
+    float x, y;
+};
+
+struct RotatedRectWrapper {
+    struct Point2fWrapper center;
+    struct Size2fWrapper size;
+    float angle;
+};
+
+struct MomentsWrapper {
+    double m00, m10, m01, m20, m11, m02, m30, m21, m12, m03;
+    double mu20, mu11, mu02, mu30, mu21, mu12, mu03;
+    double nu20, nu11, nu02, nu30, nu21, nu12, nu03;
 };
 
 struct TWPlusDouble {
@@ -71,9 +99,7 @@ struct FloatArrayOfArrays {
     int dims;
 };
 
-struct Algorithm;
-struct Algorithm *createAlgorithm();
-void destroyAlgorithm(struct Algorithm *ptr);
+int getIntMax();
 ]]
 
 local C = ffi.load(libPath('Common'))
@@ -81,6 +107,8 @@ local C = ffi.load(libPath('Common'))
 cv = {}
 
 require 'cv.constants'
+
+cv.INT_MAX = C.getIntMax()
 
 --- ***************** Tensor <=> Mat conversion *****************
 
@@ -207,32 +235,45 @@ end
 -- r = cv.Rect{10, 10, 15, 25}
 -- OR
 -- r = cv.Rect{x=10, y=10, width=15, height=25}
--- same with most of the following wrappers (see creation functions)
+-- same with most of the following wrappers (see OpenCV defs)
 function cv.Rect(rect)
-    if not rect then
-        return ffi.new('struct RectWrapper')
-    else
-        return ffi.new('struct RectWrapper',
-            rect[1] or rect.x,
-            rect[2] or rect.y,
-            rect[3] or rect.width,
-            rect[4] or rect.height)
-    end
+    return ffi.new('struct RectWrapper', rect)
 end
 
 function cv.TermCriteria(criteria)
-    if not criteria then
-        return ffi.new('struct TermCriteriaWrapper')
-    else
-        return ffi.new('struct TermCriteriaWrapper', 
-            criteria[1] or criteria.type,
-            criteria[2] or criteria.maxCount,
-            criteria[3] or criteria.epsilon)
-    end
+    return ffi.new('struct TermCriteriaWrapper', criteria)
 end
 
 function cv.Scalar(values)
     return ffi.new('struct ScalarWrapper', values)
+end
+
+function cv.Moments(values)
+    return ffi.new('struct MomentsWrapper', values)
+end
+
+function cv.Size(data)
+    return ffi.new('struct SizeWrapper', data)
+end
+
+function cv.Size2f(data)
+    return ffi.new('struct Size2fWrapper', data)
+end
+
+function cv.Vec3d(data)
+    return ffi.new('struct Vec3dWrapper', data)
+end
+
+function cv.Point(data)
+    return ffi.new('struct PointWrapper', data)
+end
+
+function cv.Point2f(data)
+    return ffi.new('struct Point2fWrapper', data)
+end
+
+function cv.RotatedRect(data)
+    return ffi.new('struct RotatedRectWrapper', data)
 end
 
 --- ***************** Other helper structs *****************

@@ -1,52 +1,51 @@
 #include <Common.hpp>
 #include <opencv2/imgproc.hpp>
 
-extern "C" struct TensorWrapper getGaussianKernel(
-        int ksize, double sigma, int ktype);
+extern "C" struct TensorWrapper getGaussianKernel(int ksize, double sigma, int ktype);
 
 extern "C" struct MultipleTensorWrapper getDerivKernels(
-        int dx, int dy, int ksize, bool normalize, int ktype);
+        int dx, int dy, int ksize,
+        bool normalize, int ktype);
 
-extern "C" struct TensorWrapper getGaborKernel(
-        int ksize_rows, int ksize_cols, double sigma, double theta,
-        double lambd, double gamma, double psi, int ktype);
+extern "C" struct TensorWrapper getGaborKernel(struct SizeWrapper ksize, double sigma, double theta,
+                                    double lambd, double gamma, double psi, int ktype);
 
-extern "C" struct TensorWrapper medianBlur(
-        struct TensorWrapper src, struct TensorWrapper dst, int ksize);
+extern "C" struct TensorWrapper getStructuringElement(int shape, struct SizeWrapper ksize,
+                                           struct PointWrapper anchor);
 
-extern "C" struct TensorWrapper GaussianBlur(
-        struct TensorWrapper src, struct TensorWrapper dst,
-        int ksize_x, int ksize_y, double sigmaX,
-        double sigmaY, int borderType);
+extern "C" struct TensorWrapper medianBlur(struct TensorWrapper src, struct TensorWrapper dst, int ksize);
 
-extern "C" struct TensorWrapper bilateralFilter(
-        struct TensorWrapper src, struct TensorWrapper dst, int d,
-        double sigmaColor, double sigmaSpace,
-        int borderType);
+extern "C" struct TensorWrapper GaussianBlur(struct TensorWrapper src, struct TensorWrapper dst,
+                                  struct SizeWrapper ksize, double sigmaX,
+                                  double sigmaY, int borderType);
+
+extern "C" struct TensorWrapper bilateralFilter(struct TensorWrapper src, struct TensorWrapper dst, int d,
+                                     double sigmaColor, double sigmaSpace,
+                                     int borderType);
 
 extern "C" struct TensorWrapper boxFilter(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
-        int ksize_x, int ksize_y, int anchor_x, int anchor_y,
+        struct SizeWrapper ksize, struct PointWrapper anchor,
         bool normalize, int borderType);
 
 extern "C" struct TensorWrapper sqrBoxFilter(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
-        int ksize_x, int ksize_y, int anchor_x, int anchor_y,
+        struct SizeWrapper ksize, struct PointWrapper anchor,
         bool normalize, int borderType);
 
 extern "C" struct TensorWrapper blur(
         struct TensorWrapper src, struct TensorWrapper dst,
-        int ksize_x, int ksize_y, int anchor_x, int anchor_y, int borderType);
+        struct SizeWrapper ksize, struct PointWrapper anchor, int borderType);
 
 extern "C" struct TensorWrapper filter2D(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
-        struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        struct TensorWrapper kernel, struct PointWrapper anchor,
         double delta, int borderType);
 
 extern "C" struct TensorWrapper sepFilter2D(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
         struct TensorWrapper kernelX,struct TensorWrapper kernelY,
-        int anchor_x, int anchor_y, double delta, int borderType);
+        struct PointWrapper anchor, double delta, int borderType);
 
 extern "C" struct TensorWrapper Sobel(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
@@ -95,7 +94,7 @@ extern "C" struct TensorWrapper HoughCircles(
 
 extern "C" void cornerSubPix(
         struct TensorWrapper image, struct TensorWrapper corners,
-        int winSize_x, int winSize_y, int zeroZone_x, int zeroZone_y,
+        struct SizeWrapper winSize, struct SizeWrapper zeroZone,
         struct TermCriteriaWrapper criteria);
 
 extern "C" struct TensorWrapper goodFeaturesToTrack(
@@ -105,33 +104,32 @@ extern "C" struct TensorWrapper goodFeaturesToTrack(
 
 extern "C" struct TensorWrapper erode(
         struct TensorWrapper src, struct TensorWrapper dst,
-        struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        struct TensorWrapper kernel, struct PointWrapper anchor,
         int iterations, int borderType, struct ScalarWrapper borderValue);
 
 extern "C" struct TensorWrapper dilate(
         struct TensorWrapper src, struct TensorWrapper dst,
-        struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        struct TensorWrapper kernel, struct PointWrapper anchor,
         int iterations, int borderType, struct ScalarWrapper borderValue);
 
 extern "C" struct TensorWrapper morphologyEx(
         struct TensorWrapper src, struct TensorWrapper dst,
-        int op, struct TensorWrapper kernel,
-        int anchor_x, int anchor_y, int iterations,
-        int borderType, struct ScalarWrapper borderValue);
+        int op, struct TensorWrapper kernel, struct PointWrapper anchor,
+        int iterations, int borderType, struct ScalarWrapper borderValue);
 
 extern "C" struct TensorWrapper resize(
         struct TensorWrapper src, struct TensorWrapper dst,
-        int dsize_x, int dsize_y, double fx, double fy,
+        struct SizeWrapper dsize, double fx, double fy,
         int interpolation);
 
 extern "C" struct TensorWrapper warpAffine(
         struct TensorWrapper src, struct TensorWrapper dst,
-        struct TensorWrapper M, int dsize_x, int dsize_y,
+        struct TensorWrapper M, struct SizeWrapper dsize,
         int flags, int borderMode, struct ScalarWrapper borderValue);
 
 extern "C" struct TensorWrapper warpPerspective(
         struct TensorWrapper src, struct TensorWrapper dst,
-        struct TensorWrapper M, int dsize_x, int dsize_y,
+        struct TensorWrapper M, struct SizeWrapper dsize,
         int flags, int borderMode, struct ScalarWrapper borderValue);
 
 extern "C" struct TensorWrapper remap(
@@ -145,7 +143,10 @@ extern "C" struct MultipleTensorWrapper convertMaps(
         int dstmap1type, bool nninterpolation);
 
 extern "C" struct TensorWrapper getRotationMatrix2D(
-        float center_x, float center_y, double angle, double scale);
+        struct Point2fWrapper center, double angle, double scale);
+
+extern "C" struct TensorWrapper invertAffineTransform(
+        struct TensorWrapper M, struct TensorWrapper iM);
 
 extern "C" struct TensorWrapper getPerspectiveTransform(
         struct TensorWrapper src, struct TensorWrapper dst);
@@ -154,17 +155,16 @@ extern "C" struct TensorWrapper getAffineTransform(
         struct TensorWrapper src, struct TensorWrapper dst);
 
 extern "C" struct TensorWrapper getRectSubPix(
-        struct TensorWrapper image, int patchSize_x, int patchsize_y,
-        float center_x, float center_y, struct TensorWrapper patch,
-        int patchType);
+        struct TensorWrapper image, struct SizeWrapper patchSize,
+        struct Point2fWrapper center, struct TensorWrapper patch, int patchType);
 
 extern "C" struct TensorWrapper logPolar(
         struct TensorWrapper src, struct TensorWrapper dst,
-        float center_x, float center_y, double M, int flags);
+        struct Point2fWrapper center, double M, int flags);
 
 extern "C" struct TensorWrapper linearPolar(
         struct TensorWrapper src, struct TensorWrapper dst,
-        float center_x, float center_y, double maxRadius, int flags);
+        struct Point2fWrapper center, double maxRadius, int flags);
 
 extern "C" struct TensorWrapper integral(
         struct TensorWrapper src, struct TensorWrapper sum, int sdepth);
@@ -193,7 +193,7 @@ extern "C" struct Vec3dWrapper phaseCorrelate(
         struct TensorWrapper window);
 
 extern "C" struct TensorWrapper createHanningWindow(
-        struct TensorWrapper dst, int winSize_x, int winSize_y, int type);
+        struct TensorWrapper dst, struct SizeWrapper winSize, int type);
 
 extern "C" struct TWPlusDouble threshold(
         struct TensorWrapper src, struct TensorWrapper dst,
@@ -206,11 +206,11 @@ extern "C" struct TensorWrapper adaptiveThreshold(
 
 extern "C" struct TensorWrapper pyrDown(
         struct TensorWrapper src, struct TensorWrapper dst,
-        int dstSize_x, int dstSize_y, int borderType);
+        struct SizeWrapper dstSize, int borderType);
 
 extern "C" struct TensorWrapper pyrUp(
         struct TensorWrapper src, struct TensorWrapper dst,
-        int dstSize_x, int dstSize_y, int borderType);
+        struct SizeWrapper dstSize, int borderType);
 
 extern "C" struct MultipleTensorWrapper buildPyramid(
         struct TensorWrapper src, struct MultipleTensorWrapper dst,
@@ -224,17 +224,17 @@ extern "C" struct TensorWrapper undistort(
 extern "C" struct MultipleTensorWrapper initUndistortRectifyMap(
         struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
         struct TensorWrapper R, struct TensorWrapper newCameraMatrix,
-        int size_x, int size_y, int m1type,
+        struct SizeWrapper size, int m1type,
         struct MultipleTensorWrapper maps);
 
 extern "C" struct MTWPlusFloat initWideAngleProjMap(
         struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
-        int imageSize_x, int imageSize_y, int destImageWidth,
+        struct SizeWrapper imageSize, int destImageWidth,
         int m1type, struct MultipleTensorWrapper maps,
         int projType, double alpha);
 
 extern "C" struct TensorWrapper getDefaultNewCameraMatrix(
-        struct TensorWrapper cameraMatrix, int imgsize_x, int imgsize_y, bool centerPrincipalPoint);
+        struct TensorWrapper cameraMatrix, struct SizeWrapper imgsize, bool centerPrincipalPoint);
 
 extern "C" struct TensorWrapper undistortPoints(
         struct TensorWrapper src, struct TensorWrapper dst,
@@ -269,7 +269,7 @@ extern "C" void watershed(
 
 extern "C" struct TensorWrapper pyrMeanShiftFiltering(
         struct TensorWrapper src, struct TensorWrapper dst,
-        double sp, double sr, int maxLevel, TermCriteriaWrapper termcrit);
+        double sp, double sr, int maxLevel, struct TermCriteriaWrapper termcrit);
 
 extern "C" void grabCut(
         struct TensorWrapper img, struct TensorWrapper mask,
@@ -287,8 +287,9 @@ extern "C" struct MultipleTensorWrapper distanceTransformWithLabels(
 
 extern "C" struct RectPlusInt floodFill(
         struct TensorWrapper image, struct TensorWrapper mask,
-        int seedPoint_x, int seedPoint_y, struct ScalarWrapper newVal,
+        struct PointWrapper seedPoint, struct ScalarWrapper newVal,
         struct ScalarWrapper loDiff, struct ScalarWrapper upDiff, int flags);
 
 extern "C" struct TensorWrapper cvtColor(
         struct TensorWrapper src, struct TensorWrapper dst, int code, int dstCn);
+

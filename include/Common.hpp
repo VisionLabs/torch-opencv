@@ -7,6 +7,8 @@ extern "C" {
 #include <iostream>
 #include <array>
 
+extern "C" int getIntMax() { return INT_MAX; }
+
 /***************** Tensor <=> Mat conversion *****************/
 
 #define TO_MAT_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toMat())
@@ -49,6 +51,18 @@ std::string typeStr(cv::Mat & mat) {
 
 /***************** Wrappers for small OpenCV classes *****************/
 
+struct SizeWrapper {
+    int width, height;
+
+    inline cv::Size toCV() { return cv::Size(width, height); }
+};
+
+struct Size2fWrapper {
+    float width, height;
+
+    inline cv::Size2f toCV() { return cv::Size2f(width, height); }
+};
+
 struct TermCriteriaWrapper {
     int type, maxCount;
     double epsilon;
@@ -81,6 +95,36 @@ struct RectWrapper {
 
     inline cv::Rect toCV() { return cv::Rect(x, y, width, height); }
     RectWrapper & operator=(cv::Rect & other);
+};
+
+struct PointWrapper {
+    int x, y;
+
+    inline cv::Point toCV() { return cv::Point(x, y); }
+};
+
+struct Point2fWrapper {
+    float x, y;
+
+    inline cv::Point2f toCV() { return cv::Point2f(x, y); }
+};
+
+struct RotatedRectWrapper {
+    struct Point2fWrapper center;
+    struct Size2fWrapper size;
+    float angle;
+
+    inline cv::RotatedRect toCV() { return cv::RotatedRect(center.toCV(), size.toCV(), angle); }
+};
+
+struct MomentsWrapper {
+    double m00, m10, m01, m20, m11, m02, m30, m21, m12, m03;
+    double mu20, mu11, mu02, mu30, mu21, mu12, mu03;
+    double nu20, nu11, nu02, nu30, nu21, nu12, nu03;
+    
+    inline cv::Moments toCV() {
+        return cv::Moments(m00, m10, m01, m20, m11, m02, m30, m21, m12, m03);
+    }
 };
 
 /***************** Helper wrappers for [OpenCV class + some primitive] *****************/

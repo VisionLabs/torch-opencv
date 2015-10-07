@@ -1,4 +1,5 @@
 #include <imgproc.hpp>
+#include <bits/stl_deque.h>
 
 // Ехали медведи, на велосипеде
 
@@ -24,21 +25,21 @@ struct MultipleTensorWrapper getDerivKernels(
 }
 
 extern "C"
-struct TensorWrapper getGaborKernel(int ksize_rows, int ksize_cols, double sigma, double theta,
+struct TensorWrapper getGaborKernel(struct SizeWrapper ksize, double sigma, double theta,
                                     double lambd, double gamma, double psi, int ktype)
 {
     return TensorWrapper(
             cv::getGaborKernel(
-                    cv::Size(ksize_rows, ksize_cols), sigma, theta, lambd, gamma, psi, ktype));
+                    ksize.toCV(), sigma, theta, lambd, gamma, psi, ktype));
 }
 
 extern "C"
-struct TensorWrapper getStructuringElement(int shape, int ksize_rows, int ksize_cols,
-                                           int anchor_x, int anchor_y)
+struct TensorWrapper getStructuringElement(int shape, struct SizeWrapper ksize,
+                                           struct PointWrapper anchor)
 {
     return TensorWrapper(
             cv::getStructuringElement(
-                    shape, cv::Size(ksize_rows, ksize_cols), cv::Point(anchor_x, anchor_y)));
+                    shape, ksize.toCV(), anchor.toCV()));
 }
 
 extern "C"
@@ -60,22 +61,22 @@ struct TensorWrapper medianBlur(struct TensorWrapper src, struct TensorWrapper d
 
 extern "C"
 struct TensorWrapper GaussianBlur(struct TensorWrapper src, struct TensorWrapper dst,
-                                  int ksize_x, int ksize_y, double sigmaX,
+                                  struct SizeWrapper ksize, double sigmaX,
                                   double sigmaY, int borderType)
 {
     if (dst.isNull()) {
         cv::Mat retval;
         cv::GaussianBlur(
-                src.toMat(), retval, cv::Size(ksize_x, ksize_y), sigmaX, sigmaY, borderType);
+                src.toMat(), retval, ksize.toCV(), sigmaX, sigmaY, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cv::Mat source = src.toMat();
         cv::GaussianBlur(
-                source, source, cv::Size(ksize_x, ksize_y), sigmaX, sigmaY, borderType);
+                source, source, ksize.toCV(), sigmaX, sigmaY, borderType);
     } else {
         cv::GaussianBlur(
-                src.toMat(), dst.toMat(), cv::Size(ksize_x, ksize_y), sigmaX, sigmaY, borderType);
+                src.toMat(), dst.toMat(), ksize.toCV(), sigmaX, sigmaY, borderType);
     }
     return dst;
 }
@@ -105,25 +106,25 @@ struct TensorWrapper bilateralFilter(struct TensorWrapper src, struct TensorWrap
 extern "C"
 struct TensorWrapper boxFilter(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
-        int ksize_x, int ksize_y, int anchor_x, int anchor_y,
+        struct SizeWrapper ksize, struct PointWrapper anchor,
         bool normalize, int borderType)
 {
     if (dst.isNull()) {
         cv::Mat retval;
         cv::boxFilter(
-                src.toMat(), retval, ddepth, cv::Size(ksize_x, ksize_y),
-                cv::Point(anchor_x, anchor_y), normalize, borderType);
+                src.toMat(), retval, ddepth, ksize.toCV(),
+                anchor.toCV(), normalize, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cv::Mat source = src.toMat();
         cv::boxFilter(
-                source, source, ddepth, cv::Size(ksize_x, ksize_y),
-                cv::Point(anchor_x, anchor_y), normalize, borderType);
+                source, source, ddepth, ksize.toCV(),
+                anchor.toCV(), normalize, borderType);
     } else {
         cv::boxFilter(
-                src.toMat(), dst.toMat(), ddepth, cv::Size(ksize_x, ksize_y),
-                cv::Point(anchor_x, anchor_y), normalize, borderType);
+                src.toMat(), dst.toMat(), ddepth, ksize.toCV(),
+                anchor.toCV(), normalize, borderType);
     }
     return dst;
 }
@@ -131,22 +132,22 @@ struct TensorWrapper boxFilter(
 extern "C"
 struct TensorWrapper sqrBoxFilter(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
-        int ksize_x, int ksize_y, int anchor_x, int anchor_y,
+        struct SizeWrapper ksize, struct PointWrapper anchor,
         bool normalize, int borderType)
 {
     if (dst.isNull()) {
         cv::Mat retval;
         cv::sqrBoxFilter(src.toMat(), retval, ddepth,
-                         cv::Point(ksize_x, ksize_y), cv::Point(anchor_x, anchor_y),
+                         ksize.toCV(), anchor.toCV(),
                          normalize, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place 
         cv::Mat source = src.toMat();
-        cv::sqrBoxFilter(source, source, ddepth, cv::Point(ksize_x, ksize_y), cv::Point(anchor_x, anchor_y),
+        cv::sqrBoxFilter(source, source, ddepth, ksize.toCV(), anchor.toCV(),
                          normalize, borderType);
     } else {
-        cv::sqrBoxFilter(src.toMat(), dst.toMat(), ddepth, cv::Point(ksize_x, ksize_y), cv::Point(anchor_x, anchor_y),
+        cv::sqrBoxFilter(src.toMat(), dst.toMat(), ddepth, ksize.toCV(), anchor.toCV(),
                          normalize, borderType);
     }
     return dst;
@@ -155,18 +156,18 @@ struct TensorWrapper sqrBoxFilter(
 extern "C"
 struct TensorWrapper blur(
         struct TensorWrapper src, struct TensorWrapper dst,
-        int ksize_x, int ksize_y, int anchor_x, int anchor_y, int borderType)
+        struct SizeWrapper ksize, struct PointWrapper anchor, int borderType)
 {
     if (dst.isNull()) {
         cv::Mat retval;
-        cv::blur(src.toMat(), retval, cv::Point(ksize_x, ksize_y), cv::Point(anchor_x, anchor_y), borderType);
+        cv::blur(src.toMat(), retval, ksize.toCV(), anchor.toCV(), borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place 
         cv::Mat source = src.toMat();
-        cv::blur(source, source, cv::Point(ksize_x, ksize_y), cv::Point(anchor_x, anchor_y), borderType);
+        cv::blur(source, source, ksize.toCV(), anchor.toCV(), borderType);
     } else {
-        cv::blur(src.toMat(), dst.toMat(), cv::Point(ksize_x, ksize_y), cv::Point(anchor_x, anchor_y), borderType);
+        cv::blur(src.toMat(), dst.toMat(), ksize.toCV(), anchor.toCV(), borderType);
     }
     return dst;
 }
@@ -174,24 +175,24 @@ struct TensorWrapper blur(
 extern "C"
 struct TensorWrapper filter2D(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
-        struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        struct TensorWrapper kernel, struct PointWrapper anchor,
         double delta, int borderType)
 {
     if (dst.isNull()) {
         cv::Mat retval;
         cv::filter2D(src.toMat(), retval, ddepth,
-                     kernel.toMat(), cv::Point(anchor_x, anchor_y),
+                     kernel.toMat(), anchor.toCV(),
                      delta, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place 
         cv::Mat source = src.toMat();
         cv::filter2D(source, source, ddepth,
-                     kernel.toMat(), cv::Point(anchor_x, anchor_y),
+                     kernel.toMat(), anchor.toCV(),
                      delta, borderType);
     } else {
         cv::filter2D(src.toMat(), dst.toMat(), ddepth,
-                     kernel.toMat(), cv::Point(anchor_x, anchor_y),
+                     kernel.toMat(), anchor.toCV(),
                      delta, borderType);
     }
     return dst;
@@ -201,24 +202,24 @@ extern "C"
 struct TensorWrapper sepFilter2D(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
         struct TensorWrapper kernelX,struct TensorWrapper kernelY,
-        int anchor_x, int anchor_y, double delta, int borderType)
+        struct PointWrapper anchor, double delta, int borderType)
 {
     if (dst.isNull()) {
         cv::Mat retval;
         cv::sepFilter2D(src.toMat(), retval, ddepth,
                         kernelX.toMat(),kernelY.toMat(),
-                        cv::Point(anchor_x, anchor_y), delta, borderType);
+                        anchor.toCV(), delta, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place 
         cv::Mat source = src.toMat();
         cv::sepFilter2D(source, source, ddepth,
                         kernelX.toMat(),kernelY.toMat(),
-                        cv::Point(anchor_x, anchor_y), delta, borderType);
+                        anchor.toCV(), delta, borderType);
     } else {
         cv::sepFilter2D(src.toMat(), dst.toMat(), ddepth,
                         kernelX.toMat(),kernelY.toMat(),
-                        cv::Point(anchor_x, anchor_y), delta, borderType);
+                        anchor.toCV(), delta, borderType);
     }
     return dst;
 }
@@ -425,11 +426,11 @@ struct TensorWrapper HoughCircles(
 extern "C"
 void cornerSubPix(
         struct TensorWrapper image, struct TensorWrapper corners,
-        int winSize_x, int winSize_y, int zeroZone_x, int zeroZone_y,
+        struct SizeWrapper winSize, struct SizeWrapper zeroZone,
         struct TermCriteriaWrapper criteria)
 {
-    cv::cornerSubPix(image.toMat(), corners.toMat(), cv::Size(winSize_x, winSize_y),
-                     cv::Size(zeroZone_x, zeroZone_y), criteria.toCV());
+    cv::cornerSubPix(image.toMat(), corners.toMat(), winSize.toCV(),
+                     zeroZone.toCV(), criteria.toCV());
 }
 
 extern "C"
@@ -447,21 +448,21 @@ struct TensorWrapper goodFeaturesToTrack(
 extern "C"
 struct TensorWrapper erode(
         struct TensorWrapper src, struct TensorWrapper dst,
-        struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        struct TensorWrapper kernel, struct PointWrapper anchor,
         int iterations, int borderType, struct ScalarWrapper borderValue)
 {
     if (dst.isNull()) {
         cv::Mat retval;
-        cv::erode(src.toMat(), retval, kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+        cv::erode(src.toMat(), retval, kernel.toMat(), anchor.toCV(), iterations,
                   borderType, borderValue.toCVorDefault(cv::morphologyDefaultBorderValue()));
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cv::Mat source = src.toMat();
-        cv::erode(source, source, kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+        cv::erode(source, source, kernel.toMat(), anchor.toCV(), iterations,
                   borderType, borderValue.toCVorDefault(cv::morphologyDefaultBorderValue()));
     } else {
-        cv::erode(src.toMat(), dst.toMat(), kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+        cv::erode(src.toMat(), dst.toMat(), kernel.toMat(), anchor.toCV(), iterations,
                   borderType, borderValue.toCVorDefault(cv::morphologyDefaultBorderValue()));
     }
     return dst;
@@ -470,21 +471,21 @@ struct TensorWrapper erode(
 extern "C"
 struct TensorWrapper dilate(
         struct TensorWrapper src, struct TensorWrapper dst,
-        struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        struct TensorWrapper kernel, struct PointWrapper anchor,
         int iterations, int borderType, struct ScalarWrapper borderValue)
 {
     if (dst.isNull()) {
         cv::Mat retval;
-        cv::dilate(src.toMat(), retval, kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+        cv::dilate(src.toMat(), retval, kernel.toMat(), anchor.toCV(), iterations,
                    borderType, borderValue.toCVorDefault(cv::morphologyDefaultBorderValue()));
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cv::Mat source = src.toMat();
-        cv::dilate(source, source, kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+        cv::dilate(source, source, kernel.toMat(), anchor.toCV(), iterations,
                    borderType, borderValue.toCVorDefault(cv::morphologyDefaultBorderValue()));
     } else {
-        cv::dilate(src.toMat(), dst.toMat(), kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+        cv::dilate(src.toMat(), dst.toMat(), kernel.toMat(), anchor.toCV(), iterations,
                    borderType, borderValue.toCVorDefault(cv::morphologyDefaultBorderValue()));
     }
     return dst;
@@ -493,21 +494,21 @@ struct TensorWrapper dilate(
 extern "C"
 struct TensorWrapper morphologyEx(
         struct TensorWrapper src, struct TensorWrapper dst,
-        int op, struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        int op, struct TensorWrapper kernel, struct PointWrapper anchor,
         int iterations, int borderType, struct ScalarWrapper borderValue)
 {
     if (dst.isNull()) {
         cv::Mat retval;
-        cv::morphologyEx(src.toMat(), retval, op, kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+        cv::morphologyEx(src.toMat(), retval, op, kernel.toMat(), anchor.toCV(), iterations,
                          borderType, borderValue.toCVorDefault(cv::morphologyDefaultBorderValue()));
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cv::Mat source = src.toMat();
-        cv::morphologyEx(source, source, op, kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+        cv::morphologyEx(source, source, op, kernel.toMat(), anchor.toCV(), iterations,
                          borderType, borderValue.toCVorDefault(cv::morphologyDefaultBorderValue()));
     } else {
-        cv::morphologyEx(src.toMat(), dst.toMat(), op, kernel.toMat(), cv::Point(anchor_x, anchor_y), iterations,
+        cv::morphologyEx(src.toMat(), dst.toMat(), op, kernel.toMat(), anchor.toCV(), iterations,
                          borderType, borderValue.toCVorDefault(cv::morphologyDefaultBorderValue()));
     }
     return dst;
@@ -516,19 +517,19 @@ struct TensorWrapper morphologyEx(
 extern "C"
 struct TensorWrapper resize(
         struct TensorWrapper src, struct TensorWrapper dst,
-        int dsize_x, int dsize_y, double fx, double fy,
+        struct SizeWrapper dsize, double fx, double fy,
         int interpolation)
 {
     if (dst.isNull()) {
         cv::Mat retval;
-        cv::resize(src.toMat(), retval, cv::Size(dsize_x, dsize_y), fx, fy, interpolation);
+        cv::resize(src.toMat(), retval, dsize.toCV(), fx, fy, interpolation);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cv::Mat source = src.toMat();
-        cv::resize(source, source, cv::Size(dsize_x, dsize_y), fx, fy, interpolation);
+        cv::resize(source, source, dsize.toCV(), fx, fy, interpolation);
     } else {
-        cv::resize(src.toMat(), dst.toMat(), cv::Size(dsize_x, dsize_y), fx, fy, interpolation);
+        cv::resize(src.toMat(), dst.toMat(), dsize.toCV(), fx, fy, interpolation);
     }
     return dst;
 }
@@ -536,19 +537,19 @@ struct TensorWrapper resize(
 extern "C"
 struct TensorWrapper warpAffine(
         struct TensorWrapper src, struct TensorWrapper dst,
-        struct TensorWrapper M, int dsize_x, int dsize_y,
+        struct TensorWrapper M, struct SizeWrapper dsize,
         int flags, int borderMode, struct ScalarWrapper borderValue)
 {
     if (dst.isNull()) {
         cv::Mat retval;
-        cv::warpAffine(src.toMat(), retval, M.toMat(), cv::Size(dsize_x, dsize_y), flags, borderMode, borderValue.toCV());
+        cv::warpAffine(src.toMat(), retval, M.toMat(), dsize.toCV(), flags, borderMode, borderValue.toCV());
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cv::Mat source = src.toMat();
-        cv::warpAffine(source, source, M.toMat(), cv::Size(dsize_x, dsize_y), flags, borderMode, borderValue.toCV());
+        cv::warpAffine(source, source, M.toMat(), dsize.toCV(), flags, borderMode, borderValue.toCV());
     } else {
-        cv::warpAffine(src.toMat(), dst.toMat(), M.toMat(), cv::Size(dsize_x, dsize_y), flags, borderMode, borderValue.toCV());
+        cv::warpAffine(src.toMat(), dst.toMat(), M.toMat(), dsize.toCV(), flags, borderMode, borderValue.toCV());
     }
     return dst;
 }
@@ -556,19 +557,19 @@ struct TensorWrapper warpAffine(
 extern "C"
 struct TensorWrapper warpPerspective(
         struct TensorWrapper src, struct TensorWrapper dst,
-        struct TensorWrapper M, int dsize_x, int dsize_y,
+        struct TensorWrapper M, struct SizeWrapper dsize,
         int flags, int borderMode, struct ScalarWrapper borderValue)
 {
     if (dst.isNull()) {
         cv::Mat retval;
-        cv::warpPerspective(src.toMat(), retval, M.toMat(), cv::Size(dsize_x, dsize_y), flags, borderMode, borderValue.toCV());
+        cv::warpPerspective(src.toMat(), retval, M.toMat(), dsize.toCV(), flags, borderMode, borderValue.toCV());
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cv::Mat source = src.toMat();
-        cv::warpPerspective(source, source, M.toMat(), cv::Size(dsize_x, dsize_y), flags, borderMode, borderValue.toCV());
+        cv::warpPerspective(source, source, M.toMat(), dsize.toCV(), flags, borderMode, borderValue.toCV());
     } else {
-        cv::warpPerspective(src.toMat(), dst.toMat(), M.toMat(), cv::Size(dsize_x, dsize_y), flags, borderMode, borderValue.toCV());
+        cv::warpPerspective(src.toMat(), dst.toMat(), M.toMat(), dsize.toCV(), flags, borderMode, borderValue.toCV());
     }
     return dst;
 }
@@ -615,9 +616,9 @@ struct MultipleTensorWrapper convertMaps(
 
 extern "C"
 struct TensorWrapper getRotationMatrix2D(
-        float center_x, float center_y, double angle, double scale)
+        struct Point2fWrapper center, double angle, double scale)
 {
-    return TensorWrapper(cv::getRotationMatrix2D(cv::Point2f(center_x, center_y), angle, scale));
+    return TensorWrapper(cv::getRotationMatrix2D(center.toCV(), angle, scale));
 }
 
 extern "C"
@@ -651,20 +652,20 @@ extern "C" struct TensorWrapper getAffineTransform(
 }
 
 extern "C" struct TensorWrapper getRectSubPix(
-        struct TensorWrapper image, int patchSize_x, int patchsize_y,
-        float center_x, float center_y, struct TensorWrapper patch, int patchType)
+        struct TensorWrapper image, struct SizeWrapper patchSize,
+        struct Point2fWrapper center, struct TensorWrapper patch, int patchType)
 {
     if (patch.isNull()) {
         cv::Mat retval;
-        cv::getRectSubPix(image.toMat(), cv::Size(patchSize_x, patchsize_y),
-                          cv::Point2f(center_x, center_y), retval, patchType);
+        cv::getRectSubPix(image.toMat(), patchSize.toCV(),
+                          center.toCV(), retval, patchType);
         return TensorWrapper(retval);
     } else if (image.tensorPtr == patch.tensorPtr) {
         // in-place
         THError("In-place isn't possible");
     } else {
-        cv::getRectSubPix(image.toMat(), cv::Size(patchSize_x, patchsize_y),
-                          cv::Point2f(center_x, center_y), patch.toMat(), patchType);
+        cv::getRectSubPix(image.toMat(), patchSize.toCV(),
+                          center.toCV(), patch.toMat(), patchType);
     }
     return patch;
 }
@@ -672,17 +673,17 @@ extern "C" struct TensorWrapper getRectSubPix(
 extern "C"
 struct TensorWrapper logPolar(
         struct TensorWrapper src, struct TensorWrapper dst,
-        float center_x, float center_y, double M, int flags)
+        struct Point2fWrapper center, double M, int flags)
 {
     if (dst.isNull()) {
         cv::Mat retval;
-        cv::logPolar(src.toMat(), retval, cv::Point2f(center_x, center_y), M, flags);
+        cv::logPolar(src.toMat(), retval, center.toCV(), M, flags);
         return TensorWrapper(retval);
     } else if (src.tensorPtr == dst.tensorPtr) {
         // in-place
         THError("In-place isn't possible");
     } else {
-        cv::logPolar(src.toMat(), dst.toMat(), cv::Point2f(center_x, center_y), M, flags);
+        cv::logPolar(src.toMat(), dst.toMat(), center.toCV(), M, flags);
     }
     return dst;
 }
@@ -690,17 +691,17 @@ struct TensorWrapper logPolar(
 extern "C"
 struct TensorWrapper linearPolar(
         struct TensorWrapper src, struct TensorWrapper dst,
-        float center_x, float center_y, double maxRadius, int flags)
+        struct Point2fWrapper center, double maxRadius, int flags)
 {
     if (dst.isNull()) {
         cv::Mat retval;
-        cv::linearPolar(src.toMat(), retval, cv::Point2f(center_x, center_y), maxRadius, flags);
+        cv::linearPolar(src.toMat(), retval, center.toCV(), maxRadius, flags);
         return TensorWrapper(retval);
     } else if (src.tensorPtr == dst.tensorPtr) {
         // in-place
         THError("In-place isn't possible");
     } else {
-        cv::linearPolar(src.toMat(), dst.toMat(), cv::Point2f(center_x, center_y), maxRadius, flags);
+        cv::linearPolar(src.toMat(), dst.toMat(), center.toCV(), maxRadius, flags);
     }
     return dst;
 }
@@ -787,17 +788,17 @@ struct Vec3dWrapper phaseCorrelate(
 
 extern "C"
 struct TensorWrapper createHanningWindow(
-        struct TensorWrapper dst, int winSize_x, int winSize_y, int type)
+        struct TensorWrapper dst, struct SizeWrapper winSize, int type)
 {
     if (dst.isNull()) {
         // output to retval
         cv::Mat retval;
-        cv::createHanningWindow(retval, cv::Size(winSize_x, winSize_y), type);
+        cv::createHanningWindow(retval, winSize.toCV(), type);
         return TensorWrapper(retval);
     } else {
         // try to output to dst
         cv::Mat dstMat = dst.toMat();
-        cv::createHanningWindow(dstMat, cv::Size(winSize_x, winSize_y), type);
+        cv::createHanningWindow(dstMat, winSize.toCV(), type);
         return dst;
     }
 }
@@ -849,18 +850,18 @@ struct TensorWrapper adaptiveThreshold(
 extern "C"
 struct TensorWrapper pyrDown(
         struct TensorWrapper src, struct TensorWrapper dst,
-        int dstSize_x, int dstSize_y, int borderType)
+        struct SizeWrapper dstSize, int borderType)
 {
     if (dst.isNull()) {
         cv::Mat retval;
-        cv::pyrDown(src.toMat(), retval, cv::Size(dstSize_x, dstSize_y), borderType);
+        cv::pyrDown(src.toMat(), retval, dstSize.toCV(), borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cv::Mat source = src.toMat();
-        cv::pyrDown(source, source, cv::Size(dstSize_x, dstSize_y), borderType);
+        cv::pyrDown(source, source, dstSize.toCV(), borderType);
     } else {
-        cv::pyrDown(src.toMat(), dst.toMat(), cv::Size(dstSize_x, dstSize_y), borderType);
+        cv::pyrDown(src.toMat(), dst.toMat(), dstSize.toCV(), borderType);
     }
     return dst;
 }
@@ -868,18 +869,18 @@ struct TensorWrapper pyrDown(
 extern "C"
 struct TensorWrapper pyrUp(
         struct TensorWrapper src, struct TensorWrapper dst,
-        int dstSize_x, int dstSize_y, int borderType)
+        struct SizeWrapper dstSize, int borderType)
 {
     if (dst.isNull()) {
         cv::Mat retval;
-        cv::pyrUp(src.toMat(), retval, cv::Size(dstSize_x, dstSize_y), borderType);
+        cv::pyrUp(src.toMat(), retval, dstSize.toCV(), borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cv::Mat source = src.toMat();
-        cv::pyrUp(source, source, cv::Size(dstSize_x, dstSize_y), borderType);
+        cv::pyrUp(source, source, dstSize.toCV(), borderType);
     } else {
-        cv::pyrUp(src.toMat(), dst.toMat(), cv::Size(dstSize_x, dstSize_y), borderType);
+        cv::pyrUp(src.toMat(), dst.toMat(), dstSize.toCV(), borderType);
     }
     return dst;
 }
@@ -919,7 +920,7 @@ extern "C" struct TensorWrapper undistort(
 extern "C" struct MultipleTensorWrapper initUndistortRectifyMap(
         struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
         struct TensorWrapper R, struct TensorWrapper newCameraMatrix,
-        int size_x, int size_y, int m1type,
+        struct SizeWrapper size, int m1type,
         struct MultipleTensorWrapper maps)
 {
     if (maps.isNull()) {
@@ -928,7 +929,7 @@ extern "C" struct MultipleTensorWrapper initUndistortRectifyMap(
         cv::initUndistortRectifyMap(
                 cameraMatrix.toMat(), TO_MAT_OR_NOARRAY(distCoeffs),
                 TO_MAT_OR_NOARRAY(R), newCameraMatrix.toMat(),
-                cv::Size(size_x, size_y), m1type, retval[0], retval[1]);
+                size.toCV(), m1type, retval[0], retval[1]);
         return MultipleTensorWrapper(retval);
     } else {
         // oh. try to output to 'maps'...
@@ -936,14 +937,14 @@ extern "C" struct MultipleTensorWrapper initUndistortRectifyMap(
         cv::initUndistortRectifyMap(
                 cameraMatrix.toMat(), TO_MAT_OR_NOARRAY(distCoeffs),
                 TO_MAT_OR_NOARRAY(R), newCameraMatrix.toMat(),
-                cv::Size(size_x, size_y), m1type, mapsVector[0], mapsVector[1]);
+                size.toCV(), m1type, mapsVector[0], mapsVector[1]);
         return maps;
     }
 }
 
 extern "C" struct MTWPlusFloat initWideAngleProjMap(
         struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
-        int imageSize_x, int imageSize_y, int destImageWidth,
+        struct SizeWrapper imageSize, int destImageWidth,
         int m1type, struct MultipleTensorWrapper maps,
         int projType, double alpha)
 {
@@ -953,7 +954,7 @@ extern "C" struct MTWPlusFloat initWideAngleProjMap(
         std::vector<cv::Mat> resultMats(2);
         retval.val = cv::initWideAngleProjMap(
                 cameraMatrix.toMat(), TO_MAT_OR_NOARRAY(distCoeffs),
-                cv::Size(imageSize_x, imageSize_y), destImageWidth,
+                imageSize.toCV(), destImageWidth,
                 m1type, resultMats[0], resultMats[1], projType, alpha);
         new (&retval.tensors) MultipleTensorWrapper(resultMats);
         return retval;
@@ -964,18 +965,18 @@ extern "C" struct MTWPlusFloat initWideAngleProjMap(
         auto mapsVec = maps.toMatList();
         retval.val = cv::initWideAngleProjMap(
                 cameraMatrix.toMat(), TO_MAT_OR_NOARRAY(distCoeffs),
-                cv::Size(imageSize_x, imageSize_y), destImageWidth,
+                imageSize.toCV(), destImageWidth,
                 m1type, mapsVec[0], mapsVec[1], projType, alpha);
         return retval;
     }
 }
 
 extern "C" struct TensorWrapper getDefaultNewCameraMatrix(
-        struct TensorWrapper cameraMatrix, int imgsize_x, int imgsize_y, bool centerPrincipalPoint)
+        struct TensorWrapper cameraMatrix, struct SizeWrapper imgsize, bool centerPrincipalPoint)
 {
     return TensorWrapper(
             cv::getDefaultNewCameraMatrix(
-                    cameraMatrix.toMat(), cv::Size(imgsize_x, imgsize_y), centerPrincipalPoint
+                    cameraMatrix.toMat(), imgsize.toCV(), centerPrincipalPoint
             ));
 }
 
@@ -1164,18 +1165,18 @@ extern "C" struct MultipleTensorWrapper distanceTransformWithLabels(
 
 extern "C" struct RectPlusInt floodFill(
         struct TensorWrapper image, struct TensorWrapper mask,
-        int seedPoint_x, int seedPoint_y, struct ScalarWrapper newVal,
+        struct PointWrapper seedPoint, struct ScalarWrapper newVal,
         struct ScalarWrapper loDiff, struct ScalarWrapper upDiff, int flags)
 {
     RectPlusInt retval;
     cv::Rect funcResult;
     if (mask.isNull()) {
         retval.val = cv::floodFill(
-                image.toMat(), cv::Point(seedPoint_x, seedPoint_y),
+                image.toMat(), seedPoint.toCV(),
                 newVal.toCV(), &funcResult, loDiff.toCV(), upDiff.toCV(), flags);
     } else {
         retval.val = cv::floodFill(
-                image.toMat(), mask.toMat(), cv::Point(seedPoint_x, seedPoint_y),
+                image.toMat(), mask.toMat(), seedPoint.toCV(),
                 newVal.toCV(), &funcResult, loDiff.toCV(), upDiff.toCV(), flags);
     }
     retval.rect = funcResult;
