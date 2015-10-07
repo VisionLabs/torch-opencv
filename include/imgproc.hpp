@@ -273,7 +273,7 @@ extern "C" struct TensorWrapper pyrMeanShiftFiltering(
 
 extern "C" void grabCut(
         struct TensorWrapper img, struct TensorWrapper mask,
-        RectWrapper rect, struct TensorWrapper bgdModel,
+        struct RectWrapper rect, struct TensorWrapper bgdModel,
         struct TensorWrapper fgdModel, int iterCount, int mode);
 
 extern "C" struct TensorWrapper distanceTransform(

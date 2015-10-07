@@ -284,6 +284,28 @@ void watershed(
 struct TensorWrapper pyrMeanShiftFiltering(
         struct TensorWrapper src, struct TensorWrapper dst,
         double sp, double sr, int maxLevel, struct TermCriteriaWrapper termcrit);
+
+void grabCut(
+        struct TensorWrapper img, struct TensorWrapper mask,
+        struct RectWrapper rect, struct TensorWrapper bgdModel,
+        struct TensorWrapper fgdModel, int iterCount, int mode);
+
+struct TensorWrapper distanceTransform(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int distanceType, int maskSize, int dstType);
+
+struct MultipleTensorWrapper distanceTransformWithLabels(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper labels, int distanceType, int maskSize,
+        int labelType);
+
+struct RectPlusInt floodFill(
+        struct TensorWrapper image, struct TensorWrapper mask,
+        int seedPoint_x, int seedPoint_y, struct ScalarWrapper newVal,
+        struct ScalarWrapper loDiff, struct ScalarWrapper upDiff, int flags);
+
+struct TensorWrapper cvtColor(
+        struct TensorWrapper src, struct TensorWrapper dst, int code, int dstCn);
 ]]
 
 
