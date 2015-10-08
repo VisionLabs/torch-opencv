@@ -49,26 +49,34 @@ std::string typeStr(cv::Mat & mat) {
 
 /***************** Wrappers for small OpenCV classes *****************/
 
+struct SizeWrapper {
+    int width, height;
+
+    inline operator cv::Size() { return cv::Size(width, height); }
+};
+
+struct Size2fWrapper {
+    float width, height;
+
+    inline operator cv::Size2f() { return cv::Size2f(width, height); }
+};
+
 struct TermCriteriaWrapper {
     int type, maxCount;
     double epsilon;
 
-    inline cv::TermCriteria toCV() {
-        return cv::TermCriteria(type, maxCount, epsilon);
-    }
-    inline cv::TermCriteria toCVorDefault(cv::TermCriteria defaultVal) {
-        return (this->type == -1 ? defaultVal : this->toCV());
+    inline operator cv::TermCriteria() { return cv::TermCriteria(type, maxCount, epsilon); }
+    inline cv::TermCriteria orDefault(cv::TermCriteria defaultVal) {
+        return (this->type == 0 ? defaultVal : *this);
     }
 };
 
 struct ScalarWrapper {
     double v0, v1, v2, v3;
 
-    inline cv::Scalar toCV() {
-        return cv::Scalar(v0, v1, v2, v3);
-    }
-    inline cv::Scalar toCVorDefault(cv::Scalar defaultVal) {
-        return (isnan(this->v0) ? defaultVal : this->toCV());
+    inline operator cv::Scalar() { return cv::Scalar(v0, v1, v2, v3); }
+    inline cv::Scalar orDefault(cv::Scalar defaultVal) {
+        return (isnan(this->v0) ? defaultVal : *this);
     }
 };
 
@@ -76,19 +84,63 @@ struct Vec3dWrapper {
     double v0, v1, v2;
 };
 
+struct RectWrapper {
+    int x, y, width, height;
+
+    inline operator cv::Rect() { return cv::Rect(x, y, width, height); }
+    RectWrapper & operator=(cv::Rect & other);
+};
+
+struct PointWrapper {
+    int x, y;
+
+    inline operator cv::Point() { return cv::Point(x, y); }
+};
+
+struct Point2fWrapper {
+    float x, y;
+
+    inline operator cv::Point2f() { return cv::Point2f(x, y); }
+};
+
+struct RotatedRectWrapper {
+    struct Point2fWrapper center;
+    struct Size2fWrapper size;
+    float angle;
+
+    inline operator cv::RotatedRect() { return cv::RotatedRect(center, size, angle); }
+};
+
+struct MomentsWrapper {
+    double m00, m10, m01, m20, m11, m02, m30, m21, m12, m03;
+    double mu20, mu11, mu02, mu30, mu21, mu12, mu03;
+    double nu20, nu11, nu02, nu30, nu21, nu12, nu03;
+
+    inline operator cv::Moments() {
+        return cv::Moments(m00, m10, m01, m20, m11, m02, m30, m21, m12, m03);
+    }
+};
+
 /***************** Helper wrappers for [OpenCV class + some primitive] *****************/
 
 struct TWPlusDouble {
-    TensorWrapper tensor;
+    struct TensorWrapper tensor;
     double val;
 };
 
 struct MTWPlusFloat {
-    MultipleTensorWrapper tensors;
+    struct MultipleTensorWrapper tensors;
     float val;
 };
 
+struct RectPlusInt {
+    struct RectWrapper rect;
+    int val;
+};
+
 /***************** Other helper structs *****************/
+
+// Arrays
 
 struct IntArray {
     int *data;
@@ -100,8 +152,27 @@ struct FloatArray {
     int size;
 };
 
+struct PointArray {
+    struct PointWrapper *data;
+    int size;
+};
+
+struct RectArray {
+    struct RectWrapper *data;
+    int size;
+};
+
+// Arrays of arrays
+
 struct FloatArrayOfArrays {
     float **pointers;
     float *realData;
     int dims;
+};
+
+struct PointArrayOfArrays {
+    struct PointWrapper **pointers;
+    struct PointWrapper *realData;
+    int dims;
+    int *sizes;
 };

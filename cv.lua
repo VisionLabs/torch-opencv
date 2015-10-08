@@ -28,6 +28,14 @@ void free(void *ptr);
 
 void transfer_tensor(void *destination, void *source);
 
+struct SizeWrapper {
+    int width, height;
+};
+
+struct Size2fWrapper {
+    float width, height;
+};
+
 struct TermCriteriaWrapper {
     int type, maxCount;
     double epsilon;
@@ -41,6 +49,30 @@ struct Vec3dWrapper {
     double v0, v1, v2;
 };
 
+struct RectWrapper {
+    int x, y, width, height;
+};
+
+struct PointWrapper {
+    int x, y;
+};
+
+struct Point2fWrapper {
+    float x, y;
+};
+
+struct RotatedRectWrapper {
+    struct Point2fWrapper center;
+    struct Size2fWrapper size;
+    float angle;
+};
+
+struct MomentsWrapper {
+    double m00, m10, m01, m20, m11, m02, m30, m21, m12, m03;
+    double mu20, mu11, mu02, mu30, mu21, mu12, mu03;
+    double nu20, nu11, nu02, nu30, nu21, nu12, nu03;
+};
+
 struct TWPlusDouble {
     struct TensorWrapper tensor;
     double val;
@@ -51,8 +83,28 @@ struct MTWPlusFloat {
     float val;
 };
 
+struct RectPlusInt {
+    struct RectWrapper rect;
+    int val;
+};
+
 struct IntArray {
     int *data;
+    int size;
+};
+
+struct FloatArray {
+    float *data;
+    int size;
+};
+
+struct PointArray {
+    struct PointWrapper *data;
+    int size;
+};
+
+struct RectArray {
+    struct RectWrapper *data;
     int size;
 };
 
@@ -62,9 +114,12 @@ struct FloatArrayOfArrays {
     int dims;
 };
 
-struct Algorithm;
-struct Algorithm *createAlgorithm();
-void destroyAlgorithm(struct Algorithm *ptr);
+struct PointArrayOfArrays {
+    struct PointWrapper **pointers;
+    struct PointWrapper *realData;
+    int dims;
+    int *sizes;
+};
 ]]
 
 local C = ffi.load(libPath('Common'))
@@ -194,12 +249,18 @@ end
 
 --- ***************** Wrappers for small OpenCV classes *****************
 
+-- TODO: generate these straight in the code
+
 function cv.TermCriteria(criteria)
     return ffi.new('struct TermCriteriaWrapper', criteria)
 end
 
 function cv.Scalar(values)
     return ffi.new('struct ScalarWrapper', values)
+end
+
+function cv.Rect(values)
+    return ffi.new('struct RectWrapper', values)
 end
 
 --- ***************** Other helper structs *****************
@@ -221,27 +282,51 @@ for i = 1,1e6 do
     ......
 --]]
 function cv.newArray(elemType, data)
-    retval = ffi.new('struct ' .. elemType .. 'Array')
-    retval.data = ffi.gc(C.malloc(#data * ffi.sizeof(elemType:lower())), C.free)
-    retval.size = #data
-    for i, value in ipairs(data) do
-        retval.data[i-1] = data[i]
+    local retval
+    local fullTypeName
+    local shortTypeName
+
+    if elemType:byte(3) == 46 then
+        -- there's a period after 2 symbols: likely "cv.Something"
+        shortTypeName = elemType:sub(4)
+        fullTypeName = 'struct ' .. shortTypeName .. 'Wrapper'
+        retval = ffi.new('struct ' .. shortTypeName .. 'Array')
+    else
+        -- C primitive type, such as 'Int' or 'Float'
+        fullTypeName = elemType:lower()
+        retval = ffi.new('struct ' .. elemType .. 'Array')
     end
+    
+    retval.data = ffi.gc(C.malloc(#data * ffi.sizeof(fullTypeName)), C.free)
+    retval.size = #data
+
+    if elemType:byte(3) == 46 then
+        for i, value in ipairs(data) do
+            retval.data[i-1] = cv[shortTypeName](data[i])
+        end
+    else
+        for i, value in ipairs(data) do
+            retval.data[i-1] = data[i]
+        end
+    end
+
     return retval
 end
 
--- table of tables of numbers ---> struct FloatArrayOfArrays
-function cv.FloatArrayOfArrays(data)
-    retval = ffi.new('struct FloatArrayOfArrays')
+-- TODO: function cv.newArrayOfArrays(elemType, data)
+
+-- example: table of tables of numbers ---> struct FloatArrayOfArrays
+function cv.numberArrayOfArrays(elemType, data)
+    local retval = ffi.new('struct ' .. elemType .. 'ArrayOfArrays')
 
     -- first, compute relative addresses
-    retval.pointers = ffi.gc(C.malloc(#data * ffi.sizeof('float*') + 1), C.free)
+    retval.pointers = ffi.gc(C.malloc(#data * ffi.sizeof(elemType:lower() .. '*') + 1), C.free)
     retval.pointers[0] = nil
     
     for i, row in ipairs(data) do
         data[i] = data[i-1] + #row
     end
-    retval.realData = ffi.gc(C.malloc(totalElemSize * ffi.sizeof('float')), C.free)
+    retval.realData = ffi.gc(C.malloc(totalElemSize * ffi.sizeof(elemType:lower())), C.free)
 
     retval.pointers[0] = retval.realData
     local counter = 0
@@ -253,21 +338,6 @@ function cv.FloatArrayOfArrays(data)
         end
         -- transform relative addresses to absolute
         retval.pointers[i] = retval.pointers[i] + retval.realData
-    end
-end
-
---- ***************** Common base classes *****************
-
-do
-    -- TODO this: implement RAII via :__gc()
-    local Algorithm = torch.class('cv.Algorithm')
-    
-    function Algorithm:destroy()
-        C.destroyAlgorithm(self.ptr);
-    end
-
-    function Algorithm:__init()
-        --self.ptr = C.createAlgorithm();
     end
 end
 
