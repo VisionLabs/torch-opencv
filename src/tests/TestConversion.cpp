@@ -13,7 +13,7 @@ TensorWrapper test_mat_to_tensor() {
 
 extern "C"
 void test_tensor_to_mat(TensorWrapper tensor) {
-    cv::Mat temp = tensor.toMat();
+    cv::Mat temp = tensor;
     std::cout << "This is a " << temp.channels() <<
     "-channel Mat of type " << typeStr(temp) << std::endl;
     std::cout << temp * 10. << std::endl;

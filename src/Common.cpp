@@ -51,7 +51,7 @@ TensorWrapper::TensorWrapper(cv::Mat && mat) {
     new (this) TensorWrapper(mat);
 }
 
-cv::Mat TensorWrapper::toMat() {
+TensorWrapper::operator cv::Mat() {
 
     THByteTensor *tensorPtr = static_cast<THByteTensor *>(this->tensorPtr);
 
@@ -110,10 +110,10 @@ MultipleTensorWrapper::MultipleTensorWrapper(std::vector<cv::Mat> & matList):
     }
 }
 
-std::vector<cv::Mat> MultipleTensorWrapper::toMatList() {
+MultipleTensorWrapper::operator std::vector<cv::Mat>() {
     std::vector<cv::Mat> retval(this->size);
     for (int i = 0; i < this->size; ++i) {
-        retval[i] = this->tensors[i].toMat();
+        retval[i] = this->tensors[i];
     }
     return retval;
 }
@@ -141,12 +141,21 @@ void transfer_tensor(void *destination, void *source) {
 
 /***************** Wrappers for small classes *****************/
 
-extern "C"
-cv::Algorithm *createAlgorithm() {
-    return new cv::Algorithm();
+MomentsWrapper::MomentsWrapper(cv::Moments other) {
+    m00 = other.m00; m01 = other.m01; m02 = other.m02; m03 = other.m03; m10 = other.m10;
+    m11 = other.m11; m12 = other.m12; m20 = other.m20; m21 = other.m21; m30 = other.m30;
+    mu20 = other.mu20; mu11 = other.mu11; mu02 = other.mu02; mu30 = other.mu30;
+    mu21 = other.mu21; mu12 = other.mu12; mu03 = other.mu03;
+    nu20 = other.nu20; nu11 = other.nu11; nu02 = other.nu02; nu30 = other.nu30;
+    nu21 = other.nu21; nu12 = other.nu12; nu03 = other.nu03;
 }
 
-extern "C"
-void destroyAlgorithm(cv::Algorithm *ptr) {
-    delete ptr;
+/***************** Helper wrappers for [OpenCV class + some primitive] *****************/
+
+RectWrapper & RectWrapper::operator=(cv::Rect & other) {
+    this->x = other.x;
+    this->y = other.y;
+    this->width = other.width;
+    this->height = other.height;
+    return *this;
 }

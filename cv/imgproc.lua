@@ -4,53 +4,51 @@ local ffi = require 'ffi'
 
 ffi.cdef[[
 
-struct TensorWrapper getGaussianKernel(
-        int ksize, double sigma, int ktype);
+struct TensorWrapper getGaussianKernel(int ksize, double sigma, int ktype);
 
 struct MultipleTensorWrapper getDerivKernels(
-        int dx, int dy, int ksize, bool normalize, int ktype);
+        int dx, int dy, int ksize,
+        bool normalize, int ktype);
 
-struct TensorWrapper getGaborKernel(
-        int ksize_rows, int ksize_cols, double sigma, double theta,
-        double lambd, double gamma, double psi, int ktype);
+struct TensorWrapper getGaborKernel(struct SizeWrapper ksize, double sigma, double theta,
+                                    double lambd, double gamma, double psi, int ktype);
 
-struct TensorWrapper getStructuringElement(
-        int shape, int ksize_rows, int ksize_cols, 
-        int anchor_x, int anchor_y);
+struct TensorWrapper getStructuringElement(int shape, struct SizeWrapper ksize,
+                                           struct PointWrapper anchor);
 
-struct TensorWrapper medianBlur(
-        struct TensorWrapper src, struct TensorWrapper dst, int ksize);
+struct TensorWrapper medianBlur(struct TensorWrapper src, struct TensorWrapper dst, int ksize);
 
-struct TensorWrapper GaussianBlur(
-        struct TensorWrapper src, struct TensorWrapper dst, 
-        int ksize_x, int ksize_y, double sigmaX, double sigmaY, int borderType);
+struct TensorWrapper GaussianBlur(struct TensorWrapper src, struct TensorWrapper dst,
+                                  struct SizeWrapper ksize, double sigmaX,
+                                  double sigmaY, int borderType);
 
-struct TensorWrapper bilateralFilter(
-        struct TensorWrapper src, struct TensorWrapper dst, int d, 
-        double sigmaColor, double sigmaSpace, int borderType);
+struct TensorWrapper bilateralFilter(struct TensorWrapper src, struct TensorWrapper dst, int d,
+                                     double sigmaColor, double sigmaSpace,
+                                     int borderType);
 
 struct TensorWrapper boxFilter(
-        struct TensorWrapper src, struct TensorWrapper dst, int ddepth, 
-        int ksize_x, int ksize_y, int anchor_x, int anchor_y, bool normalize, int borderType);
+        struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
+        struct SizeWrapper ksize, struct PointWrapper anchor,
+        bool normalize, int borderType);
 
 struct TensorWrapper sqrBoxFilter(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
-        int ksize_x, int ksize_y, int anchor_x, int anchor_y,
+        struct SizeWrapper ksize, struct PointWrapper anchor,
         bool normalize, int borderType);
 
 struct TensorWrapper blur(
         struct TensorWrapper src, struct TensorWrapper dst,
-        int ksize_x, int ksize_y, int anchor_x, int anchor_y, int borderType);
+        struct SizeWrapper ksize, struct PointWrapper anchor, int borderType);
 
 struct TensorWrapper filter2D(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
-        struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        struct TensorWrapper kernel, struct PointWrapper anchor,
         double delta, int borderType);
 
 struct TensorWrapper sepFilter2D(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
         struct TensorWrapper kernelX,struct TensorWrapper kernelY,
-        int anchor_x, int anchor_y, double delta, int borderType);
+        struct PointWrapper anchor, double delta, int borderType);
 
 struct TensorWrapper Sobel(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
@@ -59,7 +57,6 @@ struct TensorWrapper Sobel(
 struct TensorWrapper Scharr(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
         int dx, int dy, double scale, double delta, int borderType);
-
 
 struct TensorWrapper Laplacian(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
@@ -84,7 +81,6 @@ struct TensorWrapper cornerEigenValsAndVecs(
 struct TensorWrapper preCornerDetect(
         struct TensorWrapper src, struct TensorWrapper dst, int ksize, int borderType);
 
-
 struct TensorWrapper HoughLines(
         struct TensorWrapper image,
         double rho, double theta, int threshold, double srn, double stn,
@@ -94,7 +90,6 @@ struct TensorWrapper HoughLinesP(
         struct TensorWrapper image, double rho,
         double theta, int threshold, double minLineLength, double maxLineGap);
 
-
 struct TensorWrapper HoughCircles(
         struct TensorWrapper image,
         int method, double dp, double minDist, double param1, double param2,
@@ -102,48 +97,42 @@ struct TensorWrapper HoughCircles(
 
 void cornerSubPix(
         struct TensorWrapper image, struct TensorWrapper corners,
-        int winSize_x, int winSize_y, int zeroZone_x, int zeroZone_y,
+        struct SizeWrapper winSize, struct SizeWrapper zeroZone,
         struct TermCriteriaWrapper criteria);
 
 struct TensorWrapper goodFeaturesToTrack(
         struct TensorWrapper image,
         int maxCorners, double qualityLevel, double minDistance,
         struct TensorWrapper mask, int blockSize, bool useHarrisDetector, double k);
-        
+
 struct TensorWrapper erode(
         struct TensorWrapper src, struct TensorWrapper dst,
-        struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        struct TensorWrapper kernel, struct PointWrapper anchor,
         int iterations, int borderType, struct ScalarWrapper borderValue);
 
 struct TensorWrapper dilate(
         struct TensorWrapper src, struct TensorWrapper dst,
-        struct TensorWrapper kernel, int anchor_x, int anchor_y,
+        struct TensorWrapper kernel, struct PointWrapper anchor,
         int iterations, int borderType, struct ScalarWrapper borderValue);
 
 struct TensorWrapper morphologyEx(
         struct TensorWrapper src, struct TensorWrapper dst,
-        int op, struct TensorWrapper kernel,
-        int anchor_x, int anchor_y, int iterations,
-        int borderType, struct ScalarWrapper borderValue);
+        int op, struct TensorWrapper kernel, struct PointWrapper anchor,
+        int iterations, int borderType, struct ScalarWrapper borderValue);
 
 struct TensorWrapper resize(
         struct TensorWrapper src, struct TensorWrapper dst,
-        int dsize_x, int dsize_y, double fx, double fy,
-        int interpolation);
-        
-struct TensorWrapper resize(
-        struct TensorWrapper src, struct TensorWrapper dst,
-        int dsize_x, int dsize_y, double fx, double fy,
+        struct SizeWrapper dsize, double fx, double fy,
         int interpolation);
 
 struct TensorWrapper warpAffine(
         struct TensorWrapper src, struct TensorWrapper dst,
-        struct TensorWrapper M, int dsize_x, int dsize_y, 
+        struct TensorWrapper M, struct SizeWrapper dsize,
         int flags, int borderMode, struct ScalarWrapper borderValue);
 
 struct TensorWrapper warpPerspective(
         struct TensorWrapper src, struct TensorWrapper dst,
-        struct TensorWrapper M, int dsize_x, int dsize_y,
+        struct TensorWrapper M, struct SizeWrapper dsize,
         int flags, int borderMode, struct ScalarWrapper borderValue);
 
 struct TensorWrapper remap(
@@ -157,8 +146,11 @@ struct MultipleTensorWrapper convertMaps(
         int dstmap1type, bool nninterpolation);
 
 struct TensorWrapper getRotationMatrix2D(
-        double center_x, double center_y, double angle, double scale);
-        
+        struct Point2fWrapper center, double angle, double scale);
+
+struct TensorWrapper invertAffineTransform(
+        struct TensorWrapper M, struct TensorWrapper iM);
+
 struct TensorWrapper getPerspectiveTransform(
         struct TensorWrapper src, struct TensorWrapper dst);
 
@@ -166,25 +158,22 @@ struct TensorWrapper getAffineTransform(
         struct TensorWrapper src, struct TensorWrapper dst);
 
 struct TensorWrapper getRectSubPix(
-        struct TensorWrapper image, int patchSize_x, int patchsize_y,
-        double center_x, double center_y, struct TensorWrapper patch,
-        int patchType);
-        
+        struct TensorWrapper image, struct SizeWrapper patchSize,
+        struct Point2fWrapper center, struct TensorWrapper patch, int patchType);
+
 struct TensorWrapper logPolar(
         struct TensorWrapper src, struct TensorWrapper dst,
-        float center_x, float center_y, double M, int flags);
+        struct Point2fWrapper center, double M, int flags);
 
 struct TensorWrapper linearPolar(
         struct TensorWrapper src, struct TensorWrapper dst,
-        float center_x, float center_y, double maxRadius, int flags);
+        struct Point2fWrapper center, double maxRadius, int flags);
 
 struct TensorWrapper integral(
         struct TensorWrapper src, struct TensorWrapper sum, int sdepth);
 
 struct MultipleTensorWrapper integralN(
-        struct TensorWrapper src, struct TensorWrapper sum,
-        struct TensorWrapper sqsum, struct TensorWrapper tilted,
-        int sdepth, int sqdepth);
+        struct TensorWrapper src, struct MultipleTensorWrapper sums, int sdepth, int sqdepth);
 
 void accumulate(
         struct TensorWrapper src, struct TensorWrapper dst,
@@ -207,7 +196,7 @@ struct Vec3dWrapper phaseCorrelate(
         struct TensorWrapper window);
 
 struct TensorWrapper createHanningWindow(
-        struct TensorWrapper dst, int winSize_x, int winSize_y, int type);
+        struct TensorWrapper dst, struct SizeWrapper winSize, int type);
 
 struct TWPlusDouble threshold(
         struct TensorWrapper src, struct TensorWrapper dst,
@@ -220,11 +209,11 @@ struct TensorWrapper adaptiveThreshold(
 
 struct TensorWrapper pyrDown(
         struct TensorWrapper src, struct TensorWrapper dst,
-        int dstSize_x, int dstSize_y, int borderType);
+        struct SizeWrapper dstSize, int borderType);
 
 struct TensorWrapper pyrUp(
         struct TensorWrapper src, struct TensorWrapper dst,
-        int dstSize_x, int dstSize_y, int borderType);
+        struct SizeWrapper dstSize, int borderType);
 
 struct MultipleTensorWrapper buildPyramid(
         struct TensorWrapper src, struct MultipleTensorWrapper dst,
@@ -238,17 +227,17 @@ struct TensorWrapper undistort(
 struct MultipleTensorWrapper initUndistortRectifyMap(
         struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
         struct TensorWrapper R, struct TensorWrapper newCameraMatrix,
-        int size_x, int size_y, int m1type,
+        struct SizeWrapper size, int m1type,
         struct MultipleTensorWrapper maps);
 
 struct MTWPlusFloat initWideAngleProjMap(
         struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
-        int imageSize_x, int imageSize_y, int destImageWidth,
+        struct SizeWrapper imageSize, int destImageWidth,
         int m1type, struct MultipleTensorWrapper maps,
         int projType, double alpha);
 
 struct TensorWrapper getDefaultNewCameraMatrix(
-        struct TensorWrapper cameraMatrix, int imgsize_x, int imgsize_y, bool centerPrincipalPoint);
+        struct TensorWrapper cameraMatrix, struct SizeWrapper imgsize, bool centerPrincipalPoint);
 
 struct TensorWrapper undistortPoints(
         struct TensorWrapper src, struct TensorWrapper dst,
@@ -284,10 +273,34 @@ void watershed(
 struct TensorWrapper pyrMeanShiftFiltering(
         struct TensorWrapper src, struct TensorWrapper dst,
         double sp, double sr, int maxLevel, struct TermCriteriaWrapper termcrit);
+
+void grabCut(
+        struct TensorWrapper img, struct TensorWrapper mask,
+        struct RectWrapper rect, struct TensorWrapper bgdModel,
+        struct TensorWrapper fgdModel, int iterCount, int mode);
+
+struct TensorWrapper distanceTransform(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int distanceType, int maskSize, int dstType);
+
+struct MultipleTensorWrapper distanceTransformWithLabels(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        struct TensorWrapper labels, int distanceType, int maskSize,
+        int labelType);
+
+struct RectPlusInt floodFill(
+        struct TensorWrapper image, struct TensorWrapper mask,
+        struct PointWrapper seedPoint, struct ScalarWrapper newVal,
+        struct ScalarWrapper loDiff, struct ScalarWrapper upDiff, int flags);
+
+struct TensorWrapper cvtColor(
+        struct TensorWrapper src, struct TensorWrapper dst, int code, int dstCn);
+
+
 ]]
 
 
-local C = ffi.load 'lib/libimgproc.so'
+local C = ffi.load(libPath('imgproc'))
 
 
 function cv.getGaussianKernel(t)
@@ -310,8 +323,7 @@ end
 
 
 function cv.getGaborKernel(t)
-    local ksize = t.ksize
-    assert(#ksize == 2)
+    local ksize = cv.Size(assert(t.ksize))
     local sigma = assert(t.sigma)
     local theta = assert(t.theta)
     local lambd = assert(t.lambd)
@@ -320,18 +332,16 @@ function cv.getGaborKernel(t)
     local ktype = t.ktype or cv.CV_64F
 
     return cv.unwrap_tensors(
-        C.getGaborKernel(ksize[1], ksize[2], sigma, theta, lambd, gamma, psi, ktype))
+        C.getGaborKernel(ksize, sigma, theta, lambd, gamma, psi, ktype))
 end
 
 
 function cv.getStructuringElement(t)
     local shape =  assert(t.shape)
-    local ksize =  t.ksize
-    assert(#ksize == 2)
-    local anchor = t.anchor or {-1, -1}
-    assert(#anchor == 2)
+    local ksize =  cv.Size(assert(t.ksize))
+    local anchor = cv.Point(t.anchor or {-1, -1})
 
-    return cv.unwrap_tensors(C.getStructuringElement(shape, ksize[1], ksize[2], anchor[1], anchor[2]))
+    return cv.unwrap_tensors(C.getStructuringElement(shape, ksize, anchor))
 end
 
 
@@ -364,8 +374,7 @@ end
 function cv.GaussianBlur(t)
     local src =        assert(t.src)
     local dst =        t.dst
-    local ksize =      t.ksize
-    assert(#ksize == 2)
+    local ksize =      cv.Size(assert(t.ksize))
     local sigmaX =     assert(t.sigmaX)
     local sigmaY =     t.sigmaY or 0
     local borderType = t.borderType or cv.BORDER_DEFAULT
@@ -378,7 +387,7 @@ function cv.GaussianBlur(t)
 
     return cv.unwrap_tensors(
         C.GaussianBlur(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), ksize[1], ksize[2], sigmaX, sigmaY, borderType))
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), ksize, sigmaX, sigmaY, borderType))
 end
 
 
@@ -409,10 +418,8 @@ function cv.boxFilter(t)
     local src =        assert(t.src)
     local dst =        t.dst
     local ddepth =     assert(t.ddepth)
-    local ksize =      t.ksize
-    assert(#ksize == 2)
-    local anchor = t.anchor or {-1, -1}
-    assert(#anchor == 2)
+    local ksize =      cv.Size(assert(t.ksize))
+    local anchor = cv.Point(t.anchor or {-1, -1})
     local normalize =  t.normalize
     if normalize == nil then normalize = true end
     local borderType = t.borderType or cv.BORDER_DEFAULT
@@ -424,7 +431,7 @@ function cv.boxFilter(t)
     return cv.unwrap_tensors(
         C.boxFilter(
             cv.wrap_tensors(src), cv.wrap_tensors(dst), ddepth, ksize[1], 
-            ksize[2], anchor[1], anchor[2], normalize, borderType))
+            ksize[2], anchor, normalize, borderType))
 end
 
 function cv.sqrBoxFilter(t)
@@ -432,8 +439,7 @@ function cv.sqrBoxFilter(t)
     local src = assert(t.src)
     local dst = t.dst
     local ddepth = assert(t.ddepth)
-    local ksize = t.ksize
-    assert(#ksize == 2)
+    local ksize = cv.Size(assert(t.ksize))
     local anchor = t.anchor or {-1,-1}
     local normalize =  t.normalize
     if normalize == nil then normalize = true end
@@ -445,16 +451,15 @@ function cv.sqrBoxFilter(t)
 
     return cv.unwrap_tensors(
         C.sqrBoxFilter(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), ddepth, ksize[1], ksize[2], anchor[1], anchor[2], normalize, borderType))
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), ddepth, ksize, anchor, normalize, borderType))
 end
 
 
 function cv.blur(t)
     local src = assert(t.src)
     local dst = t.dst
-    local ksize = t.ksize
-    assert(#ksize == 2)
-    local anchor = t.anchor or {-1,-1}
+    local ksize = cv.Size(assert(t.ksize))
+    local anchor = cv.Point(t.anchor or {-1,-1})
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
     assert(cv.tensorType(src) ~= cv.CV_8S and
@@ -465,7 +470,7 @@ function cv.blur(t)
 
     return cv.unwrap_tensors(
         C.blur(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), ksize[1], ksize[2], anchor[1], anchor[2], borderType))
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), ksize, anchor, borderType))
 end
 
 
@@ -485,7 +490,7 @@ function cv.filter2D(t)
 
     return cv.unwrap_tensors(
         C.filter2D(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), ddepth, cv.wrap_tensors(kernel), anchor[1], anchor[2], delta, borderType))
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), ddepth, cv.wrap_tensors(kernel), anchor, delta, borderType))
 end
 
 
@@ -506,7 +511,7 @@ function cv.sepFilter2D(t)
 
     return cv.unwrap_tensors(
         C.sepFilter2D(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), ddepth, kernelX, kernelY, anchor[1], anchor[2], delta, borderType))
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), ddepth, kernelX, kernelY, anchor, delta, borderType))
 end
 
 
@@ -733,18 +738,16 @@ end
 function cv.cornerSubPix(t)
     local image = assert(t.image)
     local corners = assert(t.corners)
-    local winSize = t.winSize
-    assert(#winSize == 2)
-    local zeroZone = t.zeroZone
-    assert(#zeroZone == 2)
+    local winSize = cv.Size(assert(t.winSize))
+    local zeroZone = cv.Size(assert(t.zeroZone))
     local criteria = cv.TermCriteria(assert(t.criteria))
 
     assert(image:nDimension() == 2)
     assert(corners:size()[2] == 2 and cv.tensorType(corners) == cv.CV_32F)
 
     C.cornerSubPix(
-        cv.wrap_tensors(image), cv.wrap_tensors(corners), winSize[1], winSize[2],
-        zeroZone[1], zeroZone[2], criteria)
+        cv.wrap_tensors(image), cv.wrap_tensors(corners), winSize,
+        zeroZone, criteria)
 end
 
 
@@ -776,14 +779,13 @@ function cv.erode(t)
     local dst =        t.dst
     local kernel = assert(t.kernel)
     local iterations = 1
-    local anchor = t.anchor or {-1, -1}
-    assert(#anchor == 2)
+    local anchor = cv.Point(t.anchor or {-1, -1})
     local borderType = t.borderType or cv.BORDER_CONSTANT
     local borderValue = cv.Scalar(t.borderValue or {0/0}) -- pass nan to detect default value
 
     return cv.unwrap_tensors(
         C.erode(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(kernel), anchor[1], anchor[2],
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(kernel), anchor,
             iterations, borderType, borderValue))
 end
 
@@ -793,14 +795,13 @@ function cv.dilate(t)
     local dst =        t.dst
     local kernel = assert(t.kernel)
     local iterations = 1
-    local anchor = t.anchor or {-1, -1}
-    assert(#anchor == 2)
+    local anchor = cv.Point(t.anchor or {-1, -1})
     local borderType = t.borderType or cv.BORDER_CONSTANT
     local borderValue = cv.Scalar(t.borderValue or {0/0}) -- pass nan to detect default value
 
     return cv.unwrap_tensors(
         C.dilate(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(kernel), anchor[1], anchor[2],
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(kernel), anchor,
             iterations, borderType, borderValue))
 end
 
@@ -811,14 +812,13 @@ function cv.morphologyEx(t)
     local op = assert(t.op)
     local kernel = assert(t.kernel)
     local iterations = 1
-    local anchor = t.anchor or {-1, -1}
-    assert(#anchor == 2)
+    local anchor = cv.Point(t.anchor or {-1, -1})
     local borderType = t.borderType or cv.BORDER_CONSTANT
     local borderValue = cv.Scalar(t.borderValue or {0/0}) -- pass nan to detect default value
 
     return cv.unwrap_tensors(
         C.morphologyEx(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), op, cv.wrap_tensors(kernel), anchor[1], anchor[2],
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), op, cv.wrap_tensors(kernel), anchor,
             iterations, borderType, borderValue))
 end
 
@@ -826,15 +826,14 @@ end
 function cv.resize(t)
     local src = assert(t.src)
     local dst = t.dst
-    local dsize = t.dsize or {0, 0}
-    assert(#dsize == 2)
+    local dsize = cv.Size(t.dsize or {0, 0})
     local fx = t.fx or 0
     local fy = t.fy or 0
     local interpolation = t.interpolation or cv.INTER_LINEAR
 
     return cv.unwrap_tensors(
         C.resize(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), dsize[1], dsize[2], fx, fy, interpolation))
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), dsize, fx, fy, interpolation))
 end
 
 
@@ -842,15 +841,14 @@ function cv.warpAffine(t)
     local src = assert(t.src)
     local dst = t.dst
     local M = assert(t.M)
-    local dsize = t.dsize or {0, 0}
-    assert(#dsize == 2)
+    local dsize = cv.Point(t.dsize or {0, 0})
     local flags = t.flags or cv.INTER_LINEAR
     local borderMode = t.borderMode or cv.BORDER_CONSTANT
     local borderValue = cv.Scalar(t.borderValue or {0/0}) -- pass nan to detect default value
 
     return cv.unwrap_tensors(
         C.warpAffine(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(M), dsize[1], dsize[2],
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(M), dsize,
             flags, borderMode, borderValue))
 end
 
@@ -859,15 +857,14 @@ function cv.warpPerspective(t)
     local src = assert(t.src)
     local dst = t.dst
     local M = assert(t.M)
-    local dsize = t.dsize or {0, 0}
-    assert(#dsize == 2)
+    local dsize = cv.Size(t.dsize or {0, 0})
     local flags = t.flags or cv.INTER_LINEAR
     local borderMode = t.borderMode or cv.BORDER_CONSTANT
     local borderValue = cv.Scalar(t.borderValue or {0/0}) -- pass nan to detect default value
 
     return cv.unwrap_tensors(
         C.warpPerspective(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(M), dsize[1], dsize[2],
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(M), dsize,
             flags, borderMode, borderValue))
 end
 
@@ -904,13 +901,12 @@ end
 
 
 function cv.getRotationMatrix2D(t)
-    local center = assert(t.center)
-    assert(#center == 2)
+    local center = cv.Point2f(assert(t.center))
     local angle = assert(t.angle)
     local scale = assert(t.scale)
 
     return cv.unwrap_tensors(
-        C.getRotationMatrix2D(center[1], center[2], angle, scale))
+        C.getRotationMatrix2D(center, angle, scale))
 end
 
 
@@ -943,57 +939,38 @@ end
 
 function cv.getRectSubPix(t)
     local image = assert(t.src)
-    local patchSize = assert(t.patchSize)
-    assert(#patchSize == 2)
-    local center = assert(t.center)
-    assert(#center == 2)
+    local patchSize = cv.Size(assert(t.patchSize))
+    local center = cv.Point2f(assert(t.center))
     local patch = t.patch
     local patchType = t.patchType or -1
 
     return cv.unwrap_tensors(
-        C.getRectSubPix(cv.wrap_tensors(image), patchSize[1], patchSize[2], center[1], center[2],
+        C.getRectSubPix(cv.wrap_tensors(image), patchSize, center,
                         cv.wrap_tensors(patch), patchType))
-end
-
-
-function cv.getRectSubPix(t)
-    local image = assert(t.src)
-    local patchSize = assert(t.patchSize)
-    assert(#patchSize == 2)
-    local center = assert(t.center)
-    assert(#center == 2)
-    local patch = t.patch
-    local patchType = t.patchType or -1
-
-    return cv.unwrap_tensors(
-        C.getRectSubPix(cv.wrap_tensors(image), patchSize[1], patchSize[2], center[1], center[2],
-            cv.wrap_tensors(patch), patchType))
 end
 
 
 function cv.logPolar(t)
     local src = assert(t.src)
     local dst = t.dst
-    local center = assert(t.center)
-    assert(#center == 2)
+    local center = cv.Point2f(assert(t.center))
     local M = assert(t.M)
     local flags = assert(t.flags)
 
     return cv.unwrap_tensors(
-        C.logPolar(cv.wrap_tensors(src), cv.wrap_tensors(dst), center[1], center[2], M, flags))
+        C.logPolar(cv.wrap_tensors(src), cv.wrap_tensors(dst), center, M, flags))
 end
 
 
 function cv.linearPolar(t)
     local src = assert(t.src)
     local dst = t.dst
-    local center = assert(t.center)
-    assert(#center == 2)
+    local center = cv.Point2f(assert(t.center))
     local maxRadius = assert(t.maxRadius)
     local flags = assert(t.flags)
 
     return cv.unwrap_tensors(
-        C.linearPolar(cv.wrap_tensors(src), cv.wrap_tensors(dst), center[1], center[2], maxRadius, flags))
+        C.linearPolar(cv.wrap_tensors(src), cv.wrap_tensors(dst), center, maxRadius, flags))
 end
 
 
@@ -1070,6 +1047,9 @@ function cv.accumulateWeighted(t)
 end
 
 
+-- point, response = cv.phaseCorrelate{...}
+-- point    -> Point
+-- response -> number
 function cv.phaseCorrelate(t)
     local src1 = assert(t.src1)
     local src2 = assert(t.src2)
@@ -1082,8 +1062,7 @@ end
 
 function cv.createHanningWindow(t)
     local dst = t.dst
-    local winSize = assert(t.winSize)
-    assert(#winSize == 2)
+    local winSize = cv.Size(assert(t.winSize))
     local type = assert(t.type)
 
     if dst then
@@ -1093,10 +1072,13 @@ function cv.createHanningWindow(t)
     end
 
     return cv.unwrap_tensors(
-        C.createHanningWindow(cv.wrap_tensors(dst), winSize[1], winSize[2], type))
+        C.createHanningWindow(cv.wrap_tensors(dst), winSize, type))
 end
 
 
+-- value, binarized = cv.threshold{...}
+-- value     -> number
+-- binarized -> Tensor
 function cv.threshold(t)
     local src = assert(t.src)
     local dst = t.dst
@@ -1138,8 +1120,7 @@ end
 function cv.pyrDown(t)
     local src = assert(t.src)
     local dst = t.dst
-    local dstSize = t.dstSize or {0,0 }
-    assert(#dstSize == 2)
+    local dstSize = cv.Size(t.dstSize or {0,0})
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
     if dst then
@@ -1151,15 +1132,14 @@ function cv.pyrDown(t)
     return cv.unwrap_tensors(
         C.pyrDown(
             cv.wrap_tensors(src), cv.wrap_tensors(dst),
-            dstSize[1], dstSize[2], borderType))
+            dstSize, borderType))
 end
 
 
 function cv.pyrUp(t)
     local src = assert(t.src)
     local dst = t.dst
-    local dstSize = t.dstSize or {0,0 }
-    assert(#dstSize == 2)
+    local dstSize = cv.Size(t.dstSize or {0,0})
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
     if dst then
@@ -1171,7 +1151,7 @@ function cv.pyrUp(t)
     return cv.unwrap_tensors(
         C.pyrUp(
             cv.wrap_tensors(src), cv.wrap_tensors(dst),
-            dstSize[1], dstSize[2], borderType))
+            dstSize, borderType))
 end
 
 
@@ -1239,8 +1219,7 @@ function cv.initUndistortRectifyMap(t)
     if type(newCameraMatrix) == "table" then
         newCameraMatrix = torch.FloatTensor(newCameraMatrix)
     end
-    local size = assert(t.size)
-    assert(#size == 2)
+    local size = cv.Size(assert(t.size))
     local m1type = assert(t.m1type)
     local maps = t.maps
 
@@ -1248,10 +1227,15 @@ function cv.initUndistortRectifyMap(t)
         C.initUndistortRectifyMap(
             cv.wrap_tensors(cameraMatrix), cv.wrap_tensors(distCoeffs), 
             cv.wrap_tensors(R), cv.wrap_tensors(newCameraMatrix),
-            size[1], size[2], m1type, cv.wrap_tensors(maps)))
+            size, m1type, cv.wrap_tensors(maps)))
 end
 
-
+-- value = cv.initWideAngleProjMap{maps={map1, map2}, ...}
+-- OR
+-- value, map1, map2 = cv.initWideAngleProjMap{...}
+--
+-- value      -> number
+-- map1, map2 -> Tensor
 function cv.initWideAngleProjMap(t)
     local cameraMatrix = assert(t.cameraMatrix)
     if type(cameraMatrix) == "table" then
@@ -1261,8 +1245,7 @@ function cv.initWideAngleProjMap(t)
     if type(distCoeffs) == "table" then
         distCoeffs = torch.FloatTensor(distCoeffs)
     end
-    local imageSize = assert(t.imageSize)
-    assert(#imageSize == 2)
+    local imageSize = cv.Size(assert(t.imageSize))
     local destImageWidth = assert(t.destImageWidth)
     local m1type = assert(t.m1type)
     local maps = t.maps
@@ -1271,7 +1254,7 @@ function cv.initWideAngleProjMap(t)
     
     result = C.initWideAngleProjMap(
         cv.wrap_tensors(cameraMatrix), cv.wrap_tensors(distCoeffs),
-        imageSize[1], imageSize[2], destImageWidth, m1type, cv.wrap_tensors(maps),
+        imageSize, destImageWidth, m1type, cv.wrap_tensors(maps),
         projType, alpha)
     return result.val, cv.unwrap_tensors(result.tensors)
 end
@@ -1390,4 +1373,77 @@ function cv.pyrMeanShiftFiltering(t)
 
     return cv.unwrap_tensors(C.pyrMeanShiftFiltering(
         cv.wrap_tensors(src), cv.wrap_tensors(dst), sp, sr, maxlevel, termcrit))
+end
+
+
+function cv.grabCut(t)
+    local img = assert(t.img)
+    local mask = assert(t.mask)
+    local rect = cv.Rect(t.rect)
+    local bgdModel = assert(t.bgdModel)
+    local fgdModel = assert(t.fgdModel)
+    local iterCount = assert(t.iterCount)
+    local mode = t.mode or cv.GC_EVAL
+    
+    C.grabCut(
+        cv.wrap_tensors(img), cv.wrap_tensors(mask), rect,
+        cv.wrap_tensors(bgdModel), cv.wrap_tensors(fgdModel),
+        iterCount, mode)
+end
+
+
+function cv.distanceTransform(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local distanceType = assert(t.distanceType)
+    local maskSize = assert(t.maskSize)
+    local dstType = t.dstType or cv.CV_32F
+
+    return cv.unwrap_tensors(
+        C.distanceTransform(
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), distanceType, maskSize, dstType))
+end
+
+
+function cv.distanceTransformWithLabels(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local labels = t.labels
+    local distanceType = assert(t.distanceType)
+    local maskSize = assert(t.maskSize)
+    local labelType = t.labelType or cv.DIST_LABEL_CCOMP
+
+    return cv.unwrap_tensors(
+        C.distanceTransformWithLabels(
+            cv.wrap_tensors(src), cv.wrap_tensors(dst), 
+            cv.wrap_tensors(labels), distanceType, maskSize, labelType)) 
+end
+
+-- area, boundingRect = cv.floodFill{...}
+-- area         -> number
+-- boundingRect -> RectWrapper
+function cv.floodFill(t)
+    local image = assert(t.image)
+    local mask = t.mask
+    local seedPoint = cv.Point(assert(t.seedPoint))
+    local newVal = cv.Scalar(assert(t.newVal))
+    local loDiff = cv.Scalar(t.loDiff or {0, 0, 0, 0})
+    local upDiff = cv.Scalar(t.upDiff or {0, 0, 0, 0})
+    local flags = t.flags or 4
+
+    local result = C.floodFill(
+        cv.wrap_tensors(image), cv.wrap_tensors(mask), seedPoint[1], 
+        seedPoint[2], newVal, loDiff, upDiff, flags)
+    return result.val, result.rect
+end
+
+
+function cv.cvtColor(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local code = assert(t.code)
+    local dstCn = t.dstCn or 0
+
+    return cv.unwrap_tensors(C.cvtColor(
+        cv.wrap_tensors(src), cv.wrap_tensors(dst), code, dstCn))
 end

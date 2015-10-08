@@ -114,12 +114,15 @@ struct FloatArrayOfArrays {
     int dims;
 };
 
+int getIntMax();
+
 struct PointArrayOfArrays {
     struct PointWrapper **pointers;
     struct PointWrapper *realData;
     int dims;
     int *sizes;
 };
+
 ]]
 
 local C = ffi.load(libPath('Common'))
@@ -127,6 +130,8 @@ local C = ffi.load(libPath('Common'))
 cv = {}
 
 require 'cv.constants'
+
+cv.INT_MAX = C.getIntMax()
 
 --- ***************** Tensor <=> Mat conversion *****************
 
@@ -248,19 +253,57 @@ function cv.checkFilterCombination(src, ddepth)
 end
 
 --- ***************** Wrappers for small OpenCV classes *****************
+-- Use these for passing into functions. Example:
+
+-- r = cv.Rect{10, 10, 15, 25}
+-- OR
+-- r = cv.Rect{x=10, y=10, width=15, height=25}
+-- OR
+-- r1 = cv.Rect{x=10, y=10, width=15, height=25}
+-- r2 = cv.Rect(r1)
+
+-- same with most of the following wrappers (see OpenCV defs)
 
 -- TODO: generate these straight in the code
 
-function cv.TermCriteria(criteria)
-    return ffi.new('struct TermCriteriaWrapper', criteria)
-end
-
-function cv.Scalar(values)
-    return ffi.new('struct ScalarWrapper', values)
-end
-
 function cv.Rect(values)
     return ffi.new('struct RectWrapper', values)
+end
+
+function cv.TermCriteria(data)
+    return ffi.new('struct TermCriteriaWrapper', data)
+end
+
+function cv.Scalar(data)
+    return ffi.new('struct ScalarWrapper', data)
+end
+
+function cv.Moments(data)
+    return ffi.new('struct MomentsWrapper', data)
+end
+
+function cv.Size(data)
+    return ffi.new('struct SizeWrapper', data)
+end
+
+function cv.Size2f(data)
+    return ffi.new('struct Size2fWrapper', data)
+end
+
+function cv.Vec3d(data)
+    return ffi.new('struct Vec3dWrapper', data)
+end
+
+function cv.Point(data)
+    return ffi.new('struct PointWrapper', data)
+end
+
+function cv.Point2f(data)
+    return ffi.new('struct Point2fWrapper', data)
+end
+
+function cv.RotatedRect(data)
+    return ffi.new('struct RotatedRectWrapper', data)
 end
 
 --- ***************** Other helper structs *****************
@@ -277,7 +320,7 @@ cv.calcHist{images=im, channels={3,3,1,3,4}, ......}
 OR
 
 ch = cv.newArray('Int', {3,3,1,3,4})
-for i = 1,1e6 do
+for i = 1,1e8 do
     cv.calcHist{images=im, channels=ch, ...}
     ......
 --]]
