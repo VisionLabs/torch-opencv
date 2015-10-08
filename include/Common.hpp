@@ -49,7 +49,7 @@ std::string typeStr(cv::Mat & mat) {
         case CV_32S: return "Int";
         case CV_32F: return "Float";
         case CV_64F: return "Double";
-        default: ; // TODO: raise an error
+        default:     return "Unknown";
     }
 }
 

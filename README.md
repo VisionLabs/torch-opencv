@@ -1,7 +1,7 @@
 imgproc module branch
 =====================
 
-**Roughly 50% completed**
+**Roughly 51% completed**
 
 Unstable pieces of code (to be tested):
 
@@ -62,7 +62,6 @@ Unstable pieces of code (to be tested):
 * drawContours
 * clipLine
 * ellipse2Poly
-* putText
 * getTextSize
 
 *Already implemented:*
@@ -143,5 +142,6 @@ Unstable pieces of code (to be tested):
 * distanceTransform
 * floodFill
 * cvtColor
+* putText
 
-71/142
+72/142
