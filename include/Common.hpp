@@ -121,7 +121,8 @@ struct MomentsWrapper {
     double m00, m10, m01, m20, m11, m02, m30, m21, m12, m03;
     double mu20, mu11, mu02, mu30, mu21, mu12, mu03;
     double nu20, nu11, nu02, nu30, nu21, nu12, nu03;
-    
+
+    MomentsWrapper(cv::Moments other);
     inline operator cv::Moments() {
         return cv::Moments(m00, m10, m01, m20, m11, m02, m30, m21, m12, m03);
     }
@@ -134,9 +135,19 @@ struct TWPlusDouble {
     double val;
 };
 
+struct TWPlusInt {
+    struct TensorWrapper tensor;
+    int val;
+};
+
 struct MTWPlusFloat {
     struct MultipleTensorWrapper tensors;
     float val;
+};
+
+struct MTWPlusInt {
+    struct MultipleTensorWrapper tensors;
+    int val;
 };
 
 struct RectPlusInt {
@@ -145,6 +156,8 @@ struct RectPlusInt {
 };
 
 /***************** Other helper structs *****************/
+
+// Arrays
 
 struct IntArray {
     int *data;
@@ -160,6 +173,13 @@ struct PointArray {
     struct PointWrapper *data;
     int size;
 };
+
+struct RectArray {
+    struct RectWrapper *data;
+    int size;
+};
+
+// Arrays of arrays
 
 struct FloatArrayOfArrays {
     float **pointers;

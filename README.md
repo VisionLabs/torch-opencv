@@ -3,10 +3,11 @@ imgproc module branch
 
 **Roughly 50% completed**
 
-Functions to test:
+Unstable pieces of code (to be tested):
 
-1) undistort
-2) grabCut
+* undistort
+* grabCut
+* Moments/HuMoments (not sure how the user should create MomentsWrapper from Lua)
 
 *To be implemented:*
 
