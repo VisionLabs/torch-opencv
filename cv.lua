@@ -290,7 +290,7 @@ cv.calcHist{images=im, channels={3,3,1,3,4}, ......}
 OR
 
 ch = cv.newArray('Int', {3,3,1,3,4})
-for i = 1,1e6 do
+for i = 1,1e8 do
     cv.calcHist{images=im, channels=ch, ...}
     ......
 --]]

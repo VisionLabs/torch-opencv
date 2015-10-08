@@ -51,7 +51,7 @@ TensorWrapper::TensorWrapper(cv::Mat && mat) {
     new (this) TensorWrapper(mat);
 }
 
-cv::Mat TensorWrapper::toMat() {
+TensorWrapper::operator cv::Mat() {
 
     THByteTensor *tensorPtr = static_cast<THByteTensor *>(this->tensorPtr);
 
@@ -110,10 +110,10 @@ MultipleTensorWrapper::MultipleTensorWrapper(std::vector<cv::Mat> & matList):
     }
 }
 
-std::vector<cv::Mat> MultipleTensorWrapper::toMatList() {
+MultipleTensorWrapper::operator std::vector<cv::Mat>() {
     std::vector<cv::Mat> retval(this->size);
     for (int i = 0; i < this->size; ++i) {
-        retval[i] = this->tensors[i].toMat();
+        retval[i] = this->tensors[i];
     }
     return retval;
 }

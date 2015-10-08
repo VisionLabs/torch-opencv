@@ -2,8 +2,7 @@
 
 extern "C"
 void imshow(const char *winname, struct TensorWrapper image) {
-    cv::Mat temp = image.toMat();
-    cv::imshow(winname, temp);
+    cv::imshow(winname, image.toMat());
 }
 
 extern "C"
