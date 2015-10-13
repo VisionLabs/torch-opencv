@@ -1,7 +1,7 @@
 imgproc module branch
 =====================
 
-**Roughly 51% completed**
+**Roughly 54% completed**
 
 Unstable pieces of code (to be tested):
 
@@ -24,12 +24,7 @@ Unstable pieces of code (to be tested):
 * calcHist (SparseMat overload)
 * calcBackProject (SparseMat overload)
 * compareHist (SparseMat overload)
-* demosaicing
-* moments
 * HuMoments
-* matchTemplate
-* connectedComponents
-* connectedComponentsWithStats
 * findContours
 * findContours
 * approxPolyDP
@@ -143,5 +138,10 @@ Unstable pieces of code (to be tested):
 * floodFill
 * cvtColor
 * putText
+* demosaicing
+* moments
+* matchTemplate
+* connectedComponents
+* connectedComponentsWithStats
 
-72/142
+77/142

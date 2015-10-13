@@ -1092,7 +1092,7 @@ function cv.threshold(t)
         assert(dst:isSameSizeAs(src))
     end
 
-    result = C.threshold(cv.wrap_tensors(src), cv.wrap_tensors(dst),
+    local result = C.threshold(cv.wrap_tensors(src), cv.wrap_tensors(dst),
                     tresh, maxval, type)
     return result.val, cv.unwrap_tensors(result.tensor)
 end
@@ -1253,7 +1253,7 @@ function cv.initWideAngleProjMap(t)
     local projType = assert(t.projType)
     local alpha = assert(t.alpha)
     
-    result = C.initWideAngleProjMap(
+    local result = C.initWideAngleProjMap(
         cv.wrap_tensors(cameraMatrix), cv.wrap_tensors(distCoeffs),
         imageSize, destImageWidth, m1type, cv.wrap_tensors(maps),
         projType, alpha)
@@ -1456,7 +1456,8 @@ function cv.demosaicing(t)
     local code = assert(t.code)
     local dcn = t.dcn or 0
 
-    return C.demosaicing(cv.wrap_tensors(_src), cv.wrap_tensors(_dst), code, dcn)
+    return cv.unwrap_tensors(C.demosaicing(
+        cv.wrap_tensors(_src), cv.wrap_tensors(_dst), code, dcn))
 end
 
 
@@ -1469,6 +1470,8 @@ end
 
 
 function cv.HuMoments(t)
+    -- TODO this
+    error("Implement me!")
     local moments = assert(t.moments)
 --    local hu[7] = assert(t.hu[7])
 
@@ -1476,22 +1479,15 @@ function cv.HuMoments(t)
 end
 
 
-function cv.HuMoments(t)
-    local m = assert(t.m)
-    local hu = assert(t.hu)
-
-    return C.HuMoments(m, cv.wrap_tensors(hu))
-end
-
-
 function cv.matchTemplate(t)
     local image = assert(t.image)
-    local templ = assert(t.templ)
+    local templ = t.templ
     local result = assert(t.result)
     local method = assert(t.method)
-    local mask = t.mask or noArray
+    local mask = t.mask
 
-    return C.matchTemplate(cv.wrap_tensors(image), cv.wrap_tensors(templ), cv.wrap_tensors(result), method, cv.wrap_tensors(mask))
+    return cv.unwrap_tensors(C.matchTemplate(
+        cv.wrap_tensors(image), cv.wrap_tensors(templ), cv.wrap_tensors(result), method, cv.wrap_tensors(mask)))
 end
 
 
@@ -1501,7 +1497,8 @@ function cv.connectedComponents(t)
     local connectivity = t.connectivity or 8
     local ltype = t.ltype or cv.CV_32S
 
-    return C.connectedComponents(cv.wrap_tensors(image), cv.wrap_tensors(labels), connectivity, ltype)
+    local result = C.connectedComponents(cv.wrap_tensors(image), cv.wrap_tensors(labels), connectivity, ltype)
+    return result.val, cv.unwrap_tensors(result.tensor)
 end
 
 

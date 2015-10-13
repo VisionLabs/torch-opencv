@@ -53,6 +53,10 @@ TensorWrapper::TensorWrapper(cv::Mat && mat) {
 
 TensorWrapper::operator cv::Mat() {
 
+    if (this->tensorPtr == nullptr) {
+        return cv::Mat();
+    }
+
     THByteTensor *tensorPtr = static_cast<THByteTensor *>(this->tensorPtr);
 
     int numberOfDims = tensorPtr->nDimension;
@@ -99,6 +103,10 @@ TensorWrapper::operator cv::Mat() {
 }
 
 MultipleTensorWrapper::MultipleTensorWrapper(): tensors(nullptr) {}
+
+MultipleTensorWrapper::MultipleTensorWrapper(short size):
+        size(size),
+        tensors(static_cast<TensorWrapper *>(malloc(size * sizeof(TensorWrapper)))) {}
 
 MultipleTensorWrapper::MultipleTensorWrapper(std::vector<cv::Mat> & matList):
         tensors(static_cast<TensorWrapper *>(malloc(matList.size() * sizeof(TensorWrapper)))),

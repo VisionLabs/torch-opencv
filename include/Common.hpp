@@ -32,6 +32,7 @@ struct MultipleTensorWrapper {
     short size;
 
     MultipleTensorWrapper();
+    explicit MultipleTensorWrapper(short size);
     MultipleTensorWrapper(std::vector<cv::Mat> & matList);
     operator std::vector<cv::Mat>();
     // synonym for operator std::vector<cv::Mat>()

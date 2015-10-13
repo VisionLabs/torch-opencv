@@ -1230,7 +1230,7 @@ extern "C"
 void HuMoments(
         struct MomentsWrapper m, struct TensorWrapper hu)
 {
-    cv::HuMoments(m, hu.toMat());
+    // TODO this
 }
 
 extern "C"
@@ -1251,7 +1251,7 @@ struct TensorWrapper matchTemplate(
 }
 
 extern "C"
-TWPlusInt connectedComponents(
+struct TWPlusInt connectedComponents(
         struct TensorWrapper image, struct TensorWrapper labels, int connectivity, int ltype)
 {
     TWPlusInt retval;
@@ -1271,13 +1271,15 @@ TWPlusInt connectedComponents(
 }
 
 extern "C"
-int connectedComponentsWithStats(
-        struct TensorWrapper image, struct TensorWrapper labels, struct TensorWrapper stats, struct TensorWrapper centroids, int connectivity, int ltype)
+struct MTWPlusInt connectedComponentsWithStats(
+        struct TensorWrapper image, struct MultipleTensorWrapper outputTensors, int connectivity, int ltype)
 {
-    //not implemented
-
-    //std::vector<cv::Mat> retval;
-    //cv::connectedComponentsWithStats(image.toMat(), labels.toMat(), stats.toMat(), centroids.toMat(), connectivity, ltype);
+    std::vector<cv::Mat> output(outputTensors);
+    MTWPlusInt retval;
+    retval.val = cv::connectedComponentsWithStats(
+            image.toMat(), output[0], output[1], output[2], connectivity, ltype);
+    retval.tensors = MultipleTensorWrapper(output);
+    return retval;
 }
 
 extern "C"
