@@ -11,7 +11,7 @@ struct TensorWrapper getGaussianKernel(int ksize, double sigma, int ktype)
 }
 
 extern "C"
-struct MultipleTensorWrapper getDerivKernels(
+struct TensorArray getDerivKernels(
         int dx, int dy, int ksize,
         bool normalize, int ktype)
 {
@@ -21,7 +21,7 @@ struct MultipleTensorWrapper getDerivKernels(
             output[0], output[1],
             dx, dy, ksize, normalize, ktype);
 
-    return MultipleTensorWrapper(output);
+    return TensorArray(output);
 }
 
 extern "C"
@@ -596,7 +596,7 @@ struct TensorWrapper remap(
 }
 
 extern "C"
-struct MultipleTensorWrapper convertMaps(
+struct TensorArray convertMaps(
         struct TensorWrapper map1, struct TensorWrapper map2,
         struct TensorWrapper dstmap1, struct TensorWrapper dstmap2,
         int dstmap1type, bool nninterpolation)
@@ -605,12 +605,12 @@ struct MultipleTensorWrapper convertMaps(
         // output to retval
         std::vector<cv::Mat> retval(2);
         cv::convertMaps(map1.toMat(), map2.toMat(), retval[0], retval[1], dstmap1type, nninterpolation);
-        return MultipleTensorWrapper(retval);
+        return TensorArray(retval);
     }
     if (!dstmap1.isNull() and !dstmap2.isNull()) {
         // try to output to the given Tensors
         cv::convertMaps(map1.toMat(), map2.toMat(), dstmap1.toMat(), dstmap2.toMat(), dstmap1type, nninterpolation);
-        return MultipleTensorWrapper();
+        return TensorArray();
     }
     THError("convertMaps: please specify either both or none of the dstmaps");
 }
@@ -725,8 +725,8 @@ struct TensorWrapper integral(
     return sum;
 }
 
-extern "C" struct MultipleTensorWrapper integralN(
-        struct TensorWrapper src, struct MultipleTensorWrapper sums, int sdepth, int sqdepth)
+extern "C" struct TensorArray integralN(
+        struct TensorWrapper src, struct TensorArray sums, int sdepth, int sqdepth)
 {
     // sums.size == 2 or 3
     std::vector<cv::Mat> retval(sums.size);
@@ -738,7 +738,7 @@ extern "C" struct MultipleTensorWrapper integralN(
     }
     cv::integral(src.toMat(), retval[0], retval[1], sdepth, sqdepth);
 
-    return MultipleTensorWrapper(retval);
+    return TensorArray(retval);
 }
 
 extern "C"
@@ -805,11 +805,11 @@ struct TensorWrapper createHanningWindow(
 }
 
 extern "C"
-struct TWPlusDouble threshold(
+struct TensorPlusDouble threshold(
         struct TensorWrapper src, struct TensorWrapper dst,
         double thresh, double maxval, int type)
 {
-    TWPlusDouble retval;
+    TensorPlusDouble retval;
     if (dst.isNull()) {
         // output to retval
         cv::Mat result;
@@ -886,14 +886,14 @@ struct TensorWrapper pyrUp(
     return dst;
 }
 
-extern "C" struct MultipleTensorWrapper buildPyramid(
-        struct TensorWrapper src, struct MultipleTensorWrapper dst,
+extern "C" struct TensorArray buildPyramid(
+        struct TensorWrapper src, struct TensorArray dst,
         int maxlevel, int borderType)
 {
     if (dst.isNull()) {
         std::vector<cv::Mat> retval;
         cv::buildPyramid(src.toMat(), retval, maxlevel, borderType);
-        return MultipleTensorWrapper(retval);
+        return TensorArray(retval);
     } else {
         cv::buildPyramid(src.toMat(), dst.toMatList(), maxlevel, borderType);
         return dst;
@@ -918,11 +918,11 @@ extern "C" struct TensorWrapper undistort(
     }
 }
 
-extern "C" struct MultipleTensorWrapper initUndistortRectifyMap(
+extern "C" struct TensorArray initUndistortRectifyMap(
         struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
         struct TensorWrapper R, struct TensorWrapper newCameraMatrix,
         struct SizeWrapper size, int m1type,
-        struct MultipleTensorWrapper maps)
+        struct TensorArray maps)
 {
     if (maps.isNull()) {
         // output to retval
@@ -931,7 +931,7 @@ extern "C" struct MultipleTensorWrapper initUndistortRectifyMap(
                 cameraMatrix.toMat(), TO_MAT_OR_NOARRAY(distCoeffs),
                 TO_MAT_OR_NOARRAY(R), newCameraMatrix.toMat(),
                 size, m1type, retval[0], retval[1]);
-        return MultipleTensorWrapper(retval);
+        return TensorArray(retval);
     } else {
         // oh. try to output to 'maps'...
         auto mapsVector = maps.toMatList();
@@ -943,25 +943,25 @@ extern "C" struct MultipleTensorWrapper initUndistortRectifyMap(
     }
 }
 
-extern "C" struct MTWPlusFloat initWideAngleProjMap(
+extern "C" struct TensorArrayPlusFloat initWideAngleProjMap(
         struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
         struct SizeWrapper imageSize, int destImageWidth,
-        int m1type, struct MultipleTensorWrapper maps,
+        int m1type, struct TensorArray maps,
         int projType, double alpha)
 {
     if (maps.isNull()) {
         // output to retval
-        MTWPlusFloat retval;
+        TensorArrayPlusFloat retval;
         std::vector<cv::Mat> resultMats(2);
         retval.val = cv::initWideAngleProjMap(
                 cameraMatrix.toMat(), TO_MAT_OR_NOARRAY(distCoeffs),
                 imageSize, destImageWidth,
                 m1type, resultMats[0], resultMats[1], projType, alpha);
-        new (&retval.tensors) MultipleTensorWrapper(resultMats);
+        new (&retval.tensors) TensorArray(resultMats);
         return retval;
     } else {
         // oh. try to output to 'maps' and return only float...
-        MTWPlusFloat retval;
+        TensorArrayPlusFloat retval;
         retval.tensors.tensors = nullptr;
         auto mapsVec = maps.toMatList();
         retval.val = cv::initWideAngleProjMap(
@@ -1004,7 +1004,7 @@ extern "C" struct TensorWrapper undistortPoints(
 }
 
 extern "C" struct TensorWrapper calcHist(
-        struct MultipleTensorWrapper images,
+        struct TensorArray images,
         struct IntArray channels, struct TensorWrapper mask,
         struct TensorWrapper hist, int dims, struct IntArray histSize,
         struct FloatArrayOfArrays ranges, bool uniform, bool accumulate)
@@ -1029,7 +1029,7 @@ extern "C" struct TensorWrapper calcHist(
 }
 
 extern "C" struct TensorWrapper calcBackProject(
-        struct MultipleTensorWrapper images, int nimages,
+        struct TensorArray images, int nimages,
         struct IntArray channels, struct TensorWrapper hist,
         struct TensorWrapper backProject, struct FloatArrayOfArrays ranges,
         double scale, bool uniform)
@@ -1142,7 +1142,7 @@ extern "C" struct TensorWrapper distanceTransform(
     }
 }
 
-extern "C" struct MultipleTensorWrapper distanceTransformWithLabels(
+extern "C" struct TensorArray distanceTransformWithLabels(
         struct TensorWrapper src, struct TensorWrapper dst,
         struct TensorWrapper labels, int distanceType, int maskSize,
         int labelType)
@@ -1152,7 +1152,7 @@ extern "C" struct MultipleTensorWrapper distanceTransformWithLabels(
         cv::distanceTransform(
                 src.toMat(), dst.toMat(), labels.toMat(),
                 distanceType, maskSize, labelType);
-        return MultipleTensorWrapper();
+        return TensorArray();
     } else {
         std::vector<cv::Mat> retval(outputVecSize);
         cv::distanceTransform(
@@ -1160,7 +1160,7 @@ extern "C" struct MultipleTensorWrapper distanceTransformWithLabels(
                 (dst.isNull() ? retval[0] : dst.toMat()),
                 (src.isNull() ? retval[dst.isNull()] : src.toMat()),
                 distanceType, maskSize, labelType);
-        return MultipleTensorWrapper(retval);
+        return TensorArray(retval);
     }
 }
 

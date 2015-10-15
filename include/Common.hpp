@@ -27,12 +27,12 @@ struct TensorWrapper {
     inline bool isNull() { return tensorPtr == nullptr; }
 };
 
-struct MultipleTensorWrapper {
+struct TensorArray {
     struct TensorWrapper *tensors;
     short size;
 
-    MultipleTensorWrapper();
-    MultipleTensorWrapper(std::vector<cv::Mat> & matList);
+    TensorArray();
+    TensorArray(std::vector<cv::Mat> & matList);
     operator std::vector<cv::Mat>();
     // synonym for operator std::vector<cv::Mat>()
     inline std::vector<cv::Mat> toMatList() { return *this; }
@@ -130,23 +130,23 @@ struct MomentsWrapper {
 
 /***************** Helper wrappers for [OpenCV class + some primitive] *****************/
 
-struct TWPlusDouble {
+struct TensorPlusDouble {
     struct TensorWrapper tensor;
     double val;
 };
 
-struct TWPlusInt {
+struct TensorPlusInt {
     struct TensorWrapper tensor;
     int val;
 };
 
-struct MTWPlusFloat {
-    struct MultipleTensorWrapper tensors;
+struct TensorArrayPlusFloat {
+    struct TensorArray tensors;
     float val;
 };
 
-struct MTWPlusInt {
-    struct MultipleTensorWrapper tensors;
+struct TensorArrayPlusInt {
+    struct TensorArray tensors;
     int val;
 };
 

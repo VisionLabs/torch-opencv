@@ -98,9 +98,9 @@ TensorWrapper::operator cv::Mat() {
     );
 }
 
-MultipleTensorWrapper::MultipleTensorWrapper(): tensors(nullptr) {}
+TensorArray::TensorArray(): tensors(nullptr) {}
 
-MultipleTensorWrapper::MultipleTensorWrapper(std::vector<cv::Mat> & matList):
+TensorArray::TensorArray(std::vector<cv::Mat> & matList):
         tensors(static_cast<TensorWrapper *>(malloc(matList.size() * sizeof(TensorWrapper)))),
         size(matList.size())
 {
@@ -110,7 +110,7 @@ MultipleTensorWrapper::MultipleTensorWrapper(std::vector<cv::Mat> & matList):
     }
 }
 
-MultipleTensorWrapper::operator std::vector<cv::Mat>() {
+TensorArray::operator std::vector<cv::Mat>() {
     std::vector<cv::Mat> retval(this->size);
     for (int i = 0; i < this->size; ++i) {
         retval[i] = this->tensors[i];
