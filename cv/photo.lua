@@ -7,3 +7,5 @@ ffi.cdef[[
 ]]
 
 local C = ffi.load(libPath('photo'))
+
+-- test
