@@ -98,6 +98,11 @@ struct FloatArray {
     int size;
 };
 
+struct DoubleArray {
+    double *data;
+    int size;
+};
+
 struct PointArray {
     struct PointWrapper *data;
     int size;

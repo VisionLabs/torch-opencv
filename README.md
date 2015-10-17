@@ -1,13 +1,12 @@
 imgproc module branch
 =====================
 
-**Roughly 54% completed**
+**Roughly 55% completed**
 
 Unstable pieces of code (to be tested):
 
-* undistort
-* grabCut
-* Moments/HuMoments (not sure how the user should create MomentsWrapper from Lua)
+* undistort (how should it work? please test if it's correct)
+* grabCut (also needs testing)
 
 *To be implemented:*
 
@@ -24,7 +23,6 @@ Unstable pieces of code (to be tested):
 * calcHist (SparseMat overload)
 * calcBackProject (SparseMat overload)
 * compareHist (SparseMat overload)
-* HuMoments
 * findContours
 * findContours
 * approxPolyDP
@@ -143,5 +141,6 @@ Unstable pieces of code (to be tested):
 * matchTemplate
 * connectedComponents
 * connectedComponentsWithStats
+* HuMoments
 
-77/142
+78/142

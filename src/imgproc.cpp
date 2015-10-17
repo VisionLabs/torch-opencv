@@ -1115,7 +1115,7 @@ extern "C" struct TensorWrapper pyrMeanShiftFiltering(
 
 extern "C" void grabCut(
         struct TensorWrapper img, struct TensorWrapper mask,
-        RectWrapper rect, struct TensorWrapper bgdModel,
+        struct RectWrapper rect, struct TensorWrapper bgdModel,
         struct TensorWrapper fgdModel, int iterCount, int mode)
 {
     cv::grabCut(
@@ -1225,10 +1225,13 @@ struct MomentsWrapper moments(
 }
 
 extern "C"
-void HuMoments(
-        struct MomentsWrapper m, struct TensorWrapper hu)
+struct DoubleArray HuMoments(struct MomentsWrapper m)
 {
-    // TODO this
+    DoubleArray retval;
+    retval.size = 7;
+    retval.data = static_cast<double *>(malloc(retval.size * sizeof(double)));
+    cv::HuMoments(m, retval.data);
+    return retval;
 }
 
 extern "C"

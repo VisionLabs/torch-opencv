@@ -296,6 +296,24 @@ struct RectPlusInt floodFill(
 struct TensorWrapper cvtColor(
         struct TensorWrapper src, struct TensorWrapper dst, int code, int dstCn);
 
+struct TensorWrapper demosaicing(
+        struct TensorWrapper _src, struct TensorWrapper _dst, int code, int dcn);
+
+struct MomentsWrapper moments(
+        struct TensorWrapper array, bool binaryImage);
+
+struct DoubleArray HuMoments(
+        struct MomentsWrapper m);
+
+struct TensorWrapper matchTemplate(
+        struct TensorWrapper image, struct TensorWrapper templ, struct TensorWrapper result, int method, struct TensorWrapper mask);
+
+struct TensorPlusInt connectedComponents(
+        struct TensorWrapper image, struct TensorWrapper labels, int connectivity, int ltype);
+
+struct TensorArrayPlusInt connectedComponentsWithStats(
+        struct TensorWrapper image, struct TensorArray outputTensors, int connectivity, int ltype);
+
 void putText(
         struct TensorWrapper img, const char *text, struct PointWrapper org, int fontFace, double fontScale, struct ScalarWrapper color, int thickness, int lineType, bool bottomLeftOrigin);
 ]]
@@ -1468,14 +1486,31 @@ function cv.moments(t)
     return C.moments(cv.wrap_tensors(array), binaryImage)
 end
 
-
+-- moments: Input moments computed with cv.moments()
+-- toTable: Output to table if true, otherwise output to Tensor. Default: true
+-- output : Optional. A Tensor of length 7 or a table; if provided, will output there
 function cv.HuMoments(t)
-    -- TODO this
-    error("Implement me!")
     local moments = assert(t.moments)
---    local hu[7] = assert(t.hu[7])
+    local toTable = t.toTable
+    if toTable == nil then
+        toTable = true
+    end
+    local output = t.output
 
---    return C.HuMoments(moments, hu[7])
+    array = C.HuMoments(moments)
+
+    if toTable then
+        output = output or {}
+    else
+        output = output or torch.DoubleTensor(7)
+    end
+
+    for i = 1,7 do
+        output[i] = array.data[i-1]
+    end
+        
+    C.free(array.data)
+    return output
 end
 
 
@@ -1510,7 +1545,12 @@ function cv.connectedComponentsWithStats(t)
     local connectivity = t.connectivity or 8
     local ltype = t.ltype or cv.CV_32S
 
-    return C.connectedComponentsWithStats(cv.wrap_tensors(image), cv.wrap_tensors(labels), cv.wrap_tensors(stats), cv.wrap_tensors(centroids), connectivity, ltype)
+    result = C.connectedComponentsWithStats(
+        cv.wrap_tensors(image), 
+        cv.wrap_tensors(labels, stats, centroids), 
+        connectivity, 
+        ltype)
+    return result.val, cv.unwrap_tensors(result.tensors)
 end
 
 
