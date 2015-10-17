@@ -18,7 +18,7 @@ struct TensorWrapper {
     char typeCode;
 };
 
-struct MultipleTensorWrapper {
+struct TensorArray {
     struct TensorWrapper *tensors;
     short size;
 };
@@ -73,13 +73,13 @@ struct MomentsWrapper {
     double nu20, nu11, nu02, nu30, nu21, nu12, nu03;
 };
 
-struct TWPlusDouble {
+struct TensorPlusDouble {
     struct TensorWrapper tensor;
     double val;
 };
 
-struct MTWPlusFloat {
-    struct MultipleTensorWrapper tensors;
+struct TensorArrayPlusFloat {
+    struct TensorArray tensors;
     float val;
 };
 
@@ -154,7 +154,7 @@ local tensor_type_by_CV_code = {
 }
 
 cv.EMPTY_WRAPPER = ffi.new("struct TensorWrapper", nil)
-cv.EMPTY_MULTI_WRAPPER = ffi.new("struct MultipleTensorWrapper", nil)
+cv.EMPTY_MULTI_WRAPPER = ffi.new("struct TensorArray", nil)
 
 function cv.tensorType(tensor)
     -- get the first letter of Tensor type
@@ -182,7 +182,7 @@ function prepare_for_wrapping(tensor)
     return tensor:cdata(), cv.tensorType(tensor)
 end
 
--- torch.RealTensor ---> struct TensorWrapper/struct MultipleTensorWrapper
+-- torch.RealTensor ---> struct TensorWrapper/struct TensorArray
 function cv.wrap_tensors(...)
     if not ... then
         return cv.EMPTY_WRAPPER
@@ -196,7 +196,7 @@ function cv.wrap_tensors(...)
     if #args == 1 then
         return ffi.new("struct TensorWrapper", prepare_for_wrapping(args[1]))
     else
-        wrapper = ffi.new("struct MultipleTensorWrapper")
+        wrapper = ffi.new("struct TensorArray")
         wrapper.size = #args
         wrapper.tensors = C.malloc(#args * ffi.sizeof("struct TensorWrapper *"))
 
@@ -263,8 +263,11 @@ end
 -- r2 = cv.Rect(r1)
 
 -- same with most of the following wrappers (see OpenCV defs)
-function cv.Rect(data)
-    return ffi.new('struct RectWrapper', data)
+
+-- TODO: generate these straight in the code
+
+function cv.Rect(values)
+    return ffi.new('struct RectWrapper', values)
 end
 
 function cv.TermCriteria(data)

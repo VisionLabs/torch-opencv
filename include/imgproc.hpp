@@ -3,7 +3,7 @@
 
 extern "C" struct TensorWrapper getGaussianKernel(int ksize, double sigma, int ktype);
 
-extern "C" struct MultipleTensorWrapper getDerivKernels(
+extern "C" struct TensorArray getDerivKernels(
         int dx, int dy, int ksize,
         bool normalize, int ktype);
 
@@ -137,7 +137,7 @@ extern "C" struct TensorWrapper remap(
         struct TensorWrapper map1, struct TensorWrapper map2,
         int interpolation, int borderMode, struct ScalarWrapper borderValue);
 
-extern "C" struct MultipleTensorWrapper convertMaps(
+extern "C" struct TensorArray convertMaps(
         struct TensorWrapper map1, struct TensorWrapper map2,
         struct TensorWrapper dstmap1, struct TensorWrapper dstmap2,
         int dstmap1type, bool nninterpolation);
@@ -169,8 +169,8 @@ extern "C" struct TensorWrapper linearPolar(
 extern "C" struct TensorWrapper integral(
         struct TensorWrapper src, struct TensorWrapper sum, int sdepth);
 
-extern "C" struct MultipleTensorWrapper integralN(
-        struct TensorWrapper src, struct MultipleTensorWrapper sums, int sdepth, int sqdepth);
+extern "C" struct TensorArray integralN(
+        struct TensorWrapper src, struct TensorArray sums, int sdepth, int sqdepth);
 
 extern "C" void accumulate(
         struct TensorWrapper src, struct TensorWrapper dst,
@@ -195,7 +195,7 @@ extern "C" struct Vec3dWrapper phaseCorrelate(
 extern "C" struct TensorWrapper createHanningWindow(
         struct TensorWrapper dst, struct SizeWrapper winSize, int type);
 
-extern "C" struct TWPlusDouble threshold(
+extern "C" struct TensorPlusDouble threshold(
         struct TensorWrapper src, struct TensorWrapper dst,
         double thresh, double maxval, int type);
 
@@ -212,8 +212,8 @@ extern "C" struct TensorWrapper pyrUp(
         struct TensorWrapper src, struct TensorWrapper dst,
         struct SizeWrapper dstSize, int borderType);
 
-extern "C" struct MultipleTensorWrapper buildPyramid(
-        struct TensorWrapper src, struct MultipleTensorWrapper dst,
+extern "C" struct TensorArray buildPyramid(
+        struct TensorWrapper src, struct TensorArray dst,
         int maxlevel, int borderType);
 
 extern "C" struct TensorWrapper undistort(
@@ -221,16 +221,16 @@ extern "C" struct TensorWrapper undistort(
         struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
         struct TensorWrapper newCameraMatrix);
 
-extern "C" struct MultipleTensorWrapper initUndistortRectifyMap(
+extern "C" struct TensorArray initUndistortRectifyMap(
         struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
         struct TensorWrapper R, struct TensorWrapper newCameraMatrix,
         struct SizeWrapper size, int m1type,
-        struct MultipleTensorWrapper maps);
+        struct TensorArray maps);
 
-extern "C" struct MTWPlusFloat initWideAngleProjMap(
+extern "C" struct TensorArrayPlusFloat initWideAngleProjMap(
         struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
         struct SizeWrapper imageSize, int destImageWidth,
-        int m1type, struct MultipleTensorWrapper maps,
+        int m1type, struct TensorArray maps,
         int projType, double alpha);
 
 extern "C" struct TensorWrapper getDefaultNewCameraMatrix(
@@ -242,13 +242,13 @@ extern "C" struct TensorWrapper undistortPoints(
         struct TensorWrapper R, struct TensorWrapper P);
 
 extern "C" struct TensorWrapper calcHist(
-        struct MultipleTensorWrapper images,
+        struct TensorArray images,
         struct IntArray channels, struct TensorWrapper mask,
         struct TensorWrapper hist, int dims, struct IntArray histSize,
         struct FloatArrayOfArrays ranges, bool uniform, bool accumulate);
 
 extern "C" struct TensorWrapper calcBackProject(
-        struct MultipleTensorWrapper images, int nimages,
+        struct TensorArray images, int nimages,
         struct IntArray channels, struct TensorWrapper hist,
         struct TensorWrapper backProject, struct FloatArrayOfArrays ranges,
         double scale, bool uniform);
@@ -280,7 +280,7 @@ extern "C" struct TensorWrapper distanceTransform(
         struct TensorWrapper src, struct TensorWrapper dst,
         int distanceType, int maskSize, int dstType);
 
-extern "C" struct MultipleTensorWrapper distanceTransformWithLabels(
+extern "C" struct TensorArray distanceTransformWithLabels(
         struct TensorWrapper src, struct TensorWrapper dst,
         struct TensorWrapper labels, int distanceType, int maskSize,
         int labelType);
