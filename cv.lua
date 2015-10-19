@@ -49,6 +49,10 @@ struct Vec3dWrapper {
     double v0, v1, v2;
 };
 
+struct Vec3fWrapper {
+    float v0, v1, v2;
+};
+
 struct RectWrapper {
     int x, y, width, height;
 };
@@ -86,6 +90,11 @@ struct TensorArrayPlusFloat {
 struct RectPlusInt {
     struct RectWrapper rect;
     int val;
+};
+
+struct ScalarPlusBool {
+    struct ScalarWrapper scalar;
+    bool val;
 };
 
 struct IntArray {

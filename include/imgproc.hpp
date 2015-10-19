@@ -392,7 +392,7 @@ struct TensorArray findContours(
         struct TensorWrapper image, bool withHierarchy, struct TensorWrapper hierarchy, int mode, int method, struct PointWrapper offset);
 
 extern "C"
-void approxPolyDP(
+struct TensorWrapper approxPolyDP(
         struct TensorWrapper curve, struct TensorWrapper approxCurve, double epsilon, bool closed);
 
 extern "C"
@@ -412,15 +412,15 @@ struct RotatedRectWrapper minAreaRect(
         struct TensorWrapper points);
 
 extern "C"
-void boxPoints(
+struct TensorWrapper boxPoints(
         struct RotatedRectWrapper box, struct TensorWrapper points);
 
 extern "C"
-void minEnclosingCircle(
+struct Vec3fWrapper minEnclosingCircle(
         struct TensorWrapper points, struct Point2fWrapper center, float radius);
 
 extern "C"
-double minEnclosingTriangle(
+struct TensorPlusDouble minEnclosingTriangle(
         struct TensorWrapper points, struct TensorWrapper triangle);
 
 extern "C"
@@ -428,43 +428,43 @@ double matchShapes(
         struct TensorWrapper contour1, struct TensorWrapper contour2, int method, double parameter);
 
 extern "C"
-void convexHull(
-        struct TensorWrapper points, struct TensorWrapper hull, bool clockwise, bool returnPoints);
+struct TensorWrapper convexHull(
+        struct TensorWrapper points, bool clockwise, bool returnPoints);
 
 extern "C"
-void convexityDefects(
-        struct TensorWrapper contour, struct TensorWrapper convexhull, struct TensorWrapper convexityDefects);
+struct TensorWrapper convexityDefects(
+        struct TensorWrapper contour, struct TensorWrapper convexhull);
 
 extern "C"
 bool isContourConvex(
         struct TensorWrapper contour);
 
 extern "C"
-float intersectConvexConvex(
-        struct TensorWrapper _p1, struct TensorWrapper _p2, struct TensorWrapper _p12, bool handleNested);
+struct TensorPlusFloat intersectConvexConvex(
+        struct TensorWrapper _p1, struct TensorWrapper _p2, bool handleNested);
 
 extern "C"
 struct RotatedRectWrapper fitEllipse(
         struct TensorWrapper points);
 
 extern "C"
-void fitLine(
-        struct TensorWrapper points, struct TensorWrapper line, int distType, double param, double reps, double aeps);
+struct TensorWrapper fitLine(
+        struct TensorWrapper points, int distType, double param, double reps, double aeps);
 
 extern "C"
 double pointPolygonTest(
         struct TensorWrapper contour, struct Point2fWrapper pt, bool measureDist);
 
 extern "C"
-int rotatedRectangleIntersection(
-        struct RotatedRectWrapper rect1, struct RotatedRectWrapper rect2, struct TensorWrapper intersectingRegion);
+struct TensorWrapper rotatedRectangleIntersection(
+        struct RotatedRectWrapper rect1, struct RotatedRectWrapper rect2);
 
 extern "C"
-void blendLinear(
+struct TensorWrapper blendLinear(
         struct TensorWrapper src1, struct TensorWrapper src2, struct TensorWrapper weights1, struct TensorWrapper weights2, struct TensorWrapper dst);
 
 extern "C"
-void applyColorMap(
+struct TensorWrapper applyColorMap(
         struct TensorWrapper src, struct TensorWrapper dst, int colormap);
 
 extern "C"
@@ -477,6 +477,10 @@ void arrowedLine(
 
 extern "C"
 void rectangle(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2, struct ScalarWrapper color, int thickness, int lineType, int shift);
+
+extern "C"
+void rectanglePts(
         struct TensorWrapper img, struct RectWrapper rec, struct ScalarWrapper color, int thickness, int lineType, int shift);
 
 extern "C"
@@ -488,35 +492,31 @@ void ellipse(
         struct TensorWrapper img, struct PointWrapper center, struct SizeWrapper axes, double angle, double startAngle, double endAngle, struct ScalarWrapper color, int thickness, int lineType, int shift);
 
 extern "C"
-void ellipseRotatedRect(
+void ellipseFromRect(
         struct TensorWrapper img, struct RotatedRectWrapper box, struct ScalarWrapper color, int thickness, int lineType);
 
 extern "C"
 void fillConvexPoly(
-        struct TensorWrapper img, struct PointArray pts, struct ScalarWrapper color, int lineType, int shift);
-
-extern "C"
-void fillConvexPolyTensor(
         struct TensorWrapper img, struct TensorWrapper points, struct ScalarWrapper color, int lineType, int shift);
 
 extern "C"
 void fillPoly(
-        struct TensorWrapper img, struct PointArrayOfArrays pts, struct ScalarWrapper color, int lineType, int shift, struct PointWrapper offset);
+        struct TensorWrapper img, struct TensorArray pts, struct ScalarWrapper color, int lineType, int shift, struct PointWrapper offset);
 
 extern "C"
 void polylines(
-        struct TensorWrapper img, struct PointArrayOfArrays pts, bool isClosed, struct ScalarWrapper color, int thickness, int lineType, int shift);
+        struct TensorWrapper img, struct TensorArray pts, bool isClosed, struct ScalarWrapper color, int thickness, int lineType, int shift);
 
 extern "C"
 void drawContours(
         struct TensorWrapper image, struct TensorArray contours, int contourIdx, struct ScalarWrapper color, int thickness, int lineType, struct TensorWrapper hierarchy, int maxLevel, struct PointWrapper offset);
 
 extern "C"
-bool clipLineSize(
+struct ScalarPlusBool clipLineSize(
         struct SizeWrapper imgSize, struct PointWrapper pt1, struct PointWrapper pt2);
 
 extern "C"
-bool clipLineRect(
+struct ScalarPlusBool clipLineRect(
         struct RectWrapper imgRect, struct PointWrapper pt1, struct PointWrapper pt2);
 
 extern "C"

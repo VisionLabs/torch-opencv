@@ -314,6 +314,105 @@ struct TensorPlusInt connectedComponents(
 struct TensorArrayPlusInt connectedComponentsWithStats(
         struct TensorWrapper image, struct TensorArray outputTensors, int connectivity, int ltype);
 
+struct TensorArray findContours(
+        struct TensorWrapper image, bool withHierarchy, struct TensorWrapper hierarchy, int mode, int method, struct PointWrapper offset);
+
+struct TensorWrapper approxPolyDP(
+        struct TensorWrapper curve, struct TensorWrapper approxCurve, double epsilon, bool closed);
+
+double arcLength(
+        struct TensorWrapper curve, bool closed);
+
+struct RectWrapper boundingRect(
+        struct TensorWrapper points);
+
+double contourArea(
+        struct TensorWrapper contour, bool oriented);
+
+struct RotatedRectWrapper minAreaRect(
+        struct TensorWrapper points);
+
+struct TensorWrapper boxPoints(
+        struct RotatedRectWrapper box, struct TensorWrapper points);
+
+struct Vec3fWrapper minEnclosingCircle(
+        struct TensorWrapper points, struct Point2fWrapper center, float radius);
+
+struct TensorPlusDouble minEnclosingTriangle(
+        struct TensorWrapper points, struct TensorWrapper triangle);
+
+double matchShapes(
+        struct TensorWrapper contour1, struct TensorWrapper contour2, int method, double parameter);
+
+struct TensorWrapper convexHull(
+        struct TensorWrapper points, bool clockwise, bool returnPoints);
+
+struct TensorWrapper convexityDefects(
+        struct TensorWrapper contour, struct TensorWrapper convexhull);
+
+bool isContourConvex(
+        struct TensorWrapper contour);
+
+struct TensorPlusFloat intersectConvexConvex(
+        struct TensorWrapper _p1, struct TensorWrapper _p2, bool handleNested);
+
+struct RotatedRectWrapper fitEllipse(
+        struct TensorWrapper points);
+
+struct TensorWrapper fitLine(
+        struct TensorWrapper points, int distType, double param, double reps, double aeps);
+
+double pointPolygonTest(
+        struct TensorWrapper contour, struct Point2fWrapper pt, bool measureDist);
+
+struct TensorWrapper rotatedRectangleIntersection(
+        struct RotatedRectWrapper rect1, struct RotatedRectWrapper rect2);
+
+struct TensorWrapper blendLinear(
+        struct TensorWrapper src1, struct TensorWrapper src2, struct TensorWrapper weights1, struct TensorWrapper weights2, struct TensorWrapper dst);
+
+struct TensorWrapper applyColorMap(
+        struct TensorWrapper src, struct TensorWrapper dst, int colormap);
+
+void line(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2, struct ScalarWrapper color, int thickness, int lineType, int shift);
+
+void arrowedLine(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2, struct ScalarWrapper color, int thickness, int line_type, int shift, double tipLength);
+
+void rectangle(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2, struct ScalarWrapper color, int thickness, int lineType, int shift);
+
+void rectanglePts(
+        struct TensorWrapper img, struct RectWrapper rec, struct ScalarWrapper color, int thickness, int lineType, int shift);
+
+void circle(
+        struct TensorWrapper img, struct PointWrapper center, int radius, struct ScalarWrapper color, int thickness, int lineType, int shift);
+
+void ellipse(
+        struct TensorWrapper img, struct PointWrapper center, struct SizeWrapper axes, double angle, double startAngle, double endAngle, struct ScalarWrapper color, int thickness, int lineType, int shift);
+
+void ellipseFromRect(
+        struct TensorWrapper img, struct RotatedRectWrapper box, struct ScalarWrapper color, int thickness, int lineType);
+
+void fillConvexPoly(
+        struct TensorWrapper img, struct TensorWrapper points, struct ScalarWrapper color, int lineType, int shift);
+
+void fillPoly(
+        struct TensorWrapper img, struct TensorArray pts, struct ScalarWrapper color, int lineType, int shift, struct PointWrapper offset);
+
+void polylines(
+        struct TensorWrapper img, struct TensorArray pts, bool isClosed, struct ScalarWrapper color, int thickness, int lineType, int shift);
+
+void drawContours(
+        struct TensorWrapper image, struct TensorArray contours, int contourIdx, struct ScalarWrapper color, int thickness, int lineType, struct TensorWrapper hierarchy, int maxLevel, struct PointWrapper offset);
+
+struct ScalarPlusBool clipLineSize(
+        struct SizeWrapper imgSize, struct PointWrapper pt1, struct PointWrapper pt2);
+
+struct ScalarPlusBool clipLineRect(
+        struct RectWrapper imgRect, struct PointWrapper pt1, struct PointWrapper pt2);
+
 void putText(
         struct TensorWrapper img, const char *text, struct PointWrapper org, int fontFace, double fontScale, struct ScalarWrapper color, int thickness, int lineType, bool bottomLeftOrigin);
 ]]
@@ -1469,8 +1568,8 @@ end
 
 
 function cv.demosaicing(t)
-    local _src = assert(t._src)
-    local _dst = assert(t._dst)
+    local _src = assert(t.src)
+    local _dst = assert(t.dst)
     local code = assert(t.code)
     local dcn = t.dcn or 0
 
@@ -1530,7 +1629,7 @@ function cv.connectedComponentsWithStats(t)
     local connectivity = t.connectivity or 8
     local ltype = t.ltype or cv.CV_32S
 
-    result = C.connectedComponentsWithStats(
+    local result = C.connectedComponentsWithStats(
         cv.wrap_tensors(image), 
         cv.wrap_tensors(labels, stats, centroids), 
         connectivity, 
@@ -1566,24 +1665,27 @@ end
 
 function cv.approxPolyDP(t)
     local curve = assert(t.curve)
-    local approxCurve = assert(t.approxCurve)
+    local approxCurve = t.approxCurve
     local epsilon = assert(t.epsilon)
     local closed = assert(t.closed)
 
-    return C.approxPolyDP(cv.wrap_tensors(curve), cv.wrap_tensors(approxCurve), epsilon, closed)
+    return cv.unwrap_tensors(C.approxPolyDP(cv.wrap_tensors(curve), cv.wrap_tensors(approxCurve), epsilon, closed))
 end
 
 
 function cv.arcLength(t)
     local curve = assert(t.curve)
     local closed = assert(t.closed)
-
+    
     return C.arcLength(cv.wrap_tensors(curve), closed)
 end
 
 
 function cv.boundingRect(t)
     local points = assert(t.points)
+    if type(points) == "table" then
+        points = torch.FloatTensor(points)
+    end
 
     return C.boundingRect(cv.wrap_tensors(points))
 end
@@ -1591,6 +1693,10 @@ end
 
 function cv.contourArea(t)
     local contour = assert(t.contour)
+    if type(contour) == "table" then
+        contour = torch.FloatTensor(contour)
+    end
+
     local oriented = t.oriented or false
 
     return C.contourArea(cv.wrap_tensors(contour), oriented)
@@ -1599,33 +1705,51 @@ end
 
 function cv.minAreaRect(t)
     local points = assert(t.points)
+    if type(points) == "table" then
+        points = torch.FloatTensor(points)
+    end
 
     return C.minAreaRect(cv.wrap_tensors(points))
 end
 
 
+-- box: a RotatedRectWrapper
+-- points: optional; a 4x2 Tensor to hold the return value
 function cv.boxPoints(t)
     local box = assert(t.box)
-    local points = assert(t.points)
+    local points = t.points
+    -- check that points is a Tensor
+    assert(not points or points.torch)
 
-    return C.boxPoints(box, cv.wrap_tensors(points))
+    return cv.unwrap_tensors(C.boxPoints(box, cv.wrap_tensors(points)))
 end
 
-
+-- points: a Tensor or a table of points
+-- return value: center, radius
 function cv.minEnclosingCircle(t)
     local points = assert(t.points)
-    local center = assert(t.center)
-    local radius = assert(t.radius)
+    if type(points) == "table" then
+        points = torch.FloatTensor(points)
+    end
 
-    return C.minEnclosingCircle(cv.wrap_tensors(points), center, radius)
+    local result = C.minEnclosingCircle(cv.wrap_tensors(points))
+    return cv.Point2f(result.v0, result.v1), result.v2
 end
 
-
+-- points: a Tensor or a table of points
+-- triangle: optional; a 3x2 Tensor to hold the return value
+-- return value: triangle_points, area
 function cv.minEnclosingTriangle(t)
     local points = assert(t.points)
-    local triangle = assert(t.triangle)
+    if type(points) == "table" then
+        points = torch.FloatTensor(points)
+    end
+    local triangle = t.triangle
+    -- check that triangle is a Tensor
+    assert(not triangle or triangle.torch)
 
-    return C.minEnclosingTriangle(cv.wrap_tensors(points), cv.wrap_tensors(triangle))
+    local result = C.minEnclosingTriangle(cv.wrap_tensors(points), cv.wrap_tensors(triangle))
+    return cv.unwrap_tensors(result.tensor), result.val
 end
 
 
@@ -1633,7 +1757,7 @@ function cv.matchShapes(t)
     local contour1 = assert(t.contour1)
     local contour2 = assert(t.contour2)
     local method = assert(t.method)
-    local parameter = assert(t.parameter)
+    local parameter = t.parameter or 0
 
     return C.matchShapes(cv.wrap_tensors(contour1), cv.wrap_tensors(contour2), method, parameter)
 end
@@ -1641,24 +1765,28 @@ end
 
 function cv.convexHull(t)
     local points = assert(t.points)
-    local hull = assert(t.hull)
     local clockwise = t.clockwise or false
     local returnPoints = t.returnPoints
     if returnPoints == nil then
          returnPoints = true
     end
 
-
-    return C.convexHull(cv.wrap_tensors(points), cv.wrap_tensors(hull), clockwise, returnPoints)
+    retval = cv.unwrap_tensors(C.convexHull(cv.wrap_tensors(points), clockwise, returnPoints))
+    if not returnPoints then
+        -- correct the 0-based indexing
+        for i = 1,#retval do
+            retval[i] = retval[i] + 1
+        end
+    end
+    return retval
 end
 
 
 function cv.convexityDefects(t)
     local contour = assert(t.contour)
     local convexhull = assert(t.convexhull)
-    local convexityDefects = assert(t.convexityDefects)
 
-    return C.convexityDefects(cv.wrap_tensors(contour), cv.wrap_tensors(convexhull), cv.wrap_tensors(convexityDefects))
+    return cv.unwrap_tensors(C.convexityDefects(cv.wrap_tensors(contour), cv.wrap_tensors(convexhull)))
 end
 
 
@@ -1669,17 +1797,19 @@ function cv.isContourConvex(t)
 end
 
 
+-- contour1, contour2: Tensors containing points
+-- handleNested: boolean
+-- return value: intersection
 function cv.intersectConvexConvex(t)
-    local _p1 = assert(t._p1)
-    local _p2 = assert(t._p2)
-    local _p12 = assert(t._p12)
+    local _p1 = assert(t.contour1)
+    local _p2 = assert(t.contour2)
     local handleNested = t.handleNested
     if handleNested == nil then
         handleNested = true
     end
 
-
-    return C.intersectConvexConvex(cv.wrap_tensors(_p1), cv.wrap_tensors(_p2), cv.wrap_tensors(_p12), handleNested)
+    return cv.unwrap_tensors(
+        C.intersectConvexConvex(cv.wrap_tensors(_p1), cv.wrap_tensors(_p2), handleNested))
 end
 
 
@@ -1692,19 +1822,19 @@ end
 
 function cv.fitLine(t)
     local points = assert(t.points)
-    local line = assert(t.line)
     local distType = assert(t.distType)
     local param = assert(t.param)
     local reps = assert(t.reps)
     local aeps = assert(t.aeps)
 
-    return C.fitLine(cv.wrap_tensors(points), cv.wrap_tensors(line), distType, param, reps, aeps)
+    return cv.unwrap_tensors(
+        C.fitLine(cv.wrap_tensors(points), distType, param, reps, aeps)
 end
 
 
 function cv.pointPolygonTest(t)
     local contour = assert(t.contour)
-    local pt = assert(t.pt)
+    local pt = cv.Point2f(assert(t.pt))
     local measureDist = assert(t.measureDist)
 
     return C.pointPolygonTest(cv.wrap_tensors(contour), pt, measureDist)
@@ -1712,11 +1842,11 @@ end
 
 
 function cv.rotatedRectangleIntersection(t)
-    local rect1 = assert(t.rect1)
-    local rect2 = assert(t.rect2)
-    local intersectingRegion = assert(t.intersectingRegion)
+    local rect1 = cv.RotatedRect(assert(t.rect1))
+    local rect2 = cv.RotatedRect(assert(t.rect2))
 
-    return C.rotatedRectangleIntersection(rect1, rect2, cv.wrap_tensors(intersectingRegion))
+    return cv.unwrap_tensors(
+        C.rotatedRectangleIntersection(rect1, rect2))
 end
 
 
@@ -1725,218 +1855,200 @@ function cv.blendLinear(t)
     local src2 = assert(t.src2)
     local weights1 = assert(t.weights1)
     local weights2 = assert(t.weights2)
-    local dst = assert(t.dst)
+    local dst = t.dst
 
-    return C.blendLinear(cv.wrap_tensors(src1), cv.wrap_tensors(src2), cv.wrap_tensors(weights1), cv.wrap_tensors(weights2), cv.wrap_tensors(dst))
+    return cv.unwrap_tensors(
+        C.blendLinear(cv.wrap_tensors(src1), cv.wrap_tensors(src2), cv.wrap_tensors(weights1), cv.wrap_tensors(weights2), cv.wrap_tensors(dst))
 end
 
 
 function cv.applyColorMap(t)
     local src = assert(t.src)
-    local dst = assert(t.dst)
+    local dst = t.dst
     local colormap = assert(t.colormap)
 
-    return C.applyColorMap(cv.wrap_tensors(src), cv.wrap_tensors(dst), colormap)
+    return cv.unwrap_tensors(
+        C.applyColorMap(cv.wrap_tensors(src), cv.wrap_tensors(dst), colormap))
 end
 
 
 function cv.line(t)
     local img = assert(t.img)
-    local pt1 = assert(t.pt1)
-    local pt2 = assert(t.pt2)
-    local color = assert(t.color)
+    local pt1 = cv.Point(assert(t.pt1))
+    local pt2 = cv.Point(assert(t.pt2))
+    local color = cv.Scalar(assert(t.color))
     local thickness = t.thickness or 1
     local lineType = t.lineType or cv.LINE_8
     local shift = t.shift or 0
 
-    return C.line(cv.wrap_tensors(img), pt1, pt2, color, thickness, lineType, shift)
+    C.line(cv.wrap_tensors(img), pt1, pt2, color, thickness, lineType, shift)
 end
 
 
 function cv.arrowedLine(t)
     local img = assert(t.img)
-    local pt1 = assert(t.pt1)
-    local pt2 = assert(t.pt2)
-    local color = assert(t.color)
+    local pt1 = cv.Point(assert(t.pt1))
+    local pt2 = cv.Point(assert(t.pt2))
+    local color = cv.Scalar(assert(t.color))
     local thickness = t.thickness or 1
     local line_type = t.line_type or 8
     local shift = t.shift or 0
     local tipLength = t.tipLength or 0.1
 
-    return C.arrowedLine(cv.wrap_tensors(img), pt1, pt2, color, thickness, line_type, shift, tipLength)
+    C.arrowedLine(cv.wrap_tensors(img), pt1, pt2, color, thickness, line_type, shift, tipLength)
 end
 
 
 function cv.rectangle(t)
     local img = assert(t.img)
-    local pt1 = assert(t.pt1)
-    local pt2 = assert(t.pt2)
-    local color = assert(t.color)
+    local pt1
+    local pt2
+    local rec
+    if t.rec then
+        rec = cv.Rect(t.rec)
+    else
+        pt1 = cv.Point(t.pt1)
+        pt2 = cv.Point(t.pt2)
+    end
+    assert((pt1 and pt2) or rec)
+    local color = cv.Scalar(assert(t.color))
     local thickness = t.thickness or 1
     local lineType = t.lineType or cv.LINE_8
     local shift = t.shift or 0
 
-    return C.rectangle(cv.wrap_tensors(img), pt1, pt2, color, thickness, lineType, shift)
-end
-
-
-function cv.rectangle(t)
-    local img = assert(t.img)
-    local rec = assert(t.rec)
-    local color = assert(t.color)
-    local thickness = t.thickness or 1
-    local lineType = t.lineType or cv.LINE_8
-    local shift = t.shift or 0
-
-    return C.rectangle(img, rec, color, thickness, lineType, shift)
+    if rec then
+        C.rectangle(cv.wrap_tensors(img), rec, color, thickness, lineType, shift)
+    else
+        C.rectangle(cv.wrap_tensors(img), pt1, pt2, color, thickness, lineType, shift)
+    end
 end
 
 
 function cv.circle(t)
     local img = assert(t.img)
-    local center = assert(t.center)
+    local center = cv.Point(assert(t.center))
     local radius = assert(t.radius)
-    local color = assert(t.color)
+    local color = cv.Scalar(assert(t.color))
     local thickness = t.thickness or 1
     local lineType = t.lineType or cv.LINE_8
     local shift = t.shift or 0
 
-    return C.circle(cv.wrap_tensors(img), center, radius, color, thickness, lineType, shift)
+    C.circle(cv.wrap_tensors(img), center, radius, color, thickness, lineType, shift)
 end
 
 
 function cv.ellipse(t)
     local img = assert(t.img)
-    local center = assert(t.center)
-    local axes = assert(t.axes)
+    local center = cv.Point(assert(t.center))
+    local axes = cv.Size(assert(t.axes))
     local angle = assert(t.angle)
     local startAngle = assert(t.startAngle)
     local endAngle = assert(t.endAngle)
-    local color = assert(t.color)
+    local color = cv.Scalar(assert(t.color))
     local thickness = t.thickness or 1
     local lineType = t.lineType or cv.LINE_8
     local shift = t.shift or 0
 
-    return C.ellipse(cv.wrap_tensors(img), center, axes, angle, startAngle, endAngle, color, thickness, lineType, shift)
+    C.ellipse(cv.wrap_tensors(img), center, axes, angle, startAngle, endAngle, color, thickness, lineType, shift)
 end
 
 
-function cv.ellipse(t)
+function cv.ellipseFromRect(t)
     local img = assert(t.img)
-    local box = assert(t.box)
-    local color = assert(t.color)
+    local box = cv.RotatedRect(assert(t.box))
+    local color = cv.Scalar(assert(t.color))
     local thickness = t.thickness or 1
     local lineType = t.lineType or cv.LINE_8
 
-    return C.ellipse(cv.wrap_tensors(img), box, color, thickness, lineType)
-end
-
-
-function cv.fillConvexPoly(t)
-    local img = assert(t.img)
-    local pts = assert(t.pts)
-    local npts = assert(t.npts)
-    local color = assert(t.color)
-    local lineType = t.lineType or cv.LINE_8
-    local shift = t.shift or 0
-
-    return C.fillConvexPoly(img, pts, npts, color, lineType, shift)
+    C.ellipseFromRect(cv.wrap_tensors(img), box, color, thickness, lineType)
 end
 
 
 function cv.fillConvexPoly(t)
     local img = assert(t.img)
     local points = assert(t.points)
-    local color = assert(t.color)
+    if type(points) == "table" then
+        points = torch.FloatTensor(points)
+    end
+    local color = cv.Scalar(assert(t.color))
     local lineType = t.lineType or cv.LINE_8
     local shift = t.shift or 0
 
-    return C.fillConvexPoly(cv.wrap_tensors(img), cv.wrap_tensors(points), color, lineType, shift)
+    C.fillConvexPoly(cv.wrap_tensors(img), cv.wrap_tensors(points), color, lineType, shift)
 end
 
 
 function cv.fillPoly(t)
     local img = assert(t.img)
     local pts = assert(t.pts)
-    local npts = assert(t.npts)
-    local ncontours = assert(t.ncontours)
-    local color = assert(t.color)
+    assert(type(pts) == 'table')
+    local color = cv.Scalar(assert(t.color))
     local lineType = t.lineType or cv.LINE_8
     local shift = t.shift or 0
-    local offset = t.offset or cv.Point
+    local offset = cv.Point(t.offset or {0,0})
 
-    return C.fillPoly(img, pts, npts, ncontours, color, lineType, shift, offset)
-end
-
-
-function cv.fillPoly(t)
-    local img = assert(t.img)
-    local pts = assert(t.pts)
-    local color = assert(t.color)
-    local lineType = t.lineType or cv.LINE_8
-    local shift = t.shift or 0
-    local offset = t.offset or cv.Point
-
-    return C.fillPoly(cv.wrap_tensors(img), cv.wrap_tensors(pts), color, lineType, shift, offset)
+    C.fillPoly(cv.wrap_tensors(img), cv.wrap_tensors(pts), color, lineType, shift, offset)
 end
 
 
 function cv.polylines(t)
     local img = assert(t.img)
     local pts = assert(t.pts)
-    local npts = assert(t.npts)
-    local ncontours = assert(t.ncontours)
+    assert(type(pts) == 'table')
     local isClosed = assert(t.isClosed)
-    local color = assert(t.color)
+    local color = cv.Scalar(assert(t.color))
     local thickness = t.thickness or 1
     local lineType = t.lineType or cv.LINE_8
     local shift = t.shift or 0
 
-    return C.polylines(img, pts, npts, ncontours, isClosed, color, thickness, lineType, shift)
-end
-
-
-function cv.polylines(t)
-    local img = assert(t.img)
-    local pts = assert(t.pts)
-    local isClosed = assert(t.isClosed)
-    local color = assert(t.color)
-    local thickness = t.thickness or 1
-    local lineType = t.lineType or cv.LINE_8
-    local shift = t.shift or 0
-
-    return C.polylines(cv.wrap_tensors(img), cv.wrap_tensors(pts), isClosed, color, thickness, lineType, shift)
+    C.polylines(cv.wrap_tensors(img), cv.wrap_tensors(pts), isClosed, color, thickness, lineType, shift)
 end
 
 
 function cv.drawContours(t)
     local image = assert(t.image)
     local contours = assert(t.contours)
+    assert(type(contours) == 'table')
     local contourIdx = assert(t.contourIdx)
-    local color = assert(t.color)
+    local color = cv.Scalar(assert(t.color))
     local thickness = t.thickness or 1
     local lineType = t.lineType or cv.LINE_8
-    local hierarchy = t.hierarchy or noArray
+    local hierarchy = t.hierarchy
     local maxLevel = t.maxLevel or cv.INT_MAX
     local offset = t.offset or cv.Point
 
-    return C.drawContours(cv.wrap_tensors(image), cv.wrap_tensors(contours), contourIdx, color, thickness, lineType, cv.wrap_tensors(hierarchy), maxLevel, offset)
+    C.drawContours(cv.wrap_tensors(image), cv.wrap_tensors(contours), contourIdx, color, thickness, lineType, cv.wrap_tensors(hierarchy), maxLevel, offset)
 end
 
 
 function cv.clipLine(t)
-    local imgSize = assert(t.imgSize)
-    local pt1 = assert(t.pt1)
-    local pt2 = assert(t.pt2)
+    local imgSize = t.imgSize
+    local imgRect = t.imgRect
+    assert(imgSize or imgRect)
+    if imgSize then
+        imgSize = cv.Size(imgSize)
+    else
+        imgRect = cv.Rect(imgRect)
+    end
 
-    return C.clipLine(imgSize, pt1, pt2)
+    local pt1 = cv.Point(assert(t.pt1))
+    local pt2 = cv.Point(assert(t.pt2))
+
+    local result
+    if imgSize then
+        result = C.clipLineSize(imgSize, pt1, pt2)
+    else
+        result = C.clipLineRect(imgRect, pt1, pt2)
+    end
+
+    return cv.Point{result.scalar.v0, result.scalar.v1}, cv.Point{result.scalar.v2, result.scalar.v3}, result.val
 end
 
 
 function cv.clipLine(t)
     local imgRect = assert(t.imgRect)
-    local pt1 = assert(t.pt1)
-    local pt2 = assert(t.pt2)
+    local pt1 = cv.Point(assert(t.pt1))
+    local pt2 = cv.Point(assert(t.pt2))
 
     return C.clipLine(imgRect, pt1, pt2)
 end

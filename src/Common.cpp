@@ -164,3 +164,26 @@ RectWrapper & RectWrapper::operator=(cv::Rect & other) {
     this->height = other.height;
     return *this;
 }
+
+RectWrapper::RectWrapper(const cv::Rect &other) {
+    this->x = other.x;
+    this->y = other.y;
+    this->width = other.width;
+    this->height = other.height;
+}
+
+RotatedRectWrapper::RotatedRectWrapper(const cv::RotatedRect &other) {
+    this->center = other.center;
+    this->size = other.size;
+    this->angle = other.angle;
+}
+
+Size2fWrapper::Size2fWrapper(const cv::Size2f &other){
+    this->height = other.height;
+    this->width = other.width;
+}
+
+Point2fWrapper::Point2fWrapper(const cv::Point2f &other) {
+    this->x = other.x;
+    this->y = other.y;
+}

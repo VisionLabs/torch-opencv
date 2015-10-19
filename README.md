@@ -1,7 +1,7 @@
 imgproc module branch
 =====================
 
-**Roughly 56% completed**
+**Roughly 76% completed**
 
 Unstable pieces of code (to be tested):
 
@@ -23,34 +23,6 @@ Unstable pieces of code (to be tested):
 * calcHist (SparseMat overload)
 * calcBackProject (SparseMat overload)
 * compareHist (SparseMat overload)
-* approxPolyDP
-* arcLength
-* boundingRect
-* contourArea
-* minAreaRect
-* boxPoints
-* minEnclosingCircle
-* minEnclosingTriangle
-* matchShapes
-* convexHull
-* convexityDefects
-* isContourConvex
-* intersectConvexConvex
-* fitEllipse
-* fitLine
-* pointPolygonTest
-* rotatedRectangleIntersection
-* blendLinear
-* applyColorMap
-* line
-* arrowedLine
-* rectangle
-* circle
-* ellipse
-* fillConvexPoly
-* fillPoly
-* polylines
-* drawContours
 * clipLine
 * ellipse2Poly
 * getTextSize
@@ -141,5 +113,33 @@ Unstable pieces of code (to be tested):
 * connectedComponentsWithStats
 * HuMoments
 * findContours
+* approxPolyDP
+* arcLength
+* boundingRect
+* contourArea
+* minAreaRect
+* boxPoints
+* minEnclosingCircle
+* minEnclosingTriangle
+* matchShapes
+* convexHull
+* convexityDefects
+* isContourConvex
+* intersectConvexConvex
+* fitEllipse
+* fitLine
+* pointPolygonTest
+* rotatedRectangleIntersection
+* blendLinear
+* applyColorMap
+* line
+* arrowedLine
+* rectangle
+* circle
+* ellipse
+* fillConvexPoly
+* fillPoly
+* polylines
+* drawContours
 
-79/141
+107/141

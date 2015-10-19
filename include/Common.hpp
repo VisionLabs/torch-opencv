@@ -67,6 +67,8 @@ struct Size2fWrapper {
     float width, height;
 
     inline operator cv::Size2f() { return cv::Size2f(width, height); }
+    inline Size2fWrapper() {}
+    Size2fWrapper(const cv::Size2f & other);
 };
 
 struct TermCriteriaWrapper {
@@ -92,11 +94,17 @@ struct Vec3dWrapper {
     double v0, v1, v2;
 };
 
+struct Vec3fWrapper {
+    float v0, v1, v2;
+};
+
 struct RectWrapper {
     int x, y, width, height;
 
     inline operator cv::Rect() { return cv::Rect(x, y, width, height); }
     RectWrapper & operator=(cv::Rect & other);
+    RectWrapper(const cv::Rect & other);
+    inline RectWrapper() {}
 };
 
 struct PointWrapper {
@@ -109,6 +117,8 @@ struct Point2fWrapper {
     float x, y;
 
     inline operator cv::Point2f() { return cv::Point2f(x, y); }
+    Point2fWrapper(const cv::Point2f & other);
+    inline Point2fWrapper() {}
 };
 
 struct RotatedRectWrapper {
@@ -117,6 +127,7 @@ struct RotatedRectWrapper {
     float angle;
 
     inline operator cv::RotatedRect() { return cv::RotatedRect(center, size, angle); }
+    RotatedRectWrapper(const cv::RotatedRect & other);
 };
 
 struct MomentsWrapper {
@@ -137,6 +148,11 @@ struct TensorPlusDouble {
     double val;
 };
 
+struct TensorPlusFloat {
+    struct TensorWrapper tensor;
+    float val;
+};
+
 struct TensorPlusInt {
     struct TensorWrapper tensor;
     int val;
@@ -155,6 +171,11 @@ struct TensorArrayPlusInt {
 struct RectPlusInt {
     struct RectWrapper rect;
     int val;
+};
+
+struct ScalarPlusBool {
+    struct ScalarWrapper scalar;
+    bool val;
 };
 
 /***************** Other helper structs *****************/

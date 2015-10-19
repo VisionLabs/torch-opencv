@@ -1303,24 +1303,31 @@ struct TensorArray findContours(
 }
 
 extern "C"
-void approxPolyDP(
+struct TensorWrapper approxPolyDP(
         struct TensorWrapper curve, struct TensorWrapper approxCurve, double epsilon, bool closed)
 {
-    cv::approxPolyDP(curve.toMat(), approxCurve.toMat(), epsilon, closed);
+    if (approxCurve.isNull()) {
+        cv::Mat retval;
+        cv::approxPolyDP(curve.toMat(), retval, epsilon, closed);
+        return TensorWrapper(retval);
+    } else {
+        cv::approxPolyDP(curve.toMat(), approxCurve.toMat(), epsilon, closed);
+        return approxCurve;
+    }
 }
 
 extern "C"
 double arcLength(
         struct TensorWrapper curve, bool closed)
 {
-    cv::arcLength(curve.toMat(), closed);
+    return cv::arcLength(curve.toMat(), closed);
 }
 
 extern "C"
 struct RectWrapper boundingRect(
         struct TensorWrapper points)
 {
-    cv::boundingRect(points.toMat());
+    return cv::boundingRect(points.toMat());
 }
 
 extern "C"
@@ -1334,105 +1341,154 @@ extern "C"
 struct RotatedRectWrapper minAreaRect(
         struct TensorWrapper points)
 {
-    cv::minAreaRect(points.toMat());
+    return cv::minAreaRect(points.toMat());
 }
 
 extern "C"
-void boxPoints(
+struct TensorWrapper boxPoints(
         struct RotatedRectWrapper box, struct TensorWrapper points)
 {
-    cv::boxPoints(box, points.toMat());
+    if (points.isNull()) {
+        cv::Mat retval;
+        cv::boxPoints(box, retval);
+        return retval;
+    } else {
+        cv::boxPoints(box, points.toMat());
+        return points;
+    }
 }
 
 extern "C"
-void minEnclosingCircle(
+struct Vec3fWrapper minEnclosingCircle(
         struct TensorWrapper points, struct Point2fWrapper center, float radius)
 {
-    //cv::minEnclosingCircle(points.toMat(), cv::Point2f(center), radius);
+    Vec3fWrapper retval;
+    cv::Point2f temp;
+
+    cv::minEnclosingCircle(points.toMat(), temp, retval.v2);
+
+    retval.v0 = temp.x;
+    retval.v1 = temp.y;
+    return retval;
 }
 
 extern "C"
-double minEnclosingTriangle(
+struct TensorPlusDouble minEnclosingTriangle(
         struct TensorWrapper points, struct TensorWrapper triangle)
 {
-    cv::minEnclosingTriangle(points.toMat(), triangle.toMat());
+    TensorPlusDouble retval;
+    if (triangle.isNull()) {
+        cv::Mat result;
+        retval.val = cv::minEnclosingTriangle(points.toMat(), result);
+        new (&retval.tensor) TensorWrapper(result);
+    } else {
+        retval.val = cv::minEnclosingTriangle(points.toMat(), triangle.toMat());
+        retval.tensor = triangle;
+    }
+    return retval;
 }
 
 extern "C"
 double matchShapes(
         struct TensorWrapper contour1, struct TensorWrapper contour2, int method, double parameter)
 {
-    cv::matchShapes(contour1.toMat(), contour2.toMat(), method, parameter);
+    return cv::matchShapes(contour1.toMat(), contour2.toMat(), method, parameter);
 }
 
 extern "C"
-void convexHull(
-        struct TensorWrapper points, struct TensorWrapper hull, bool clockwise, bool returnPoints)
+struct TensorWrapper convexHull(
+        struct TensorWrapper points, bool clockwise, bool returnPoints)
 {
-    cv::convexHull(points.toMat(), hull.toMat(), clockwise, returnPoints);
+    cv::Mat retval;
+    cv::convexHull(points.toMat(), retval, clockwise, returnPoints);
+    return TensorWrapper(retval);
 }
 
 extern "C"
-void convexityDefects(
-        struct TensorWrapper contour, struct TensorWrapper convexhull, struct TensorWrapper convexityDefects)
+struct TensorWrapper convexityDefects(
+        struct TensorWrapper contour, struct TensorWrapper convexhull)
 {
-    cv::convexityDefects(contour.toMat(), convexhull.toMat(), convexityDefects.toMat());
+    cv::Mat retval;
+    cv::convexityDefects(contour.toMat(), convexhull.toMat(), retval);
+    return TensorWrapper(retval);
 }
 
 extern "C"
 bool isContourConvex(
         struct TensorWrapper contour)
 {
-    cv::isContourConvex(contour.toMat());
+    return cv::isContourConvex(contour.toMat());
 }
 
 extern "C"
-float intersectConvexConvex(
-        struct TensorWrapper _p1, struct TensorWrapper _p2, struct TensorWrapper _p12, bool handleNested)
+struct TensorPlusFloat intersectConvexConvex(
+        struct TensorWrapper _p1, struct TensorWrapper _p2, bool handleNested)
 {
-    cv::intersectConvexConvex(_p1.toMat(), _p2.toMat(), _p12.toMat(), handleNested);
+    TensorPlusFloat retval;
+    cv::Mat result;
+    retval.val = cv::intersectConvexConvex(_p1.toMat(), _p2.toMat(), result, handleNested);
+    new (&retval.tensor) TensorWrapper(result);
+    return retval;
 }
 
 extern "C"
 struct RotatedRectWrapper fitEllipse(
         struct TensorWrapper points)
 {
-    cv::fitEllipse(points.toMat());
+    return cv::fitEllipse(points.toMat());
 }
 
 extern "C"
-void fitLine(
-        struct TensorWrapper points, struct TensorWrapper line, int distType, double param, double reps, double aeps)
+struct TensorWrapper fitLine(
+        struct TensorWrapper points, int distType, double param, double reps, double aeps)
 {
-    cv::fitLine(points.toMat(), line.toMat(), distType, param, reps, aeps);
+    cv::Mat retval;
+    cv::fitLine(points.toMat(), retval, distType, param, reps, aeps);
+    return TensorWrapper(retval);
 }
 
 extern "C"
 double pointPolygonTest(
         struct TensorWrapper contour, struct Point2fWrapper pt, bool measureDist)
 {
-    cv::pointPolygonTest(contour.toMat(), pt, measureDist);
+    return cv::pointPolygonTest(contour.toMat(), pt, measureDist);
 }
 
 extern "C"
-int rotatedRectangleIntersection(
-        struct RotatedRectWrapper rect1, struct RotatedRectWrapper rect2, struct TensorWrapper intersectingRegion)
+struct TensorWrapper rotatedRectangleIntersection(
+        struct RotatedRectWrapper rect1, struct RotatedRectWrapper rect2)
 {
-    cv::rotatedRectangleIntersection(rect1, rect2, intersectingRegion.toMat());
+    cv::Mat retval;
+    cv::rotatedRectangleIntersection(rect1, rect2, retval);
+    return TensorWrapper(retval);
 }
 
 extern "C"
-void blendLinear(
+struct TensorWrapper blendLinear(
         struct TensorWrapper src1, struct TensorWrapper src2, struct TensorWrapper weights1, struct TensorWrapper weights2, struct TensorWrapper dst)
 {
-    cv::blendLinear(src1.toMat(), src2.toMat(), weights1.toMat(), weights2.toMat(), dst.toMat());
+    if (dst.isNull()) {
+        cv::Mat retval;
+        cv::blendLinear(src1.toMat(), src2.toMat(), weights1.toMat(), weights2.toMat(), retval);
+        return TensorWrapper(retval);
+    } else {
+        cv::blendLinear(src1.toMat(), src2.toMat(), weights1.toMat(), weights2.toMat(), dst.toMat());
+        return dst;
+    }
 }
 
 extern "C"
-void applyColorMap(
+struct TensorWrapper applyColorMap(
         struct TensorWrapper src, struct TensorWrapper dst, int colormap)
 {
-    cv::applyColorMap(src.toMat(), dst.toMat(), colormap);
+    if (dst.isNull()) {
+        cv::Mat retval;
+        cv::applyColorMap(src.toMat(), retval, colormap);
+        return TensorWrapper(retval);
+    } else {
+        cv::applyColorMap(src.toMat(), dst.toMat(), colormap);
+        return dst;
+    }
 }
 
 extern "C"
@@ -1451,10 +1507,16 @@ void arrowedLine(
 
 extern "C"
 void rectangle(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2, struct ScalarWrapper color, int thickness, int lineType, int shift)
+{
+    cv::rectangle(img.toMat(), pt1, pt2, color, thickness, lineType, shift);
+}
+
+extern "C"
+void rectanglePts(
         struct TensorWrapper img, struct RectWrapper rec, struct ScalarWrapper color, int thickness, int lineType, int shift)
 {
-    // overload!!!
-    cv::Mat imgMat = img;
+    cv::Mat imgMat(img);
     cv::rectangle(imgMat, rec, color, thickness, lineType, shift);
 }
 
@@ -1473,7 +1535,7 @@ void ellipse(
 }
 
 extern "C"
-void ellipseRotatedRect(
+void ellipseFromRect(
         struct TensorWrapper img, struct RotatedRectWrapper box, struct ScalarWrapper color, int thickness, int lineType)
 {
     cv::ellipse(img.toMat(), box, color, thickness, lineType);
@@ -1481,69 +1543,59 @@ void ellipseRotatedRect(
 
 extern "C"
 void fillConvexPoly(
-        struct TensorWrapper img, struct PointArray pts, struct ScalarWrapper color, int lineType, int shift)
-{
-    cv::Mat imgMat = img;
-    std::vector<cv::Point> points(pts.data, pts.data + pts.size);
-    cv::fillConvexPoly(imgMat, points.data(), pts.size, color, lineType, shift);
-}
-
-extern "C"
-void fillConvexPolyTensor(
         struct TensorWrapper img, struct TensorWrapper points, struct ScalarWrapper color, int lineType, int shift)
 {
-    cv::Mat imgMat = img;
+    cv::Mat imgMat(img);
     cv::fillConvexPoly(imgMat, points.toMat(), color, lineType, shift);
 }
 
 extern "C"
 void fillPoly(
-        struct TensorWrapper img, struct PointArrayOfArrays pts, struct ScalarWrapper color, int lineType, int shift, struct PointWrapper offset)
+        struct TensorWrapper img, struct TensorArray pts, struct ScalarWrapper color, int lineType, int shift, struct PointWrapper offset)
 {
-    cv::Mat imgMat = img;
-    std::vector<cv::Point> pointsVec(pts.realData, pts.realData + std::accumulate(pts.sizes, pts.sizes + pts.dims, 0));
-    std::vector<const cv::Point*> pointers;
-    pointers[0] = pointsVec.data();
-    for (size_t i = 1; i < pts.dims; ++i) {
-        pointers[i] = pointers[i-1] + pts.sizes[i-1];
-    }
-    cv::fillPoly(imgMat, pointers.data(), pts.sizes, pts.dims, color, lineType, shift, offset);
+    cv::fillPoly(img.toMat(), pts.toMatList(), color, lineType, shift, offset);
 }
 
 extern "C"
 void polylines(
-        struct TensorWrapper img, struct PointArrayOfArrays pts, bool isClosed, struct ScalarWrapper color, int thickness, int lineType, int shift)
+        struct TensorWrapper img, struct TensorArray pts, bool isClosed, struct ScalarWrapper color, int thickness, int lineType, int shift)
 {
-    cv::Mat imgMat = img;
-    std::vector<cv::Point> pointsVec(pts.realData, pts.realData + std::accumulate(pts.sizes, pts.sizes + pts.dims, 0));
-    std::vector<const cv::Point*> pointers;
-    pointers[0] = pointsVec.data();
-    for (size_t i = 1; i < pts.dims; ++i) {
-        pointers[i] = pointers[i-1] + pts.sizes[i-1];
-    }
-    cv::polylines(imgMat, pointers.data(), pts.sizes, pts.dims, isClosed, color, thickness, lineType, shift);
+    cv::polylines(img.toMat(), pts.toMatList(), isClosed, color, thickness, lineType, shift);
 }
 
 extern "C"
 void drawContours(
         struct TensorWrapper image, struct TensorArray contours, int contourIdx, struct ScalarWrapper color, int thickness, int lineType, struct TensorWrapper hierarchy, int maxLevel, struct PointWrapper offset)
 {
-    auto contoursVec = contours.toMatList();
-    cv::drawContours(image.toMat(), contoursVec, contourIdx, color, thickness, lineType, TO_MAT_OR_NOARRAY(hierarchy), maxLevel, offset);
+    cv::drawContours(image.toMat(), contours.toMatList(), contourIdx, color, thickness, lineType, TO_MAT_OR_NOARRAY(hierarchy), maxLevel, offset);
 }
 
 extern "C"
-bool clipLineSize(
+struct ScalarPlusBool clipLineSize(
         struct SizeWrapper imgSize, struct PointWrapper pt1, struct PointWrapper pt2)
 {
-    //cv::clipLine(imgSize, pt1, pt2);
+    ScalarPlusBool retval;
+    cv::Point temp1(pt1), temp2(pt2);
+    retval.val = cv::clipLine(imgSize, temp1, temp2);
+    retval.scalar.v0 = temp1.x;
+    retval.scalar.v1 = temp1.y;
+    retval.scalar.v2 = temp2.x;
+    retval.scalar.v3 = temp2.y;
+    return retval;
 }
 
 extern "C"
-bool clipLineRect(
+struct ScalarPlusBool clipLineRect(
         struct RectWrapper imgRect, struct PointWrapper pt1, struct PointWrapper pt2)
 {
-    //cv::clipLine(imgRect, pt1, pt2);
+    ScalarPlusBool retval;
+    cv::Point temp1(pt1), temp2(pt2);
+    retval.val = cv::clipLine(imgRect, temp1, temp2);
+    retval.scalar.v0 = temp1.x;
+    retval.scalar.v1 = temp1.y;
+    retval.scalar.v2 = temp2.x;
+    retval.scalar.v3 = temp2.y;
+    return retval;
 }
 
 extern "C"
