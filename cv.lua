@@ -384,4 +384,52 @@ function cv.numberArrayOfArrays(elemType, data)
     end
 end
 
+
+function cv.arrayToLua(array, outputType, output)
+    local retval
+
+    if output then
+        for i = 1,array.size do
+            output[i] = array.data[i-1]
+        end
+
+        C.free(array.data)
+        return output
+    end
+    
+    if     outputType == 'table' then
+        retval = {}
+    elseif outputType == 'Tensor' then
+        -- ctype has the form 'ctype<struct IntArray>'
+        ctype = tostring(ffi.typeof(array))
+        local typeStart = 14
+        local typeEnd = ctype:find('Arr') - 1
+        retval = torch[ctype:sub(typeStart, typeEnd) .. 'Tensor'](array.size)
+    end
+
+    for i = 1,array.size do
+        retval[i] = array.data[i-1]
+    end
+
+    C.free(array.data)
+    return retval
+end
+
+--- ***************** Classes *****************
+
+do
+    local Algorithm = torch.class('Algorithm')
+
+    function Algorithm:__init()
+        self.ptr = cv.NULLPTR
+    end
+
+    function Algorithm:clear()
+        C.algo_clear(self.ptr)
+    end
+
+
+end
+
+
 return cv

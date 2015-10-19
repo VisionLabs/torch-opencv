@@ -33,6 +33,8 @@ struct TensorArray {
 
     TensorArray();
     TensorArray(std::vector<cv::Mat> & matList);
+    explicit TensorArray(short size);
+
     operator std::vector<cv::Mat>();
     // synonym for operator std::vector<cv::Mat>()
     inline std::vector<cv::Mat> toMatList() { return *this; }
@@ -49,7 +51,7 @@ std::string typeStr(cv::Mat & mat) {
         case CV_32S: return "Int";
         case CV_32F: return "Float";
         case CV_64F: return "Double";
-        default: ; // TODO: raise an error
+        default:     return "Unknown";
     }
 }
 
@@ -59,12 +61,16 @@ struct SizeWrapper {
     int width, height;
 
     inline operator cv::Size() { return cv::Size(width, height); }
+    SizeWrapper(const cv::Size & other);
+    inline SizeWrapper() {}
 };
 
 struct Size2fWrapper {
     float width, height;
 
     inline operator cv::Size2f() { return cv::Size2f(width, height); }
+    inline Size2fWrapper() {}
+    Size2fWrapper(const cv::Size2f & other);
 };
 
 struct TermCriteriaWrapper {
@@ -90,11 +96,17 @@ struct Vec3dWrapper {
     double v0, v1, v2;
 };
 
+struct Vec3fWrapper {
+    float v0, v1, v2;
+};
+
 struct RectWrapper {
     int x, y, width, height;
 
     inline operator cv::Rect() { return cv::Rect(x, y, width, height); }
     RectWrapper & operator=(cv::Rect & other);
+    RectWrapper(const cv::Rect & other);
+    inline RectWrapper() {}
 };
 
 struct PointWrapper {
@@ -107,6 +119,8 @@ struct Point2fWrapper {
     float x, y;
 
     inline operator cv::Point2f() { return cv::Point2f(x, y); }
+    Point2fWrapper(const cv::Point2f & other);
+    inline Point2fWrapper() {}
 };
 
 struct RotatedRectWrapper {
@@ -115,6 +129,7 @@ struct RotatedRectWrapper {
     float angle;
 
     inline operator cv::RotatedRect() { return cv::RotatedRect(center, size, angle); }
+    RotatedRectWrapper(const cv::RotatedRect & other);
 };
 
 struct MomentsWrapper {
@@ -122,7 +137,7 @@ struct MomentsWrapper {
     double mu20, mu11, mu02, mu30, mu21, mu12, mu03;
     double nu20, nu11, nu02, nu30, nu21, nu12, nu03;
 
-    MomentsWrapper(cv::Moments other);
+    MomentsWrapper(const cv::Moments & other);
     inline operator cv::Moments() {
         return cv::Moments(m00, m10, m01, m20, m11, m02, m30, m21, m12, m03);
     }
@@ -133,6 +148,11 @@ struct MomentsWrapper {
 struct TensorPlusDouble {
     struct TensorWrapper tensor;
     double val;
+};
+
+struct TensorPlusFloat {
+    struct TensorWrapper tensor;
+    float val;
 };
 
 struct TensorPlusInt {
@@ -155,6 +175,16 @@ struct RectPlusInt {
     int val;
 };
 
+struct ScalarPlusBool {
+    struct ScalarWrapper scalar;
+    bool val;
+};
+
+struct SizePlusInt {
+    struct SizeWrapper size;
+    int val;
+};
+
 /***************** Other helper structs *****************/
 
 // Arrays
@@ -166,6 +196,11 @@ struct IntArray {
 
 struct FloatArray {
     float *data;
+    int size;
+};
+
+struct DoubleArray {
+    double *data;
     int size;
 };
 
@@ -193,3 +228,8 @@ struct PointArrayOfArrays {
     int dims;
     int *sizes;
 };
+
+/***************** Algorithm *****************/
+
+extern "C"
+void algo_clear(void *ptr);

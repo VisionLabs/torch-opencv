@@ -1,5 +1,4 @@
 #include <imgproc.hpp>
-#include <functional>
 
 // Ехали медведи, на велосипеде
 
