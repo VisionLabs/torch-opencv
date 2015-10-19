@@ -1599,11 +1599,12 @@ struct ScalarPlusBool clipLineRect(
 }
 
 extern "C"
-void ellipse2Poly(
-        struct PointWrapper center, struct SizeWrapper axes, int angle, int arcStart, int arcEnd, int delta, struct PointArray pts)
+struct TensorWrapper ellipse2Poly(
+        struct PointWrapper center, struct SizeWrapper axes, int angle, int arcStart, int arcEnd, int delta)
 {
-    std::vector<cv::Point> ptsVec(pts.data, pts.data + pts.size);
-    cv::ellipse2Poly(center, axes, angle, arcStart, arcEnd, delta, ptsVec);
+    std::vector<cv::Point> result;
+    cv::ellipse2Poly(center, axes, angle, arcStart, arcEnd, delta, result);
+    return TensorWrapper(cv::Mat(result));
 }
 
 extern "C"
@@ -1614,8 +1615,10 @@ void putText(
 }
 
 extern "C"
-struct SizeWrapper getTextSize(
-        const char *text, int fontFace, double fontScale, int thickness, int* baseLine)
+struct SizePlusInt getTextSize(
+        const char *text, int fontFace, double fontScale, int thickness)
 {
-    cv::getTextSize(text, fontFace, fontScale, thickness, baseLine);
+    SizePlusInt retval;
+    retval.size = cv::getTextSize(text, fontFace, fontScale, thickness, &retval.val);
+    return retval;
 }

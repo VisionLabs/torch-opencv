@@ -1,12 +1,12 @@
 imgproc module branch
 =====================
 
-**Roughly 76% completed**
+**Roughly 78% completed**
 
 Unstable pieces of code (to be tested):
 
 * undistort (how should it work? please test if it's correct)
-* grabCut (also needs testing)
+* grabCut (same thing)
 
 *To be implemented:*
 
@@ -23,9 +23,6 @@ Unstable pieces of code (to be tested):
 * calcHist (SparseMat overload)
 * calcBackProject (SparseMat overload)
 * compareHist (SparseMat overload)
-* clipLine
-* ellipse2Poly
-* getTextSize
 
 *Already implemented:*
 
@@ -141,5 +138,8 @@ Unstable pieces of code (to be tested):
 * fillPoly
 * polylines
 * drawContours
+* clipLine
+* ellipse2Poly
+* getTextSize
 
-107/141
+110/141

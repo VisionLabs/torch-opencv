@@ -520,13 +520,13 @@ struct ScalarPlusBool clipLineRect(
         struct RectWrapper imgRect, struct PointWrapper pt1, struct PointWrapper pt2);
 
 extern "C"
-void ellipse2Poly(
-        struct PointWrapper center, struct SizeWrapper axes, int angle, int arcStart, int arcEnd, int delta, struct PointArray pts);
+struct TensorWrapper ellipse2Poly(
+        struct PointWrapper center, struct SizeWrapper axes, int angle, int arcStart, int arcEnd, int delta);
 
 extern "C"
 void putText(
         struct TensorWrapper img, const char *text, struct PointWrapper org, int fontFace, double fontScale, struct ScalarWrapper color, int thickness, int lineType, bool bottomLeftOrigin);
 
 extern "C"
-struct SizeWrapper getTextSize(
-        const char *text, int fontFace, double fontScale, int thickness, int* baseLine);
+struct SizePlusInt getTextSize(
+        const char *text, int fontFace, double fontScale, int thickness);

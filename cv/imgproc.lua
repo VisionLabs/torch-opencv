@@ -2045,25 +2045,16 @@ function cv.clipLine(t)
 end
 
 
-function cv.clipLine(t)
-    local imgRect = assert(t.imgRect)
-    local pt1 = cv.Point(assert(t.pt1))
-    local pt2 = cv.Point(assert(t.pt2))
-
-    return C.clipLine(imgRect, pt1, pt2)
-end
-
-
 function cv.ellipse2Poly(t)
-    local center = assert(t.center)
-    local axes = assert(t.axes)
+    local center = cv.Point(assert(t.center))
+    local axes = cv.Size(assert(t.axes))
     local angle = assert(t.angle)
     local arcStart = assert(t.arcStart)
     local arcEnd = assert(t.arcEnd)
     local delta = assert(t.delta)
-    local pts = assert(t.pts)
 
-    return C.ellipse2Poly(center, axes, angle, arcStart, arcEnd, delta, pts)
+    return cv.unwrap_tensors(
+        C.ellipse2Poly(center, axes, angle, arcStart, arcEnd, delta, pts))
 end
 
 
@@ -2078,7 +2069,7 @@ function cv.putText(t)
     local lineType = t.lineType or cv.LINE_8
     local bottomLeftOrigin = t.bottomLeftOrigin or false
 
-    return C.putText(cv.wrap_tensors(img), text, org, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin)
+    C.putText(cv.wrap_tensors(img), text, org, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin)
 end
 
 
@@ -2087,8 +2078,8 @@ function cv.getTextSize(t)
     local fontFace = assert(t.fontFace)
     local fontScale = assert(t.fontScale)
     local thickness = assert(t.thickness)
-    local baseLine = assert(t.baseLine)
 
-    return C.getTextSize(text, fontFace, fontScale, thickness, baseLine)
+    local result = C.getTextSize(text, fontFace, fontScale, thickness)
+    return result.size, result.val
 end
 

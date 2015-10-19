@@ -363,8 +363,15 @@ function cv.newArray(elemType, data)
         return retval
     end
 
+    if type(data) == 'number' then
+        retval.data = ffi.gc(C.malloc(data * ffi.sizeof(fullTypeName)), C.free)
+        retval.size = data
+        return retval
+    end
+
     retval.data = ffi.gc(C.malloc(#data * ffi.sizeof(fullTypeName)), C.free)
     retval.size = #data
+    
 
     if elemType:byte(3) == 46 then
         for i, value in ipairs(data) do

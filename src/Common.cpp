@@ -146,7 +146,7 @@ void transfer_tensor(void *destination, void *source) {
 
 /***************** Wrappers for small classes *****************/
 
-MomentsWrapper::MomentsWrapper(cv::Moments other) {
+MomentsWrapper::MomentsWrapper(const cv::Moments & other) {
     m00 = other.m00; m01 = other.m01; m02 = other.m02; m03 = other.m03; m10 = other.m10;
     m11 = other.m11; m12 = other.m12; m20 = other.m20; m21 = other.m21; m30 = other.m30;
     mu20 = other.mu20; mu11 = other.mu11; mu02 = other.mu02; mu30 = other.mu30;
@@ -186,4 +186,9 @@ Size2fWrapper::Size2fWrapper(const cv::Size2f &other){
 Point2fWrapper::Point2fWrapper(const cv::Point2f &other) {
     this->x = other.x;
     this->y = other.y;
+}
+
+SizeWrapper::SizeWrapper(const cv::Size & other) {
+    this->height = other.height;
+    this->width = other.width;
 }

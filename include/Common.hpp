@@ -61,6 +61,8 @@ struct SizeWrapper {
     int width, height;
 
     inline operator cv::Size() { return cv::Size(width, height); }
+    SizeWrapper(const cv::Size & other);
+    inline SizeWrapper() {}
 };
 
 struct Size2fWrapper {
@@ -135,7 +137,7 @@ struct MomentsWrapper {
     double mu20, mu11, mu02, mu30, mu21, mu12, mu03;
     double nu20, nu11, nu02, nu30, nu21, nu12, nu03;
 
-    MomentsWrapper(cv::Moments other);
+    MomentsWrapper(const cv::Moments & other);
     inline operator cv::Moments() {
         return cv::Moments(m00, m10, m01, m20, m11, m02, m30, m21, m12, m03);
     }
@@ -176,6 +178,11 @@ struct RectPlusInt {
 struct ScalarPlusBool {
     struct ScalarWrapper scalar;
     bool val;
+};
+
+struct SizePlusInt {
+    struct SizeWrapper size;
+    int val;
 };
 
 /***************** Other helper structs *****************/
