@@ -137,6 +137,7 @@ cv = {}
 require 'cv.constants'
 
 cv.INT_MAX = C.getIntMax()
+cv.NULLPTR = ffi.new('void *', nil)
 
 --- ***************** Tensor <=> Mat conversion *****************
 
@@ -345,6 +346,14 @@ function cv.newArray(elemType, data)
         retval = ffi.new('struct ' .. elemType .. 'Array')
     end
     
+    if not data then
+        -- create an array with no data
+        -- here, we assume that our C function will resize the array
+        retval.data = ffi.gc(cv.NULLPTR, C.free)
+        retval.size = 0
+        return retval
+    end
+
     retval.data = ffi.gc(C.malloc(#data * ffi.sizeof(fullTypeName)), C.free)
     retval.size = #data
 
@@ -388,5 +397,36 @@ function cv.numberArrayOfArrays(elemType, data)
         retval.pointers[i] = retval.pointers[i] + retval.realData
     end
 end
+
+function cv.arrayToLua(array, outputType, output)
+    local retval
+
+    if output then
+        for i = 1,array.size do
+            output[i] = array.data[i-1]
+        end
+
+        C.free(array.data)
+        return output
+    end
+    
+    if     outputType == 'table' then
+        retval = {}
+    elseif outputType == 'Tensor' then
+        -- ctype has the form 'ctype<struct IntArray>'
+        ctype = tostring(ffi.typeof(array))
+        local typeStart = 14
+        local typeEnd = ctype:find('Arr') - 1
+        retval = torch[ctype:sub(typeStart, typeEnd) .. 'Tensor'](array.size)
+    end
+
+    for i = 1,array.size do
+        retval[i] = array.data[i-1]
+    end
+
+    C.free(array.data)
+    return retval
+end
+
 
 return cv

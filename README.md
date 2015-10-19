@@ -1,7 +1,7 @@
 imgproc module branch
 =====================
 
-**Roughly 55% completed**
+**Roughly 56% completed**
 
 Unstable pieces of code (to be tested):
 
@@ -23,8 +23,6 @@ Unstable pieces of code (to be tested):
 * calcHist (SparseMat overload)
 * calcBackProject (SparseMat overload)
 * compareHist (SparseMat overload)
-* findContours
-* findContours
 * approxPolyDP
 * arcLength
 * boundingRect
@@ -142,5 +140,6 @@ Unstable pieces of code (to be tested):
 * connectedComponents
 * connectedComponentsWithStats
 * HuMoments
+* findContours
 
-78/142
+79/141

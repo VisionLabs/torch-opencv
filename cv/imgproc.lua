@@ -1486,31 +1486,16 @@ function cv.moments(t)
     return C.moments(cv.wrap_tensors(array), binaryImage)
 end
 
+
 -- moments: Input moments computed with cv.moments()
 -- toTable: Output to table if true, otherwise output to Tensor. Default: true
 -- output : Optional. A Tensor of length 7 or a table; if provided, will output there
 function cv.HuMoments(t)
     local moments = assert(t.moments)
-    local toTable = t.toTable
-    if toTable == nil then
-        toTable = true
-    end
+    local outputType = t.outputType or 'table'
     local output = t.output
 
-    array = C.HuMoments(moments)
-
-    if toTable then
-        output = output or {}
-    else
-        output = output or torch.DoubleTensor(7)
-    end
-
-    for i = 1,7 do
-        output[i] = array.data[i-1]
-    end
-        
-    C.free(array.data)
-    return output
+    return cv.arrayToLua(C.HuMoments(moments), outputType, output)
 end
 
 
@@ -1553,27 +1538,29 @@ function cv.connectedComponentsWithStats(t)
     return result.val, cv.unwrap_tensors(result.tensors)
 end
 
-
+-- image: Source Tensor
+-- hierarchy: optional, an array to output hierarchy into
+-- withHierarchy: boolean, to output hierarchy or not. Default: false
+-- other params: see OpenCV docs for findContours
 function cv.findContours(t)
     local image = assert(t.image)
-    local contours = assert(t.contours)
-    local hierarchy = assert(t.hierarchy)
+    local hierarchy = t.hierarchy
+    local withHierarchy = t.withHierarchy or false
     local mode = assert(t.mode)
     local method = assert(t.method)
-    local offset = t.offset or cv.Point
+    local offset = cv.Point(t.offset or {0, 0})
 
-    return C.findContours(cv.wrap_tensors(image), cv.wrap_tensors(contours), cv.wrap_tensors(hierarchy), mode, method, offset)
-end
+    contours = cv.unwrap_tensors(
+        C.findContours(
+            cv.wrap_tensors(image), withHierarchy, cv.wrap_tensors(hierarchy), mode, method, offset), true)
 
-
-function cv.findContours(t)
-    local image = assert(t.image)
-    local contours = assert(t.contours)
-    local mode = assert(t.mode)
-    local method = assert(t.method)
-    local offset = t.offset or cv.Point
-
-    return C.findContours(cv.wrap_tensors(image), cv.wrap_tensors(contours), mode, method, offset)
+    if withHierarchy and not hierarchy then
+        hierarchy = contours[#contours]
+        contours[#contours] = nil
+        return contours, hierarchy
+    else
+        return contours
+    end
 end
 
 

@@ -12,7 +12,11 @@ points = {
 pointsTensor = torch.FloatTensor(points)
 moments = cv.moments{array=pointsTensor}
 
-Hu_table = cv.HuMoments{moments=moments, toTable=true}
-Hu_tensor = cv.HuMoments{moments=moments, toTable=false}
+Hu_table = {}
+Hu_tensor = torch.DoubleTensor(7)
+
+cv.HuMoments{moments=moments, outputType='table', output=Hu_table}
+Hu_tensor = cv.HuMoments{moments=moments, outputType='Tensor', output=Hu_tensor}
+
 print(Hu_table)
 print(Hu_tensor)
