@@ -228,3 +228,8 @@ struct PointArrayOfArrays {
     int dims;
     int *sizes;
 };
+
+/***************** Algorithm *****************/
+
+extern "C"
+void algo_clear(void *ptr);

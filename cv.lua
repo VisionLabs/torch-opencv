@@ -414,6 +414,7 @@ function cv.numberArrayOfArrays(elemType, data)
     end
 end
 
+
 function cv.arrayToLua(array, outputType, output)
     local retval
 
@@ -443,6 +444,10 @@ function cv.arrayToLua(array, outputType, output)
     C.free(array.data)
     return retval
 end
+
+--- ***************** Classes *****************
+
+
 
 
 return cv
