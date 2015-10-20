@@ -227,6 +227,9 @@ end
 function cv.unwrap_tensors(wrapper, toTable)
     if ffi.typeof(wrapper) == ffi.typeof("struct TensorWrapper") then
         -- handle single tensor
+        if wrapper.tensorPtr == nil then
+            return
+        end
         retval = empty_tensor_of_type(wrapper.typeCode)
         C.transfer_tensor(retval:cdata(), wrapper.tensorPtr)
         return retval
@@ -444,10 +447,6 @@ function cv.arrayToLua(array, outputType, output)
     C.free(array.data)
     return retval
 end
-
---- ***************** Classes *****************
-
-
 
 
 return cv

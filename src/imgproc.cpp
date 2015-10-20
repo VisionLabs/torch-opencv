@@ -1622,3 +1622,126 @@ struct SizePlusInt getTextSize(
     retval.size = cv::getTextSize(text, fontFace, fontScale, thickness, &retval.val);
     return retval;
 }
+
+/****************** Algorithms ******************/
+
+// GeneralizedHough
+
+struct GeneralizedHoughPtr {
+    void *ptr;
+
+    inline cv::GeneralizedHough * operator->() { return static_cast<cv::GeneralizedHough *>(ptr); }
+    inline GeneralizedHoughPtr(cv::GeneralizedHough *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+void GeneralizedHough_setTemplate(
+        GeneralizedHoughPtr ptr, struct TensorWrapper templ, struct PointWrapper templCenter)
+{
+    ptr->setTemplate(templ.toMat(), templCenter);
+}
+
+extern "C"
+void GeneralizedHough_setTemplate_edges(
+        GeneralizedHoughPtr ptr, struct TensorWrapper edges, struct TensorWrapper dx,
+        struct TensorWrapper dy, struct PointWrapper templCenter)
+{
+    ptr->setTemplate(edges.toMat(), dx.toMat(), dy.toMat(), templCenter);
+}
+
+extern "C"
+struct TensorArray GeneralizedHough_detect(
+        GeneralizedHoughPtr ptr, struct TensorWrapper image, struct TensorWrapper positions, bool votes)
+{
+    std::vector<cv::Mat> retval(1 + votes);
+    if (!positions.isNull()) retval[0] = positions;
+    ptr->detect(image.toMat(), retval[0], votes ? retval[1] : cv::noArray());
+    return TensorArray(retval);
+}
+
+extern "C"
+struct TensorArray GeneralizedHough_detect_edges(
+        GeneralizedHoughPtr ptr, struct TensorWrapper edges, struct TensorWrapper dx,
+        struct TensorWrapper dy, struct TensorWrapper positions, bool votes)
+{
+    std::vector<cv::Mat> retval(1 + votes);
+    if (!positions.isNull()) retval[0] = positions;
+    ptr->detect(edges.toMat(), dx.toMat(), dy.toMat(), retval[0], votes ? retval[1] : cv::noArray());
+    return TensorArray(retval);
+}
+
+extern "C"
+void GeneralizedHough_setCannyLowThresh(GeneralizedHoughPtr ptr, int cannyLowThresh)
+{
+    ptr->setCannyLowThresh(cannyLowThresh);
+}
+
+extern "C"
+int GeneralizedHough_getCannyLowThresh(GeneralizedHoughPtr ptr)
+{
+    return ptr->getCannyLowThresh();
+}
+
+extern "C"
+void GeneralizedHough_setCannyHighThresh(GeneralizedHoughPtr ptr, int cannyHighThresh)
+{
+    ptr->setCannyHighThresh(cannyHighThresh);
+}
+
+extern "C"
+int GeneralizedHough_getCannyHighThresh(GeneralizedHoughPtr ptr)
+{
+    return ptr->getCannyHighThresh();
+}
+
+extern "C"
+void GeneralizedHough_setMinDist(GeneralizedHoughPtr ptr, double MinDist)
+{
+    ptr->setMinDist(MinDist);
+}
+
+extern "C"
+double GeneralizedHough_getMinDist(GeneralizedHoughPtr ptr)
+{
+    return ptr->getMinDist();
+}
+
+extern "C"
+void GeneralizedHough_setDp(GeneralizedHoughPtr ptr, double Dp)
+{
+    ptr->setDp(Dp);
+}
+
+extern "C"
+double GeneralizedHough_getDp(GeneralizedHoughPtr ptr)
+{
+    return ptr->getDp();
+}
+
+extern "C"
+void GeneralizedHough_setMaxBufferSize(GeneralizedHoughPtr ptr, int MaxBufferSize)
+{
+    ptr->setMaxBufferSize(MaxBufferSize);
+}
+
+extern "C"
+int GeneralizedHough_getMaxBufferSize(GeneralizedHoughPtr ptr)
+{
+    return ptr->getMaxBufferSize();
+}
+
+// GeneralizedHoughBallard
+
+struct GeneralizedHoughBallardPtr {
+    void *ptr;
+
+    inline cv::GeneralizedHoughBallard * operator->() { return static_cast<cv::GeneralizedHoughBallard *>(ptr); }
+    inline GeneralizedHoughBallardPtr(cv::GeneralizedHoughBallard *ptr) { this->ptr = ptr; }
+};
+
+struct GeneralizedHoughBallardPtr GeneralizedHoughBallard_ctor() {
+    return cv::createGeneralizedHoughBallard().get();
+}
+
+// GeneralizedHoughGuil
+

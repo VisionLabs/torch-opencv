@@ -2083,3 +2083,99 @@ function cv.getTextSize(t)
     return result.size, result.val
 end
 
+--- ***************** Classes *****************
+require 'cv.Classes'
+
+do
+    local GeneralizedHough = torch.class('cv.GeneralizedHough', 'cv.Algorithm')
+
+    function GeneralizedHough:setTemplate(t)
+        if t.templ then            
+            local templ = assert(t.templ)
+            local templCenter = cv.Point(t.templCenter or {-1, -1})
+
+            C.GeneralizedHough_setTemplate(self.ptr, cv.wrap_tensors(templ), templCenter)
+        else
+            local edges = assert(t.edges)
+            local dx = assert(t.dx)
+            local dy = assert(t.dy)
+            local templCenter = cv.Point(t.templCenter or {-1, -1})
+
+            C.GeneralizedHough_setTemplate_edges(
+                self.ptr, cv.wrap_tensors(edges), cv.wrap_tensors(dx),
+                cv.wrap_tensors(dy), templCenter)
+        end
+    end
+
+    -- votes: boolean. To output votes or not
+    function GeneralizedHough:detect(t)
+        if t.image then
+            local image = assert(t.image)
+            local positions = t.positions
+            local votes = t.votes or false
+
+            return cv.unwrap_tensors(
+                C.GeneralizedHough_detect(
+                    self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(positions), votes))
+        else
+            local image = assert(t.image)
+            local positions = t.positions
+            local votes = t.votes or false
+
+            return cv.unwrap_tensors(
+                C.GeneralizedHough_detect(
+                    self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(positions), votes))
+        end
+    end
+
+    function GeneralizedHough:setCannyLowThresh(cannyLowThresh)
+        C.GeneralizedHough_setCannyLowThresh(self.ptr, cannyLowThresh)
+    end
+
+    function GeneralizedHough:getCannyLowThresh()
+        return C.GeneralizedHough_getCannyLowThresh(self.ptr)
+    end
+
+    function GeneralizedHough:setCannyHighThresh(cannyHighThresh)
+        C.GeneralizedHough_setCannyHighThresh(self.ptr, cannyHighThresh)
+    end
+
+    function GeneralizedHough:getCannyHighThresh()
+        return C.GeneralizedHough_getCannyHighThresh(self.ptr)
+    end
+
+    function GeneralizedHough:setMinDist(minDist)
+        C.GeneralizedHough_setMinDist(self.ptr, MinDist)
+    end
+
+    function GeneralizedHough:getMinDist()
+        return C.GeneralizedHough_getMinDist(self.ptr)
+    end
+
+    function GeneralizedHough:setDp(dp)
+        C.GeneralizedHough_setDp(self.ptr, Dp)
+    end
+
+    function GeneralizedHough:getDp()
+        return C.GeneralizedHough_getDp(self.ptr)
+    end
+
+    function GeneralizedHough:setMaxBufferSize(maxBufferSize)
+        C.GeneralizedHough_setMaxBufferSize(self.ptr, MaxBufferSize)
+    end
+
+    function GeneralizedHough:getMaxBufferSize()
+        return C.GeneralizedHough_getMaxBufferSize(self.ptr)
+    end
+end
+
+
+do
+    local GeneralizedHoughBallard = torch.class('cv.GeneralizedHoughBallard', 'cv.GeneralizedHough')
+
+    function GeneralizedHoughBallard:__init()
+        self.ptr = ffi.gc(C.GeneralizedHoughBallard_ctor(), C.Algorithm_dtor)
+    end
+
+
+end

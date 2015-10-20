@@ -1,4 +1,5 @@
 #include <Common.hpp>
+#include <Classes.hpp>
 #include <opencv2/imgproc.hpp>
 
 extern "C"
