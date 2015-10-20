@@ -7,6 +7,10 @@ extern "C" struct TensorWrapper inpaint(struct TensorWrapper src, struct TensorW
         cv::Mat retval;
         cv::inpaint(src.toMat(), inpaintMask.toMat(), retval, inpaintRadius, flags);
         return TensorWrapper(retval);
+    } else if (dst.tensorPtr == src.tensorPtr) {
+        // in-place
+        cv::Mat source = src.toMat();
+        cv::inpaint(source, inpaintMask.toMat(), source, inpaintRadius, flags);
     } else {
         cv::inpaint(src.toMat(), inpaintMask.toMat(), dst.toMat(), inpaintRadius, flags);
     }
@@ -20,6 +24,10 @@ extern "C" struct TensorWrapper fastNlMeansDenoising(struct TensorWrapper src, s
         cv::Mat retval;
         cv::fastNlMeansDenoising(src.toMat(), retval, h, templateWindowSize, searchWindowSize);
         return TensorWrapper(retval);
+    } else if (dst.tensorPtr == src.tensorPtr) {
+        // in-place
+        cv::Mat source = src.toMat();
+        cv::fastNlMeansDenoising(source, source, h, templateWindowSize, searchWindowSize);
     } else {
         cv::fastNlMeansDenoising(src.toMat(), dst.toMat(), h, templateWindowSize, searchWindowSize);
     }
@@ -33,6 +41,10 @@ extern "C" struct TensorWrapper fastNlMeansDenoisingColored(struct TensorWrapper
         cv::Mat retval;
         cv::fastNlMeansDenoisingColored(src.toMat(), retval, h, hColor, templateWindowSize, searchWindowSize);
         return TensorWrapper(retval);
+    } else if (dst.tensorPtr == src.tensorPtr) {
+        // in-place
+        cv::Mat source = src.toMat();
+        cv::fastNlMeansDenoisingColored(source, source, h, hColor, templateWindowSize, searchWindowSize);
     } else {
         cv::fastNlMeansDenoisingColored(src.toMat(), dst.toMat(), h, hColor, templateWindowSize, searchWindowSize);
     }
