@@ -1828,7 +1828,7 @@ function cv.fitLine(t)
     local aeps = assert(t.aeps)
 
     return cv.unwrap_tensors(
-        C.fitLine(cv.wrap_tensors(points), distType, param, reps, aeps)
+        C.fitLine(cv.wrap_tensors(points), distType, param, reps, aeps))
 end
 
 
@@ -1858,7 +1858,7 @@ function cv.blendLinear(t)
     local dst = t.dst
 
     return cv.unwrap_tensors(
-        C.blendLinear(cv.wrap_tensors(src1), cv.wrap_tensors(src2), cv.wrap_tensors(weights1), cv.wrap_tensors(weights2), cv.wrap_tensors(dst))
+        C.blendLinear(cv.wrap_tensors(src1), cv.wrap_tensors(src2), cv.wrap_tensors(weights1), cv.wrap_tensors(weights2), cv.wrap_tensors(dst)))
 end
 
 
