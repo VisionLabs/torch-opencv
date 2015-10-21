@@ -2086,6 +2086,8 @@ end
 --- ***************** Classes *****************
 require 'cv.Classes'
 
+-- GeneralizedHough
+
 do
     local GeneralizedHough = torch.class('cv.GeneralizedHough', 'cv.Algorithm')
 
@@ -2169,6 +2171,7 @@ do
     end
 end
 
+-- GeneralizedHoughBallard
 
 do
     local GeneralizedHoughBallard = torch.class('cv.GeneralizedHoughBallard', 'cv.GeneralizedHough')
@@ -2177,5 +2180,121 @@ do
         self.ptr = ffi.gc(C.GeneralizedHoughBallard_ctor(), C.Algorithm_dtor)
     end
 
+    function GeneralizedHoughBallard:setLevels(levels)
+        C.GeneralizedHoughBallard_setLevels(self.ptr, levels)
+    end
 
+    function GeneralizedHoughBallard:getLevels()
+        return C.GeneralizedHoughBallard_getLevels(self.ptr)
+    end
+
+    function GeneralizedHoughBallard:setVotesThreshold(votesThreshold)
+        C.GeneralizedHoughBallard_setVotesThreshold(self.ptr, votesThreshold)
+    end
+
+    function GeneralizedHoughBallard:getVotesThreshold()
+        return C.GeneralizedHoughBallard_getVotesThreshold(self.ptr)
+    end
+end
+
+-- GeneralizedHoughGuil
+
+do
+    local GeneralizedHoughGuil = torch.class('cv.GeneralizedHoughGuil', 'cv.GeneralizedHough')
+
+    function GeneralizedHoughGuil:setXi(xi)
+        C.GeneralizedHoughGuil_setXi(self.ptr, xi)
+    end
+
+    function GeneralizedHoughGuil:getXi()
+        return C.GeneralizedHoughGuil_getXi(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setLevels(levels)
+        C.GeneralizedHoughGuil_setLevels(self.ptr, levels)
+    end
+
+    function GeneralizedHoughGuil:getLevels()
+        return C.GeneralizedHoughGuil_getLevels(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setAngleEpsilon(angleEpsilon)
+        C.GeneralizedHoughGuil_setAngleEpsilon(self.ptr, angleEpsilon)
+    end
+
+    function GeneralizedHoughGuil:getAngleEpsilon()
+        return C.GeneralizedHoughGuil_getAngleEpsilon(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setMinAngle(minAngle)
+        C.GeneralizedHoughGuil_setMinAngle(self.ptr, minAngle)
+    end
+
+    function GeneralizedHoughGuil:getMinAngle()
+        return C.GeneralizedHoughGuil_getMinAngle(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setMaxAngle(maxAngle)
+        C.GeneralizedHoughGuil_setMaxAngle(self.ptr, maxAngle)
+    end
+
+    function GeneralizedHoughGuil:getMaxAngle()
+        return C.GeneralizedHoughGuil_getMaxAngle(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setAngleStep(angleStep)
+        C.GeneralizedHoughGuil_setAngleStep(self.ptr, angleStep)
+    end
+
+    function GeneralizedHoughGuil:getAngleStep()
+        return C.GeneralizedHoughGuil_getAngleStep(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setAngleThresh(angleThresh)
+        C.GeneralizedHoughGuil_setAngleThresh(self.ptr, angleThresh)
+    end
+
+    function GeneralizedHoughGuil:getAngleThresh()
+        return C.GeneralizedHoughGuil_getAngleThresh(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setMinScale(minScale)
+        C.GeneralizedHoughGuil_setMinScale(self.ptr, minScale)
+    end
+
+    function GeneralizedHoughGuil:getMinScale()
+        return C.GeneralizedHoughGuil_getMinScale(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setMaxScale(maxScale)
+        C.GeneralizedHoughGuil_setMaxScale(self.ptr, maxScale)
+    end
+
+    function GeneralizedHoughGuil:getMaxScale()
+        return C.GeneralizedHoughGuil_getMaxScale(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setScaleStep(scaleStep)
+        C.GeneralizedHoughGuil_setScaleStep(self.ptr, scaleStep)
+    end
+
+    function GeneralizedHoughGuil:getScaleStep()
+        return C.GeneralizedHoughGuil_getScaleStep(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setScaleThresh(scaleThresh)
+        C.GeneralizedHoughGuil_setScaleThresh(self.ptr, scaleThresh)
+    end
+
+    function GeneralizedHoughGuil:getScaleThresh()
+        return C.GeneralizedHoughGuil_getScaleThresh(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setPosThresh(posThresh)
+        C.GeneralizedHoughGuil_setPosThresh(self.ptr, posThresh)
+    end
+
+    function GeneralizedHoughGuil:getPosThresh()
+        return C.GeneralizedHoughGuil_getPosThresh(self.ptr)
+    end
 end

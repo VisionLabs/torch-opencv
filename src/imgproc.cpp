@@ -1743,5 +1743,173 @@ struct GeneralizedHoughBallardPtr GeneralizedHoughBallard_ctor() {
     return cv::createGeneralizedHoughBallard().get();
 }
 
+extern "C"
+void GeneralizedHoughBallard_setLevels(GeneralizedHoughBallardPtr ptr, double Levels)
+{
+    ptr->setLevels(Levels);
+}
+
+extern "C"
+double GeneralizedHoughBallard_getLevels(GeneralizedHoughBallardPtr ptr)
+{
+    return ptr->getLevels();
+}
+
+extern "C"
+void GeneralizedHoughBallard_setVotesThreshold(GeneralizedHoughBallardPtr ptr, double votesThreshold)
+{
+    ptr->setVotesThreshold(votesThreshold);
+}
+
+extern "C"
+double GeneralizedHoughBallard_getVotesThreshold(GeneralizedHoughBallardPtr ptr)
+{
+    return ptr->getVotesThreshold();
+}
+
 // GeneralizedHoughGuil
 
+struct GeneralizedHoughGuilPtr {
+    void *ptr;
+
+    inline cv::GeneralizedHoughGuil * operator->() { return static_cast<cv::GeneralizedHoughGuil *>(ptr); }
+    inline GeneralizedHoughGuilPtr(cv::GeneralizedHoughGuil *ptr) { this->ptr = ptr; }
+};
+
+struct GeneralizedHoughGuilPtr GeneralizedHoughGuil_ctor() {
+    return cv::createGeneralizedHoughGuil().get();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setLevels(GeneralizedHoughGuilPtr ptr, int levels)
+{
+    ptr->setLevels(levels);
+}
+
+extern "C"
+int GeneralizedHoughGuil_getLevels(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getLevels();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setAngleEpsilon(GeneralizedHoughGuilPtr ptr, double AngleEpsilon)
+{
+    ptr->setAngleEpsilon(AngleEpsilon);
+}
+
+extern "C"
+double GeneralizedHoughGuil_getAngleEpsilon(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getAngleEpsilon();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setMinAngle(GeneralizedHoughGuilPtr ptr, double MinAngle)
+{
+    ptr->setMinAngle(MinAngle);
+}
+
+extern "C"
+double GeneralizedHoughGuil_getMinAngle(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getMinAngle();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setMaxAngle(GeneralizedHoughGuilPtr ptr, double MaxAngle)
+{
+    ptr->setMaxAngle(MaxAngle);
+}
+
+extern "C"
+double GeneralizedHoughGuil_getMaxAngle(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getMaxAngle();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setAngleStep(GeneralizedHoughGuilPtr ptr, double AngleStep)
+{
+    ptr->setAngleStep(AngleStep);
+}
+
+extern "C"
+double GeneralizedHoughGuil_getAngleStep(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getAngleStep();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setAngleThresh(GeneralizedHoughGuilPtr ptr, int AngleThresh)
+{
+    ptr->setAngleThresh(AngleThresh);
+}
+
+extern "C"
+int GeneralizedHoughGuil_getAngleThresh(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getAngleThresh();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setMinScale(GeneralizedHoughGuilPtr ptr, double MinScale)
+{
+    ptr->setMinScale(MinScale);
+}
+
+extern "C"
+double GeneralizedHoughGuil_getMinScale(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getMinScale();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setMaxScale(GeneralizedHoughGuilPtr ptr, double MaxScale)
+{
+    ptr->setMaxScale(MaxScale);
+}
+
+extern "C"
+double GeneralizedHoughGuil_getMaxScale(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getMaxScale();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setScaleStep(GeneralizedHoughGuilPtr ptr, double ScaleStep)
+{
+    ptr->setScaleStep(ScaleStep);
+}
+
+extern "C"
+double GeneralizedHoughGuil_getScaleStep(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getScaleStep();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setScaleThresh(GeneralizedHoughGuilPtr ptr, int ScaleThresh)
+{
+    ptr->setScaleThresh(ScaleThresh);
+}
+
+extern "C"
+int GeneralizedHoughGuil_getScaleThresh(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getScaleThresh();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setPosThresh(GeneralizedHoughGuilPtr ptr, int PosThresh)
+{
+    ptr->setPosThresh(PosThresh);
+}
+
+extern "C"
+int GeneralizedHoughGuil_getPosThresh(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getPosThresh();
+}
+
+// CLAHE
