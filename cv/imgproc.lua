@@ -2317,7 +2317,7 @@ do
     end
 
     function CLAHE:getClipLimit()
-        return C.CLAHE_getClipLimit()
+        return C.CLAHE_getClipLimit(self.ptr)
     end
 
     function CLAHE:setTileGridSize(tileGridSize)
@@ -2325,10 +2325,62 @@ do
     end
 
     function CLAHE:getTileGridSize()
-        return C.CLAHE_getTileGridSize()
+        return C.CLAHE_getTileGridSize(self.ptr)
     end
 
     function CLAHE:collectGarbage()
-        C.CLAHE_collectGarbage()
+        C.CLAHE_collectGarbage(self.ptr)
+    end
+end
+
+-- LineSegmentDetector
+
+do
+    local LineSegmentDetector = torch.class('cv.LineSegmentDetector', 'cv.Algorithm')
+
+    function LineSegmentDetector:__init(t)
+        local refine = t.refine or cv.LSD_REFINE_STD
+        local scale = t.scale or 0.8
+        local sigma_scale = t.sigma_scale or 0.6
+        local quant = t.quant or 2.0
+        local ang_th = t.ang_th or 22.5
+        local log_eps = t.log_eps or 0
+        local density_th = t.density_th or 0.7
+        local n_bins = t.n_bins or 1024
+
+        self.ptr = ffi.gc(
+            C.LineSegmentDetector_ctor(
+                refine, scale, sigma_scale, quant, ang_th, log_eps, density_th, n_bins), 
+            C.Algorithm_dtor
+        )
+    end
+
+    function LineSegmentDetector:detect(t)
+        local image = assert(t.image)
+        local lines = t.lines
+        local width = t.width or false
+        local prec  = t.prec or false
+        local nfa   = t.nfa or false
+
+        return cv.unwrap_tensors(
+            C.LineSegmentDetector_detect(
+                self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(lines), width, prec, nfa))
+    end
+
+    function LineSegmentDetector:drawSegments(t)
+        local image = assert(t.image)
+        local lines = assert(t.lines)
+
+        C.LineSegmentDetector_drawSegments(
+            self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(lines))
+    end
+
+    function LineSegmentDetector:compareSegments(t)
+        local lines1 = assert(t.lines1)
+        local lines2 = assert(t.lines2)
+        local image = t.image
+
+        return C.LineSegmentDetector_compareSegments(
+            self.ptr, cv.wrap_tensors(lines1), cv.wrap_tensors(lines2), cv.wrap_tensors(image))
     end
 end

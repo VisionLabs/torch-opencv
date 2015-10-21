@@ -6,6 +6,11 @@ TensorWrapper::TensorWrapper(): tensorPtr(nullptr) {}
 
 TensorWrapper::TensorWrapper(cv::Mat & mat) {
 
+    if (mat.empty()) {
+        this->tensorPtr = nullptr;
+        return;
+    }
+
     this->typeCode = static_cast<char>(mat.depth());
 
     THByteTensor *outputPtr = new THByteTensor;

@@ -1959,3 +1959,49 @@ void CLAHE_collectGarbage(CLAHEPtr ptr)
 }
 
 // LineSegmentDetector
+
+struct LineSegmentDetectorPtr {
+    void *ptr;
+
+    inline cv::LineSegmentDetector * operator->() { return static_cast<cv::LineSegmentDetector *>(ptr); }
+    inline LineSegmentDetectorPtr(cv::LineSegmentDetector *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+struct LineSegmentDetectorPtr LineSegmentDetector_ctor(
+        int refine, double scale, double sigma_scale, double quant,
+        double ang_th, double log_eps, double density_th, int n_bins)
+{
+    return cv::createLineSegmentDetector(
+            refine, scale, sigma_scale, quant, ang_th, log_eps, density_th, n_bins).get();
+}
+
+extern "C"
+struct TensorArray LineSegmentDetector_detect(
+        struct LineSegmentDetectorPtr ptr, struct TensorWrapper image,
+        struct TensorWrapper lines, bool width, bool prec, bool nfa)
+{
+    std::vector<cv::Mat> retval(1 + width + prec + nfa);
+    if (!lines.isNull()) retval[0] = lines;
+    ptr->detect(
+            image.toMat(), retval[0],
+            width ? retval[1] : cv::noArray(),
+            prec  ? retval[1 + width] : cv::noArray(),
+            nfa   ? retval[1 + width + prec] : cv::noArray());
+    return TensorArray(retval);
+}
+
+extern "C"
+void LineSegmentDetector_drawSegments(
+        struct LineSegmentDetectorPtr ptr, struct TensorWrapper image, struct TensorWrapper lines)
+{
+    ptr->drawSegments(image.toMat(), lines.toMat());
+}
+
+extern "C"
+int compareSegments(struct LineSegmentDetectorPtr ptr, struct SizeWrapper size, struct TensorWrapper lines1,
+                    struct TensorWrapper lines2, struct TensorWrapper image)
+{
+    return ptr->compareSegments(size, lines1.toMat(), lines2.toMat(), TO_MAT_OR_NOARRAY(image));
+}
+
