@@ -6,6 +6,11 @@ TensorWrapper::TensorWrapper(): tensorPtr(nullptr) {}
 
 TensorWrapper::TensorWrapper(cv::Mat & mat) {
 
+    if (mat.empty()) {
+        this->tensorPtr = nullptr;
+        return;
+    }
+
     this->typeCode = static_cast<char>(mat.depth());
 
     THByteTensor *outputPtr = new THByteTensor;
@@ -181,6 +186,11 @@ RotatedRectWrapper::RotatedRectWrapper(const cv::RotatedRect &other) {
 Size2fWrapper::Size2fWrapper(const cv::Size2f &other){
     this->height = other.height;
     this->width = other.width;
+}
+
+PointWrapper::PointWrapper(const cv::Point & other) {
+    this->x = other.x;
+    this->y = other.y;
 }
 
 Point2fWrapper::Point2fWrapper(const cv::Point2f &other) {

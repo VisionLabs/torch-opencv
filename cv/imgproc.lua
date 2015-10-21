@@ -296,7 +296,125 @@ struct RectPlusInt floodFill(
 struct TensorWrapper cvtColor(
         struct TensorWrapper src, struct TensorWrapper dst, int code, int dstCn);
 
+struct TensorWrapper demosaicing(
+        struct TensorWrapper _src, struct TensorWrapper _dst, int code, int dcn);
 
+struct MomentsWrapper moments(
+        struct TensorWrapper array, bool binaryImage);
+
+struct DoubleArray HuMoments(
+        struct MomentsWrapper m);
+
+struct TensorWrapper matchTemplate(
+        struct TensorWrapper image, struct TensorWrapper templ, struct TensorWrapper result, int method, struct TensorWrapper mask);
+
+struct TensorPlusInt connectedComponents(
+        struct TensorWrapper image, struct TensorWrapper labels, int connectivity, int ltype);
+
+struct TensorArrayPlusInt connectedComponentsWithStats(
+        struct TensorWrapper image, struct TensorArray outputTensors, int connectivity, int ltype);
+
+struct TensorArray findContours(
+        struct TensorWrapper image, bool withHierarchy, struct TensorWrapper hierarchy, int mode, int method, struct PointWrapper offset);
+
+struct TensorWrapper approxPolyDP(
+        struct TensorWrapper curve, struct TensorWrapper approxCurve, double epsilon, bool closed);
+
+double arcLength(
+        struct TensorWrapper curve, bool closed);
+
+struct RectWrapper boundingRect(
+        struct TensorWrapper points);
+
+double contourArea(
+        struct TensorWrapper contour, bool oriented);
+
+struct RotatedRectWrapper minAreaRect(
+        struct TensorWrapper points);
+
+struct TensorWrapper boxPoints(
+        struct RotatedRectWrapper box, struct TensorWrapper points);
+
+struct Vec3fWrapper minEnclosingCircle(
+        struct TensorWrapper points, struct Point2fWrapper center, float radius);
+
+struct TensorPlusDouble minEnclosingTriangle(
+        struct TensorWrapper points, struct TensorWrapper triangle);
+
+double matchShapes(
+        struct TensorWrapper contour1, struct TensorWrapper contour2, int method, double parameter);
+
+struct TensorWrapper convexHull(
+        struct TensorWrapper points, bool clockwise, bool returnPoints);
+
+struct TensorWrapper convexityDefects(
+        struct TensorWrapper contour, struct TensorWrapper convexhull);
+
+bool isContourConvex(
+        struct TensorWrapper contour);
+
+struct TensorPlusFloat intersectConvexConvex(
+        struct TensorWrapper _p1, struct TensorWrapper _p2, bool handleNested);
+
+struct RotatedRectWrapper fitEllipse(
+        struct TensorWrapper points);
+
+struct TensorWrapper fitLine(
+        struct TensorWrapper points, int distType, double param, double reps, double aeps);
+
+double pointPolygonTest(
+        struct TensorWrapper contour, struct Point2fWrapper pt, bool measureDist);
+
+struct TensorWrapper rotatedRectangleIntersection(
+        struct RotatedRectWrapper rect1, struct RotatedRectWrapper rect2);
+
+struct TensorWrapper blendLinear(
+        struct TensorWrapper src1, struct TensorWrapper src2, struct TensorWrapper weights1, struct TensorWrapper weights2, struct TensorWrapper dst);
+
+struct TensorWrapper applyColorMap(
+        struct TensorWrapper src, struct TensorWrapper dst, int colormap);
+
+void line(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2, struct ScalarWrapper color, int thickness, int lineType, int shift);
+
+void arrowedLine(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2, struct ScalarWrapper color, int thickness, int line_type, int shift, double tipLength);
+
+void rectangle(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2, struct ScalarWrapper color, int thickness, int lineType, int shift);
+
+void rectanglePts(
+        struct TensorWrapper img, struct RectWrapper rec, struct ScalarWrapper color, int thickness, int lineType, int shift);
+
+void circle(
+        struct TensorWrapper img, struct PointWrapper center, int radius, struct ScalarWrapper color, int thickness, int lineType, int shift);
+
+void ellipse(
+        struct TensorWrapper img, struct PointWrapper center, struct SizeWrapper axes, double angle, double startAngle, double endAngle, struct ScalarWrapper color, int thickness, int lineType, int shift);
+
+void ellipseFromRect(
+        struct TensorWrapper img, struct RotatedRectWrapper box, struct ScalarWrapper color, int thickness, int lineType);
+
+void fillConvexPoly(
+        struct TensorWrapper img, struct TensorWrapper points, struct ScalarWrapper color, int lineType, int shift);
+
+void fillPoly(
+        struct TensorWrapper img, struct TensorArray pts, struct ScalarWrapper color, int lineType, int shift, struct PointWrapper offset);
+
+void polylines(
+        struct TensorWrapper img, struct TensorArray pts, bool isClosed, struct ScalarWrapper color, int thickness, int lineType, int shift);
+
+void drawContours(
+        struct TensorWrapper image, struct TensorArray contours, int contourIdx, struct ScalarWrapper color, int thickness, int lineType, struct TensorWrapper hierarchy, int maxLevel, struct PointWrapper offset);
+
+struct ScalarPlusBool clipLineSize(
+        struct SizeWrapper imgSize, struct PointWrapper pt1, struct PointWrapper pt2);
+
+struct ScalarPlusBool clipLineRect(
+        struct RectWrapper imgRect, struct PointWrapper pt1, struct PointWrapper pt2);
+
+void putText(
+        struct TensorWrapper img, const char *text, struct PointWrapper org, int fontFace, double fontScale, struct ScalarWrapper color, int thickness, int lineType, bool bottomLeftOrigin);
 ]]
 
 
@@ -1091,7 +1209,7 @@ function cv.threshold(t)
         assert(dst:isSameSizeAs(src))
     end
 
-    result = C.threshold(cv.wrap_tensors(src), cv.wrap_tensors(dst),
+    local result = C.threshold(cv.wrap_tensors(src), cv.wrap_tensors(dst),
                     tresh, maxval, type)
     return result.val, cv.unwrap_tensors(result.tensor)
 end
@@ -1252,7 +1370,7 @@ function cv.initWideAngleProjMap(t)
     local projType = assert(t.projType)
     local alpha = assert(t.alpha)
     
-    result = C.initWideAngleProjMap(
+    local result = C.initWideAngleProjMap(
         cv.wrap_tensors(cameraMatrix), cv.wrap_tensors(distCoeffs),
         imageSize, destImageWidth, m1type, cv.wrap_tensors(maps),
         projType, alpha)
@@ -1446,4 +1564,1115 @@ function cv.cvtColor(t)
 
     return cv.unwrap_tensors(C.cvtColor(
         cv.wrap_tensors(src), cv.wrap_tensors(dst), code, dstCn))
+end
+
+
+function cv.demosaicing(t)
+    local _src = assert(t.src)
+    local _dst = assert(t.dst)
+    local code = assert(t.code)
+    local dcn = t.dcn or 0
+
+    return cv.unwrap_tensors(C.demosaicing(
+        cv.wrap_tensors(_src), cv.wrap_tensors(_dst), code, dcn))
+end
+
+
+function cv.moments(t)
+    local array = assert(t.array)
+    local binaryImage = t.binaryImage or false
+
+    return C.moments(cv.wrap_tensors(array), binaryImage)
+end
+
+
+-- moments: Input moments computed with cv.moments()
+-- toTable: Output to table if true, otherwise output to Tensor. Default: true
+-- output : Optional. A Tensor of length 7 or a table; if provided, will output there
+function cv.HuMoments(t)
+    local moments = assert(t.moments)
+    local outputType = t.outputType or 'table'
+    local output = t.output
+
+    return cv.arrayToLua(C.HuMoments(moments), outputType, output)
+end
+
+
+function cv.matchTemplate(t)
+    local image = assert(t.image)
+    local templ = t.templ
+    local result = assert(t.result)
+    local method = assert(t.method)
+    local mask = t.mask
+
+    return cv.unwrap_tensors(C.matchTemplate(
+        cv.wrap_tensors(image), cv.wrap_tensors(templ), cv.wrap_tensors(result), method, cv.wrap_tensors(mask)))
+end
+
+
+function cv.connectedComponents(t)
+    local image = assert(t.image)
+    local labels = assert(t.labels)
+    local connectivity = t.connectivity or 8
+    local ltype = t.ltype or cv.CV_32S
+
+    local result = C.connectedComponents(cv.wrap_tensors(image), cv.wrap_tensors(labels), connectivity, ltype)
+    return result.val, cv.unwrap_tensors(result.tensor)
+end
+
+
+function cv.connectedComponentsWithStats(t)
+    local image = assert(t.image)
+    local labels = assert(t.labels)
+    local stats = assert(t.stats)
+    local centroids = assert(t.centroids)
+    local connectivity = t.connectivity or 8
+    local ltype = t.ltype or cv.CV_32S
+
+    local result = C.connectedComponentsWithStats(
+        cv.wrap_tensors(image), 
+        cv.wrap_tensors(labels, stats, centroids), 
+        connectivity, 
+        ltype)
+    return result.val, cv.unwrap_tensors(result.tensors)
+end
+
+-- image: Source Tensor
+-- hierarchy: optional, an array to output hierarchy into
+-- withHierarchy: boolean, to output hierarchy or not. Default: false
+-- other params: see OpenCV docs for findContours
+function cv.findContours(t)
+    local image = assert(t.image)
+    local hierarchy = t.hierarchy
+    local withHierarchy = t.withHierarchy or false
+    local mode = assert(t.mode)
+    local method = assert(t.method)
+    local offset = cv.Point(t.offset or {0, 0})
+
+    contours = cv.unwrap_tensors(
+        C.findContours(
+            cv.wrap_tensors(image), withHierarchy, cv.wrap_tensors(hierarchy), mode, method, offset), true)
+
+    if withHierarchy and not hierarchy then
+        hierarchy = contours[#contours]
+        contours[#contours] = nil
+        return contours, hierarchy
+    else
+        return contours
+    end
+end
+
+
+function cv.approxPolyDP(t)
+    local curve = assert(t.curve)
+    local approxCurve = t.approxCurve
+    local epsilon = assert(t.epsilon)
+    local closed = assert(t.closed)
+
+    return cv.unwrap_tensors(C.approxPolyDP(cv.wrap_tensors(curve), cv.wrap_tensors(approxCurve), epsilon, closed))
+end
+
+
+function cv.arcLength(t)
+    local curve = assert(t.curve)
+    local closed = assert(t.closed)
+    
+    return C.arcLength(cv.wrap_tensors(curve), closed)
+end
+
+
+function cv.boundingRect(t)
+    local points = assert(t.points)
+    if type(points) == "table" then
+        points = torch.FloatTensor(points)
+    end
+
+    return C.boundingRect(cv.wrap_tensors(points))
+end
+
+
+function cv.contourArea(t)
+    local contour = assert(t.contour)
+    if type(contour) == "table" then
+        contour = torch.FloatTensor(contour)
+    end
+
+    local oriented = t.oriented or false
+
+    return C.contourArea(cv.wrap_tensors(contour), oriented)
+end
+
+
+function cv.minAreaRect(t)
+    local points = assert(t.points)
+    if type(points) == "table" then
+        points = torch.FloatTensor(points)
+    end
+
+    return C.minAreaRect(cv.wrap_tensors(points))
+end
+
+
+-- box: a RotatedRectWrapper
+-- points: optional; a 4x2 Tensor to hold the return value
+function cv.boxPoints(t)
+    local box = assert(t.box)
+    local points = t.points
+    -- check that points is a Tensor
+    assert(not points or points.torch)
+
+    return cv.unwrap_tensors(C.boxPoints(box, cv.wrap_tensors(points)))
+end
+
+-- points: a Tensor or a table of points
+-- return value: center, radius
+function cv.minEnclosingCircle(t)
+    local points = assert(t.points)
+    if type(points) == "table" then
+        points = torch.FloatTensor(points)
+    end
+
+    local result = C.minEnclosingCircle(cv.wrap_tensors(points))
+    return cv.Point2f(result.v0, result.v1), result.v2
+end
+
+-- points: a Tensor or a table of points
+-- triangle: optional; a 3x2 Tensor to hold the return value
+-- return value: triangle_points, area
+function cv.minEnclosingTriangle(t)
+    local points = assert(t.points)
+    if type(points) == "table" then
+        points = torch.FloatTensor(points)
+    end
+    local triangle = t.triangle
+    -- check that triangle is a Tensor
+    assert(not triangle or triangle.torch)
+
+    local result = C.minEnclosingTriangle(cv.wrap_tensors(points), cv.wrap_tensors(triangle))
+    return cv.unwrap_tensors(result.tensor), result.val
+end
+
+
+function cv.matchShapes(t)
+    local contour1 = assert(t.contour1)
+    local contour2 = assert(t.contour2)
+    local method = assert(t.method)
+    local parameter = t.parameter or 0
+
+    return C.matchShapes(cv.wrap_tensors(contour1), cv.wrap_tensors(contour2), method, parameter)
+end
+
+
+function cv.convexHull(t)
+    local points = assert(t.points)
+    local clockwise = t.clockwise or false
+    local returnPoints = t.returnPoints
+    if returnPoints == nil then
+         returnPoints = true
+    end
+
+    retval = cv.unwrap_tensors(C.convexHull(cv.wrap_tensors(points), clockwise, returnPoints))
+    if not returnPoints then
+        -- correct the 0-based indexing
+        for i = 1,#retval do
+            retval[i] = retval[i] + 1
+        end
+    end
+    return retval
+end
+
+
+function cv.convexityDefects(t)
+    local contour = assert(t.contour)
+    local convexhull = assert(t.convexhull)
+
+    return cv.unwrap_tensors(C.convexityDefects(cv.wrap_tensors(contour), cv.wrap_tensors(convexhull)))
+end
+
+
+function cv.isContourConvex(t)
+    local contour = assert(t.contour)
+
+    return C.isContourConvex(cv.wrap_tensors(contour))
+end
+
+
+-- contour1, contour2: Tensors containing points
+-- handleNested: boolean
+-- return value: intersection
+function cv.intersectConvexConvex(t)
+    local _p1 = assert(t.contour1)
+    local _p2 = assert(t.contour2)
+    local handleNested = t.handleNested
+    if handleNested == nil then
+        handleNested = true
+    end
+
+    return cv.unwrap_tensors(
+        C.intersectConvexConvex(cv.wrap_tensors(_p1), cv.wrap_tensors(_p2), handleNested))
+end
+
+
+function cv.fitEllipse(t)
+    local points = assert(t.points)
+
+    return C.fitEllipse(cv.wrap_tensors(points))
+end
+
+
+function cv.fitLine(t)
+    local points = assert(t.points)
+    local distType = assert(t.distType)
+    local param = assert(t.param)
+    local reps = assert(t.reps)
+    local aeps = assert(t.aeps)
+
+    return cv.unwrap_tensors(
+        C.fitLine(cv.wrap_tensors(points), distType, param, reps, aeps))
+end
+
+
+function cv.pointPolygonTest(t)
+    local contour = assert(t.contour)
+    local pt = cv.Point2f(assert(t.pt))
+    local measureDist = assert(t.measureDist)
+
+    return C.pointPolygonTest(cv.wrap_tensors(contour), pt, measureDist)
+end
+
+
+function cv.rotatedRectangleIntersection(t)
+    local rect1 = cv.RotatedRect(assert(t.rect1))
+    local rect2 = cv.RotatedRect(assert(t.rect2))
+
+    return cv.unwrap_tensors(
+        C.rotatedRectangleIntersection(rect1, rect2))
+end
+
+
+function cv.blendLinear(t)
+    local src1 = assert(t.src1)
+    local src2 = assert(t.src2)
+    local weights1 = assert(t.weights1)
+    local weights2 = assert(t.weights2)
+    local dst = t.dst
+
+    return cv.unwrap_tensors(
+        C.blendLinear(cv.wrap_tensors(src1), cv.wrap_tensors(src2), cv.wrap_tensors(weights1), cv.wrap_tensors(weights2), cv.wrap_tensors(dst)))
+end
+
+
+function cv.applyColorMap(t)
+    local src = assert(t.src)
+    local dst = t.dst
+    local colormap = assert(t.colormap)
+
+    return cv.unwrap_tensors(
+        C.applyColorMap(cv.wrap_tensors(src), cv.wrap_tensors(dst), colormap))
+end
+
+
+function cv.line(t)
+    local img = assert(t.img)
+    local pt1 = cv.Point(assert(t.pt1))
+    local pt2 = cv.Point(assert(t.pt2))
+    local color = cv.Scalar(assert(t.color))
+    local thickness = t.thickness or 1
+    local lineType = t.lineType or cv.LINE_8
+    local shift = t.shift or 0
+
+    C.line(cv.wrap_tensors(img), pt1, pt2, color, thickness, lineType, shift)
+end
+
+
+function cv.arrowedLine(t)
+    local img = assert(t.img)
+    local pt1 = cv.Point(assert(t.pt1))
+    local pt2 = cv.Point(assert(t.pt2))
+    local color = cv.Scalar(assert(t.color))
+    local thickness = t.thickness or 1
+    local line_type = t.line_type or 8
+    local shift = t.shift or 0
+    local tipLength = t.tipLength or 0.1
+
+    C.arrowedLine(cv.wrap_tensors(img), pt1, pt2, color, thickness, line_type, shift, tipLength)
+end
+
+
+function cv.rectangle(t)
+    local img = assert(t.img)
+    local pt1
+    local pt2
+    local rec
+    if t.rec then
+        rec = cv.Rect(t.rec)
+    else
+        pt1 = cv.Point(t.pt1)
+        pt2 = cv.Point(t.pt2)
+    end
+    assert((pt1 and pt2) or rec)
+    local color = cv.Scalar(assert(t.color))
+    local thickness = t.thickness or 1
+    local lineType = t.lineType or cv.LINE_8
+    local shift = t.shift or 0
+
+    if rec then
+        C.rectangle(cv.wrap_tensors(img), rec, color, thickness, lineType, shift)
+    else
+        C.rectangle(cv.wrap_tensors(img), pt1, pt2, color, thickness, lineType, shift)
+    end
+end
+
+
+function cv.circle(t)
+    local img = assert(t.img)
+    local center = cv.Point(assert(t.center))
+    local radius = assert(t.radius)
+    local color = cv.Scalar(assert(t.color))
+    local thickness = t.thickness or 1
+    local lineType = t.lineType or cv.LINE_8
+    local shift = t.shift or 0
+
+    C.circle(cv.wrap_tensors(img), center, radius, color, thickness, lineType, shift)
+end
+
+
+function cv.ellipse(t)
+    local img = assert(t.img)
+    local center = cv.Point(assert(t.center))
+    local axes = cv.Size(assert(t.axes))
+    local angle = assert(t.angle)
+    local startAngle = assert(t.startAngle)
+    local endAngle = assert(t.endAngle)
+    local color = cv.Scalar(assert(t.color))
+    local thickness = t.thickness or 1
+    local lineType = t.lineType or cv.LINE_8
+    local shift = t.shift or 0
+
+    C.ellipse(cv.wrap_tensors(img), center, axes, angle, startAngle, endAngle, color, thickness, lineType, shift)
+end
+
+
+function cv.ellipseFromRect(t)
+    local img = assert(t.img)
+    local box = cv.RotatedRect(assert(t.box))
+    local color = cv.Scalar(assert(t.color))
+    local thickness = t.thickness or 1
+    local lineType = t.lineType or cv.LINE_8
+
+    C.ellipseFromRect(cv.wrap_tensors(img), box, color, thickness, lineType)
+end
+
+
+function cv.fillConvexPoly(t)
+    local img = assert(t.img)
+    local points = assert(t.points)
+    if type(points) == "table" then
+        points = torch.FloatTensor(points)
+    end
+    local color = cv.Scalar(assert(t.color))
+    local lineType = t.lineType or cv.LINE_8
+    local shift = t.shift or 0
+
+    C.fillConvexPoly(cv.wrap_tensors(img), cv.wrap_tensors(points), color, lineType, shift)
+end
+
+
+function cv.fillPoly(t)
+    local img = assert(t.img)
+    local pts = assert(t.pts)
+    assert(type(pts) == 'table')
+    local color = cv.Scalar(assert(t.color))
+    local lineType = t.lineType or cv.LINE_8
+    local shift = t.shift or 0
+    local offset = cv.Point(t.offset or {0,0})
+
+    C.fillPoly(cv.wrap_tensors(img), cv.wrap_tensors(pts), color, lineType, shift, offset)
+end
+
+
+function cv.polylines(t)
+    local img = assert(t.img)
+    local pts = assert(t.pts)
+    assert(type(pts) == 'table')
+    local isClosed = assert(t.isClosed)
+    local color = cv.Scalar(assert(t.color))
+    local thickness = t.thickness or 1
+    local lineType = t.lineType or cv.LINE_8
+    local shift = t.shift or 0
+
+    C.polylines(cv.wrap_tensors(img), cv.wrap_tensors(pts), isClosed, color, thickness, lineType, shift)
+end
+
+
+function cv.drawContours(t)
+    local image = assert(t.image)
+    local contours = assert(t.contours)
+    assert(type(contours) == 'table')
+    local contourIdx = assert(t.contourIdx)
+    local color = cv.Scalar(assert(t.color))
+    local thickness = t.thickness or 1
+    local lineType = t.lineType or cv.LINE_8
+    local hierarchy = t.hierarchy
+    local maxLevel = t.maxLevel or cv.INT_MAX
+    local offset = t.offset or cv.Point
+
+    C.drawContours(cv.wrap_tensors(image), cv.wrap_tensors(contours), contourIdx, color, thickness, lineType, cv.wrap_tensors(hierarchy), maxLevel, offset)
+end
+
+
+function cv.clipLine(t)
+    local imgSize = t.imgSize
+    local imgRect = t.imgRect
+    assert(imgSize or imgRect)
+    if imgSize then
+        imgSize = cv.Size(imgSize)
+    else
+        imgRect = cv.Rect(imgRect)
+    end
+
+    local pt1 = cv.Point(assert(t.pt1))
+    local pt2 = cv.Point(assert(t.pt2))
+
+    local result
+    if imgSize then
+        result = C.clipLineSize(imgSize, pt1, pt2)
+    else
+        result = C.clipLineRect(imgRect, pt1, pt2)
+    end
+
+    return cv.Point{result.scalar.v0, result.scalar.v1}, cv.Point{result.scalar.v2, result.scalar.v3}, result.val
+end
+
+
+function cv.ellipse2Poly(t)
+    local center = cv.Point(assert(t.center))
+    local axes = cv.Size(assert(t.axes))
+    local angle = assert(t.angle)
+    local arcStart = assert(t.arcStart)
+    local arcEnd = assert(t.arcEnd)
+    local delta = assert(t.delta)
+
+    return cv.unwrap_tensors(
+        C.ellipse2Poly(center, axes, angle, arcStart, arcEnd, delta, pts))
+end
+
+
+function cv.putText(t)
+    local img = assert(t.img)
+    local text = assert(t.text)
+    local org = cv.Point(assert(t.org))
+    local fontFace = assert(t.fontFace)
+    local fontScale = assert(t.fontScale)
+    local color = cv.Scalar(assert(t.color))
+    local thickness = t.thickness or 1
+    local lineType = t.lineType or cv.LINE_8
+    local bottomLeftOrigin = t.bottomLeftOrigin or false
+
+    C.putText(cv.wrap_tensors(img), text, org, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin)
+end
+
+
+function cv.getTextSize(t)
+    local text = assert(t.text)
+    local fontFace = assert(t.fontFace)
+    local fontScale = assert(t.fontScale)
+    local thickness = assert(t.thickness)
+
+    local result = C.getTextSize(text, fontFace, fontScale, thickness)
+    return result.size, result.val
+end
+
+--- ***************** Classes *****************
+require 'cv.Classes'
+
+ffi.cdef[[
+void GeneralizedHough_setTemplate(
+        struct PtrWrapper ptr, struct TensorWrapper templ, struct PointWrapper templCenter);
+
+void GeneralizedHough_setTemplate_edges(
+        struct PtrWrapper ptr, struct TensorWrapper edges, struct TensorWrapper dx,
+        struct TensorWrapper dy, struct PointWrapper templCenter);
+
+struct TensorArray GeneralizedHough_detect(
+        struct PtrWrapper ptr, struct TensorWrapper image, struct TensorWrapper positions, bool votes);
+
+struct TensorArray GeneralizedHough_detect_edges(
+        struct PtrWrapper ptr, struct TensorWrapper edges, struct TensorWrapper dx,
+        struct TensorWrapper dy, struct TensorWrapper positions, bool votes);
+
+void GeneralizedHough_setCannyLowThresh(struct PtrWrapper ptr, int cannyLowThresh);
+
+int GeneralizedHough_getCannyLowThresh(struct PtrWrapper ptr);
+
+void GeneralizedHough_setCannyHighThresh(struct PtrWrapper ptr, int cannyHighThresh);
+
+int GeneralizedHough_getCannyHighThresh(struct PtrWrapper ptr);
+
+void GeneralizedHough_setMinDist(struct PtrWrapper ptr, double MinDist);
+
+double GeneralizedHough_getMinDist(struct PtrWrapper ptr);
+
+void GeneralizedHough_setDp(struct PtrWrapper ptr, double Dp);
+
+double GeneralizedHough_getDp(struct PtrWrapper ptr);
+
+void GeneralizedHough_setMaxBufferSize(struct PtrWrapper ptr, int MaxBufferSize);
+
+int GeneralizedHough_getMaxBufferSize(struct PtrWrapper ptr);
+
+struct PtrWrapper GeneralizedHoughBallard_ctor();
+
+void GeneralizedHoughBallard_setLevels(struct PtrWrapper ptr, double Levels);
+
+double GeneralizedHoughBallard_getLevels(struct PtrWrapper ptr);
+
+void GeneralizedHoughBallard_setVotesThreshold(struct PtrWrapper ptr, double votesThreshold);
+
+double GeneralizedHoughBallard_getVotesThreshold(struct PtrWrapper ptr);
+
+struct PtrWrapper GeneralizedHoughGuil_ctor();
+
+void GeneralizedHoughGuil_setLevels(struct PtrWrapper ptr, int levels);
+
+int GeneralizedHoughGuil_getLevels(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setAngleEpsilon(struct PtrWrapper ptr, double AngleEpsilon);
+
+double GeneralizedHoughGuil_getAngleEpsilon(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setMinAngle(struct PtrWrapper ptr, double MinAngle);
+
+double GeneralizedHoughGuil_getMinAngle(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setMaxAngle(struct PtrWrapper ptr, double MaxAngle);
+
+double GeneralizedHoughGuil_getMaxAngle(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setAngleStep(struct PtrWrapper ptr, double AngleStep);
+
+double GeneralizedHoughGuil_getAngleStep(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setAngleThresh(struct PtrWrapper ptr, int AngleThresh);
+
+int GeneralizedHoughGuil_getAngleThresh(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setMinScale(struct PtrWrapper ptr, double MinScale);
+
+double GeneralizedHoughGuil_getMinScale(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setMaxScale(struct PtrWrapper ptr, double MaxScale);
+
+double GeneralizedHoughGuil_getMaxScale(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setScaleStep(struct PtrWrapper ptr, double ScaleStep);
+
+double GeneralizedHoughGuil_getScaleStep(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setScaleThresh(struct PtrWrapper ptr, int ScaleThresh);
+
+int GeneralizedHoughGuil_getScaleThresh(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setPosThresh(struct PtrWrapper ptr, int PosThresh);
+
+int GeneralizedHoughGuil_getPosThresh(struct PtrWrapper ptr);
+
+struct PtrWrapper CLAHE_ctor();
+
+void CLAHE_setClipLimit(struct PtrWrapper ptr, double ClipLimit);
+
+double CLAHE_getClipLimit(struct PtrWrapper ptr);
+
+void CLAHE_setTilesGridSize(struct PtrWrapper ptr, struct SizeWrapper TilesGridSize);
+
+struct SizeWrapper CLAHE_getTilesGridSize(struct PtrWrapper ptr);
+
+void CLAHE_collectGarbage(struct PtrWrapper ptr);
+
+struct PtrWrapper LineSegmentDetector_ctor(
+        int refine, double scale, double sigma_scale, double quant,
+        double ang_th, double log_eps, double density_th, int n_bins);
+
+struct TensorArray LineSegmentDetector_detect(
+        struct PtrWrapper ptr, struct TensorWrapper image,
+        struct TensorWrapper lines, bool width, bool prec, bool nfa);
+
+void LineSegmentDetector_drawSegments(
+        struct PtrWrapper ptr, struct TensorWrapper image, struct TensorWrapper lines);
+
+int compareSegments(struct PtrWrapper ptr, struct SizeWrapper size, struct TensorWrapper lines1,
+                    struct TensorWrapper lines2, struct TensorWrapper image);
+
+struct PtrWrapper Subdiv2D_ctor_default();
+
+struct PtrWrapper Subdiv2D_ctor(struct RectWrapper rect);
+
+void Subdiv2D_dtor(struct PtrWrapper ptr);
+
+void Subdiv2D_initDelaunay(struct PtrWrapper ptr, struct RectWrapper rect);
+
+int Subdiv2D_insert(struct PtrWrapper ptr, struct Point2fWrapper pt);
+
+void Subdiv2D_insert_vector(struct PtrWrapper ptr, struct TensorWrapper ptvec);
+
+struct Vec3iWrapper Subdiv2D_locate(struct PtrWrapper ptr, struct Point2fWrapper pt);
+
+struct Point2fPlusInt Subdiv2D_findNearest(struct PtrWrapper ptr, struct Point2fWrapper pt);
+
+struct TensorWrapper Subdiv2D_getEdgeList(struct PtrWrapper ptr);
+
+struct TensorWrapper Subdiv2D_getTriangleList(struct PtrWrapper ptr);
+
+struct TensorArray Subdiv2D_getVoronoiFacetList(struct PtrWrapper ptr, struct TensorWrapper idx);
+
+struct Point2fPlusInt Subdiv2D_getVertex(struct PtrWrapper ptr, int vertex);
+
+int Subdiv2D_getEdge(struct PtrWrapper ptr, int edge, int nextEdgeType);
+
+int Subdiv2D_nextEdge(struct PtrWrapper ptr, int edge);
+
+int Subdiv2D_rotateEdge(struct PtrWrapper ptr, int edge, int rotate);
+
+int Subdiv2D_symEdge(struct PtrWrapper ptr, int edge);
+
+struct Point2fPlusInt Subdiv2D_edgeOrg(struct PtrWrapper ptr, int edge);
+
+struct Point2fPlusInt Subdiv2D_edgeDst(struct PtrWrapper ptr, int edge);
+
+struct PtrWrapper LineIterator_ctor(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2,
+        int connectivity, bool leftToRight);
+
+void LineIterator_dtor(struct PtrWrapper ptr);
+
+int LineIterator_count(struct PtrWrapper ptr);
+
+struct PointWrapper LineIterator_pos(struct PtrWrapper ptr);
+
+void LineIterator_incr(struct PtrWrapper ptr);
+]]
+
+-- GeneralizedHough
+
+do
+    local GeneralizedHough = torch.class('cv.GeneralizedHough', 'cv.Algorithm')
+
+    function GeneralizedHough:setTemplate(t)
+        if t.templ then            
+            local templ = assert(t.templ)
+            local templCenter = cv.Point(t.templCenter or {-1, -1})
+
+            C.GeneralizedHough_setTemplate(self.ptr, cv.wrap_tensors(templ), templCenter)
+        else
+            local edges = assert(t.edges)
+            local dx = assert(t.dx)
+            local dy = assert(t.dy)
+            local templCenter = cv.Point(t.templCenter or {-1, -1})
+
+            C.GeneralizedHough_setTemplate_edges(
+                self.ptr, cv.wrap_tensors(edges), cv.wrap_tensors(dx),
+                cv.wrap_tensors(dy), templCenter)
+        end
+    end
+
+    -- votes: boolean. To output votes or not
+    function GeneralizedHough:detect(t)
+        if t.image then
+            local image = assert(t.image)
+            local positions = t.positions
+            local votes = t.votes or false
+
+            return cv.unwrap_tensors(
+                C.GeneralizedHough_detect(
+                    self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(positions), votes))
+        else
+            local image = assert(t.image)
+            local positions = t.positions
+            local votes = t.votes or false
+
+            return cv.unwrap_tensors(
+                C.GeneralizedHough_detect(
+                    self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(positions), votes))
+        end
+    end
+
+    function GeneralizedHough:setCannyLowThresh(cannyLowThresh)
+        C.GeneralizedHough_setCannyLowThresh(self.ptr, cannyLowThresh)
+    end
+
+    function GeneralizedHough:getCannyLowThresh()
+        return C.GeneralizedHough_getCannyLowThresh(self.ptr)
+    end
+
+    function GeneralizedHough:setCannyHighThresh(cannyHighThresh)
+        C.GeneralizedHough_setCannyHighThresh(self.ptr, cannyHighThresh)
+    end
+
+    function GeneralizedHough:getCannyHighThresh()
+        return C.GeneralizedHough_getCannyHighThresh(self.ptr)
+    end
+
+    function GeneralizedHough:setMinDist(minDist)
+        C.GeneralizedHough_setMinDist(self.ptr, MinDist)
+    end
+
+    function GeneralizedHough:getMinDist()
+        return C.GeneralizedHough_getMinDist(self.ptr)
+    end
+
+    function GeneralizedHough:setDp(dp)
+        C.GeneralizedHough_setDp(self.ptr, Dp)
+    end
+
+    function GeneralizedHough:getDp()
+        return C.GeneralizedHough_getDp(self.ptr)
+    end
+
+    function GeneralizedHough:setMaxBufferSize(maxBufferSize)
+        C.GeneralizedHough_setMaxBufferSize(self.ptr, MaxBufferSize)
+    end
+
+    function GeneralizedHough:getMaxBufferSize()
+        return C.GeneralizedHough_getMaxBufferSize(self.ptr)
+    end
+end
+
+-- GeneralizedHoughBallard
+
+do
+    local GeneralizedHoughBallard = torch.class('cv.GeneralizedHoughBallard', 'cv.GeneralizedHough')
+
+    function GeneralizedHoughBallard:__init()
+        self.ptr = ffi.gc(C.GeneralizedHoughBallard_ctor(), C.Algorithm_dtor)
+    end
+
+    function GeneralizedHoughBallard:setLevels(levels)
+        C.GeneralizedHoughBallard_setLevels(self.ptr, levels)
+    end
+
+    function GeneralizedHoughBallard:getLevels()
+        return C.GeneralizedHoughBallard_getLevels(self.ptr)
+    end
+
+    function GeneralizedHoughBallard:setVotesThreshold(votesThreshold)
+        C.GeneralizedHoughBallard_setVotesThreshold(self.ptr, votesThreshold)
+    end
+
+    function GeneralizedHoughBallard:getVotesThreshold()
+        return C.GeneralizedHoughBallard_getVotesThreshold(self.ptr)
+    end
+end
+
+-- GeneralizedHoughGuil
+
+do
+    local GeneralizedHoughGuil = torch.class('cv.GeneralizedHoughGuil', 'cv.GeneralizedHough')
+
+    function GeneralizedHoughGuil:__init()
+        self.ptr = ffi.gc(C.GeneralizedHoughGuil_ctor(), C.Algorithm_dtor)
+    end
+
+    function GeneralizedHoughGuil:setXi(xi)
+        C.GeneralizedHoughGuil_setXi(self.ptr, xi)
+    end
+
+    function GeneralizedHoughGuil:getXi()
+        return C.GeneralizedHoughGuil_getXi(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setLevels(levels)
+        C.GeneralizedHoughGuil_setLevels(self.ptr, levels)
+    end
+
+    function GeneralizedHoughGuil:getLevels()
+        return C.GeneralizedHoughGuil_getLevels(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setAngleEpsilon(angleEpsilon)
+        C.GeneralizedHoughGuil_setAngleEpsilon(self.ptr, angleEpsilon)
+    end
+
+    function GeneralizedHoughGuil:getAngleEpsilon()
+        return C.GeneralizedHoughGuil_getAngleEpsilon(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setMinAngle(minAngle)
+        C.GeneralizedHoughGuil_setMinAngle(self.ptr, minAngle)
+    end
+
+    function GeneralizedHoughGuil:getMinAngle()
+        return C.GeneralizedHoughGuil_getMinAngle(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setMaxAngle(maxAngle)
+        C.GeneralizedHoughGuil_setMaxAngle(self.ptr, maxAngle)
+    end
+
+    function GeneralizedHoughGuil:getMaxAngle()
+        return C.GeneralizedHoughGuil_getMaxAngle(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setAngleStep(angleStep)
+        C.GeneralizedHoughGuil_setAngleStep(self.ptr, angleStep)
+    end
+
+    function GeneralizedHoughGuil:getAngleStep()
+        return C.GeneralizedHoughGuil_getAngleStep(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setAngleThresh(angleThresh)
+        C.GeneralizedHoughGuil_setAngleThresh(self.ptr, angleThresh)
+    end
+
+    function GeneralizedHoughGuil:getAngleThresh()
+        return C.GeneralizedHoughGuil_getAngleThresh(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setMinScale(minScale)
+        C.GeneralizedHoughGuil_setMinScale(self.ptr, minScale)
+    end
+
+    function GeneralizedHoughGuil:getMinScale()
+        return C.GeneralizedHoughGuil_getMinScale(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setMaxScale(maxScale)
+        C.GeneralizedHoughGuil_setMaxScale(self.ptr, maxScale)
+    end
+
+    function GeneralizedHoughGuil:getMaxScale()
+        return C.GeneralizedHoughGuil_getMaxScale(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setScaleStep(scaleStep)
+        C.GeneralizedHoughGuil_setScaleStep(self.ptr, scaleStep)
+    end
+
+    function GeneralizedHoughGuil:getScaleStep()
+        return C.GeneralizedHoughGuil_getScaleStep(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setScaleThresh(scaleThresh)
+        C.GeneralizedHoughGuil_setScaleThresh(self.ptr, scaleThresh)
+    end
+
+    function GeneralizedHoughGuil:getScaleThresh()
+        return C.GeneralizedHoughGuil_getScaleThresh(self.ptr)
+    end
+
+    function GeneralizedHoughGuil:setPosThresh(posThresh)
+        C.GeneralizedHoughGuil_setPosThresh(self.ptr, posThresh)
+    end
+
+    function GeneralizedHoughGuil:getPosThresh()
+        return C.GeneralizedHoughGuil_getPosThresh(self.ptr)
+    end
+end
+
+-- CLAHE
+
+do
+    local CLAHE = torch.class('cv.CLAHE', 'cv.Algorithm')
+
+    function CLAHE:__init()
+        self.ptr = ffi.gc(C.CLAHE_ctor(), C.Algorithm_dtor)
+    end
+
+    function CLAHE:setClipLimit(clipLimit)
+        C.CLAHE_setClipLimit(self.ptr, clipLimit)
+    end
+
+    function CLAHE:getClipLimit()
+        return C.CLAHE_getClipLimit(self.ptr)
+    end
+
+    function CLAHE:setTileGridSize(tileGridSize)
+        C.CLAHE_setTileGridSize(self.ptr, TileGridSize)
+    end
+
+    function CLAHE:getTileGridSize()
+        return C.CLAHE_getTileGridSize(self.ptr)
+    end
+
+    function CLAHE:collectGarbage()
+        C.CLAHE_collectGarbage(self.ptr)
+    end
+end
+
+-- LineSegmentDetector
+
+do
+    local LineSegmentDetector = torch.class('cv.LineSegmentDetector', 'cv.Algorithm')
+
+    function LineSegmentDetector:__init(t)
+        local refine = t.refine or cv.LSD_REFINE_STD
+        local scale = t.scale or 0.8
+        local sigma_scale = t.sigma_scale or 0.6
+        local quant = t.quant or 2.0
+        local ang_th = t.ang_th or 22.5
+        local log_eps = t.log_eps or 0
+        local density_th = t.density_th or 0.7
+        local n_bins = t.n_bins or 1024
+
+        self.ptr = ffi.gc(
+            C.LineSegmentDetector_ctor(
+                refine, scale, sigma_scale, quant, ang_th, log_eps, density_th, n_bins), 
+            C.Algorithm_dtor
+        )
+    end
+
+    function LineSegmentDetector:detect(t)
+        local image = assert(t.image)
+        local lines = t.lines
+        local width = t.width or false
+        local prec  = t.prec or false
+        local nfa   = t.nfa or false
+
+        return cv.unwrap_tensors(
+            C.LineSegmentDetector_detect(
+                self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(lines), width, prec, nfa))
+    end
+
+    function LineSegmentDetector:drawSegments(t)
+        local image = assert(t.image)
+        local lines = assert(t.lines)
+
+        C.LineSegmentDetector_drawSegments(
+            self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(lines))
+    end
+
+    function LineSegmentDetector:compareSegments(t)
+        local lines1 = assert(t.lines1)
+        local lines2 = assert(t.lines2)
+        local image = t.image
+
+        return C.LineSegmentDetector_compareSegments(
+            self.ptr, cv.wrap_tensors(lines1), cv.wrap_tensors(lines2), cv.wrap_tensors(image))
+    end
+end
+
+-- Subdiv2D
+
+do
+    local Subdiv2D = torch.class('cv.Subdiv2D')
+
+    function Subdiv2D:__init(t)
+        local rect = cv.Rect(t.rect)
+
+        if rect then
+            self.ptr = ffi.gc(C.Subdiv2D_ctor(cv.Rect(rect)), C.Subdiv2D_dtor)
+        else
+            self.ptr = ffi.gc(C.Subdiv2D_ctor_default(), C.Subdiv2D_dtor)
+        end
+    end
+
+    function Subdiv2D:initDelaunay(t)
+        local rect = cv.Rect(assert(t.rect))
+
+        C.Subdiv2D_initDelaunay(self.ptr, rect)
+    end
+
+    function Subdiv2D:insert(t)
+        local pt = t.pt
+        local ptvec = t.ptvec
+        
+        if pt then
+            return C.Subdiv2D_insert(cv.Point2f(pt))
+        else
+            if type(ptvec) == "table" then
+                ptvec = torch.FloatTensor(ptvec)
+            end
+            C.Subdiv2D_insert_vector(self.ptr, cv.wrap_tensors(ptvec))
+        end
+    end
+
+    function Subdiv2D:locate(t)
+        local pt = cv.Point2f(assert(t.pt))
+        
+        local result = C.Subdiv2D_locate(self.ptr, pt)
+        return result.v0, result.v1, result.v2
+    end
+
+    function Subdiv2D:findNearest(t)
+        local pt = cv.Point2f(assert(t.pt))
+        
+        local result = C.Subdiv2D_findNearest(self.ptr, pt)
+        return result.point, result.val
+    end
+
+    function Subdiv2D:getEdgeList(t)        
+        return cv.unwrap_tensors(C.Subdiv2D_getEdgeList(self.ptr))
+    end
+
+    function Subdiv2D:getTriangleList(t)
+        return cv.unwrap_tensors(C.Subdiv2D_getTriangleList(self.ptr), true)
+    end
+
+    function Subdiv2D:getVoronoiFacetList(t)
+        local facetList = cv.unwrap_tensors(C.Subdiv2D_getVoronoiFacetList(self.ptr, cv.unwrap_tensors(idx)), true)
+        local facetCenters = facetList[#facetList]
+        facetList[#facetList] = nil
+        return facetCenters, facetList
+    end
+
+    function Subdiv2D:getVertex(t)
+        local result = C.Subdiv2D_getVertex(self.ptr, vertex)
+        return result.point, result.val
+    end
+
+    function Subdiv2D:getEdge(t)
+        return C.Subdiv2D_getEdge(self.ptr, edge, nextEdgeType)
+    end
+
+    function Subdiv2D:nextEdge(t)
+        return C.Subdiv2D_nextEdge(self.ptr, edge)
+    end
+
+    function Subdiv2D:rotateEdge(t)
+        return C.Subdiv2D_rotateEdge(self.ptr, edge, rotate)
+    end
+
+    function Subdiv2D:symEdge(t)
+        return C.Subdiv2D_symEdge(self.ptr, edge)
+    end
+
+    function Subdiv2D:edgeOrg(t)
+        local result = C.Subdiv2D_edgeOrg(self.ptr, edge)
+        return result.point, result.val
+    end
+
+    function Subdiv2D:edgeDst(t)
+        local result = C.Subdiv2D_edgeDst(self.ptr, edge)
+        return result.point, result.val
+    end
+end
+
+-- LineIterator
+
+function cv.LineIterator(t)
+    local img = assert(t.img)
+    local pt1 = cv.Point(assert(t.pt1))
+    pt1.x = pt1.x - 1
+    pt1.y = pt1.y - 1
+    local pt2 = cv.Point(assert(t.pt2))
+    pt2.x = pt2.x - 1
+    pt2.y = pt2.y - 1
+    local connectivity = t.connectivity or 8
+    local leftToRight = t.leftToRight or false
+
+    local ptr = ffi.gc(
+        C.LineIterator_ctor(cv.wrap_tensors(img), pt1, pt2, connectivity, leftToRight),
+        C.LineIterator_dtor)
+    local count = C.LineIterator_count(ptr)
+
+    function lineIter(pos)
+        if count > 0 then
+            count = count - 1
+            result = C.LineIterator_pos(ptr)
+            C.LineIterator_incr(ptr)
+            return result
+        end
+    end
+
+    return lineIter, nil, nil
 end

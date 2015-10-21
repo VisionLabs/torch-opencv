@@ -14,7 +14,17 @@ if image:nDimension() == 0 then
 	os.exit(0)
 end
 
-cv.imshow("Original image", image)
+cv.putText{
+	img=image, 
+	text="Some text on top of the image", 
+	org={x=50, y=50},
+	fontFace=cv.FONT_HERSHEY_DUPLEX,
+	fontScale=2,
+	color={255, 255, 0},
+	thickness=3,
+}
+
+cv.imshow("Original image with text", image)
 cv.waitKey(0)
 
 -- output to another Tensor of same size & type...

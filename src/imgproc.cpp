@@ -1115,7 +1115,7 @@ extern "C" struct TensorWrapper pyrMeanShiftFiltering(
 
 extern "C" void grabCut(
         struct TensorWrapper img, struct TensorWrapper mask,
-        RectWrapper rect, struct TensorWrapper bgdModel,
+        struct RectWrapper rect, struct TensorWrapper bgdModel,
         struct TensorWrapper fgdModel, int iterCount, int mode)
 {
     cv::grabCut(
@@ -1198,4 +1198,945 @@ extern "C" struct TensorWrapper cvtColor(
         cv::cvtColor(src.toMat(), dst.toMat(), code, dstCn);
     }
     return dst;
+}
+
+extern "C"
+struct TensorWrapper demosaicing(
+        struct TensorWrapper _src, struct TensorWrapper _dst, int code, int dcn)
+{
+    if (_dst.isNull()) {
+        cv::Mat retval;
+        cv::demosaicing(_src.toMat(), retval, code, dcn);
+        return TensorWrapper(retval);
+    } else if (_src.tensorPtr == _dst.tensorPtr) {
+        cv::Mat source = _src.toMat();
+        cv::demosaicing(source, source, code, dcn);
+    } else {
+        cv::demosaicing(_src.toMat(), _dst.toMat(), code, dcn);
+    }
+    return _dst;
+}
+
+extern "C"
+struct MomentsWrapper moments(
+        struct TensorWrapper array, bool binaryImage)
+{
+    return cv::moments(array.toMat(), binaryImage);
+}
+
+extern "C"
+struct DoubleArray HuMoments(struct MomentsWrapper m)
+{
+    DoubleArray retval;
+    retval.size = 7;
+    retval.data = static_cast<double *>(malloc(retval.size * sizeof(double)));
+    cv::HuMoments(m, retval.data);
+    return retval;
+}
+
+extern "C"
+struct TensorWrapper matchTemplate(
+        struct TensorWrapper image, struct TensorWrapper templ, struct TensorWrapper result, int method, struct TensorWrapper mask)
+{
+    if (result.isNull()) {
+        cv::Mat retval;
+        cv::matchTemplate(image.toMat(), templ.toMat(), retval, method, TO_MAT_OR_NOARRAY(mask));
+        return TensorWrapper(retval);
+    } else if (image.tensorPtr == result.tensorPtr) {
+        cv::Mat source = image.toMat();
+        cv::matchTemplate(source, templ.toMat(), source, method, TO_MAT_OR_NOARRAY(mask));
+    } else {
+        cv::matchTemplate(image.toMat(), templ.toMat(), result.toMat(), method, TO_MAT_OR_NOARRAY(mask));
+    }
+    return result;
+}
+
+extern "C"
+struct TensorPlusInt connectedComponents(
+        struct TensorWrapper image, struct TensorWrapper labels, int connectivity, int ltype)
+{
+    TensorPlusInt retval;
+    if (labels.isNull()) {
+        cv::Mat result;
+        retval.val = cv::connectedComponents(image.toMat(), result, connectivity, ltype);
+        new (&retval.tensor) TensorWrapper(result);
+    } else if (image.tensorPtr == labels.tensorPtr) {
+        cv::Mat source = image.toMat();
+        retval.val = cv::connectedComponents(source, source, connectivity, ltype);
+        retval.tensor = labels;
+    } else {
+        retval.val = cv::connectedComponents(image.toMat(), labels.toMat(), connectivity, ltype);
+        retval.tensor = labels;
+    }
+    return retval;
+}
+
+extern "C"
+struct TensorArrayPlusInt connectedComponentsWithStats(
+        struct TensorWrapper image, struct TensorArray outputTensors, int connectivity, int ltype)
+{
+    std::vector<cv::Mat> output(outputTensors);
+    TensorArrayPlusInt retval;
+    retval.val = cv::connectedComponentsWithStats(
+            image.toMat(), output[0], output[1], output[2], connectivity, ltype);
+    retval.tensors = TensorArray(output);
+    return retval;
+}
+
+extern "C"
+struct TensorArray findContours(
+        struct TensorWrapper image, bool withHierarchy, struct TensorWrapper hierarchy, int mode, int method, struct PointWrapper offset)
+{
+    std::vector<cv::Mat> retval;
+    if (withHierarchy) {
+        if (hierarchy.isNull()) {
+            cv::Mat hierarchyMat;
+            cv::findContours(image.toMat(), retval, hierarchyMat, mode, method, offset);
+            retval.push_back(hierarchyMat);
+        } else {
+            cv::findContours(image.toMat(), retval, hierarchy.toMat(), mode, method, offset);
+        }
+    } else {
+        cv::findContours(image.toMat(), retval, mode, method, offset);
+    }
+    return TensorArray(retval);
+}
+
+extern "C"
+struct TensorWrapper approxPolyDP(
+        struct TensorWrapper curve, struct TensorWrapper approxCurve, double epsilon, bool closed)
+{
+    if (approxCurve.isNull()) {
+        cv::Mat retval;
+        cv::approxPolyDP(curve.toMat(), retval, epsilon, closed);
+        return TensorWrapper(retval);
+    } else {
+        cv::approxPolyDP(curve.toMat(), approxCurve.toMat(), epsilon, closed);
+        return approxCurve;
+    }
+}
+
+extern "C"
+double arcLength(
+        struct TensorWrapper curve, bool closed)
+{
+    return cv::arcLength(curve.toMat(), closed);
+}
+
+extern "C"
+struct RectWrapper boundingRect(
+        struct TensorWrapper points)
+{
+    return cv::boundingRect(points.toMat());
+}
+
+extern "C"
+double contourArea(
+        struct TensorWrapper contour, bool oriented)
+{
+    cv::contourArea(contour.toMat(), oriented);
+}
+
+extern "C"
+struct RotatedRectWrapper minAreaRect(
+        struct TensorWrapper points)
+{
+    return cv::minAreaRect(points.toMat());
+}
+
+extern "C"
+struct TensorWrapper boxPoints(
+        struct RotatedRectWrapper box, struct TensorWrapper points)
+{
+    if (points.isNull()) {
+        cv::Mat retval;
+        cv::boxPoints(box, retval);
+        return retval;
+    } else {
+        cv::boxPoints(box, points.toMat());
+        return points;
+    }
+}
+
+extern "C"
+struct Vec3fWrapper minEnclosingCircle(
+        struct TensorWrapper points, struct Point2fWrapper center, float radius)
+{
+    Vec3fWrapper retval;
+    cv::Point2f temp;
+
+    cv::minEnclosingCircle(points.toMat(), temp, retval.v2);
+
+    retval.v0 = temp.x;
+    retval.v1 = temp.y;
+    return retval;
+}
+
+extern "C"
+struct TensorPlusDouble minEnclosingTriangle(
+        struct TensorWrapper points, struct TensorWrapper triangle)
+{
+    TensorPlusDouble retval;
+    if (triangle.isNull()) {
+        cv::Mat result;
+        retval.val = cv::minEnclosingTriangle(points.toMat(), result);
+        new (&retval.tensor) TensorWrapper(result);
+    } else {
+        retval.val = cv::minEnclosingTriangle(points.toMat(), triangle.toMat());
+        retval.tensor = triangle;
+    }
+    return retval;
+}
+
+extern "C"
+double matchShapes(
+        struct TensorWrapper contour1, struct TensorWrapper contour2, int method, double parameter)
+{
+    return cv::matchShapes(contour1.toMat(), contour2.toMat(), method, parameter);
+}
+
+extern "C"
+struct TensorWrapper convexHull(
+        struct TensorWrapper points, bool clockwise, bool returnPoints)
+{
+    cv::Mat retval;
+    cv::convexHull(points.toMat(), retval, clockwise, returnPoints);
+    return TensorWrapper(retval);
+}
+
+extern "C"
+struct TensorWrapper convexityDefects(
+        struct TensorWrapper contour, struct TensorWrapper convexhull)
+{
+    cv::Mat retval;
+    cv::convexityDefects(contour.toMat(), convexhull.toMat(), retval);
+    return TensorWrapper(retval);
+}
+
+extern "C"
+bool isContourConvex(
+        struct TensorWrapper contour)
+{
+    return cv::isContourConvex(contour.toMat());
+}
+
+extern "C"
+struct TensorPlusFloat intersectConvexConvex(
+        struct TensorWrapper _p1, struct TensorWrapper _p2, bool handleNested)
+{
+    TensorPlusFloat retval;
+    cv::Mat result;
+    retval.val = cv::intersectConvexConvex(_p1.toMat(), _p2.toMat(), result, handleNested);
+    new (&retval.tensor) TensorWrapper(result);
+    return retval;
+}
+
+extern "C"
+struct RotatedRectWrapper fitEllipse(
+        struct TensorWrapper points)
+{
+    return cv::fitEllipse(points.toMat());
+}
+
+extern "C"
+struct TensorWrapper fitLine(
+        struct TensorWrapper points, int distType, double param, double reps, double aeps)
+{
+    cv::Mat retval;
+    cv::fitLine(points.toMat(), retval, distType, param, reps, aeps);
+    return TensorWrapper(retval);
+}
+
+extern "C"
+double pointPolygonTest(
+        struct TensorWrapper contour, struct Point2fWrapper pt, bool measureDist)
+{
+    return cv::pointPolygonTest(contour.toMat(), pt, measureDist);
+}
+
+extern "C"
+struct TensorWrapper rotatedRectangleIntersection(
+        struct RotatedRectWrapper rect1, struct RotatedRectWrapper rect2)
+{
+    cv::Mat retval;
+    cv::rotatedRectangleIntersection(rect1, rect2, retval);
+    return TensorWrapper(retval);
+}
+
+extern "C"
+struct TensorWrapper blendLinear(
+        struct TensorWrapper src1, struct TensorWrapper src2, struct TensorWrapper weights1, struct TensorWrapper weights2, struct TensorWrapper dst)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        cv::blendLinear(src1.toMat(), src2.toMat(), weights1.toMat(), weights2.toMat(), retval);
+        return TensorWrapper(retval);
+    } else {
+        cv::blendLinear(src1.toMat(), src2.toMat(), weights1.toMat(), weights2.toMat(), dst.toMat());
+        return dst;
+    }
+}
+
+extern "C"
+struct TensorWrapper applyColorMap(
+        struct TensorWrapper src, struct TensorWrapper dst, int colormap)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        cv::applyColorMap(src.toMat(), retval, colormap);
+        return TensorWrapper(retval);
+    } else {
+        cv::applyColorMap(src.toMat(), dst.toMat(), colormap);
+        return dst;
+    }
+}
+
+extern "C"
+void line(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2, struct ScalarWrapper color, int thickness, int lineType, int shift)
+{
+    cv::line(img.toMat(), pt1, pt2, color, thickness, lineType, shift);
+}
+
+extern "C"
+void arrowedLine(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2, struct ScalarWrapper color, int thickness, int line_type, int shift, double tipLength)
+{
+    cv::arrowedLine(img.toMat(), pt1, pt2, color, thickness, line_type, shift, tipLength);
+}
+
+extern "C"
+void rectangle(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2, struct ScalarWrapper color, int thickness, int lineType, int shift)
+{
+    cv::rectangle(img.toMat(), pt1, pt2, color, thickness, lineType, shift);
+}
+
+extern "C"
+void rectanglePts(
+        struct TensorWrapper img, struct RectWrapper rec, struct ScalarWrapper color, int thickness, int lineType, int shift)
+{
+    cv::Mat imgMat(img);
+    cv::rectangle(imgMat, rec, color, thickness, lineType, shift);
+}
+
+extern "C"
+void circle(
+        struct TensorWrapper img, struct PointWrapper center, int radius, struct ScalarWrapper color, int thickness, int lineType, int shift)
+{
+    cv::circle(img.toMat(), center, radius, color, thickness, lineType, shift);
+}
+
+extern "C"
+void ellipse(
+        struct TensorWrapper img, struct PointWrapper center, struct SizeWrapper axes, double angle, double startAngle, double endAngle, struct ScalarWrapper color, int thickness, int lineType, int shift)
+{
+    cv::ellipse(img.toMat(), center, axes, angle, startAngle, endAngle, color, thickness, lineType, shift);
+}
+
+extern "C"
+void ellipseFromRect(
+        struct TensorWrapper img, struct RotatedRectWrapper box, struct ScalarWrapper color, int thickness, int lineType)
+{
+    cv::ellipse(img.toMat(), box, color, thickness, lineType);
+}
+
+extern "C"
+void fillConvexPoly(
+        struct TensorWrapper img, struct TensorWrapper points, struct ScalarWrapper color, int lineType, int shift)
+{
+    cv::Mat imgMat(img);
+    cv::fillConvexPoly(imgMat, points.toMat(), color, lineType, shift);
+}
+
+extern "C"
+void fillPoly(
+        struct TensorWrapper img, struct TensorArray pts, struct ScalarWrapper color, int lineType, int shift, struct PointWrapper offset)
+{
+    cv::fillPoly(img.toMat(), pts.toMatList(), color, lineType, shift, offset);
+}
+
+extern "C"
+void polylines(
+        struct TensorWrapper img, struct TensorArray pts, bool isClosed, struct ScalarWrapper color, int thickness, int lineType, int shift)
+{
+    cv::polylines(img.toMat(), pts.toMatList(), isClosed, color, thickness, lineType, shift);
+}
+
+extern "C"
+void drawContours(
+        struct TensorWrapper image, struct TensorArray contours, int contourIdx, struct ScalarWrapper color, int thickness, int lineType, struct TensorWrapper hierarchy, int maxLevel, struct PointWrapper offset)
+{
+    cv::drawContours(image.toMat(), contours.toMatList(), contourIdx, color, thickness, lineType, TO_MAT_OR_NOARRAY(hierarchy), maxLevel, offset);
+}
+
+extern "C"
+struct ScalarPlusBool clipLineSize(
+        struct SizeWrapper imgSize, struct PointWrapper pt1, struct PointWrapper pt2)
+{
+    ScalarPlusBool retval;
+    cv::Point temp1(pt1), temp2(pt2);
+    retval.val = cv::clipLine(imgSize, temp1, temp2);
+    retval.scalar.v0 = temp1.x;
+    retval.scalar.v1 = temp1.y;
+    retval.scalar.v2 = temp2.x;
+    retval.scalar.v3 = temp2.y;
+    return retval;
+}
+
+extern "C"
+struct ScalarPlusBool clipLineRect(
+        struct RectWrapper imgRect, struct PointWrapper pt1, struct PointWrapper pt2)
+{
+    ScalarPlusBool retval;
+    cv::Point temp1(pt1), temp2(pt2);
+    retval.val = cv::clipLine(imgRect, temp1, temp2);
+    retval.scalar.v0 = temp1.x;
+    retval.scalar.v1 = temp1.y;
+    retval.scalar.v2 = temp2.x;
+    retval.scalar.v3 = temp2.y;
+    return retval;
+}
+
+extern "C"
+struct TensorWrapper ellipse2Poly(
+        struct PointWrapper center, struct SizeWrapper axes, int angle, int arcStart, int arcEnd, int delta)
+{
+    std::vector<cv::Point> result;
+    cv::ellipse2Poly(center, axes, angle, arcStart, arcEnd, delta, result);
+    return TensorWrapper(cv::Mat(result));
+}
+
+extern "C"
+void putText(
+        struct TensorWrapper img, const char *text, struct PointWrapper org, int fontFace, double fontScale, struct ScalarWrapper color, int thickness, int lineType, bool bottomLeftOrigin)
+{
+    cv::putText(img.toMat(), text, org, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin);
+}
+
+extern "C"
+struct SizePlusInt getTextSize(
+        const char *text, int fontFace, double fontScale, int thickness)
+{
+    SizePlusInt retval;
+    retval.size = cv::getTextSize(text, fontFace, fontScale, thickness, &retval.val);
+    return retval;
+}
+
+/****************** Algorithms ******************/
+
+// GeneralizedHough
+
+extern "C"
+void GeneralizedHough_setTemplate(
+        GeneralizedHoughPtr ptr, struct TensorWrapper templ, struct PointWrapper templCenter)
+{
+    ptr->setTemplate(templ.toMat(), templCenter);
+}
+
+extern "C"
+void GeneralizedHough_setTemplate_edges(
+        GeneralizedHoughPtr ptr, struct TensorWrapper edges, struct TensorWrapper dx,
+        struct TensorWrapper dy, struct PointWrapper templCenter)
+{
+    ptr->setTemplate(edges.toMat(), dx.toMat(), dy.toMat(), templCenter);
+}
+
+extern "C"
+struct TensorArray GeneralizedHough_detect(
+        GeneralizedHoughPtr ptr, struct TensorWrapper image, struct TensorWrapper positions, bool votes)
+{
+    std::vector<cv::Mat> retval(1 + votes);
+    if (!positions.isNull()) retval[0] = positions;
+    ptr->detect(image.toMat(), retval[0], votes ? retval[1] : cv::noArray());
+    return TensorArray(retval);
+}
+
+extern "C"
+struct TensorArray GeneralizedHough_detect_edges(
+        GeneralizedHoughPtr ptr, struct TensorWrapper edges, struct TensorWrapper dx,
+        struct TensorWrapper dy, struct TensorWrapper positions, bool votes)
+{
+    std::vector<cv::Mat> retval(1 + votes);
+    if (!positions.isNull()) retval[0] = positions;
+    ptr->detect(edges.toMat(), dx.toMat(), dy.toMat(), retval[0], votes ? retval[1] : cv::noArray());
+    return TensorArray(retval);
+}
+
+extern "C"
+void GeneralizedHough_setCannyLowThresh(GeneralizedHoughPtr ptr, int cannyLowThresh)
+{
+    ptr->setCannyLowThresh(cannyLowThresh);
+}
+
+extern "C"
+int GeneralizedHough_getCannyLowThresh(GeneralizedHoughPtr ptr)
+{
+    return ptr->getCannyLowThresh();
+}
+
+extern "C"
+void GeneralizedHough_setCannyHighThresh(GeneralizedHoughPtr ptr, int cannyHighThresh)
+{
+    ptr->setCannyHighThresh(cannyHighThresh);
+}
+
+extern "C"
+int GeneralizedHough_getCannyHighThresh(GeneralizedHoughPtr ptr)
+{
+    return ptr->getCannyHighThresh();
+}
+
+extern "C"
+void GeneralizedHough_setMinDist(GeneralizedHoughPtr ptr, double MinDist)
+{
+    ptr->setMinDist(MinDist);
+}
+
+extern "C"
+double GeneralizedHough_getMinDist(GeneralizedHoughPtr ptr)
+{
+    return ptr->getMinDist();
+}
+
+extern "C"
+void GeneralizedHough_setDp(GeneralizedHoughPtr ptr, double Dp)
+{
+    ptr->setDp(Dp);
+}
+
+extern "C"
+double GeneralizedHough_getDp(GeneralizedHoughPtr ptr)
+{
+    return ptr->getDp();
+}
+
+extern "C"
+void GeneralizedHough_setMaxBufferSize(GeneralizedHoughPtr ptr, int MaxBufferSize)
+{
+    ptr->setMaxBufferSize(MaxBufferSize);
+}
+
+extern "C"
+int GeneralizedHough_getMaxBufferSize(GeneralizedHoughPtr ptr)
+{
+    return ptr->getMaxBufferSize();
+}
+
+// GeneralizedHoughBallard
+
+extern "C"
+struct GeneralizedHoughBallardPtr GeneralizedHoughBallard_ctor() {
+    return cv::createGeneralizedHoughBallard().get();
+}
+
+extern "C"
+void GeneralizedHoughBallard_setLevels(GeneralizedHoughBallardPtr ptr, double Levels)
+{
+    ptr->setLevels(Levels);
+}
+
+extern "C"
+double GeneralizedHoughBallard_getLevels(GeneralizedHoughBallardPtr ptr)
+{
+    return ptr->getLevels();
+}
+
+extern "C"
+void GeneralizedHoughBallard_setVotesThreshold(GeneralizedHoughBallardPtr ptr, double votesThreshold)
+{
+    ptr->setVotesThreshold(votesThreshold);
+}
+
+extern "C"
+double GeneralizedHoughBallard_getVotesThreshold(GeneralizedHoughBallardPtr ptr)
+{
+    return ptr->getVotesThreshold();
+}
+
+// GeneralizedHoughGuil
+
+extern "C"
+struct GeneralizedHoughGuilPtr GeneralizedHoughGuil_ctor() {
+    return cv::createGeneralizedHoughGuil().get();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setLevels(GeneralizedHoughGuilPtr ptr, int levels)
+{
+    ptr->setLevels(levels);
+}
+
+extern "C"
+int GeneralizedHoughGuil_getLevels(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getLevels();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setAngleEpsilon(GeneralizedHoughGuilPtr ptr, double AngleEpsilon)
+{
+    ptr->setAngleEpsilon(AngleEpsilon);
+}
+
+extern "C"
+double GeneralizedHoughGuil_getAngleEpsilon(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getAngleEpsilon();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setMinAngle(GeneralizedHoughGuilPtr ptr, double MinAngle)
+{
+    ptr->setMinAngle(MinAngle);
+}
+
+extern "C"
+double GeneralizedHoughGuil_getMinAngle(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getMinAngle();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setMaxAngle(GeneralizedHoughGuilPtr ptr, double MaxAngle)
+{
+    ptr->setMaxAngle(MaxAngle);
+}
+
+extern "C"
+double GeneralizedHoughGuil_getMaxAngle(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getMaxAngle();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setAngleStep(GeneralizedHoughGuilPtr ptr, double AngleStep)
+{
+    ptr->setAngleStep(AngleStep);
+}
+
+extern "C"
+double GeneralizedHoughGuil_getAngleStep(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getAngleStep();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setAngleThresh(GeneralizedHoughGuilPtr ptr, int AngleThresh)
+{
+    ptr->setAngleThresh(AngleThresh);
+}
+
+extern "C"
+int GeneralizedHoughGuil_getAngleThresh(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getAngleThresh();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setMinScale(GeneralizedHoughGuilPtr ptr, double MinScale)
+{
+    ptr->setMinScale(MinScale);
+}
+
+extern "C"
+double GeneralizedHoughGuil_getMinScale(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getMinScale();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setMaxScale(GeneralizedHoughGuilPtr ptr, double MaxScale)
+{
+    ptr->setMaxScale(MaxScale);
+}
+
+extern "C"
+double GeneralizedHoughGuil_getMaxScale(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getMaxScale();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setScaleStep(GeneralizedHoughGuilPtr ptr, double ScaleStep)
+{
+    ptr->setScaleStep(ScaleStep);
+}
+
+extern "C"
+double GeneralizedHoughGuil_getScaleStep(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getScaleStep();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setScaleThresh(GeneralizedHoughGuilPtr ptr, int ScaleThresh)
+{
+    ptr->setScaleThresh(ScaleThresh);
+}
+
+extern "C"
+int GeneralizedHoughGuil_getScaleThresh(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getScaleThresh();
+}
+
+extern "C"
+void GeneralizedHoughGuil_setPosThresh(GeneralizedHoughGuilPtr ptr, int PosThresh)
+{
+    ptr->setPosThresh(PosThresh);
+}
+
+extern "C"
+int GeneralizedHoughGuil_getPosThresh(GeneralizedHoughGuilPtr ptr)
+{
+    return ptr->getPosThresh();
+}
+
+// CLAHE
+
+extern "C"
+struct CLAHEPtr CLAHE_ctor() {
+    return cv::createCLAHE().get();
+}
+
+extern "C"
+void CLAHE_setClipLimit(CLAHEPtr ptr, double ClipLimit)
+{
+    ptr->setClipLimit(ClipLimit);
+}
+
+extern "C"
+double CLAHE_getClipLimit(CLAHEPtr ptr)
+{
+    return ptr->getClipLimit();
+}
+
+extern "C"
+void CLAHE_setTilesGridSize(CLAHEPtr ptr, struct SizeWrapper TilesGridSize)
+{
+    ptr->setTilesGridSize(TilesGridSize);
+}
+
+extern "C"
+struct SizeWrapper CLAHE_getTilesGridSize(CLAHEPtr ptr)
+{
+    return ptr->getTilesGridSize();
+}
+
+extern "C"
+void CLAHE_collectGarbage(CLAHEPtr ptr)
+{
+    ptr->collectGarbage();
+}
+
+// LineSegmentDetector
+
+extern "C"
+struct LineSegmentDetectorPtr LineSegmentDetector_ctor(
+        int refine, double scale, double sigma_scale, double quant,
+        double ang_th, double log_eps, double density_th, int n_bins)
+{
+    return cv::createLineSegmentDetector(
+            refine, scale, sigma_scale, quant, ang_th, log_eps, density_th, n_bins).get();
+}
+
+extern "C"
+struct TensorArray LineSegmentDetector_detect(
+        struct LineSegmentDetectorPtr ptr, struct TensorWrapper image,
+        struct TensorWrapper lines, bool width, bool prec, bool nfa)
+{
+    std::vector<cv::Mat> retval(1 + width + prec + nfa);
+    if (!lines.isNull()) retval[0] = lines;
+    ptr->detect(
+            image.toMat(), retval[0],
+            width ? retval[1] : cv::noArray(),
+            prec  ? retval[1 + width] : cv::noArray(),
+            nfa   ? retval[1 + width + prec] : cv::noArray());
+    return TensorArray(retval);
+}
+
+extern "C"
+void LineSegmentDetector_drawSegments(
+        struct LineSegmentDetectorPtr ptr, struct TensorWrapper image, struct TensorWrapper lines)
+{
+    ptr->drawSegments(image.toMat(), lines.toMat());
+}
+
+extern "C"
+int compareSegments(struct LineSegmentDetectorPtr ptr, struct SizeWrapper size, struct TensorWrapper lines1,
+                    struct TensorWrapper lines2, struct TensorWrapper image)
+{
+    return ptr->compareSegments(size, lines1.toMat(), lines2.toMat(), TO_MAT_OR_NOARRAY(image));
+}
+
+// Subdiv2D
+
+extern "C"
+struct Subdiv2DPtr Subdiv2D_ctor_default() {
+    return new cv::Subdiv2D();
+}
+
+extern "C"
+struct Subdiv2DPtr Subdiv2D_ctor(struct RectWrapper rect) {
+    return new cv::Subdiv2D(rect);
+}
+
+extern "C"
+void Subdiv2D_dtor(struct Subdiv2DPtr ptr) {
+    delete static_cast<cv::Subdiv2D *>(ptr.ptr);
+}
+
+extern "C"
+void Subdiv2D_initDelaunay(struct Subdiv2DPtr ptr, struct RectWrapper rect)
+{
+    ptr->initDelaunay(rect);
+}
+
+extern "C"
+int Subdiv2D_insert(struct Subdiv2DPtr ptr, struct Point2fWrapper pt)
+{
+    return ptr->insert(pt);
+}
+
+extern "C"
+void Subdiv2D_insert_vector(struct Subdiv2DPtr ptr, struct TensorWrapper ptvec)
+{
+    ptr->insert(ptvec.toMat());
+}
+
+extern "C"
+struct Vec3iWrapper Subdiv2D_locate(struct Subdiv2DPtr ptr, struct Point2fWrapper pt)
+{
+    Vec3iWrapper retval;
+    retval.v0 = ptr->locate(pt, retval.v1, retval.v2);
+    return retval;
+}
+
+extern "C"
+struct Point2fPlusInt Subdiv2D_findNearest(struct Subdiv2DPtr ptr, struct Point2fWrapper pt)
+{
+    Point2fPlusInt retval;
+    cv::Point2f temp;
+    retval.val = ptr->findNearest(pt, &temp);
+    retval.point = temp;
+    return retval;
+}
+
+extern "C"
+struct TensorWrapper Subdiv2D_getEdgeList(struct Subdiv2DPtr ptr)
+{
+    auto result = new std::vector<cv::Vec4f>;
+    ptr->getEdgeList(*result);
+    return TensorWrapper(cv::Mat(*result, false));
+}
+
+
+extern "C"
+struct TensorWrapper Subdiv2D_getTriangleList(struct Subdiv2DPtr ptr)
+{
+    auto result = new std::vector<cv::Vec6f>;
+    ptr->getTriangleList(*result);
+    return TensorWrapper(cv::Mat(*result, false));
+}
+
+extern "C"
+struct TensorArray Subdiv2D_getVoronoiFacetList(struct Subdiv2DPtr ptr, struct TensorWrapper idx)
+{
+    auto facetList = new std::vector<std::vector<cv::Point2f>>;
+    auto facetCenters = new std::vector<cv::Point2f>;
+    ptr->getVoronoiFacetList(idx.toMat(), *facetList, *facetCenters);
+
+    std::vector<cv::Mat> retval(facetList->size() + 1);
+    for (int i = 0; i < facetList->size(); ++i) {
+        new (&retval[i + 1]) cv::Mat((*facetList)[i]);
+    }
+    new (&retval[retval.size() - 1]) cv::Mat(*facetCenters);
+
+    return TensorArray(retval);
+}
+
+extern "C"
+struct Point2fPlusInt Subdiv2D_getVertex(struct Subdiv2DPtr ptr, int vertex)
+{
+    Point2fPlusInt retval;
+    retval.point = ptr->getVertex(vertex, &retval.val);
+    return retval;
+}
+
+extern "C"
+int Subdiv2D_getEdge(struct Subdiv2DPtr ptr, int edge, int nextEdgeType)
+{
+    return ptr->getEdge(edge, nextEdgeType);
+}
+
+extern "C"
+int Subdiv2D_nextEdge(struct Subdiv2DPtr ptr, int edge)
+{
+    return ptr->nextEdge(edge);
+}
+
+extern "C"
+int Subdiv2D_rotateEdge(struct Subdiv2DPtr ptr, int edge, int rotate)
+{
+    return ptr->rotateEdge(edge, rotate);
+}
+
+extern "C"
+int Subdiv2D_symEdge(struct Subdiv2DPtr ptr, int edge)
+{
+    return ptr->symEdge(edge);
+}
+
+extern "C"
+struct Point2fPlusInt Subdiv2D_edgeOrg(struct Subdiv2DPtr ptr, int edge)
+{
+    Point2fPlusInt retval;
+    cv::Point2f temp;
+    retval.val = ptr->edgeOrg(edge, &temp);
+    retval.point = temp;
+    return retval;
+}
+
+extern "C"
+struct Point2fPlusInt Subdiv2D_edgeDst(struct Subdiv2DPtr ptr, int edge)
+{
+    Point2fPlusInt retval;
+    cv::Point2f temp;
+    retval.val = ptr->edgeDst(edge, &temp);
+    retval.point = temp;
+    return retval;
+}
+
+// LineIterator
+
+extern "C"
+struct LineIteratorPtr LineIterator_ctor(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2,
+        int connectivity, bool leftToRight)
+{
+    return new cv::LineIterator(img.toMat(), pt1, pt2, connectivity, leftToRight);
+}
+
+extern "C"
+void LineIterator_dtor(struct LineIteratorPtr ptr) {
+    delete static_cast<cv::LineIterator *>(ptr.ptr);
+}
+
+extern "C"
+int LineIterator_count(struct LineIteratorPtr ptr)
+{
+    return ptr->count;
+}
+
+extern "C"
+struct PointWrapper LineIterator_pos(struct LineIteratorPtr ptr)
+{
+    return ptr->pos();
+}
+
+extern "C"
+void LineIterator_incr(struct LineIteratorPtr ptr)
+{
+    ++(*static_cast<cv::LineIterator *>(ptr.ptr));
 }

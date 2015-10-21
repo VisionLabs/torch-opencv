@@ -49,6 +49,10 @@ struct Vec3dWrapper {
     double v0, v1, v2;
 };
 
+struct Vec3fWrapper {
+    float v0, v1, v2;
+};
+
 struct RectWrapper {
     int x, y, width, height;
 };
@@ -88,6 +92,11 @@ struct RectPlusInt {
     int val;
 };
 
+struct ScalarPlusBool {
+    struct ScalarWrapper scalar;
+    bool val;
+};
+
 struct IntArray {
     int *data;
     int size;
@@ -95,6 +104,11 @@ struct IntArray {
 
 struct FloatArray {
     float *data;
+    int size;
+};
+
+struct DoubleArray {
+    double *data;
     int size;
 };
 
@@ -132,6 +146,7 @@ cv = {}
 require 'cv.constants'
 
 cv.INT_MAX = C.getIntMax()
+cv.NULLPTR = ffi.new('void *', nil)
 
 --- ***************** Tensor <=> Mat conversion *****************
 
@@ -212,6 +227,9 @@ end
 function cv.unwrap_tensors(wrapper, toTable)
     if ffi.typeof(wrapper) == ffi.typeof("struct TensorWrapper") then
         -- handle single tensor
+        if wrapper.tensorPtr == nil then
+            return
+        end
         retval = empty_tensor_of_type(wrapper.typeCode)
         C.transfer_tensor(retval:cdata(), wrapper.tensorPtr)
         return retval
@@ -340,8 +358,23 @@ function cv.newArray(elemType, data)
         retval = ffi.new('struct ' .. elemType .. 'Array')
     end
     
+    if not data then
+        -- create an array with no data
+        -- here, we assume that our C function will resize the array
+        retval.data = ffi.gc(cv.NULLPTR, C.free)
+        retval.size = 0
+        return retval
+    end
+
+    if type(data) == 'number' then
+        retval.data = ffi.gc(C.malloc(data * ffi.sizeof(fullTypeName)), C.free)
+        retval.size = data
+        return retval
+    end
+
     retval.data = ffi.gc(C.malloc(#data * ffi.sizeof(fullTypeName)), C.free)
     retval.size = #data
+    
 
     if elemType:byte(3) == 46 then
         for i, value in ipairs(data) do
@@ -413,22 +446,6 @@ function cv.arrayToLua(array, outputType, output)
 
     C.free(array.data)
     return retval
-end
-
---- ***************** Classes *****************
-
-do
-    local Algorithm = torch.class('Algorithm')
-
-    function Algorithm:__init()
-        self.ptr = cv.NULLPTR
-    end
-
-    function Algorithm:clear()
-        C.algo_clear(self.ptr)
-    end
-
-
 end
 
 

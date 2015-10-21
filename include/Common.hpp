@@ -1,3 +1,4 @@
+#pragma once
 #include <opencv2/core/core.hpp>
 
 extern "C" {
@@ -100,6 +101,10 @@ struct Vec3fWrapper {
     float v0, v1, v2;
 };
 
+struct Vec3iWrapper {
+    int v0, v1, v2;
+};
+
 struct RectWrapper {
     int x, y, width, height;
 
@@ -113,6 +118,7 @@ struct PointWrapper {
     int x, y;
 
     inline operator cv::Point() { return cv::Point(x, y); }
+    PointWrapper(const cv::Point & other);
 };
 
 struct Point2fWrapper {
@@ -185,6 +191,11 @@ struct SizePlusInt {
     int val;
 };
 
+struct Point2fPlusInt {
+    struct Point2fWrapper point;
+    int val;
+};
+
 /***************** Other helper structs *****************/
 
 // Arrays
@@ -228,8 +239,3 @@ struct PointArrayOfArrays {
     int dims;
     int *sizes;
 };
-
-/***************** Algorithm *****************/
-
-extern "C"
-void algo_clear(void *ptr);
