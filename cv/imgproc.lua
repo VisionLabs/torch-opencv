@@ -2202,6 +2202,10 @@ end
 do
     local GeneralizedHoughGuil = torch.class('cv.GeneralizedHoughGuil', 'cv.GeneralizedHough')
 
+    function GeneralizedHoughGuil:__init()
+        self.ptr = ffi.gc(C.GeneralizedHoughGuil_ctor(), C.Algorithm_dtor)
+    end
+
     function GeneralizedHoughGuil:setXi(xi)
         C.GeneralizedHoughGuil_setXi(self.ptr, xi)
     end
@@ -2296,5 +2300,35 @@ do
 
     function GeneralizedHoughGuil:getPosThresh()
         return C.GeneralizedHoughGuil_getPosThresh(self.ptr)
+    end
+end
+
+-- CLAHE
+
+do
+    local CLAHE = torch.class('cv.CLAHE', 'cv.Algorithm')
+
+    function CLAHE:__init()
+        self.ptr = ffi.gc(C.CLAHE_ctor(), C.Algorithm_dtor)
+    end
+
+    function CLAHE:setClipLimit(clipLimit)
+        C.CLAHE_setClipLimit(self.ptr, clipLimit)
+    end
+
+    function CLAHE:getClipLimit()
+        return C.CLAHE_getClipLimit()
+    end
+
+    function CLAHE:setTileGridSize(tileGridSize)
+        C.CLAHE_setTileGridSize(self.ptr, TileGridSize)
+    end
+
+    function CLAHE:getTileGridSize()
+        return C.CLAHE_getTileGridSize()
+    end
+
+    function CLAHE:collectGarbage()
+        C.CLAHE_collectGarbage()
     end
 end

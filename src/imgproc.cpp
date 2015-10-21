@@ -1739,6 +1739,7 @@ struct GeneralizedHoughBallardPtr {
     inline GeneralizedHoughBallardPtr(cv::GeneralizedHoughBallard *ptr) { this->ptr = ptr; }
 };
 
+extern "C"
 struct GeneralizedHoughBallardPtr GeneralizedHoughBallard_ctor() {
     return cv::createGeneralizedHoughBallard().get();
 }
@@ -1776,6 +1777,7 @@ struct GeneralizedHoughGuilPtr {
     inline GeneralizedHoughGuilPtr(cv::GeneralizedHoughGuil *ptr) { this->ptr = ptr; }
 };
 
+extern "C"
 struct GeneralizedHoughGuilPtr GeneralizedHoughGuil_ctor() {
     return cv::createGeneralizedHoughGuil().get();
 }
@@ -1913,3 +1915,47 @@ int GeneralizedHoughGuil_getPosThresh(GeneralizedHoughGuilPtr ptr)
 }
 
 // CLAHE
+
+struct CLAHEPtr {
+    void *ptr;
+
+    inline cv::CLAHE * operator->() { return static_cast<cv::CLAHE *>(ptr); }
+    inline CLAHEPtr(cv::CLAHE *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+struct CLAHEPtr CLAHE_ctor() {
+    return cv::createCLAHE().get();
+}
+
+extern "C"
+void CLAHE_setClipLimit(CLAHEPtr ptr, double ClipLimit)
+{
+    ptr->setClipLimit(ClipLimit);
+}
+
+extern "C"
+double CLAHE_getClipLimit(CLAHEPtr ptr)
+{
+    return ptr->getClipLimit();
+}
+
+extern "C"
+void CLAHE_setTilesGridSize(CLAHEPtr ptr, struct SizeWrapper TilesGridSize)
+{
+    ptr->setTilesGridSize(TilesGridSize);
+}
+
+extern "C"
+struct SizeWrapper CLAHE_getTilesGridSize(CLAHEPtr ptr)
+{
+    return ptr->getTilesGridSize();
+}
+
+extern "C"
+void CLAHE_collectGarbage(CLAHEPtr ptr)
+{
+    ptr->collectGarbage();
+}
+
+// LineSegmentDetector

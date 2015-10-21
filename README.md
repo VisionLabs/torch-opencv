@@ -1,7 +1,7 @@
 imgproc module branch
 =====================
 
-**Roughly 87% completed**
+**Roughly 89% completed**
 
 Unstable pieces of code (to be tested):
 
@@ -11,7 +11,6 @@ Unstable pieces of code (to be tested):
 *To be implemented:*
 
 **Class-based stuff including algorithms:**
-* CLAHE
 * LineSegmentDetector
 * Subdiv2D
 * LineIterator
@@ -28,6 +27,7 @@ Unstable pieces of code (to be tested):
 * GeneralizedHough
 * GeneralizedHoughBallard
 * GeneralizedHoughGuil
+* CLAHE
 
 **Separate functions (filters, detectors, ...):**
 * getGaussianKernel
@@ -141,4 +141,4 @@ Unstable pieces of code (to be tested):
 * ellipse2Poly
 * getTextSize
 
-122/141
+126/141
