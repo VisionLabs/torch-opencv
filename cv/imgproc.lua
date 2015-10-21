@@ -2384,3 +2384,99 @@ do
             self.ptr, cv.wrap_tensors(lines1), cv.wrap_tensors(lines2), cv.wrap_tensors(image))
     end
 end
+
+-- Subdiv2D
+
+do
+    local Subdiv2D = torch.class('cv.Subdiv2D')
+
+    function Subdiv2D:__init(t)
+        local rect = cv.Rect(t.rect)
+
+        if rect then
+            self.ptr = ffi.gc(C.Subdiv2D_ctor(cv.Rect(rect)), C.Subdiv2D_dtor)
+        else
+            self.ptr = ffi.gc(C.Subdiv2D_ctor_default(), C.Subdiv2D_dtor)
+        end
+    end
+
+    function Subdiv2D:initDelaunay(t)
+        local rect = cv.Rect(assert(t.rect))
+
+        C.Subdiv2D_initDelaunay(self.ptr, rect)
+    end
+
+    function Subdiv2D:insert(t)
+        local pt = t.pt
+        local ptvec = t.ptvec
+        
+        if pt then
+            return C.Subdiv2D_insert(cv.Point2f(pt))
+        else
+            if type(ptvec) == "table" then
+                ptvec = torch.FloatTensor(ptvec)
+            end
+            C.Subdiv2D_insert_vector(self.ptr, cv.wrap_tensors(ptvec))
+        end
+    end
+
+    function Subdiv2D:locate(t)
+        local pt = cv.Point2f(assert(t.pt))
+        
+        result = C.Subdiv2D_locate(self.ptr, pt)
+        return result.v0, result.v1, result.v2
+    end
+
+    function Subdiv2D:findNearest(t)
+        local pt = cv.Point2f(assert(t.pt))
+        
+        result = C.Subdiv2D_findNearest(self.ptr, pt)
+        return result.point, result.val
+    end
+
+    function Subdiv2D:getEdgeList(t)        
+        return cv.unwrap_tensors(C.Subdiv2D_getEdgeList(self.ptr))
+    end
+
+    function Subdiv2D:getTriangleList(t)
+        return cv.unwrap_tensors(C.Subdiv2D_getTriangleList(self.ptr), true)
+    end
+
+    function Subdiv2D:getVoronoiFacetList(t)
+        facetList = cv.unwrap_tensors(C.Subdiv2D_getVoronoiFacetList(self.ptr, cv.unwrap_tensors(idx)), true)
+        facetCenters = facetList[#facetList]
+        facetList[#facetList] = nil
+        return facetCenters, facetList
+    end
+
+    function Subdiv2D:getVertex(t)
+        result = C.Subdiv2D_getVertex(self.ptr, vertex)
+        return result.point, result.val
+    end
+
+    function Subdiv2D:getEdge(t)
+        return C.Subdiv2D_getEdge(self.ptr, edge, nextEdgeType)
+    end
+
+    function Subdiv2D:nextEdge(t)
+        return C.Subdiv2D_nextEdge(self.ptr, edge)
+    end
+
+    function Subdiv2D:rotateEdge(t)
+        return C.Subdiv2D_rotateEdge(self.ptr, edge, rotate)
+    end
+
+    function Subdiv2D:symEdge(t)
+        return C.Subdiv2D_symEdge(self.ptr, edge)
+    end
+
+    function Subdiv2D:edgeOrg(t)
+        result = C.Subdiv2D_edgeOrg(self.ptr, edge)
+        return result.point, result.val
+    end
+
+    function Subdiv2D:edgeDst(t)
+        result = C.Subdiv2D_edgeDst(self.ptr, edge)
+        return result.point, result.val
+    end
+end

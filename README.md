@@ -1,17 +1,19 @@
 imgproc module branch
 =====================
 
-**Roughly 92% completed**
+**Roughly 95% completed**
 
 Unstable pieces of code (to be tested):
 
 * undistort (how should it work? please test if it's correct)
 * grabCut (same thing)
+* Subdiv2D:getTriangleList
+* Subdiv2D:getEdgeList
+* Subdiv2D:getVoronoiFacetList
 
 *To be implemented:*
 
 **Class-based stuff including algorithms:**
-* Subdiv2D
 * LineIterator
 
 **Separate functions (filters, detectors, ...):**
@@ -28,6 +30,7 @@ Unstable pieces of code (to be tested):
 * GeneralizedHoughGuil
 * CLAHE
 * LineSegmentDetector
+* Subdiv2D
 
 **Separate functions (filters, detectors, ...):**
 * getGaussianKernel
@@ -141,4 +144,4 @@ Unstable pieces of code (to be tested):
 * ellipse2Poly
 * getTextSize
 
-130/141
+134/141

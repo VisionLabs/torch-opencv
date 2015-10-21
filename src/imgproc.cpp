@@ -2005,3 +2005,147 @@ int compareSegments(struct LineSegmentDetectorPtr ptr, struct SizeWrapper size, 
     return ptr->compareSegments(size, lines1.toMat(), lines2.toMat(), TO_MAT_OR_NOARRAY(image));
 }
 
+// Subdiv2D
+
+struct Subdiv2DPtr {
+    void *ptr;
+
+    inline cv::Subdiv2D * operator->() { return static_cast<cv::Subdiv2D *>(ptr); }
+    inline Subdiv2DPtr(cv::Subdiv2D *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+struct Subdiv2DPtr Subdiv2D_ctor_default() {
+    return new cv::Subdiv2D();
+}
+
+extern "C"
+struct Subdiv2DPtr Subdiv2D_ctor(struct RectWrapper rect) {
+    return new cv::Subdiv2D(rect);
+}
+
+extern "C"
+void Subdiv2D_dtor(struct Subdiv2DPtr ptr) {
+    delete static_cast<cv::Subdiv2D *>(ptr.ptr);
+}
+
+extern "C"
+void Subdiv2D_initDelaunay(struct Subdiv2DPtr ptr, struct RectWrapper rect)
+{
+    ptr->initDelaunay(rect);
+}
+
+extern "C"
+int Subdiv2D_insert(struct Subdiv2DPtr ptr, struct Point2fWrapper pt)
+{
+    return ptr->insert(pt);
+}
+
+extern "C"
+void Subdiv2D_insert_vector(struct Subdiv2DPtr ptr, struct TensorWrapper ptvec)
+{
+    ptr->insert(ptvec.toMat());
+}
+
+extern "C"
+struct Vec3iWrapper Subdiv2D_locate(struct Subdiv2DPtr ptr, struct Point2fWrapper pt)
+{
+    Vec3iWrapper retval;
+    retval.v0 = ptr->locate(pt, retval.v1, retval.v2);
+    return retval;
+}
+
+extern "C"
+struct Point2fPlusInt Subdiv2D_findNearest(struct Subdiv2DPtr ptr, struct Point2fWrapper pt)
+{
+    Point2fPlusInt retval;
+    cv::Point2f temp;
+    retval.val = ptr->findNearest(pt, &temp);
+    retval.point = temp;
+    return retval;
+}
+
+extern "C"
+struct TensorWrapper Subdiv2D_getEdgeList(struct Subdiv2DPtr ptr)
+{
+    auto result = new std::vector<cv::Vec4f>;
+    ptr->getEdgeList(*result);
+    return TensorWrapper(cv::Mat(*result, false));
+}
+
+
+extern "C"
+struct TensorWrapper Subdiv2D_getTriangleList(struct Subdiv2DPtr ptr)
+{
+    auto result = new std::vector<cv::Vec6f>;
+    ptr->getTriangleList(*result);
+    return TensorWrapper(cv::Mat(*result, false));
+}
+
+extern "C"
+struct TensorArray Subdiv2D_getVoronoiFacetList(struct Subdiv2DPtr ptr, struct TensorWrapper idx)
+{
+    auto facetList = new std::vector<std::vector<cv::Point2f>>;
+    auto facetCenters = new std::vector<cv::Point2f>;
+    ptr->getVoronoiFacetList(idx.toMat(), *facetList, *facetCenters);
+
+    std::vector<cv::Mat> retval(facetList->size() + 1);
+    for (int i = 0; i < facetList->size(); ++i) {
+        new (&retval[i + 1]) cv::Mat((*facetList)[i]);
+    }
+    new (&retval[retval.size() - 1]) cv::Mat(*facetCenters);
+
+    return TensorArray(retval);
+}
+
+extern "C"
+struct Point2fPlusInt Subdiv2D_getVertex(struct Subdiv2DPtr ptr, int vertex)
+{
+    Point2fPlusInt retval;
+    retval.point = ptr->getVertex(vertex, &retval.val);
+    return retval;
+}
+
+extern "C"
+int Subdiv2D_getEdge(struct Subdiv2DPtr ptr, int edge, int nextEdgeType)
+{
+    return ptr->getEdge(edge, nextEdgeType);
+}
+
+extern "C"
+int Subdiv2D_nextEdge(struct Subdiv2DPtr ptr, int edge)
+{
+    return ptr->nextEdge(edge);
+}
+
+extern "C"
+int Subdiv2D_rotateEdge(struct Subdiv2DPtr ptr, int edge, int rotate)
+{
+    return ptr->rotateEdge(edge, rotate);
+}
+
+extern "C"
+int Subdiv2D_symEdge(struct Subdiv2DPtr ptr, int edge)
+{
+    return ptr->symEdge(edge);
+}
+
+extern "C"
+struct Point2fPlusInt Subdiv2D_edgeOrg(struct Subdiv2DPtr ptr, int edge)
+{
+    Point2fPlusInt retval;
+    cv::Point2f temp;
+    retval.val = ptr->edgeOrg(edge, &temp);
+    retval.point = temp;
+    return retval;
+}
+
+extern "C"
+struct Point2fPlusInt Subdiv2D_edgeDst(struct Subdiv2DPtr ptr, int edge)
+{
+    Point2fPlusInt retval;
+    cv::Point2f temp;
+    retval.val = ptr->edgeDst(edge, &temp);
+    retval.point = temp;
+    return retval;
+}
