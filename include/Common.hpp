@@ -118,6 +118,7 @@ struct PointWrapper {
     int x, y;
 
     inline operator cv::Point() { return cv::Point(x, y); }
+    PointWrapper(const cv::Point & other);
 };
 
 struct Point2fWrapper {

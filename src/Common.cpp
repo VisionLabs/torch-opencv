@@ -188,6 +188,11 @@ Size2fWrapper::Size2fWrapper(const cv::Size2f &other){
     this->width = other.width;
 }
 
+PointWrapper::PointWrapper(const cv::Point & other) {
+    this->x = other.x;
+    this->y = other.y;
+}
+
 Point2fWrapper::Point2fWrapper(const cv::Point2f &other) {
     this->x = other.x;
     this->y = other.y;

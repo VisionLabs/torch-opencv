@@ -1627,13 +1627,6 @@ struct SizePlusInt getTextSize(
 
 // GeneralizedHough
 
-struct GeneralizedHoughPtr {
-    void *ptr;
-
-    inline cv::GeneralizedHough * operator->() { return static_cast<cv::GeneralizedHough *>(ptr); }
-    inline GeneralizedHoughPtr(cv::GeneralizedHough *ptr) { this->ptr = ptr; }
-};
-
 extern "C"
 void GeneralizedHough_setTemplate(
         GeneralizedHoughPtr ptr, struct TensorWrapper templ, struct PointWrapper templCenter)
@@ -1732,13 +1725,6 @@ int GeneralizedHough_getMaxBufferSize(GeneralizedHoughPtr ptr)
 
 // GeneralizedHoughBallard
 
-struct GeneralizedHoughBallardPtr {
-    void *ptr;
-
-    inline cv::GeneralizedHoughBallard * operator->() { return static_cast<cv::GeneralizedHoughBallard *>(ptr); }
-    inline GeneralizedHoughBallardPtr(cv::GeneralizedHoughBallard *ptr) { this->ptr = ptr; }
-};
-
 extern "C"
 struct GeneralizedHoughBallardPtr GeneralizedHoughBallard_ctor() {
     return cv::createGeneralizedHoughBallard().get();
@@ -1769,13 +1755,6 @@ double GeneralizedHoughBallard_getVotesThreshold(GeneralizedHoughBallardPtr ptr)
 }
 
 // GeneralizedHoughGuil
-
-struct GeneralizedHoughGuilPtr {
-    void *ptr;
-
-    inline cv::GeneralizedHoughGuil * operator->() { return static_cast<cv::GeneralizedHoughGuil *>(ptr); }
-    inline GeneralizedHoughGuilPtr(cv::GeneralizedHoughGuil *ptr) { this->ptr = ptr; }
-};
 
 extern "C"
 struct GeneralizedHoughGuilPtr GeneralizedHoughGuil_ctor() {
@@ -1916,13 +1895,6 @@ int GeneralizedHoughGuil_getPosThresh(GeneralizedHoughGuilPtr ptr)
 
 // CLAHE
 
-struct CLAHEPtr {
-    void *ptr;
-
-    inline cv::CLAHE * operator->() { return static_cast<cv::CLAHE *>(ptr); }
-    inline CLAHEPtr(cv::CLAHE *ptr) { this->ptr = ptr; }
-};
-
 extern "C"
 struct CLAHEPtr CLAHE_ctor() {
     return cv::createCLAHE().get();
@@ -1959,13 +1931,6 @@ void CLAHE_collectGarbage(CLAHEPtr ptr)
 }
 
 // LineSegmentDetector
-
-struct LineSegmentDetectorPtr {
-    void *ptr;
-
-    inline cv::LineSegmentDetector * operator->() { return static_cast<cv::LineSegmentDetector *>(ptr); }
-    inline LineSegmentDetectorPtr(cv::LineSegmentDetector *ptr) { this->ptr = ptr; }
-};
 
 extern "C"
 struct LineSegmentDetectorPtr LineSegmentDetector_ctor(
@@ -2006,13 +1971,6 @@ int compareSegments(struct LineSegmentDetectorPtr ptr, struct SizeWrapper size, 
 }
 
 // Subdiv2D
-
-struct Subdiv2DPtr {
-    void *ptr;
-
-    inline cv::Subdiv2D * operator->() { return static_cast<cv::Subdiv2D *>(ptr); }
-    inline Subdiv2DPtr(cv::Subdiv2D *ptr) { this->ptr = ptr; }
-};
 
 extern "C"
 struct Subdiv2DPtr Subdiv2D_ctor_default() {
@@ -2148,4 +2106,37 @@ struct Point2fPlusInt Subdiv2D_edgeDst(struct Subdiv2DPtr ptr, int edge)
     retval.val = ptr->edgeDst(edge, &temp);
     retval.point = temp;
     return retval;
+}
+
+// LineIterator
+
+extern "C"
+struct LineIteratorPtr LineIterator_ctor(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2,
+        int connectivity, bool leftToRight)
+{
+    return new cv::LineIterator(img.toMat(), pt1, pt2, connectivity, leftToRight);
+}
+
+extern "C"
+void LineIterator_dtor(struct LineIteratorPtr ptr) {
+    delete static_cast<cv::LineIterator *>(ptr.ptr);
+}
+
+extern "C"
+int LineIterator_count(struct LineIteratorPtr ptr)
+{
+    return ptr->count;
+}
+
+extern "C"
+struct PointWrapper LineIterator_pos(struct LineIteratorPtr ptr)
+{
+    return ptr->pos();
+}
+
+extern "C"
+void LineIterator_incr(struct LineIteratorPtr ptr)
+{
+    ++(*static_cast<cv::LineIterator *>(ptr.ptr));
 }

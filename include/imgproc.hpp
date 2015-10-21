@@ -531,3 +531,291 @@ void putText(
 extern "C"
 struct SizePlusInt getTextSize(
         const char *text, int fontFace, double fontScale, int thickness);
+
+struct GeneralizedHoughPtr {
+    void *ptr;
+
+    inline cv::GeneralizedHough * operator->() { return static_cast<cv::GeneralizedHough *>(ptr); }
+    inline GeneralizedHoughPtr(cv::GeneralizedHough *ptr) { this->ptr = ptr; }
+};
+
+struct GeneralizedHoughBallardPtr {
+    void *ptr;
+
+    inline cv::GeneralizedHoughBallard * operator->() { return static_cast<cv::GeneralizedHoughBallard *>(ptr); }
+    inline GeneralizedHoughBallardPtr(cv::GeneralizedHoughBallard *ptr) { this->ptr = ptr; }
+};
+
+struct GeneralizedHoughGuilPtr {
+    void *ptr;
+
+    inline cv::GeneralizedHoughGuil * operator->() { return static_cast<cv::GeneralizedHoughGuil *>(ptr); }
+    inline GeneralizedHoughGuilPtr(cv::GeneralizedHoughGuil *ptr) { this->ptr = ptr; }
+};
+
+struct CLAHEPtr {
+    void *ptr;
+
+    inline cv::CLAHE * operator->() { return static_cast<cv::CLAHE *>(ptr); }
+    inline CLAHEPtr(cv::CLAHE *ptr) { this->ptr = ptr; }
+};
+
+struct LineSegmentDetectorPtr {
+    void *ptr;
+
+    inline cv::LineSegmentDetector * operator->() { return static_cast<cv::LineSegmentDetector *>(ptr); }
+    inline LineSegmentDetectorPtr(cv::LineSegmentDetector *ptr) { this->ptr = ptr; }
+};
+
+struct Subdiv2DPtr {
+    void *ptr;
+
+    inline cv::Subdiv2D * operator->() { return static_cast<cv::Subdiv2D *>(ptr); }
+    inline Subdiv2DPtr(cv::Subdiv2D *ptr) { this->ptr = ptr; }
+};
+
+struct LineIteratorPtr {
+    void *ptr;
+
+    inline cv::LineIterator * operator->() { return static_cast<cv::LineIterator *>(ptr); }
+    inline LineIteratorPtr(cv::LineIterator *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+void GeneralizedHough_setTemplate(
+        GeneralizedHoughPtr ptr, struct TensorWrapper templ, struct PointWrapper templCenter);
+
+extern "C"
+void GeneralizedHough_setTemplate_edges(
+        GeneralizedHoughPtr ptr, struct TensorWrapper edges, struct TensorWrapper dx,
+        struct TensorWrapper dy, struct PointWrapper templCenter);
+
+extern "C"
+struct TensorArray GeneralizedHough_detect(
+        GeneralizedHoughPtr ptr, struct TensorWrapper image, struct TensorWrapper positions, bool votes);
+
+extern "C"
+struct TensorArray GeneralizedHough_detect_edges(
+        GeneralizedHoughPtr ptr, struct TensorWrapper edges, struct TensorWrapper dx,
+        struct TensorWrapper dy, struct TensorWrapper positions, bool votes);
+
+extern "C"
+void GeneralizedHough_setCannyLowThresh(GeneralizedHoughPtr ptr, int cannyLowThresh);
+
+extern "C"
+int GeneralizedHough_getCannyLowThresh(GeneralizedHoughPtr ptr);
+
+extern "C"
+void GeneralizedHough_setCannyHighThresh(GeneralizedHoughPtr ptr, int cannyHighThresh);
+
+extern "C"
+int GeneralizedHough_getCannyHighThresh(GeneralizedHoughPtr ptr);
+
+extern "C"
+void GeneralizedHough_setMinDist(GeneralizedHoughPtr ptr, double MinDist);
+
+extern "C"
+double GeneralizedHough_getMinDist(GeneralizedHoughPtr ptr);
+
+extern "C"
+void GeneralizedHough_setDp(GeneralizedHoughPtr ptr, double Dp);
+
+extern "C"
+double GeneralizedHough_getDp(GeneralizedHoughPtr ptr);
+
+extern "C"
+void GeneralizedHough_setMaxBufferSize(GeneralizedHoughPtr ptr, int MaxBufferSize);
+
+extern "C"
+int GeneralizedHough_getMaxBufferSize(GeneralizedHoughPtr ptr);
+
+extern "C"
+struct GeneralizedHoughBallardPtr GeneralizedHoughBallard_ctor();
+
+extern "C"
+void GeneralizedHoughBallard_setLevels(GeneralizedHoughBallardPtr ptr, double Levels);
+
+extern "C"
+double GeneralizedHoughBallard_getLevels(GeneralizedHoughBallardPtr ptr);
+
+extern "C"
+void GeneralizedHoughBallard_setVotesThreshold(GeneralizedHoughBallardPtr ptr, double votesThreshold);
+
+extern "C"
+double GeneralizedHoughBallard_getVotesThreshold(GeneralizedHoughBallardPtr ptr);
+
+extern "C"
+struct GeneralizedHoughGuilPtr GeneralizedHoughGuil_ctor();
+
+extern "C"
+void GeneralizedHoughGuil_setLevels(GeneralizedHoughGuilPtr ptr, int levels);
+
+extern "C"
+int GeneralizedHoughGuil_getLevels(GeneralizedHoughGuilPtr ptr);
+
+extern "C"
+void GeneralizedHoughGuil_setAngleEpsilon(GeneralizedHoughGuilPtr ptr, double AngleEpsilon);
+
+extern "C"
+double GeneralizedHoughGuil_getAngleEpsilon(GeneralizedHoughGuilPtr ptr);
+
+extern "C"
+void GeneralizedHoughGuil_setMinAngle(GeneralizedHoughGuilPtr ptr, double MinAngle);
+
+extern "C"
+double GeneralizedHoughGuil_getMinAngle(GeneralizedHoughGuilPtr ptr);
+
+extern "C"
+void GeneralizedHoughGuil_setMaxAngle(GeneralizedHoughGuilPtr ptr, double MaxAngle);
+
+extern "C"
+double GeneralizedHoughGuil_getMaxAngle(GeneralizedHoughGuilPtr ptr);
+
+extern "C"
+void GeneralizedHoughGuil_setAngleStep(GeneralizedHoughGuilPtr ptr, double AngleStep);
+
+extern "C"
+double GeneralizedHoughGuil_getAngleStep(GeneralizedHoughGuilPtr ptr);
+
+extern "C"
+void GeneralizedHoughGuil_setAngleThresh(GeneralizedHoughGuilPtr ptr, int AngleThresh);
+
+extern "C"
+int GeneralizedHoughGuil_getAngleThresh(GeneralizedHoughGuilPtr ptr);
+
+extern "C"
+void GeneralizedHoughGuil_setMinScale(GeneralizedHoughGuilPtr ptr, double MinScale);
+
+extern "C"
+double GeneralizedHoughGuil_getMinScale(GeneralizedHoughGuilPtr ptr);
+
+extern "C"
+void GeneralizedHoughGuil_setMaxScale(GeneralizedHoughGuilPtr ptr, double MaxScale);
+
+extern "C"
+double GeneralizedHoughGuil_getMaxScale(GeneralizedHoughGuilPtr ptr);
+
+extern "C"
+void GeneralizedHoughGuil_setScaleStep(GeneralizedHoughGuilPtr ptr, double ScaleStep);
+
+extern "C"
+double GeneralizedHoughGuil_getScaleStep(GeneralizedHoughGuilPtr ptr);
+
+extern "C"
+void GeneralizedHoughGuil_setScaleThresh(GeneralizedHoughGuilPtr ptr, int ScaleThresh);
+
+extern "C"
+int GeneralizedHoughGuil_getScaleThresh(GeneralizedHoughGuilPtr ptr);
+
+extern "C"
+void GeneralizedHoughGuil_setPosThresh(GeneralizedHoughGuilPtr ptr, int PosThresh);
+
+extern "C"
+int GeneralizedHoughGuil_getPosThresh(GeneralizedHoughGuilPtr ptr);
+
+extern "C"
+struct CLAHEPtr CLAHE_ctor();
+
+extern "C"
+void CLAHE_setClipLimit(CLAHEPtr ptr, double ClipLimit);
+
+extern "C"
+double CLAHE_getClipLimit(CLAHEPtr ptr);
+
+extern "C"
+void CLAHE_setTilesGridSize(CLAHEPtr ptr, struct SizeWrapper TilesGridSize);
+
+extern "C"
+struct SizeWrapper CLAHE_getTilesGridSize(CLAHEPtr ptr);
+
+extern "C"
+void CLAHE_collectGarbage(CLAHEPtr ptr);
+
+extern "C"
+struct LineSegmentDetectorPtr LineSegmentDetector_ctor(
+        int refine, double scale, double sigma_scale, double quant,
+        double ang_th, double log_eps, double density_th, int n_bins);
+
+extern "C"
+struct TensorArray LineSegmentDetector_detect(
+        struct LineSegmentDetectorPtr ptr, struct TensorWrapper image,
+        struct TensorWrapper lines, bool width, bool prec, bool nfa);
+
+extern "C"
+void LineSegmentDetector_drawSegments(
+        struct LineSegmentDetectorPtr ptr, struct TensorWrapper image, struct TensorWrapper lines);
+
+extern "C"
+int compareSegments(struct LineSegmentDetectorPtr ptr, struct SizeWrapper size, struct TensorWrapper lines1,
+                    struct TensorWrapper lines2, struct TensorWrapper image);
+
+extern "C"
+struct Subdiv2DPtr Subdiv2D_ctor_default();
+
+extern "C"
+struct Subdiv2DPtr Subdiv2D_ctor(struct RectWrapper rect);
+
+extern "C"
+void Subdiv2D_dtor(struct Subdiv2DPtr ptr);
+
+extern "C"
+void Subdiv2D_initDelaunay(struct Subdiv2DPtr ptr, struct RectWrapper rect);
+
+extern "C"
+int Subdiv2D_insert(struct Subdiv2DPtr ptr, struct Point2fWrapper pt);
+
+extern "C"
+void Subdiv2D_insert_vector(struct Subdiv2DPtr ptr, struct TensorWrapper ptvec);
+
+extern "C"
+struct Vec3iWrapper Subdiv2D_locate(struct Subdiv2DPtr ptr, struct Point2fWrapper pt);
+
+extern "C"
+struct Point2fPlusInt Subdiv2D_findNearest(struct Subdiv2DPtr ptr, struct Point2fWrapper pt);
+
+extern "C"
+struct TensorWrapper Subdiv2D_getEdgeList(struct Subdiv2DPtr ptr);
+
+extern "C"
+struct TensorWrapper Subdiv2D_getTriangleList(struct Subdiv2DPtr ptr);
+
+extern "C"
+struct TensorArray Subdiv2D_getVoronoiFacetList(struct Subdiv2DPtr ptr, struct TensorWrapper idx);
+
+extern "C"
+struct Point2fPlusInt Subdiv2D_getVertex(struct Subdiv2DPtr ptr, int vertex);
+
+extern "C"
+int Subdiv2D_getEdge(struct Subdiv2DPtr ptr, int edge, int nextEdgeType);
+
+extern "C"
+int Subdiv2D_nextEdge(struct Subdiv2DPtr ptr, int edge);
+
+extern "C"
+int Subdiv2D_rotateEdge(struct Subdiv2DPtr ptr, int edge, int rotate);
+
+extern "C"
+int Subdiv2D_symEdge(struct Subdiv2DPtr ptr, int edge);
+
+extern "C"
+struct Point2fPlusInt Subdiv2D_edgeOrg(struct Subdiv2DPtr ptr, int edge);
+
+extern "C"
+struct Point2fPlusInt Subdiv2D_edgeDst(struct Subdiv2DPtr ptr, int edge);
+
+extern "C"
+struct LineIteratorPtr LineIterator_ctor(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2,
+        int connectivity, bool leftToRight);
+
+extern "C"
+void LineIterator_dtor(struct LineIteratorPtr ptr);
+
+extern "C"
+int LineIterator_count(struct LineIteratorPtr ptr);
+
+extern "C"
+struct PointWrapper LineIterator_pos(struct LineIteratorPtr ptr);
+
+extern "C"
+void LineIterator_incr(struct LineIteratorPtr ptr);

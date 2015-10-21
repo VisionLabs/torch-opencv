@@ -1,7 +1,7 @@
 imgproc module branch
 =====================
 
-**Roughly 95% completed**
+**Roughly 98% completed**
 
 Unstable pieces of code (to be tested):
 
@@ -13,10 +13,6 @@ Unstable pieces of code (to be tested):
 
 *To be implemented:*
 
-**Class-based stuff including algorithms:**
-* LineIterator
-
-**Separate functions (filters, detectors, ...):**
 * calcHist (SparseMat overload)
 * calcBackProject (SparseMat overload)
 * compareHist (SparseMat overload)
@@ -31,6 +27,7 @@ Unstable pieces of code (to be tested):
 * CLAHE
 * LineSegmentDetector
 * Subdiv2D
+* LineIterator
 
 **Separate functions (filters, detectors, ...):**
 * getGaussianKernel
@@ -144,4 +141,4 @@ Unstable pieces of code (to be tested):
 * ellipse2Poly
 * getTextSize
 
-134/141
+138/141

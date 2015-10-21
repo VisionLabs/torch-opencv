@@ -2086,6 +2086,172 @@ end
 --- ***************** Classes *****************
 require 'cv.Classes'
 
+ffi.cdef[[
+void GeneralizedHough_setTemplate(
+        struct PtrWrapper ptr, struct TensorWrapper templ, struct PointWrapper templCenter);
+
+void GeneralizedHough_setTemplate_edges(
+        struct PtrWrapper ptr, struct TensorWrapper edges, struct TensorWrapper dx,
+        struct TensorWrapper dy, struct PointWrapper templCenter);
+
+struct TensorArray GeneralizedHough_detect(
+        struct PtrWrapper ptr, struct TensorWrapper image, struct TensorWrapper positions, bool votes);
+
+struct TensorArray GeneralizedHough_detect_edges(
+        struct PtrWrapper ptr, struct TensorWrapper edges, struct TensorWrapper dx,
+        struct TensorWrapper dy, struct TensorWrapper positions, bool votes);
+
+void GeneralizedHough_setCannyLowThresh(struct PtrWrapper ptr, int cannyLowThresh);
+
+int GeneralizedHough_getCannyLowThresh(struct PtrWrapper ptr);
+
+void GeneralizedHough_setCannyHighThresh(struct PtrWrapper ptr, int cannyHighThresh);
+
+int GeneralizedHough_getCannyHighThresh(struct PtrWrapper ptr);
+
+void GeneralizedHough_setMinDist(struct PtrWrapper ptr, double MinDist);
+
+double GeneralizedHough_getMinDist(struct PtrWrapper ptr);
+
+void GeneralizedHough_setDp(struct PtrWrapper ptr, double Dp);
+
+double GeneralizedHough_getDp(struct PtrWrapper ptr);
+
+void GeneralizedHough_setMaxBufferSize(struct PtrWrapper ptr, int MaxBufferSize);
+
+int GeneralizedHough_getMaxBufferSize(struct PtrWrapper ptr);
+
+struct PtrWrapper GeneralizedHoughBallard_ctor();
+
+void GeneralizedHoughBallard_setLevels(struct PtrWrapper ptr, double Levels);
+
+double GeneralizedHoughBallard_getLevels(struct PtrWrapper ptr);
+
+void GeneralizedHoughBallard_setVotesThreshold(struct PtrWrapper ptr, double votesThreshold);
+
+double GeneralizedHoughBallard_getVotesThreshold(struct PtrWrapper ptr);
+
+struct PtrWrapper GeneralizedHoughGuil_ctor();
+
+void GeneralizedHoughGuil_setLevels(struct PtrWrapper ptr, int levels);
+
+int GeneralizedHoughGuil_getLevels(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setAngleEpsilon(struct PtrWrapper ptr, double AngleEpsilon);
+
+double GeneralizedHoughGuil_getAngleEpsilon(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setMinAngle(struct PtrWrapper ptr, double MinAngle);
+
+double GeneralizedHoughGuil_getMinAngle(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setMaxAngle(struct PtrWrapper ptr, double MaxAngle);
+
+double GeneralizedHoughGuil_getMaxAngle(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setAngleStep(struct PtrWrapper ptr, double AngleStep);
+
+double GeneralizedHoughGuil_getAngleStep(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setAngleThresh(struct PtrWrapper ptr, int AngleThresh);
+
+int GeneralizedHoughGuil_getAngleThresh(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setMinScale(struct PtrWrapper ptr, double MinScale);
+
+double GeneralizedHoughGuil_getMinScale(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setMaxScale(struct PtrWrapper ptr, double MaxScale);
+
+double GeneralizedHoughGuil_getMaxScale(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setScaleStep(struct PtrWrapper ptr, double ScaleStep);
+
+double GeneralizedHoughGuil_getScaleStep(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setScaleThresh(struct PtrWrapper ptr, int ScaleThresh);
+
+int GeneralizedHoughGuil_getScaleThresh(struct PtrWrapper ptr);
+
+void GeneralizedHoughGuil_setPosThresh(struct PtrWrapper ptr, int PosThresh);
+
+int GeneralizedHoughGuil_getPosThresh(struct PtrWrapper ptr);
+
+struct PtrWrapper CLAHE_ctor();
+
+void CLAHE_setClipLimit(struct PtrWrapper ptr, double ClipLimit);
+
+double CLAHE_getClipLimit(struct PtrWrapper ptr);
+
+void CLAHE_setTilesGridSize(struct PtrWrapper ptr, struct SizeWrapper TilesGridSize);
+
+struct SizeWrapper CLAHE_getTilesGridSize(struct PtrWrapper ptr);
+
+void CLAHE_collectGarbage(struct PtrWrapper ptr);
+
+struct PtrWrapper LineSegmentDetector_ctor(
+        int refine, double scale, double sigma_scale, double quant,
+        double ang_th, double log_eps, double density_th, int n_bins);
+
+struct TensorArray LineSegmentDetector_detect(
+        struct PtrWrapper ptr, struct TensorWrapper image,
+        struct TensorWrapper lines, bool width, bool prec, bool nfa);
+
+void LineSegmentDetector_drawSegments(
+        struct PtrWrapper ptr, struct TensorWrapper image, struct TensorWrapper lines);
+
+int compareSegments(struct PtrWrapper ptr, struct SizeWrapper size, struct TensorWrapper lines1,
+                    struct TensorWrapper lines2, struct TensorWrapper image);
+
+struct PtrWrapper Subdiv2D_ctor_default();
+
+struct PtrWrapper Subdiv2D_ctor(struct RectWrapper rect);
+
+void Subdiv2D_dtor(struct PtrWrapper ptr);
+
+void Subdiv2D_initDelaunay(struct PtrWrapper ptr, struct RectWrapper rect);
+
+int Subdiv2D_insert(struct PtrWrapper ptr, struct Point2fWrapper pt);
+
+void Subdiv2D_insert_vector(struct PtrWrapper ptr, struct TensorWrapper ptvec);
+
+struct Vec3iWrapper Subdiv2D_locate(struct PtrWrapper ptr, struct Point2fWrapper pt);
+
+struct Point2fPlusInt Subdiv2D_findNearest(struct PtrWrapper ptr, struct Point2fWrapper pt);
+
+struct TensorWrapper Subdiv2D_getEdgeList(struct PtrWrapper ptr);
+
+struct TensorWrapper Subdiv2D_getTriangleList(struct PtrWrapper ptr);
+
+struct TensorArray Subdiv2D_getVoronoiFacetList(struct PtrWrapper ptr, struct TensorWrapper idx);
+
+struct Point2fPlusInt Subdiv2D_getVertex(struct PtrWrapper ptr, int vertex);
+
+int Subdiv2D_getEdge(struct PtrWrapper ptr, int edge, int nextEdgeType);
+
+int Subdiv2D_nextEdge(struct PtrWrapper ptr, int edge);
+
+int Subdiv2D_rotateEdge(struct PtrWrapper ptr, int edge, int rotate);
+
+int Subdiv2D_symEdge(struct PtrWrapper ptr, int edge);
+
+struct Point2fPlusInt Subdiv2D_edgeOrg(struct PtrWrapper ptr, int edge);
+
+struct Point2fPlusInt Subdiv2D_edgeDst(struct PtrWrapper ptr, int edge);
+
+struct PtrWrapper LineIterator_ctor(
+        struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2,
+        int connectivity, bool leftToRight);
+
+void LineIterator_dtor(struct PtrWrapper ptr);
+
+int LineIterator_count(struct PtrWrapper ptr);
+
+struct PointWrapper LineIterator_pos(struct PtrWrapper ptr);
+
+void LineIterator_incr(struct PtrWrapper ptr);
+]]
+
 -- GeneralizedHough
 
 do
@@ -2423,14 +2589,14 @@ do
     function Subdiv2D:locate(t)
         local pt = cv.Point2f(assert(t.pt))
         
-        result = C.Subdiv2D_locate(self.ptr, pt)
+        local result = C.Subdiv2D_locate(self.ptr, pt)
         return result.v0, result.v1, result.v2
     end
 
     function Subdiv2D:findNearest(t)
         local pt = cv.Point2f(assert(t.pt))
         
-        result = C.Subdiv2D_findNearest(self.ptr, pt)
+        local result = C.Subdiv2D_findNearest(self.ptr, pt)
         return result.point, result.val
     end
 
@@ -2443,14 +2609,14 @@ do
     end
 
     function Subdiv2D:getVoronoiFacetList(t)
-        facetList = cv.unwrap_tensors(C.Subdiv2D_getVoronoiFacetList(self.ptr, cv.unwrap_tensors(idx)), true)
-        facetCenters = facetList[#facetList]
+        local facetList = cv.unwrap_tensors(C.Subdiv2D_getVoronoiFacetList(self.ptr, cv.unwrap_tensors(idx)), true)
+        local facetCenters = facetList[#facetList]
         facetList[#facetList] = nil
         return facetCenters, facetList
     end
 
     function Subdiv2D:getVertex(t)
-        result = C.Subdiv2D_getVertex(self.ptr, vertex)
+        local result = C.Subdiv2D_getVertex(self.ptr, vertex)
         return result.point, result.val
     end
 
@@ -2471,12 +2637,42 @@ do
     end
 
     function Subdiv2D:edgeOrg(t)
-        result = C.Subdiv2D_edgeOrg(self.ptr, edge)
+        local result = C.Subdiv2D_edgeOrg(self.ptr, edge)
         return result.point, result.val
     end
 
     function Subdiv2D:edgeDst(t)
-        result = C.Subdiv2D_edgeDst(self.ptr, edge)
+        local result = C.Subdiv2D_edgeDst(self.ptr, edge)
         return result.point, result.val
     end
+end
+
+-- LineIterator
+
+function cv.LineIterator(t)
+    local img = assert(t.img)
+    local pt1 = cv.Point(assert(t.pt1))
+    pt1.x = pt1.x - 1
+    pt1.y = pt1.y - 1
+    local pt2 = cv.Point(assert(t.pt2))
+    pt2.x = pt2.x - 1
+    pt2.y = pt2.y - 1
+    local connectivity = t.connectivity or 8
+    local leftToRight = t.leftToRight or false
+
+    local ptr = ffi.gc(
+        C.LineIterator_ctor(cv.wrap_tensors(img), pt1, pt2, connectivity, leftToRight),
+        C.LineIterator_dtor)
+    local count = C.LineIterator_count(ptr)
+
+    function lineIter(pos)
+        if count > 0 then
+            count = count - 1
+            result = C.LineIterator_pos(ptr)
+            C.LineIterator_incr(ptr)
+            return result
+        end
+    end
+
+    return lineIter, nil, nil
 end
