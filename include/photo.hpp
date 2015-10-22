@@ -7,10 +7,9 @@ extern "C" struct TensorWrapper inpaint(struct TensorWrapper src, struct TensorW
 extern "C" struct TensorWrapper fastNlMeansDenoising(struct TensorWrapper src, struct TensorWrapper dst,
                                     float h, int templateWindowSize, int searchWindowSize);
 
-/*extern "C"  void fastNlMeansDenoising( InputArray src, OutputArray dst,
-                                        const std::vector<float>& h,
-                                        int templateWindowSize = 7, int searchWindowSize = 21,
-                                        int normType = NORM_L2);*/
+/*extern "C" struct TensorWrapper fastNlMeansDenoising(struct TensorWrapper src, struct TensorWrapper dst,
+                                        const std::vector<float>& h, int templateWindowSize,
+                                        int searchWindowSize, int normType);*/
 
 extern "C" struct TensorWrapper fastNlMeansDenoisingColored(struct TensorWrapper src, struct TensorWrapper dst,
                                     float h, float hColor, int templateWindowSize, int searchWindowSize);
@@ -30,8 +29,6 @@ extern "C" struct TensorWrapper fastNlMeansDenoisingColoredMulti(struct TensorAr
                             float hColor, int templateWindowSize, int searchWindowSize);
 
 // Some frightening functions with patterns and structures
-
-
 
 
 

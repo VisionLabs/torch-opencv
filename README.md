@@ -7,13 +7,13 @@ photo module branch
 - fastNlMeansDenoisingMulti(1/2)
 - fastNlMeansDenoisingColoredMulti
 - decolor
-- seamlessClone **(test it)**
+- seamlessClone
 - colorChange
 - illuminationChange
 - textureFlattening
 - edgePreservingFilter
 - detailEnhance
-- pencilSketch **(test it)**
+- pencilSketch
 - stylization
 
 *To be implemented:*

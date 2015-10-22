@@ -292,7 +292,7 @@ end
 
 function cv.pencilSketch(t)
     local src          = assert(t.src)
-    local dst1         = assert(t.dst1)
+    local dst1         = t.dst1
     local dst          = t.dst2
     local sigma_s      = t.sigma_s or 60
     local sigma_r      = t.sigma_r or 0.07
