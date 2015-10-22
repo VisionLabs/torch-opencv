@@ -95,3 +95,67 @@ double VideoCapture_get(VideoCapturePtr ptr, int propId)
 {
     return ptr->get(propId);
 }
+
+// VideoWriter
+
+extern "C"
+struct VideoWriterPtr VideoWriter_ctor_default()
+{
+    return new cv::VideoWriter();
+}
+
+extern "C"
+struct VideoWriterPtr VideoWriter_ctor(
+        const char *filename, int fourcc, double fps, struct SizeWrapper frameSize, bool isColor)
+{
+    return new cv::VideoWriter(filename, fourcc, fps, frameSize, isColor);
+}
+
+extern "C"
+void VideoWriter_dtor(struct VideoWriterPtr ptr)
+{
+    delete static_cast<cv::VideoWriter *>(ptr.ptr);
+}
+
+extern "C"
+bool VideoWriter_open(struct VideoWriterPtr ptr, const char *filename, int fourcc, 
+                      double fps, struct SizeWrapper frameSize, bool isColor)
+{
+    return ptr->open(filename, fourcc, fps, frameSize, isColor);
+}
+
+extern "C"
+bool VideoWriter_isOpened(struct VideoWriterPtr ptr)
+{
+    return ptr->isOpened();
+}
+
+extern "C"
+void VideoWriter_release(struct VideoWriterPtr ptr)
+{
+    ptr->release();
+}
+
+extern "C"
+void VideoWriter_write(struct VideoWriterPtr ptr, struct TensorWrapper image)
+{
+    ptr->write(image.toMat());
+}
+
+extern "C"
+bool VideoWriter_set(VideoWriterPtr ptr, int propId, double value)
+{
+    return ptr->set(propId, value);
+}
+
+extern "C"
+double VideoWriter_get(VideoWriterPtr ptr, int propId)
+{
+    return ptr->get(propId);
+}
+
+extern "C"
+int VideoWriter_fourcc(char c1, char c2, char c3, char c4)
+{
+    return cv::VideoWriter::fourcc(c1, c2, c3, c4);
+}
