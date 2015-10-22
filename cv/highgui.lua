@@ -19,7 +19,7 @@ function cv.imshow(t)
 end
 
 function cv.waitKey(delay)
-    C.waitKey(delay)
+    return C.waitKey(delay)
 end
 
 function cv.namedWindow(t)

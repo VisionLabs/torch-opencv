@@ -7,7 +7,7 @@ void imshow(const char *winname, struct TensorWrapper image) {
 
 extern "C"
 int waitKey(int delay) {
-    cv::waitKey(delay);
+    return cv::waitKey(delay);
 }
 
 extern "C"

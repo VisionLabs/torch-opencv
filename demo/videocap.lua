@@ -1,3 +1,6 @@
+-- a translated demo from here:
+-- http://docs.opencv.org/3.0-beta/modules/videoio/doc/reading_and_writing_video.html
+
 require 'cv.highgui'
 require 'cv.videoio'
 require 'cv.imgproc'
@@ -8,7 +11,30 @@ if not cap:isOpened() then
 	os.exit(-1)
 end
 
-_, im = cap:read{}
+cv.namedWindow{winname="edges", flags=cv.WINDOW_AUTOSIZE}
+_, frame = cap:read{}
 
-cv.imshow{winname="camera", image=im}
-cv.waitKey(0)
+while true do
+	edges = cv.cvtColor{src=frame, code=cv.COLOR_BGR2GRAY}
+	
+	cv.GaussianBlur{
+		src = edges, 
+		dst = edges, 
+		ksize = {7,7}, 
+		sigmaX = 1.5,
+		sigmaY = 1.5
+	}
+	
+	cv.Canny{
+		image = edges,
+		edges = edges,
+		threshold1 = 0,
+		threshold2 = 30,
+		apertureSize = 3
+	}
+
+	cv.imshow{winname="edges", image=edges}
+	if cv.waitKey(30) >= 0 then break end
+
+	cap:read{image=frame}
+end
