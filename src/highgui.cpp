@@ -9,3 +9,8 @@ extern "C"
 int waitKey(int delay) {
     cv::waitKey(delay);
 }
+
+extern "C"
+void namedWindow(const char *winname, int flags) {
+    cv::namedWindow(winname, flags);
+}
