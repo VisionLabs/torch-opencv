@@ -82,6 +82,11 @@ struct TensorPlusDouble {
     double val;
 };
 
+struct TensorPlusBool {
+    struct TensorWrapper tensor;
+    bool val;
+};
+
 struct TensorArrayPlusFloat {
     struct TensorArray tensors;
     float val;
@@ -225,7 +230,7 @@ end
 
 -- struct TensorWrapper(s) ---> torch.RealTensor
 function cv.unwrap_tensors(wrapper, toTable)
-    if ffi.typeof(wrapper) == ffi.typeof("struct TensorWrapper") then
+    if ffi.istype(ffi.typeof(wrapper), cv.EMPTY_WRAPPER) then
         -- handle single tensor
         if wrapper.tensorPtr == nil then
             return

@@ -24,7 +24,7 @@ cv.putText{
 	thickness=3,
 }
 
-cv.imshow("Original image with text", image)
+cv.imshow{winname="Original image with text", image=image}
 cv.waitKey(0)
 
 -- output to another Tensor of same size & type...
@@ -42,7 +42,7 @@ cv.GaussianBlur{src=image, dst=image, ksize={width=7, height=7}, sigmaX=3.5, sig
 assert((image:eq(image_B) - 1):sum() == 0)
 assert((image:eq(image_A) - 1):sum() == 0)
 
-cv.imshow("Blurred", image_B)
+cv.imshow{winname="Blurred", image=image_B}
 cv.waitKey(0)
 
 -- output to a single-channel ByteTensor of same size
@@ -55,5 +55,5 @@ local edges2 = cv.Canny{image=image, threshold1=0, threshold2=30}
 -- results are equal
 assert((edges:eq(edges2) - 1):sum() == 0)
 
-cv.imshow("Edges by Canny", edges2)
+cv.imshow{winname="Edges by Canny", image=edges2}
 cv.waitKey(0)

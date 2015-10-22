@@ -9,7 +9,9 @@ int waitKey(int delay);
 
 local C = ffi.load(libPath('highgui'))
 
-function cv.imshow(winname, image)
+function cv.imshow(t)
+	local winname = t.winname or "Window 1"
+	local image = assert(t.image)
     C.imshow(winname, cv.wrap_tensors(image))
 end
 
