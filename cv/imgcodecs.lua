@@ -15,6 +15,8 @@ cv.IMREAD_ANYDEPTH   = 2
 cv.IMREAD_ANYCOLOR   = 4
 cv.IMREAD_LOAD_GDAL  = 8 
 
-function cv.imread(filename, flags)
-    return cv.unwrap_tensors(C.imread(filename, flags or cv.IMREAD_COLOR))
+function cv.imread(t)
+	local filename = assert(t.filename)
+	local flags = t.flags or cv.IMREAD_COLOR
+    return cv.unwrap_tensors(C.imread(filename, flags))
 end

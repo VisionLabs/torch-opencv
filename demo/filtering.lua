@@ -7,7 +7,7 @@ if not arg[1] then
 	os.exit(0)
 end
 
-local image = cv.imread(arg[1], cv.IMREAD_GRAYSCALE)
+local image = cv.imread{filename=arg[1]}
 
 if image:nDimension() == 0 then
 	print("Problem loading image\n")
@@ -25,7 +25,7 @@ cv.putText{
 }
 
 cv.imshow{winname="Original image with text", image=image}
-cv.waitKey(0)
+cv.waitKey{0}
 
 -- output to another Tensor of same size & type...
 local image_A = image * 0
@@ -43,7 +43,7 @@ assert((image:eq(image_B) - 1):sum() == 0)
 assert((image:eq(image_A) - 1):sum() == 0)
 
 cv.imshow{winname="Blurred", image=image_B}
-cv.waitKey(0)
+cv.waitKey{0}
 
 -- output to a single-channel ByteTensor of same size
 local edges = torch.ByteTensor(image:size()[1], image:size()[2])
@@ -56,4 +56,4 @@ local edges2 = cv.Canny{image=image, threshold1=0, threshold2=30}
 assert((edges:eq(edges2) - 1):sum() == 0)
 
 cv.imshow{winname="Edges by Canny", image=edges2}
-cv.waitKey(0)
+cv.waitKey{0}
