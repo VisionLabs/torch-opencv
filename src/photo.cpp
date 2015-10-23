@@ -53,32 +53,41 @@ extern "C" struct TensorWrapper fastNlMeansDenoisingColored(struct TensorWrapper
     return dst;
 }
 
-extern "C" struct TensorWrapper fastNlMeansDenoisingMulti(struct TensorArray srcImgs, struct TensorWrapper dst,
-                                    int imgToDenoiseIndex, int temporalWindowSize, float h,
-                                    int templateWindowSize, int searchWindowSize)
+extern "C" struct TensorWrapper fastNlMeansDenoisingMultiCommon(struct TensorArray srcImgs, struct TensorWrapper dst,
+                                    int imgToDenoiseIndex, int temporalWindowSize, struct FloatArray h,
+                                    int templateWindowSize, int searchWindowSize, int normType)
 {
+    if (normType == -1) {
+        if (dst.isNull()) {
+            cv::Mat retval;
+            cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), retval, imgToDenoiseIndex, temporalWindowSize, *(h.data),
+                                        templateWindowSize, searchWindowSize);
+        
+            return TensorWrapper(retval);
+        } else {
+            cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), dst.toMat(), imgToDenoiseIndex, temporalWindowSize, *(h.data),
+                                        templateWindowSize, searchWindowSize);
+            return dst;
+        }
+    }
+    std::vector<float> hvec;
+    hvec = h.toFloatList(hvec);
+
     if (dst.isNull()) {
         cv::Mat retval;
-        cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), retval, imgToDenoiseIndex, temporalWindowSize, h,
-                                    templateWindowSize, searchWindowSize);
-    
+        cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), retval, imgToDenoiseIndex, temporalWindowSize, hvec,
+                                        templateWindowSize, searchWindowSize, normType);
         return TensorWrapper(retval);
     } else {
-        cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), dst.toMat(), imgToDenoiseIndex, temporalWindowSize, h,
-                                    templateWindowSize, searchWindowSize);
+        cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), dst.toMat(), imgToDenoiseIndex, temporalWindowSize, hvec,
+                                        templateWindowSize, searchWindowSize, normType);
     }
     return dst;
 }
 
-/*extern "C"  void fastNlMeansDenoisingMulti( InputArrayOfArrays srcImgs, OutputArray dst,
-                                             int imgToDenoiseIndex, int temporalWindowSize,
-                                             const std::vector<float>& h,
-                                             int templateWindowSize = 7, int searchWindowSize = 21,
-                                             int normType = NORM_L2);*/
-
 extern "C" struct TensorWrapper fastNlMeansDenoisingColoredMulti(struct TensorArray srcImgs, struct TensorWrapper dst,
-                            int imgToDenoiseIndex, int temporalWindowSize, float h,
-                            float hColor, int templateWindowSize, int searchWindowSize)
+                                    int imgToDenoiseIndex, int temporalWindowSize, float h,
+                                    float hColor, int templateWindowSize, int searchWindowSize)
 {
     if (dst.isNull()) {
         cv::Mat retval;
@@ -96,7 +105,7 @@ extern "C" struct TensorWrapper fastNlMeansDenoisingColoredMulti(struct TensorAr
 // Some frightening functions with patterns and structures
 
 extern "C" struct TensorWrapper decolor(struct TensorWrapper src, struct TensorWrapper grayscale,
-                            struct TensorWrapper color_boost)
+                                    struct TensorWrapper color_boost)
 {
     if (grayscale.isNull()) {
         cv::Mat retval;
@@ -109,8 +118,8 @@ extern "C" struct TensorWrapper decolor(struct TensorWrapper src, struct TensorW
 }
 
 extern "C" struct TensorWrapper seamlessClone(struct TensorWrapper src, struct TensorWrapper dst,
-                            struct TensorWrapper mask, struct PointWrapper p,
-                            struct TensorWrapper blend, int flags)
+                                    struct TensorWrapper mask, struct PointWrapper p,
+                                    struct TensorWrapper blend, int flags)
 {
     if (blend.isNull()) {
         cv::Mat retval;
@@ -123,8 +132,8 @@ extern "C" struct TensorWrapper seamlessClone(struct TensorWrapper src, struct T
 }
 
 extern "C" struct TensorWrapper colorChange(struct TensorWrapper src, struct TensorWrapper mask,
-                            struct TensorWrapper dst, float red_mul,
-                            float green_mul, float blue_mul)
+                                    struct TensorWrapper dst, float red_mul,
+                                    float green_mul, float blue_mul)
 {
     if (dst.isNull()) {
         cv::Mat retval;
@@ -138,7 +147,7 @@ extern "C" struct TensorWrapper colorChange(struct TensorWrapper src, struct Ten
 }
 
 extern "C" struct TensorWrapper illuminationChange(struct TensorWrapper src, struct TensorWrapper mask,
-                            struct TensorWrapper dst, float alpha, float beta)
+                                    struct TensorWrapper dst, float alpha, float beta)
 {
     if (dst.isNull()) {
         cv::Mat retval;
@@ -152,8 +161,8 @@ extern "C" struct TensorWrapper illuminationChange(struct TensorWrapper src, str
 }
 
 extern "C" struct TensorWrapper textureFlattening(struct TensorWrapper src, struct TensorWrapper mask,
-                            struct TensorWrapper dst, float low_threshold, float high_threshold,
-                            int kernel_size)
+                                    struct TensorWrapper dst, float low_threshold, float high_threshold,
+                                    int kernel_size)
 {
     if (dst.isNull()) {
         cv::Mat retval;
@@ -169,7 +178,7 @@ extern "C" struct TensorWrapper textureFlattening(struct TensorWrapper src, stru
 }
 
 extern "C" struct TensorWrapper edgePreservingFilter(struct TensorWrapper src, struct TensorWrapper dst,
-                            int flags, float sigma_s, float sigma_r)
+                                    int flags, float sigma_s, float sigma_r)
 {
     if (dst.isNull()) {
         cv::Mat retval;
@@ -183,7 +192,7 @@ extern "C" struct TensorWrapper edgePreservingFilter(struct TensorWrapper src, s
 }
 
 extern "C" struct TensorWrapper detailEnhance(struct TensorWrapper src, struct TensorWrapper dst,
-                            float sigma_s, float sigma_r)
+                                    float sigma_s, float sigma_r)
 {
     if (dst.isNull()) {
         cv::Mat retval;
@@ -197,7 +206,7 @@ extern "C" struct TensorWrapper detailEnhance(struct TensorWrapper src, struct T
 }
 
 extern "C" struct TensorWrapper pencilSketch(struct TensorWrapper src, struct TensorWrapper dst1,
-                            struct TensorWrapper dst2, float sigma_s, float sigma_r, float shade_factor)
+                                    struct TensorWrapper dst2, float sigma_s, float sigma_r, float shade_factor)
 {
     cv::Mat retval1;
     cv::Mat retval2;
@@ -213,7 +222,7 @@ extern "C" struct TensorWrapper pencilSketch(struct TensorWrapper src, struct Te
 }
 
 extern "C" struct TensorWrapper stylization(struct TensorWrapper src, struct TensorWrapper dst,
-                            float sigma_s, float sigma_r)
+                                    float sigma_s, float sigma_r)
 {
     if (dst.isNull()) {
         cv::Mat retval;

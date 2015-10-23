@@ -14,11 +14,9 @@ struct TensorWrapper fastNlMeansDenoisingCommon(struct TensorWrapper src, struct
 struct TensorWrapper fastNlMeansDenoisingColored(struct TensorWrapper src, struct TensorWrapper dst,
                             float h, float hColor, int templateWindowSize, int searchWindowSize);
 
-struct TensorWrapper fastNlMeansDenoisingMulti(struct TensorArray srcImgs, struct TensorWrapper dst,
-                            int imgToDenoiseIndex, int temporalWindowSize, float h,
-                            int templateWindowSize, int searchWindowSize);
-
-
+struct TensorWrapper fastNlMeansDenoisingMultiCommon(struct TensorArray srcImgs, struct TensorWrapper dst,
+                            int imgToDenoiseIndex, int temporalWindowSize, struct FloatArray h,
+                            int templateWindowSize, int searchWindowSize, int normType);
 
 struct TensorWrapper fastNlMeansDenoisingColoredMulti(struct TensorArray srcImgs, struct TensorWrapper dst,
                             int imgToDenoiseIndex, int temporalWindowSize, float h,
@@ -130,7 +128,6 @@ function cv.fastNlMeansDenoisingMulti(t)
     local dst                = t.dst
     local imgToDenoiseIndex  = assert(t.imgToDenoiseIndex)
     local temporalWindowSize = assert(t.temporalWindowSize)
-    local h                  = t.h or 3
     local templateWindowSize = t.templateWindowSize or 7
     local searchWindowSize   = t.searchWindowSize or 21
 
@@ -148,14 +145,37 @@ function cv.fastNlMeansDenoisingMulti(t)
     assert(templateWindowSize % 2 == 1)
     assert(searchWindowSize % 2 == 1)
 
+    -- h is a single number
+    if type(t.h) == "number" or t.h == nil then
+        h = t.h or 3
+        h = cv.newArray('Float', h)
+    
+        if #srcImgs == 1 then
+            return cv.unwrap_tensors(
+                C.fastNlMeansDenoisingCommon(
+                    cv.wrap_tensors(srcImgs[1]), cv.wrap_tensors(dst), h, templateWindowSize, searchWindowSize, -1))
+        end
+
+        return cv.unwrap_tensors(
+            C.fastNlMeansDenoisingMultiCommon(
+                cv.wrap_tensors(srcImgs), cv.wrap_tensors(dst), imgToDenoiseIndex, temporalWindowSize,
+                h, templateWindowSize, searchWindowSize, -1))
+    end
+
+    -- h is a vector
+    local h        = cv.newArray('Float', assert(t.h))
+    local normType = t.normType or cv.NORM_L2
+
     if #srcImgs == 1 then
         return cv.unwrap_tensors(
-            C.fastNlMeansDenoising(
-                cv.wrap_tensors(srcImgs[1]), cv.wrap_tensors(dst), h, templateWindowSize, searchWindowSize))
+            C.fastNlMeansDenoisingCommon(
+                cv.wrap_tensors(srcImgs[1]), cv.wrap_tensors(dst), h, templateWindowSize, searchWindowSize, normType))
     end
-    return cv.unwrap_tensors(
-        C.fastNlMeansDenoisingMulti(
-            cv.wrap_tensors(srcImgs), cv.wrap_tensors(dst), imgToDenoiseIndex, temporalWindowSize, h, templateWindowSize, searchWindowSize))
+
+        return cv.unwrap_tensors(
+            C.fastNlMeansDenoisingMultiCommon(
+                cv.wrap_tensors(srcImgs), cv.wrap_tensors(dst), imgToDenoiseIndex, temporalWindowSize,
+                h, templateWindowSize, searchWindowSize, normType))
 end
 
 function cv.fastNlMeansDenoisingColoredMulti(t)
@@ -190,7 +210,8 @@ function cv.fastNlMeansDenoisingColoredMulti(t)
 
     return cv.unwrap_tensors(
         C.fastNlMeansDenoisingColoredMulti(
-            cv.wrap_tensors(srcImgs), cv.wrap_tensors(dst), imgToDenoiseIndex, temporalWindowSize, h, hColor, templateWindowSize, searchWindowSize))
+            cv.wrap_tensors(srcImgs), cv.wrap_tensors(dst), imgToDenoiseIndex, temporalWindowSize,
+            h, hColor, templateWindowSize, searchWindowSize))
 end
 
 function cv.decolor(t)
