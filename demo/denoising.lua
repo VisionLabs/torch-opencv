@@ -16,6 +16,6 @@ image = {image1, image2}
 cv.fastNlMeansDenoisingColoredMulti{srcImgs = image, dst = dst_image1, imgToDenoiseIndex = 1, temporalWindowSize = 1};
 
 cv.imshow{winname="Inpaint image", image=dst_image1}
-cv.waitKey(0)
+cv.waitKey{0}
 --cv.imshow("Inpaint image", dst_image2)
 --cv.waitKey(0)

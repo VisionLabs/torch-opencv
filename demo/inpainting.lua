@@ -14,4 +14,4 @@ local dst_image = image * 0
 cv.inpaint{src = image, inpaintMask = mask, dst = dst_image, inpaintRadius = 1, flags = cv.INPAINT_TELEA}
 
 cv.imshow{winname="Inpaint image", image=dst_image}
-cv.waitKey(0)
+cv.waitKey{0}
