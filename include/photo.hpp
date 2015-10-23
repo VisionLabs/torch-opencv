@@ -8,6 +8,9 @@ extern "C" struct TensorWrapper fastNlMeansDenoisingCommon(struct TensorWrapper 
                                     struct FloatArray h, int templateWindowSize,
                                     int searchWindowSize, int normType);
 
+extern "C" struct TensorWrapper fastNlMeansDenoisingColored(struct TensorWrapper src, struct TensorWrapper dst,
+                                    float h, float hColor, int templateWindowSize, int searchWindowSize);
+
 extern "C" struct TensorWrapper fastNlMeansDenoisingMultiCommon(struct TensorArray srcImgs, struct TensorWrapper dst,
                                     int imgToDenoiseIndex, int temporalWindowSize, struct FloatArray h,
                                     int templateWindowSize, int searchWindowSize, int normType);

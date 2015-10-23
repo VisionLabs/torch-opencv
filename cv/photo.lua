@@ -172,10 +172,10 @@ function cv.fastNlMeansDenoisingMulti(t)
                 cv.wrap_tensors(srcImgs[1]), cv.wrap_tensors(dst), h, templateWindowSize, searchWindowSize, normType))
     end
 
-        return cv.unwrap_tensors(
-            C.fastNlMeansDenoisingMultiCommon(
-                cv.wrap_tensors(srcImgs), cv.wrap_tensors(dst), imgToDenoiseIndex, temporalWindowSize,
-                h, templateWindowSize, searchWindowSize, normType))
+    return cv.unwrap_tensors(
+        C.fastNlMeansDenoisingMultiCommon(
+            cv.wrap_tensors(srcImgs), cv.wrap_tensors(dst), imgToDenoiseIndex, temporalWindowSize,
+            h, templateWindowSize, searchWindowSize, normType))
 end
 
 function cv.fastNlMeansDenoisingColoredMulti(t)
