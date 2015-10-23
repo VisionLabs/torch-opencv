@@ -13,32 +13,32 @@ extern "C" struct TensorWrapper inpaint(struct TensorWrapper src, struct TensorW
     return dst;
 }
 
-extern "C" struct TensorWrapper fastNlMeansDenoising(struct TensorWrapper src, struct TensorWrapper dst,
-                                    float h, int templateWindowSize, int searchWindowSize)
+extern "C" struct TensorWrapper fastNlMeansDenoisingCommon(struct TensorWrapper src, struct TensorWrapper dst,
+                                    struct FloatArray h, int templateWindowSize,
+                                    int searchWindowSize, int normType)
 {
+    if (normType == -1) {
+        if (dst.isNull()) {
+            cv::Mat retval;
+            cv::fastNlMeansDenoising(src.toMat(), retval, *(h.data), templateWindowSize, searchWindowSize);
+            return TensorWrapper(retval);
+        } else {
+            cv::fastNlMeansDenoising(src.toMat(), dst.toMat(), *(h.data), templateWindowSize, searchWindowSize);
+            return dst;
+        }
+    }
+    std::vector<float> hvec;
+    hvec = h.toFloatList(hvec);
+
     if (dst.isNull()) {
         cv::Mat retval;
-        cv::fastNlMeansDenoising(src.toMat(), retval, h, templateWindowSize, searchWindowSize);
+        cv::fastNlMeansDenoising(src.toMat(), retval, hvec, templateWindowSize, searchWindowSize, normType);
         return TensorWrapper(retval);
     } else {
-        cv::fastNlMeansDenoising(src.toMat(), dst.toMat(), h, templateWindowSize, searchWindowSize);
+        cv::fastNlMeansDenoising(src.toMat(), dst.toMat(), hvec, templateWindowSize, searchWindowSize, normType);
     }
     return dst;
 }
-
-/*extern "C" struct TensorWrapper fastNlMeansDenoising(struct TensorWrapper src, struct TensorWrapper dst,
-                                        const std::vector<float>& h, int templateWindowSize,
-                                        int searchWindowSize, int normType)
-{
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::fastNlMeansDenoising(src.toMat(), retval, h, templateWindowSize, searchWindowSize, normType);
-        return TensorWrapper(retval);
-    } else {
-        cv::fastNlMeansDenoising(src.toMat(), dst.toMat(), h, templateWindowSize, searchWindowSize, normType);
-    }
-    return dst;
-}*/
 
 extern "C" struct TensorWrapper fastNlMeansDenoisingColored(struct TensorWrapper src, struct TensorWrapper dst,
                                     float h, float hColor, int templateWindowSize, int searchWindowSize)

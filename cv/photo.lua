@@ -7,10 +7,9 @@ ffi.cdef[[
 struct TensorWrapper inpaint(struct TensorWrapper src, struct TensorWrapper inpaintMask,
                             struct TensorWrapper dst, double inpaintRadius, int flags);
 
-struct TensorWrapper fastNlMeansDenoising(struct TensorWrapper src, struct TensorWrapper dst,
-                            float h, int templateWindowSize, int searchWindowSize);
-
-
+struct TensorWrapper fastNlMeansDenoisingCommon(struct TensorWrapper src, struct TensorWrapper dst,
+                            struct FloatArray h, int templateWindowSize,
+                            int searchWindowSize, int normType);
 
 struct TensorWrapper fastNlMeansDenoisingColored(struct TensorWrapper src, struct TensorWrapper dst,
                             float h, float hColor, int templateWindowSize, int searchWindowSize);
@@ -24,6 +23,7 @@ struct TensorWrapper fastNlMeansDenoisingMulti(struct TensorArray srcImgs, struc
 struct TensorWrapper fastNlMeansDenoisingColoredMulti(struct TensorArray srcImgs, struct TensorWrapper dst,
                             int imgToDenoiseIndex, int temporalWindowSize, float h,
                             float hColor, int templateWindowSize, int searchWindowSize);
+
 
 
 struct TensorWrapper decolor(struct TensorWrapper src, struct TensorWrapper grayscale,
@@ -60,11 +60,11 @@ struct TensorWrapper stylization(struct TensorWrapper src, struct TensorWrapper 
 local C = ffi.load(libPath('photo'))
 
 function cv.inpaint(t)
-    local src =           assert(t.src)
-    local inpaintMask =   assert(t.inpaintMask)
-    local dst =           t.dst
+    local src           = assert(t.src)
+    local inpaintMask   = assert(t.inpaintMask)
+    local dst           = t.dst
     local inpaintRadius = assert(t.inpaintRadius)
-    local flags =         assert(t.flags)
+    local flags         = assert(t.flags)
     
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
@@ -76,30 +76,42 @@ function cv.inpaint(t)
 end
 
 function cv.fastNlMeansDenoising(t)
-    local src =                assert(t.src)
-    local dst =                t.dst
-    local h =                  t.h or 3
+    local src                = assert(t.src)
+    local dst                = t.dst
     local templateWindowSize = t.templateWindowSize or 7
-    local searchWindowSize =   t.searchWindowSize or 21
-    
+    local searchWindowSize   = t.searchWindowSize or 21
+
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
     end
-    
+
     assert(templateWindowSize % 2 == 1)
+
+    if type(t.h) == "number" or t.h == nil then
+        h = t.h or 3
+        h = cv.newArray('Float', h)
     
+        return cv.unwrap_tensors(
+            C.fastNlMeansDenoisingCommon(
+                cv.wrap_tensors(src), cv.wrap_tensors(dst), h, templateWindowSize, searchWindowSize, -1))
+    end
+
+    local h        = cv.newArray('Float', assert(t.h))
+    local normType = t.normType or cv.NORM_L2
+
     return cv.unwrap_tensors(
-        C.fastNlMeansDenoising(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), h, templateWindowSize, searchWindowSize))
+            C.fastNlMeansDenoisingCommon(
+                cv.wrap_tensors(src), cv.wrap_tensors(dst), h,
+                templateWindowSize, searchWindowSize, normType))
 end
 
 function cv.fastNlMeansDenoisingColored(t)
-    local src =                assert(t.src)
-    local dst =                t.dst
-    local h =                  t.h or 3
-    local hColor =             t.hColor or 3
+    local src                = assert(t.src)
+    local dst                = t.dst
+    local h                  = t.h or 3
+    local hColor             = t.hColor or 3
     local templateWindowSize = t.templateWindowSize or 7
-    local searchWindowSize =   t.searchWindowSize or 21
+    local searchWindowSize   = t.searchWindowSize or 21
     
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
@@ -114,13 +126,13 @@ function cv.fastNlMeansDenoisingColored(t)
 end
 
 function cv.fastNlMeansDenoisingMulti(t)
-    local srcImgs =            assert(t.srcImgs)
-    local dst =                t.dst
-    local imgToDenoiseIndex =  assert(t.imgToDenoiseIndex)
+    local srcImgs            = assert(t.srcImgs)
+    local dst                = t.dst
+    local imgToDenoiseIndex  = assert(t.imgToDenoiseIndex)
     local temporalWindowSize = assert(t.temporalWindowSize)
-    local h =                  t.h or 3
+    local h                  = t.h or 3
     local templateWindowSize = t.templateWindowSize or 7
-    local searchWindowSize =   t.searchWindowSize or 21
+    local searchWindowSize   = t.searchWindowSize or 21
 
     if #srcImgs > 1 then 
         for i = 2, #srcImgs do
@@ -147,14 +159,14 @@ function cv.fastNlMeansDenoisingMulti(t)
 end
 
 function cv.fastNlMeansDenoisingColoredMulti(t)
-    local srcImgs =            assert(t.srcImgs)
-    local dst =                t.dst
-    local imgToDenoiseIndex =  assert(t.imgToDenoiseIndex)
+    local srcImgs            = assert(t.srcImgs)
+    local dst                = t.dst
+    local imgToDenoiseIndex  = assert(t.imgToDenoiseIndex)
     local temporalWindowSize = assert(t.temporalWindowSize)
-    local h =                  t.h or 3
-    local hColor =             t.hColor or 3
+    local h                  = t.h or 3
+    local hColor             = t.hColor or 3
     local templateWindowSize = t.templateWindowSize or 7
-    local searchWindowSize =   t.searchWindowSize or 21
+    local searchWindowSize   = t.searchWindowSize or 21
 
     if #srcImgs > 1 then 
         for i = 2, #srcImgs do
@@ -293,7 +305,7 @@ end
 function cv.pencilSketch(t)
     local src          = assert(t.src)
     local dst1         = t.dst1
-    local dst          = t.dst2
+    local dst2         = t.dst2
     local sigma_s      = t.sigma_s or 60
     local sigma_r      = t.sigma_r or 0.07
     local shade_factor = t.shade_factor or 0.02

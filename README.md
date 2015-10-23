@@ -2,7 +2,7 @@ photo module branch
 =========================
 *Already implemented:*
 - inpaint
-- fastNlMeansDenoising(1/2)
+- fastNlMeansDenoising(2)
 - fastNlMeansDenoisingColored
 - fastNlMeansDenoisingMulti(1/2)
 - fastNlMeansDenoisingColoredMulti
@@ -17,6 +17,5 @@ photo module branch
 - stylization
 
 *To be implemented:*
-- fastNlMeansDenoising(2/2)
 - fastNlMeansDenoisingMulti(2/2)
 - Some frightening functions with patterns and structures.. 

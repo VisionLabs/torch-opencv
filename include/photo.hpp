@@ -4,15 +4,9 @@
 extern "C" struct TensorWrapper inpaint(struct TensorWrapper src, struct TensorWrapper inpaintMask,
                                     struct TensorWrapper dst, double inpaintRadius, int flags);
 
-extern "C" struct TensorWrapper fastNlMeansDenoising(struct TensorWrapper src, struct TensorWrapper dst,
-                                    float h, int templateWindowSize, int searchWindowSize);
-
-/*extern "C" struct TensorWrapper fastNlMeansDenoising(struct TensorWrapper src, struct TensorWrapper dst,
-                                        const std::vector<float>& h, int templateWindowSize,
-                                        int searchWindowSize, int normType);*/
-
-extern "C" struct TensorWrapper fastNlMeansDenoisingColored(struct TensorWrapper src, struct TensorWrapper dst,
-                                    float h, float hColor, int templateWindowSize, int searchWindowSize);
+extern "C" struct TensorWrapper fastNlMeansDenoisingCommon(struct TensorWrapper src, struct TensorWrapper dst,
+                                    struct FloatArray h, int templateWindowSize,
+                                    int searchWindowSize, int normType);
 
 extern "C" struct TensorWrapper fastNlMeansDenoisingMulti(struct TensorArray srcImgs, struct TensorWrapper dst,
                                     int imgToDenoiseIndex, int temporalWindowSize, float h,
