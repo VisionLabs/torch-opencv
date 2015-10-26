@@ -27,10 +27,8 @@ extern "C" struct TensorWrapper fastNlMeansDenoisingColoredMulti(struct TensorAr
                                     int imgToDenoiseIndex, int temporalWindowSize, float h,
                                     float hColor, int templateWindowSize, int searchWindowSize);
 
-// Some frightening functions with patterns and structures
-
-
-
+extern "C" struct TensorWrapper denoise_TVL1(struct TensorArray observations, struct TensorWrapper result,
+                                    double lambda, int niters);
 
 extern "C" struct TensorWrapper decolor(struct TensorWrapper src, struct TensorWrapper grayscale,
                                     struct TensorWrapper color_boost);

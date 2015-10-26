@@ -3,3 +3,9 @@
 *~
 scripts/
 demo/1.lua
+*.dylib
+build/
+lib/
+Makefile
+mydemo/
+

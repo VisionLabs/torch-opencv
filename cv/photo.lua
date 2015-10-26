@@ -30,6 +30,9 @@ struct TensorWrapper fastNlMeansDenoisingColoredMulti(struct TensorArray srcImgs
                             int imgToDenoiseIndex, int temporalWindowSize, float h,
                             float hColor, int templateWindowSize, int searchWindowSize);
 
+struct TensorWrapper denoise_TVL1(struct TensorArray observations, struct TensorWrapper result,
+                            double lambda, int niters);
+
 struct TensorWrapper decolor(struct TensorWrapper src, struct TensorWrapper grayscale,
                             struct TensorWrapper color_boost);
 
@@ -224,6 +227,17 @@ function cv.fastNlMeansDenoisingColoredMulti(t)
         C.fastNlMeansDenoisingColoredMulti(
             cv.wrap_tensors(srcImgs), cv.wrap_tensors(dst), imgToDenoiseIndex, temporalWindowSize,
             h, hColor, templateWindowSize, searchWindowSize))
+end
+
+function cv.denoise_TVL1(t)
+    local observations = assert(t.observations)
+    local result       = t.result
+    local lambda       = t.lambda or 1.0
+    local niters       = t.niters or 30
+
+    return cv.unwrap_tensors(
+        C.denoise_TVL1(
+            cv.wrap_tensors(observations), cv.wrap_tensors(result), lambda, niters))
 end
 
 function cv.decolor(t)

@@ -103,7 +103,19 @@ extern "C" struct TensorWrapper fastNlMeansDenoisingColoredMulti(struct TensorAr
     return dst;
 }
 
-// Some frightening functions with patterns and structures
+extern "C" struct TensorWrapper denoise_TVL1(struct TensorArray observations, struct TensorWrapper result,
+                                    double lambda, int niters)
+{
+    if (result.isNull()) {
+        cv::Mat retval;
+        cv::denoise_TVL1(observations.toMatList(), retval, lambda, niters);
+        return TensorWrapper(retval);
+    } else {
+        cv::Mat retval = result.toMat();
+        cv::denoise_TVL1(observations.toMatList(), retval, lambda, niters);
+    }
+    return result;
+}
 
 extern "C" struct TensorWrapper decolor(struct TensorWrapper src, struct TensorWrapper grayscale,
                                     struct TensorWrapper color_boost)

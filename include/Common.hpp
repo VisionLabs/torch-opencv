@@ -1,5 +1,5 @@
 #pragma once
-#include <opencv2/core/core.hpp>
+#include <opencv2/core.hpp>
 
 extern "C" {
 #include <TH/TH.h>
@@ -179,6 +179,11 @@ struct TensorArrayPlusFloat {
 struct TensorArrayPlusInt {
     struct TensorArray tensors;
     int val;
+};
+
+struct TensorArrayPlusBool {
+    struct TensorArray tensors;
+    bool val;
 };
 
 struct RectPlusInt {

@@ -485,7 +485,7 @@ function cv.medianBlur(t)
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
     end
 
-    return cv.unwrap_tensors(C.medianBlur(cv.wrap_tensors(src), cv.wrap_tensors(dst), ksize))
+    return cv.unwrap_tensors(C.medianBlur(cv.wrap_tensor(src), cv.wrap_tensor(dst), ksize))
 end
 
 
@@ -505,7 +505,7 @@ function cv.GaussianBlur(t)
 
     return cv.unwrap_tensors(
         C.GaussianBlur(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), ksize, sigmaX, sigmaY, borderType))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), ksize, sigmaX, sigmaY, borderType))
 end
 
 
@@ -528,7 +528,7 @@ function cv.bilateralFilter(t)
 
     return cv.unwrap_tensors(
         C.bilateralFilter(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), d, sigmaColor, sigmaSpace, borderType))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), d, sigmaColor, sigmaSpace, borderType))
 end
 
 
@@ -548,7 +548,7 @@ function cv.boxFilter(t)
 
     return cv.unwrap_tensors(
         C.boxFilter(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), ddepth, ksize[1], 
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), ddepth, ksize[1], 
             ksize[2], anchor, normalize, borderType))
 end
 
@@ -569,7 +569,7 @@ function cv.sqrBoxFilter(t)
 
     return cv.unwrap_tensors(
         C.sqrBoxFilter(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), ddepth, ksize, anchor, normalize, borderType))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), ddepth, ksize, anchor, normalize, borderType))
 end
 
 
@@ -588,7 +588,7 @@ function cv.blur(t)
 
     return cv.unwrap_tensors(
         C.blur(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), ksize, anchor, borderType))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), ksize, anchor, borderType))
 end
 
 
@@ -608,7 +608,7 @@ function cv.filter2D(t)
 
     return cv.unwrap_tensors(
         C.filter2D(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), ddepth, cv.wrap_tensors(kernel), anchor, delta, borderType))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), ddepth, cv.wrap_tensor(kernel), anchor, delta, borderType))
 end
 
 
@@ -629,7 +629,7 @@ function cv.sepFilter2D(t)
 
     return cv.unwrap_tensors(
         C.sepFilter2D(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), ddepth, kernelX, kernelY, anchor, delta, borderType))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), ddepth, kernelX, kernelY, anchor, delta, borderType))
 end
 
 
@@ -651,7 +651,7 @@ function cv.Sobel(t)
 
     return cv.unwrap_tensors(
         C.Sobel(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), ddepth, dx, dy, ksize, scale, delta, borderType))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), ddepth, dx, dy, ksize, scale, delta, borderType))
 end
 
 
@@ -672,7 +672,7 @@ function cv.Scharr(t)
 
     return cv.unwrap_tensors(
         C.Scharr(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), ddepth, dx, dy, scale, delta, borderType))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), ddepth, dx, dy, scale, delta, borderType))
 end
 
 
@@ -692,7 +692,7 @@ function cv.Laplacian(t)
 
     return cv.unwrap_tensors(
         C.Laplacian(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), ddepth, ksize, scale, delta, borderType))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), ddepth, ksize, scale, delta, borderType))
 end
 
 
@@ -714,7 +714,7 @@ function cv.Canny(t)
 
     return cv.unwrap_tensors(
         C.Canny(
-            cv.wrap_tensors(image), cv.wrap_tensors(edges), threshold1, threshold2, apertureSize, L2gradient))
+            cv.wrap_tensor(image), cv.wrap_tensor(edges), threshold1, threshold2, apertureSize, L2gradient))
 end
 
 
@@ -733,7 +733,7 @@ function cv.cornerMinEigenVal(t)
 
     return cv.unwrap_tensors(
         C.cornerMinEigenVal(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), blockSize, ksize, borderType))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), blockSize, ksize, borderType))
 end
 
 
@@ -754,7 +754,7 @@ function cv.cornerHarris(t)
 
     return cv.unwrap_tensors(
         C.cornerHarris(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), blockSize, ksize, k, borderType))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), blockSize, ksize, k, borderType))
 end
 
 
@@ -778,7 +778,7 @@ function cv.cornerEigenValsAndVecs(t)
 
     return cv.unwrap_tensors(
         C.cornerEigenValsAndVecs(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), blockSize, ksize, borderType))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), blockSize, ksize, borderType))
 end
 
 
@@ -797,7 +797,7 @@ function cv.preCornerDetect(t)
 
     return cv.unwrap_tensors(
         C.preCornerDetect(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), ksize, borderType))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), ksize, borderType))
 end
 
 
@@ -815,7 +815,7 @@ function cv.HoughLines(t)
 
     return cv.unwrap_tensors(
         C.HoughLines(
-            cv.wrap_tensors(image), rho, theta, threshold, srn, stn, min_theta, max_theta))
+            cv.wrap_tensor(image), rho, theta, threshold, srn, stn, min_theta, max_theta))
 end
 
 
@@ -831,7 +831,7 @@ function cv.HoughLinesP(t)
 
     return cv.unwrap_tensors(
         C.HoughLinesP(
-            cv.wrap_tensors(image), rho, theta, threshold, minLineLength, maxLineGap))
+            cv.wrap_tensor(image), rho, theta, threshold, minLineLength, maxLineGap))
 end
 
 
@@ -849,7 +849,7 @@ function cv.HoughCircles(t)
 
     return cv.unwrap_tensors(
         C.HoughCircles(
-            cv.wrap_tensors(image), method, dp, minDist, param1, param2, minRadius, maxRadius))
+            cv.wrap_tensor(image), method, dp, minDist, param1, param2, minRadius, maxRadius))
 end
 
 
@@ -864,7 +864,7 @@ function cv.cornerSubPix(t)
     assert(corners:size()[2] == 2 and cv.tensorType(corners) == cv.CV_32F)
 
     C.cornerSubPix(
-        cv.wrap_tensors(image), cv.wrap_tensors(corners), winSize,
+        cv.wrap_tensor(image), cv.wrap_tensor(corners), winSize,
         zeroZone, criteria)
 end
 
@@ -888,7 +888,7 @@ function cv.goodFeaturesToTrack(t)
 
     return cv.unwrap_tensors(
         C.goodFeaturesToTrack(
-            cv.wrap_tensors(image), maxCorners, qualityLevel, minDistance, cv.wrap_tensors(mask), blockSize, useHarrisDetector, k))
+            cv.wrap_tensor(image), maxCorners, qualityLevel, minDistance, cv.wrap_tensor(mask), blockSize, useHarrisDetector, k))
 end
 
 
@@ -903,7 +903,7 @@ function cv.erode(t)
 
     return cv.unwrap_tensors(
         C.erode(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(kernel), anchor,
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(kernel), anchor,
             iterations, borderType, borderValue))
 end
 
@@ -919,7 +919,7 @@ function cv.dilate(t)
 
     return cv.unwrap_tensors(
         C.dilate(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(kernel), anchor,
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(kernel), anchor,
             iterations, borderType, borderValue))
 end
 
@@ -936,7 +936,7 @@ function cv.morphologyEx(t)
 
     return cv.unwrap_tensors(
         C.morphologyEx(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), op, cv.wrap_tensors(kernel), anchor,
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), op, cv.wrap_tensor(kernel), anchor,
             iterations, borderType, borderValue))
 end
 
@@ -951,7 +951,7 @@ function cv.resize(t)
 
     return cv.unwrap_tensors(
         C.resize(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), dsize, fx, fy, interpolation))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), dsize, fx, fy, interpolation))
 end
 
 
@@ -966,7 +966,7 @@ function cv.warpAffine(t)
 
     return cv.unwrap_tensors(
         C.warpAffine(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(M), dsize,
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(M), dsize,
             flags, borderMode, borderValue))
 end
 
@@ -982,7 +982,7 @@ function cv.warpPerspective(t)
 
     return cv.unwrap_tensors(
         C.warpPerspective(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(M), dsize,
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(M), dsize,
             flags, borderMode, borderValue))
 end
 
@@ -998,7 +998,7 @@ function cv.remap(t)
 
     return cv.unwrap_tensors(
         C.remap(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(map1), cv.wrap_tensors(map2),
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(map1), cv.wrap_tensor(map2),
             interpolation, borderMode, borderValue))
 end
 
@@ -1013,8 +1013,8 @@ function cv.convertMaps(t)
 
     return cv.unwrap_tensors(
         C.convertMaps(
-            cv.wrap_tensors(map1), cv.wrap_tensors(map2), cv.wrap_tensors(dstmap1),
-            cv.wrap_tensors(dstmap2), dstmap1type, nninterpolation))
+            cv.wrap_tensor(map1), cv.wrap_tensor(map2), cv.wrap_tensor(dstmap1),
+            cv.wrap_tensor(dstmap2), dstmap1type, nninterpolation))
 end
 
 
@@ -1033,7 +1033,7 @@ function cv.invertAffineTransform(t)
     local iM = t.iM
 
     return cv.unwrap_tensors(
-        C.invertAffineTransform(cv.wrap_tensors(M), cv.wrap_tensors(iM)))
+        C.invertAffineTransform(cv.wrap_tensor(M), cv.wrap_tensor(iM)))
 end
 
 
@@ -1042,7 +1042,7 @@ function cv.getPerspectiveTransform(t)
     local dst = assert(t.dst)
 
     return cv.unwrap_tensors(
-        C.getPerspectiveTransform(cv.wrap_tensors(src), cv.wrap_tensors(dst)))
+        C.getPerspectiveTransform(cv.wrap_tensor(src), cv.wrap_tensor(dst)))
 end
 
 
@@ -1051,7 +1051,7 @@ function cv.getAffineTransform(t)
     local dst = assert(t.dst)
 
     return cv.unwrap_tensors(
-        C.getAffineTransform(cv.wrap_tensors(src), cv.wrap_tensors(dst)))
+        C.getAffineTransform(cv.wrap_tensor(src), cv.wrap_tensor(dst)))
 end
 
 
@@ -1063,8 +1063,8 @@ function cv.getRectSubPix(t)
     local patchType = t.patchType or -1
 
     return cv.unwrap_tensors(
-        C.getRectSubPix(cv.wrap_tensors(image), patchSize, center,
-                        cv.wrap_tensors(patch), patchType))
+        C.getRectSubPix(cv.wrap_tensor(image), patchSize, center,
+                        cv.wrap_tensor(patch), patchType))
 end
 
 
@@ -1076,7 +1076,7 @@ function cv.logPolar(t)
     local flags = assert(t.flags)
 
     return cv.unwrap_tensors(
-        C.logPolar(cv.wrap_tensors(src), cv.wrap_tensors(dst), center, M, flags))
+        C.logPolar(cv.wrap_tensor(src), cv.wrap_tensor(dst), center, M, flags))
 end
 
 
@@ -1088,7 +1088,7 @@ function cv.linearPolar(t)
     local flags = assert(t.flags)
 
     return cv.unwrap_tensors(
-        C.linearPolar(cv.wrap_tensors(src), cv.wrap_tensors(dst), center, maxRadius, flags))
+        C.linearPolar(cv.wrap_tensor(src), cv.wrap_tensor(dst), center, maxRadius, flags))
 end
 
 
@@ -1098,7 +1098,7 @@ function cv.integral(t)
     local sdepth = t.sdepth or -1
 
     return cv.unwrap_tensors(
-        C.integral(cv.wrap_tensors(src), cv.wrap_tensors(sum), sdepth))
+        C.integral(cv.wrap_tensor(src), cv.wrap_tensor(sum), sdepth))
 end
 
 
@@ -1110,7 +1110,7 @@ function cv.integral2(t)
     local sqdepth = t.sqdepth or -1
 
     return cv.unwrap_tensors(
-        C.integralN(cv.wrap_tensors(src), cv.wrap_tensors(sum, sqsum), sdepth, sqdepth))
+        C.integralN(cv.wrap_tensor(src), cv.wrap_tensors(sum, sqsum), sdepth, sqdepth))
 end
 
 
@@ -1123,7 +1123,7 @@ function cv.integral3(t)
     local sqdepth = t.sqdepth or -1
 
     return cv.unwrap_tensors(
-        C.integralN(cv.wrap_tensors(src), cv.wrap_tensors(sum, sqsum, tilted), sdepth, sqdepth))
+        C.integralN(cv.wrap_tensor(src), cv.wrap_tensors(sum, sqsum, tilted), sdepth, sqdepth))
 end
 
 
@@ -1132,7 +1132,7 @@ function cv.accumulate(t)
     local sum = assert(t.sum)
     local mask = t.mask
 
-    C.accumulate(cv.wrap_tensors(src), cv.wrap_tensors(sum), cv.wrap_tensors(mask))
+    C.accumulate(cv.wrap_tensor(src), cv.wrap_tensor(sum), cv.wrap_tensor(mask))
 end
 
 
@@ -1141,7 +1141,7 @@ function cv.accumulateSquare(t)
     local sum = assert(t.sum)
     local mask = t.mask
 
-    C.accumulateSquare(cv.wrap_tensors(src), cv.wrap_tensors(sum), cv.wrap_tensors(mask))
+    C.accumulateSquare(cv.wrap_tensor(src), cv.wrap_tensor(sum), cv.wrap_tensor(mask))
 end
 
 
@@ -1151,7 +1151,7 @@ function cv.accumulateProduct(t)
     local sum = assert(t.sum)
     local mask = t.mask
 
-    C.accumulateSquare(cv.wrap_tensors(src1), cv.wrap_tensors(src2), cv.wrap_tensors(sum), cv.wrap_tensors(mask))
+    C.accumulateSquare(cv.wrap_tensor(src1), cv.wrap_tensor(src2), cv.wrap_tensor(sum), cv.wrap_tensor(mask))
 end
 
 
@@ -1161,7 +1161,7 @@ function cv.accumulateWeighted(t)
     local alpha = assert(t.alpha)
     local mask = t.mask
 
-    C.accumulateWeighted(cv.wrap_tensors(src), cv.wrap_tensors(sum), alpha, cv.wrap_tensors(mask))
+    C.accumulateWeighted(cv.wrap_tensor(src), cv.wrap_tensor(sum), alpha, cv.wrap_tensor(mask))
 end
 
 
@@ -1173,7 +1173,7 @@ function cv.phaseCorrelate(t)
     local src2 = assert(t.src2)
     local window = t.window
 
-    local result = C.phaseCorrelate(cv.wrap_tensors(src1), cv.wrap_tensors(src2), cv.wrap_tensors(window))
+    local result = C.phaseCorrelate(cv.wrap_tensor(src1), cv.wrap_tensor(src2), cv.wrap_tensor(window))
     return {x=result.v0, y=result.v1}, result.v2
 end
 
@@ -1190,7 +1190,7 @@ function cv.createHanningWindow(t)
     end
 
     return cv.unwrap_tensors(
-        C.createHanningWindow(cv.wrap_tensors(dst), winSize, type))
+        C.createHanningWindow(cv.wrap_tensor(dst), winSize, type))
 end
 
 
@@ -1209,7 +1209,7 @@ function cv.threshold(t)
         assert(dst:isSameSizeAs(src))
     end
 
-    local result = C.threshold(cv.wrap_tensors(src), cv.wrap_tensors(dst),
+    local result = C.threshold(cv.wrap_tensor(src), cv.wrap_tensor(dst),
                     tresh, maxval, type)
     return result.val, cv.unwrap_tensors(result.tensor)
 end
@@ -1230,7 +1230,7 @@ function cv.adaptiveThreshold(t)
 
     return cv.unwrap_tensors(
         C.adaptiveThreshold(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), maxValue,
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), maxValue,
                             adaptiveMethod, thresholdType, blockSize))
 end
 
@@ -1249,7 +1249,7 @@ function cv.pyrDown(t)
 
     return cv.unwrap_tensors(
         C.pyrDown(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst),
+            cv.wrap_tensor(src), cv.wrap_tensor(dst),
             dstSize, borderType))
 end
 
@@ -1268,14 +1268,14 @@ function cv.pyrUp(t)
 
     return cv.unwrap_tensors(
         C.pyrUp(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst),
+            cv.wrap_tensor(src), cv.wrap_tensor(dst),
             dstSize, borderType))
 end
 
 
 function cv.buildPyramid(t)
     local src = assert(t.src)
-    local dst = t.dst or cv.wrap_tensors(dst)
+    local dst = t.dst
     local maxlevel = assert(t.maxlevel)
     local borderType = t.borderType or cv.BORDER_DEFAULT
 
@@ -1287,7 +1287,7 @@ function cv.buildPyramid(t)
     end
 
     return cv.unwrap_tensors(
-        C.buildPyramid(cv.wrap_tensors(src), dst, maxlevel, borderType), 
+        C.buildPyramid(cv.wrap_tensor(src), cv.wrap_tensors(dst), maxlevel, borderType), 
         true)
 end
 
@@ -1314,8 +1314,8 @@ function cv.undistort(t)
     end
 
     return cv.unwrap_tensors(
-        C.undistort(cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(cameraMatrix), 
-                    cv.wrap_tensors(distCoeffs), cv.wrap_tensors(newCameraMatrix)))
+        C.undistort(cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(cameraMatrix), 
+                    cv.wrap_tensor(distCoeffs), cv.wrap_tensor(newCameraMatrix)))
 end
 
 
@@ -1343,8 +1343,8 @@ function cv.initUndistortRectifyMap(t)
 
     return cv.unwrap_tensors(
         C.initUndistortRectifyMap(
-            cv.wrap_tensors(cameraMatrix), cv.wrap_tensors(distCoeffs), 
-            cv.wrap_tensors(R), cv.wrap_tensors(newCameraMatrix),
+            cv.wrap_tensor(cameraMatrix), cv.wrap_tensor(distCoeffs), 
+            cv.wrap_tensor(R), cv.wrap_tensor(newCameraMatrix),
             size, m1type, cv.wrap_tensors(maps)))
 end
 
@@ -1371,7 +1371,7 @@ function cv.initWideAngleProjMap(t)
     local alpha = assert(t.alpha)
     
     local result = C.initWideAngleProjMap(
-        cv.wrap_tensors(cameraMatrix), cv.wrap_tensors(distCoeffs),
+        cv.wrap_tensor(cameraMatrix), cv.wrap_tensor(distCoeffs),
         imageSize, destImageWidth, m1type, cv.wrap_tensors(maps),
         projType, alpha)
     return result.val, cv.unwrap_tensors(result.tensors)
@@ -1405,8 +1405,8 @@ function cv.calcHist(t)
 
     return cv.unwrap_tensors(
         C.calcHist(
-            cv.wrap_tensors(images), channels, cv.wrap_tensors(mask),
-            cv.wrap_tensors(hist), dims, histSize, ranges, uniform, accumulate))
+            cv.wrap_tensors(images), channels, cv.wrap_tensor(mask),
+            cv.wrap_tensor(hist), dims, histSize, ranges, uniform, accumulate))
 end
 
 
@@ -1432,8 +1432,8 @@ function cv.calcBackProject(t)
     
     return cv.unwrap_tensors(
         C.calcBackProject(
-            cv.wrap_tensors(images), nimages, channels, cv.wrap_tensors(hist),
-            cv.wrap_tensors(backProject), ranges, scale, uniform))
+            cv.wrap_tensors(images), nimages, channels, cv.wrap_tensor(hist),
+            cv.wrap_tensor(backProject), ranges, scale, uniform))
 end
 
 
@@ -1442,7 +1442,7 @@ function cv.compareHist(t)
     local H2 = assert(t.H2)
     local method = assert(t.method)
 
-    return C.compareHist(cv.wrap_tensors(H1), cv.wrap_tensors(H2), method)
+    return C.compareHist(cv.wrap_tensor(H1), cv.wrap_tensor(H2), method)
 end
 
 
@@ -1452,7 +1452,7 @@ function cv.equializeHist(t)
 
     return cv.unwrap_tensors(
         C.equializeHist(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst)))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst)))
 end
 
 
@@ -1468,8 +1468,8 @@ function cv.EMD(t)
     local flow = t.flow
 
     return C.EMD(
-        cv.wrap_tensors(signature1), cv.wrap_tensors(signature2), distType,
-        cv.wrap_tensors(cost), lowerBound, cv.wrap_tensors(flow))
+        cv.wrap_tensor(signature1), cv.wrap_tensor(signature2), distType,
+        cv.wrap_tensor(cost), lowerBound, cv.wrap_tensor(flow))
 end
 
 
@@ -1477,7 +1477,7 @@ function cv.watershed(t)
     local image = assert(t.image)
     local markers = assert(t.markers)
 
-    C.watershed(cv.wrap_tensors(image), cv.wrap_tensors(markers))
+    C.watershed(cv.wrap_tensor(image), cv.wrap_tensor(markers))
 end
 
 
@@ -1490,7 +1490,7 @@ function cv.pyrMeanShiftFiltering(t)
     local termcrit = cv.TermCriteria(t.termcrit)
 
     return cv.unwrap_tensors(C.pyrMeanShiftFiltering(
-        cv.wrap_tensors(src), cv.wrap_tensors(dst), sp, sr, maxlevel, termcrit))
+        cv.wrap_tensor(src), cv.wrap_tensor(dst), sp, sr, maxlevel, termcrit))
 end
 
 
@@ -1504,8 +1504,8 @@ function cv.grabCut(t)
     local mode = t.mode or cv.GC_EVAL
     
     C.grabCut(
-        cv.wrap_tensors(img), cv.wrap_tensors(mask), rect,
-        cv.wrap_tensors(bgdModel), cv.wrap_tensors(fgdModel),
+        cv.wrap_tensor(img), cv.wrap_tensor(mask), rect,
+        cv.wrap_tensor(bgdModel), cv.wrap_tensor(fgdModel),
         iterCount, mode)
 end
 
@@ -1519,7 +1519,7 @@ function cv.distanceTransform(t)
 
     return cv.unwrap_tensors(
         C.distanceTransform(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), distanceType, maskSize, dstType))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), distanceType, maskSize, dstType))
 end
 
 
@@ -1533,8 +1533,8 @@ function cv.distanceTransformWithLabels(t)
 
     return cv.unwrap_tensors(
         C.distanceTransformWithLabels(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), 
-            cv.wrap_tensors(labels), distanceType, maskSize, labelType)) 
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), 
+            cv.wrap_tensor(labels), distanceType, maskSize, labelType)) 
 end
 
 -- area, boundingRect = cv.floodFill{...}
@@ -1550,7 +1550,7 @@ function cv.floodFill(t)
     local flags = t.flags or 4
 
     local result = C.floodFill(
-        cv.wrap_tensors(image), cv.wrap_tensors(mask), seedPoint[1], 
+        cv.wrap_tensor(image), cv.wrap_tensor(mask), seedPoint[1], 
         seedPoint[2], newVal, loDiff, upDiff, flags)
     return result.val, result.rect
 end
@@ -1563,7 +1563,7 @@ function cv.cvtColor(t)
     local dstCn = t.dstCn or 0
 
     return cv.unwrap_tensors(C.cvtColor(
-        cv.wrap_tensors(src), cv.wrap_tensors(dst), code, dstCn))
+        cv.wrap_tensor(src), cv.wrap_tensor(dst), code, dstCn))
 end
 
 
@@ -1574,7 +1574,7 @@ function cv.demosaicing(t)
     local dcn = t.dcn or 0
 
     return cv.unwrap_tensors(C.demosaicing(
-        cv.wrap_tensors(_src), cv.wrap_tensors(_dst), code, dcn))
+        cv.wrap_tensor(_src), cv.wrap_tensor(_dst), code, dcn))
 end
 
 
@@ -1582,7 +1582,7 @@ function cv.moments(t)
     local array = assert(t.array)
     local binaryImage = t.binaryImage or false
 
-    return C.moments(cv.wrap_tensors(array), binaryImage)
+    return C.moments(cv.wrap_tensor(array), binaryImage)
 end
 
 
@@ -1606,7 +1606,7 @@ function cv.matchTemplate(t)
     local mask = t.mask
 
     return cv.unwrap_tensors(C.matchTemplate(
-        cv.wrap_tensors(image), cv.wrap_tensors(templ), cv.wrap_tensors(result), method, cv.wrap_tensors(mask)))
+        cv.wrap_tensor(image), cv.wrap_tensor(templ), cv.wrap_tensor(result), method, cv.wrap_tensor(mask)))
 end
 
 
@@ -1616,7 +1616,7 @@ function cv.connectedComponents(t)
     local connectivity = t.connectivity or 8
     local ltype = t.ltype or cv.CV_32S
 
-    local result = C.connectedComponents(cv.wrap_tensors(image), cv.wrap_tensors(labels), connectivity, ltype)
+    local result = C.connectedComponents(cv.wrap_tensor(image), cv.wrap_tensor(labels), connectivity, ltype)
     return result.val, cv.unwrap_tensors(result.tensor)
 end
 
@@ -1630,7 +1630,7 @@ function cv.connectedComponentsWithStats(t)
     local ltype = t.ltype or cv.CV_32S
 
     local result = C.connectedComponentsWithStats(
-        cv.wrap_tensors(image), 
+        cv.wrap_tensor(image), 
         cv.wrap_tensors(labels, stats, centroids), 
         connectivity, 
         ltype)
@@ -1651,7 +1651,7 @@ function cv.findContours(t)
 
     contours = cv.unwrap_tensors(
         C.findContours(
-            cv.wrap_tensors(image), withHierarchy, cv.wrap_tensors(hierarchy), mode, method, offset), true)
+            cv.wrap_tensor(image), withHierarchy, cv.wrap_tensor(hierarchy), mode, method, offset), true)
 
     if withHierarchy and not hierarchy then
         hierarchy = contours[#contours]
@@ -1669,7 +1669,7 @@ function cv.approxPolyDP(t)
     local epsilon = assert(t.epsilon)
     local closed = assert(t.closed)
 
-    return cv.unwrap_tensors(C.approxPolyDP(cv.wrap_tensors(curve), cv.wrap_tensors(approxCurve), epsilon, closed))
+    return cv.unwrap_tensors(C.approxPolyDP(cv.wrap_tensor(curve), cv.wrap_tensor(approxCurve), epsilon, closed))
 end
 
 
@@ -1677,7 +1677,7 @@ function cv.arcLength(t)
     local curve = assert(t.curve)
     local closed = assert(t.closed)
     
-    return C.arcLength(cv.wrap_tensors(curve), closed)
+    return C.arcLength(cv.wrap_tensor(curve), closed)
 end
 
 
@@ -1687,7 +1687,7 @@ function cv.boundingRect(t)
         points = torch.FloatTensor(points)
     end
 
-    return C.boundingRect(cv.wrap_tensors(points))
+    return C.boundingRect(cv.wrap_tensor(points))
 end
 
 
@@ -1699,7 +1699,7 @@ function cv.contourArea(t)
 
     local oriented = t.oriented or false
 
-    return C.contourArea(cv.wrap_tensors(contour), oriented)
+    return C.contourArea(cv.wrap_tensor(contour), oriented)
 end
 
 
@@ -1709,7 +1709,7 @@ function cv.minAreaRect(t)
         points = torch.FloatTensor(points)
     end
 
-    return C.minAreaRect(cv.wrap_tensors(points))
+    return C.minAreaRect(cv.wrap_tensor(points))
 end
 
 
@@ -1721,7 +1721,7 @@ function cv.boxPoints(t)
     -- check that points is a Tensor
     assert(not points or points.torch)
 
-    return cv.unwrap_tensors(C.boxPoints(box, cv.wrap_tensors(points)))
+    return cv.unwrap_tensors(C.boxPoints(box, cv.wrap_tensor(points)))
 end
 
 -- points: a Tensor or a table of points
@@ -1732,7 +1732,7 @@ function cv.minEnclosingCircle(t)
         points = torch.FloatTensor(points)
     end
 
-    local result = C.minEnclosingCircle(cv.wrap_tensors(points))
+    local result = C.minEnclosingCircle(cv.wrap_tensor(points))
     return cv.Point2f(result.v0, result.v1), result.v2
 end
 
@@ -1748,7 +1748,7 @@ function cv.minEnclosingTriangle(t)
     -- check that triangle is a Tensor
     assert(not triangle or triangle.torch)
 
-    local result = C.minEnclosingTriangle(cv.wrap_tensors(points), cv.wrap_tensors(triangle))
+    local result = C.minEnclosingTriangle(cv.wrap_tensor(points), cv.wrap_tensor(triangle))
     return cv.unwrap_tensors(result.tensor), result.val
 end
 
@@ -1759,7 +1759,7 @@ function cv.matchShapes(t)
     local method = assert(t.method)
     local parameter = t.parameter or 0
 
-    return C.matchShapes(cv.wrap_tensors(contour1), cv.wrap_tensors(contour2), method, parameter)
+    return C.matchShapes(cv.wrap_tensor(contour1), cv.wrap_tensor(contour2), method, parameter)
 end
 
 
@@ -1771,7 +1771,7 @@ function cv.convexHull(t)
          returnPoints = true
     end
 
-    retval = cv.unwrap_tensors(C.convexHull(cv.wrap_tensors(points), clockwise, returnPoints))
+    retval = cv.unwrap_tensors(C.convexHull(cv.wrap_tensor(points), clockwise, returnPoints))
     if not returnPoints then
         -- correct the 0-based indexing
         for i = 1,#retval do
@@ -1786,14 +1786,14 @@ function cv.convexityDefects(t)
     local contour = assert(t.contour)
     local convexhull = assert(t.convexhull)
 
-    return cv.unwrap_tensors(C.convexityDefects(cv.wrap_tensors(contour), cv.wrap_tensors(convexhull)))
+    return cv.unwrap_tensors(C.convexityDefects(cv.wrap_tensor(contour), cv.wrap_tensor(convexhull)))
 end
 
 
 function cv.isContourConvex(t)
     local contour = assert(t.contour)
 
-    return C.isContourConvex(cv.wrap_tensors(contour))
+    return C.isContourConvex(cv.wrap_tensor(contour))
 end
 
 
@@ -1809,14 +1809,14 @@ function cv.intersectConvexConvex(t)
     end
 
     return cv.unwrap_tensors(
-        C.intersectConvexConvex(cv.wrap_tensors(_p1), cv.wrap_tensors(_p2), handleNested))
+        C.intersectConvexConvex(cv.wrap_tensor(_p1), cv.wrap_tensor(_p2), handleNested))
 end
 
 
 function cv.fitEllipse(t)
     local points = assert(t.points)
 
-    return C.fitEllipse(cv.wrap_tensors(points))
+    return C.fitEllipse(cv.wrap_tensor(points))
 end
 
 
@@ -1828,7 +1828,7 @@ function cv.fitLine(t)
     local aeps = assert(t.aeps)
 
     return cv.unwrap_tensors(
-        C.fitLine(cv.wrap_tensors(points), distType, param, reps, aeps))
+        C.fitLine(cv.wrap_tensor(points), distType, param, reps, aeps))
 end
 
 
@@ -1837,7 +1837,7 @@ function cv.pointPolygonTest(t)
     local pt = cv.Point2f(assert(t.pt))
     local measureDist = assert(t.measureDist)
 
-    return C.pointPolygonTest(cv.wrap_tensors(contour), pt, measureDist)
+    return C.pointPolygonTest(cv.wrap_tensor(contour), pt, measureDist)
 end
 
 
@@ -1858,7 +1858,7 @@ function cv.blendLinear(t)
     local dst = t.dst
 
     return cv.unwrap_tensors(
-        C.blendLinear(cv.wrap_tensors(src1), cv.wrap_tensors(src2), cv.wrap_tensors(weights1), cv.wrap_tensors(weights2), cv.wrap_tensors(dst)))
+        C.blendLinear(cv.wrap_tensor(src1), cv.wrap_tensor(src2), cv.wrap_tensor(weights1), cv.wrap_tensor(weights2), cv.wrap_tensor(dst)))
 end
 
 
@@ -1868,7 +1868,7 @@ function cv.applyColorMap(t)
     local colormap = assert(t.colormap)
 
     return cv.unwrap_tensors(
-        C.applyColorMap(cv.wrap_tensors(src), cv.wrap_tensors(dst), colormap))
+        C.applyColorMap(cv.wrap_tensor(src), cv.wrap_tensor(dst), colormap))
 end
 
 
@@ -1881,7 +1881,7 @@ function cv.line(t)
     local lineType = t.lineType or cv.LINE_8
     local shift = t.shift or 0
 
-    C.line(cv.wrap_tensors(img), pt1, pt2, color, thickness, lineType, shift)
+    C.line(cv.wrap_tensor(img), pt1, pt2, color, thickness, lineType, shift)
 end
 
 
@@ -1895,7 +1895,7 @@ function cv.arrowedLine(t)
     local shift = t.shift or 0
     local tipLength = t.tipLength or 0.1
 
-    C.arrowedLine(cv.wrap_tensors(img), pt1, pt2, color, thickness, line_type, shift, tipLength)
+    C.arrowedLine(cv.wrap_tensor(img), pt1, pt2, color, thickness, line_type, shift, tipLength)
 end
 
 
@@ -1917,9 +1917,9 @@ function cv.rectangle(t)
     local shift = t.shift or 0
 
     if rec then
-        C.rectangle(cv.wrap_tensors(img), rec, color, thickness, lineType, shift)
+        C.rectangle(cv.wrap_tensor(img), rec, color, thickness, lineType, shift)
     else
-        C.rectangle(cv.wrap_tensors(img), pt1, pt2, color, thickness, lineType, shift)
+        C.rectangle(cv.wrap_tensor(img), pt1, pt2, color, thickness, lineType, shift)
     end
 end
 
@@ -1933,7 +1933,7 @@ function cv.circle(t)
     local lineType = t.lineType or cv.LINE_8
     local shift = t.shift or 0
 
-    C.circle(cv.wrap_tensors(img), center, radius, color, thickness, lineType, shift)
+    C.circle(cv.wrap_tensor(img), center, radius, color, thickness, lineType, shift)
 end
 
 
@@ -1949,7 +1949,7 @@ function cv.ellipse(t)
     local lineType = t.lineType or cv.LINE_8
     local shift = t.shift or 0
 
-    C.ellipse(cv.wrap_tensors(img), center, axes, angle, startAngle, endAngle, color, thickness, lineType, shift)
+    C.ellipse(cv.wrap_tensor(img), center, axes, angle, startAngle, endAngle, color, thickness, lineType, shift)
 end
 
 
@@ -1960,7 +1960,7 @@ function cv.ellipseFromRect(t)
     local thickness = t.thickness or 1
     local lineType = t.lineType or cv.LINE_8
 
-    C.ellipseFromRect(cv.wrap_tensors(img), box, color, thickness, lineType)
+    C.ellipseFromRect(cv.wrap_tensor(img), box, color, thickness, lineType)
 end
 
 
@@ -1974,7 +1974,7 @@ function cv.fillConvexPoly(t)
     local lineType = t.lineType or cv.LINE_8
     local shift = t.shift or 0
 
-    C.fillConvexPoly(cv.wrap_tensors(img), cv.wrap_tensors(points), color, lineType, shift)
+    C.fillConvexPoly(cv.wrap_tensor(img), cv.wrap_tensor(points), color, lineType, shift)
 end
 
 
@@ -1987,7 +1987,7 @@ function cv.fillPoly(t)
     local shift = t.shift or 0
     local offset = cv.Point(t.offset or {0,0})
 
-    C.fillPoly(cv.wrap_tensors(img), cv.wrap_tensors(pts), color, lineType, shift, offset)
+    C.fillPoly(cv.wrap_tensor(img), cv.wrap_tensors(pts), color, lineType, shift, offset)
 end
 
 
@@ -2001,7 +2001,7 @@ function cv.polylines(t)
     local lineType = t.lineType or cv.LINE_8
     local shift = t.shift or 0
 
-    C.polylines(cv.wrap_tensors(img), cv.wrap_tensors(pts), isClosed, color, thickness, lineType, shift)
+    C.polylines(cv.wrap_tensor(img), cv.wrap_tensors(pts), isClosed, color, thickness, lineType, shift)
 end
 
 
@@ -2017,7 +2017,7 @@ function cv.drawContours(t)
     local maxLevel = t.maxLevel or cv.INT_MAX
     local offset = t.offset or cv.Point
 
-    C.drawContours(cv.wrap_tensors(image), cv.wrap_tensors(contours), contourIdx, color, thickness, lineType, cv.wrap_tensors(hierarchy), maxLevel, offset)
+    C.drawContours(cv.wrap_tensor(image), cv.wrap_tensors(contours), contourIdx, color, thickness, lineType, cv.wrap_tensor(hierarchy), maxLevel, offset)
 end
 
 
@@ -2069,7 +2069,7 @@ function cv.putText(t)
     local lineType = t.lineType or cv.LINE_8
     local bottomLeftOrigin = t.bottomLeftOrigin or false
 
-    C.putText(cv.wrap_tensors(img), text, org, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin)
+    C.putText(cv.wrap_tensor(img), text, org, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin)
 end
 
 
@@ -2262,7 +2262,7 @@ do
             local templ = assert(t.templ)
             local templCenter = cv.Point(t.templCenter or {-1, -1})
 
-            C.GeneralizedHough_setTemplate(self.ptr, cv.wrap_tensors(templ), templCenter)
+            C.GeneralizedHough_setTemplate(self.ptr, cv.wrap_tensor(templ), templCenter)
         else
             local edges = assert(t.edges)
             local dx = assert(t.dx)
@@ -2270,8 +2270,8 @@ do
             local templCenter = cv.Point(t.templCenter or {-1, -1})
 
             C.GeneralizedHough_setTemplate_edges(
-                self.ptr, cv.wrap_tensors(edges), cv.wrap_tensors(dx),
-                cv.wrap_tensors(dy), templCenter)
+                self.ptr, cv.wrap_tensor(edges), cv.wrap_tensor(dx),
+                cv.wrap_tensor(dy), templCenter)
         end
     end
 
@@ -2284,7 +2284,7 @@ do
 
             return cv.unwrap_tensors(
                 C.GeneralizedHough_detect(
-                    self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(positions), votes))
+                    self.ptr, cv.wrap_tensor(image), cv.wrap_tensor(positions), votes))
         else
             local image = assert(t.image)
             local positions = t.positions
@@ -2292,7 +2292,7 @@ do
 
             return cv.unwrap_tensors(
                 C.GeneralizedHough_detect(
-                    self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(positions), votes))
+                    self.ptr, cv.wrap_tensor(image), cv.wrap_tensor(positions), votes))
         end
     end
 
@@ -2530,7 +2530,7 @@ do
 
         return cv.unwrap_tensors(
             C.LineSegmentDetector_detect(
-                self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(lines), width, prec, nfa))
+                self.ptr, cv.wrap_tensor(image), cv.wrap_tensor(lines), width, prec, nfa))
     end
 
     function LineSegmentDetector:drawSegments(t)
@@ -2538,7 +2538,7 @@ do
         local lines = assert(t.lines)
 
         C.LineSegmentDetector_drawSegments(
-            self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(lines))
+            self.ptr, cv.wrap_tensor(image), cv.wrap_tensor(lines))
     end
 
     function LineSegmentDetector:compareSegments(t)
@@ -2547,7 +2547,7 @@ do
         local image = t.image
 
         return C.LineSegmentDetector_compareSegments(
-            self.ptr, cv.wrap_tensors(lines1), cv.wrap_tensors(lines2), cv.wrap_tensors(image))
+            self.ptr, cv.wrap_tensor(lines1), cv.wrap_tensor(lines2), cv.wrap_tensor(image))
     end
 end
 
@@ -2582,7 +2582,7 @@ do
             if type(ptvec) == "table" then
                 ptvec = torch.FloatTensor(ptvec)
             end
-            C.Subdiv2D_insert_vector(self.ptr, cv.wrap_tensors(ptvec))
+            C.Subdiv2D_insert_vector(self.ptr, cv.wrap_tensor(ptvec))
         end
     end
 
@@ -2661,7 +2661,7 @@ function cv.LineIterator(t)
     local leftToRight = t.leftToRight or false
 
     local ptr = ffi.gc(
-        C.LineIterator_ctor(cv.wrap_tensors(img), pt1, pt2, connectivity, leftToRight),
+        C.LineIterator_ctor(cv.wrap_tensor(img), pt1, pt2, connectivity, leftToRight),
         C.LineIterator_dtor)
     local count = C.LineIterator_count(ptr)
 

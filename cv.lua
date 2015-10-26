@@ -87,9 +87,19 @@ struct TensorPlusBool {
     bool val;
 };
 
+struct TensorArrayPlusInt {
+    struct TensorArray tensors;
+    int val;
+};
+
 struct TensorArrayPlusFloat {
     struct TensorArray tensors;
     float val;
+};
+
+struct TensorArrayPlusBool {
+    struct TensorArray tensors;
+    bool val;
 };
 
 struct RectPlusInt {
@@ -202,10 +212,18 @@ function prepare_for_wrapping(tensor)
     return tensor:cdata(), cv.tensorType(tensor)
 end
 
--- torch.RealTensor ---> struct TensorWrapper/struct TensorArray
+-- torch.RealTensor ---> struct TensorWrapper
+function cv.wrap_tensor(tensor)
+    if not tensor then
+        return cv.EMPTY_WRAPPER
+    end
+
+    return ffi.new("struct TensorWrapper", prepare_for_wrapping(tensor))
+end
+
 function cv.wrap_tensors(...)
     if not ... then
-        return cv.EMPTY_WRAPPER
+        return cv.EMPTY_MULTI_WRAPPER
     end
 
     local args = {...}
@@ -213,19 +231,15 @@ function cv.wrap_tensors(...)
         args = args[1]
     end
 
-    if #args == 1 then
-        return ffi.new("struct TensorWrapper", prepare_for_wrapping(args[1]))
-    else
-        wrapper = ffi.new("struct TensorArray")
-        wrapper.size = #args
-        wrapper.tensors = C.malloc(#args * ffi.sizeof("struct TensorWrapper *"))
+    wrapper = ffi.new("struct TensorArray")
+    wrapper.size = #args
+    wrapper.tensors = C.malloc(#args * ffi.sizeof("struct TensorWrapper *"))
 
-        for i, tensor in ipairs(args) do
-            wrapper.tensors[i-1] = cv.wrap_tensors(tensor)
-        end
-
-        return wrapper
+    for i, tensor in ipairs(args) do
+        wrapper.tensors[i-1] = cv.wrap_tensors(tensor)
     end
+
+    return wrapper
 end
 
 -- struct TensorWrapper(s) ---> torch.RealTensor
@@ -278,6 +292,8 @@ end
 --- ***************** Wrappers for small OpenCV classes *****************
 -- Use these for passing into functions. Example:
 
+-- r = cv.Rect(10, 10, 15, 25)
+-- OR
 -- r = cv.Rect{10, 10, 15, 25}
 -- OR
 -- r = cv.Rect{x=10, y=10, width=15, height=25}
@@ -289,44 +305,44 @@ end
 
 -- TODO: generate these straight in the code
 
-function cv.Rect(values)
-    return ffi.new('struct RectWrapper', values)
+function cv.Rect(...)
+    return ffi.new('struct RectWrapper', ...)
 end
 
-function cv.TermCriteria(data)
-    return ffi.new('struct TermCriteriaWrapper', data)
+function cv.TermCriteria(...)
+    return ffi.new('struct TermCriteriaWrapper', ...)
 end
 
-function cv.Scalar(data)
-    return ffi.new('struct ScalarWrapper', data)
+function cv.Scalar(...)
+    return ffi.new('struct ScalarWrapper', ...)
 end
 
-function cv.Moments(data)
-    return ffi.new('struct MomentsWrapper', data)
+function cv.Moments(...)
+    return ffi.new('struct MomentsWrapper', ...)
 end
 
-function cv.Size(data)
-    return ffi.new('struct SizeWrapper', data)
+function cv.Size(...)
+    return ffi.new('struct SizeWrapper', ...)
 end
 
-function cv.Size2f(data)
-    return ffi.new('struct Size2fWrapper', data)
+function cv.Size2f(...)
+    return ffi.new('struct Size2fWrapper', ...)
 end
 
-function cv.Vec3d(data)
-    return ffi.new('struct Vec3dWrapper', data)
+function cv.Vec3d(...)
+    return ffi.new('struct Vec3dWrapper', ...)
 end
 
-function cv.Point(data)
-    return ffi.new('struct PointWrapper', data)
+function cv.Point(...)
+    return ffi.new('struct PointWrapper', ...)
 end
 
-function cv.Point2f(data)
-    return ffi.new('struct Point2fWrapper', data)
+function cv.Point2f(...)
+    return ffi.new('struct Point2fWrapper', ...)
 end
 
-function cv.RotatedRect(data)
-    return ffi.new('struct RotatedRectWrapper', data)
+function cv.RotatedRect(...)
+    return ffi.new('struct RotatedRectWrapper', ...)
 end
 
 --- ***************** Other helper structs *****************

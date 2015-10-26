@@ -7,6 +7,8 @@ local C = ffi.load(libPath('videoio'))
 --- ***************** Classes *****************
 require 'cv.Classes'
 
+-- VideoCapture
+
 ffi.cdef[[
 struct PtrWrapper VideoCapture_ctor_default();
 
@@ -96,5 +98,83 @@ do
 
 	function VideoCapture:get(propId)
 		return C.VideoCapture_get(self.ptr, propId)
+	end
+end
+
+-- VideoWriter
+
+ffi.cdef[[
+struct PtrWrapper VideoWriter_ctor_default();
+
+struct PtrWrapper VideoWriter_ctor(
+        const char *filename, int fourcc, double fps, struct SizeWrapper frameSize, bool isColor);
+
+void VideoWriter_dtor(struct PtrWrapper ptr);
+
+bool VideoWriter_open(struct PtrWrapper ptr, const char *filename, int fourcc, 
+                      double fps, struct SizeWrapper frameSize, bool isColor);
+
+bool VideoWriter_isOpened(struct PtrWrapper ptr);
+
+void VideoWriter_release(struct PtrWrapper ptr);
+
+void VideoWriter_write(struct PtrWrapper ptr, struct TensorWrapper image);
+
+bool VideoWriter_set(struct PtrWrapper ptr, int propId, double value);
+
+double VideoWriter_get(struct PtrWrapper ptr, int propId);
+
+int VideoWriter_fourcc(char c1, char c2, char c3, char c4);
+]]
+
+do
+	local VideoWriter = torch.class('cv.VideoWriter')
+
+	function VideoWriter:__init(t)
+		if t.filename then
+			local filename = assert(t.filename)
+			local fourcc = assert(t.fourcc)
+			local fps = assert(t.fps)
+			local frameSize = cv.Size(assert(t.frameSize))
+			local isColor = t.isColor
+			if isColor == nil then isColor = true end
+			self.ptr = ffi.gc(C.VideoWriter_ctor(
+				filename, fourcc, fps, frameSize, isColor), 
+				C.VideoWriter_dtor)
+		else
+			self.ptr = ffi.gc(C.VideoWriter_ctor_default(), C.VideoWriter_dtor)
+		end
+	end
+
+	function VideoWriter:open(t)
+		local filename = assert(t.filename)
+		local fourcc = assert(t.fourcc)
+		local fps = assert(t.fps)
+		local frameSize = cv.Size(assert(t.frameSize))
+		local isColor = t.isColor
+		if isColor == nil then isColor = true end
+		
+		return C.VideoWriter_open(self.ptr, filename, fourcc, fps, frameSize, isColor)
+	end
+
+	function VideoWriter:isOpened()
+		return C.VideoWriter_isOpened(self.ptr)
+	end
+
+	function VideoWriter:release()
+		C.VideoWriter_release(self.ptr)		
+	end
+
+	function VideoWriter:write(t)
+		local image = assert(t.image)
+		C.VideoWriter_write(self.ptr, image)
+	end
+
+	function VideoWriter:set(propId, value)
+		return C.VideoWriter_set(self.ptr, propId, value)
+	end
+
+	function VideoWriter:get(propId)
+		return C.VideoWriter_get(self.ptr, propId)
 	end
 end
