@@ -237,7 +237,7 @@ function cv.denoise_TVL1(t)
 
     return cv.unwrap_tensors(
         C.denoise_TVL1(
-            cv.wrap_tensors(observations), cv.wrap_tensors(result), lambda, niters))
+            cv.wrap_tensors(observations), cv.wrap_tensor(result), lambda, niters))
 end
 
 function cv.decolor(t)
