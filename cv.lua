@@ -221,8 +221,8 @@ function cv.wrap_tensor(tensor)
     return ffi.new("struct TensorWrapper", prepare_for_wrapping(tensor))
 end
 
-function cv.wrap_tensors(tensors)
-    if not tensors then
+function cv.wrap_tensors(...)
+    if not ... then
         return cv.EMPTY_MULTI_WRAPPER
     end
 
