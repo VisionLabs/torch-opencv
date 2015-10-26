@@ -236,7 +236,7 @@ function cv.wrap_tensors(...)
     wrapper.tensors = C.malloc(#args * ffi.sizeof("struct TensorWrapper *"))
 
     for i, tensor in ipairs(args) do
-        wrapper.tensors[i-1] = cv.wrap_tensors(tensor)
+        wrapper.tensors[i-1] = cv.wrap_tensor(tensor)
     end
 
     return wrapper
