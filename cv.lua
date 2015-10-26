@@ -212,10 +212,18 @@ function prepare_for_wrapping(tensor)
     return tensor:cdata(), cv.tensorType(tensor)
 end
 
--- torch.RealTensor ---> struct TensorWrapper/struct TensorArray
-function cv.wrap_tensors(...)
-    if not ... then
+-- torch.RealTensor ---> struct TensorWrapper
+function cv.wrap_tensor(tensor)
+    if not tensor then
         return cv.EMPTY_WRAPPER
+    end
+
+    return ffi.new("struct TensorWrapper", prepare_for_wrapping(tensor))
+end
+
+function cv.wrap_tensors(tensors)
+    if not tensors then
+        return cv.EMPTY_MULTI_WRAPPER
     end
 
     local args = {...}
@@ -223,19 +231,15 @@ function cv.wrap_tensors(...)
         args = args[1]
     end
 
-    if #args == 1 then
-        return ffi.new("struct TensorWrapper", prepare_for_wrapping(args[1]))
-    else
-        wrapper = ffi.new("struct TensorArray")
-        wrapper.size = #args
-        wrapper.tensors = C.malloc(#args * ffi.sizeof("struct TensorWrapper *"))
+    wrapper = ffi.new("struct TensorArray")
+    wrapper.size = #args
+    wrapper.tensors = C.malloc(#args * ffi.sizeof("struct TensorWrapper *"))
 
-        for i, tensor in ipairs(args) do
-            wrapper.tensors[i-1] = cv.wrap_tensors(tensor)
-        end
-
-        return wrapper
+    for i, tensor in ipairs(args) do
+        wrapper.tensors[i-1] = cv.wrap_tensors(tensor)
     end
+
+    return wrapper
 end
 
 -- struct TensorWrapper(s) ---> torch.RealTensor
