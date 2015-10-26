@@ -87,9 +87,19 @@ struct TensorPlusBool {
     bool val;
 };
 
+struct TensorArrayPlusInt {
+    struct TensorArray tensors;
+    int val;
+};
+
 struct TensorArrayPlusFloat {
     struct TensorArray tensors;
     float val;
+};
+
+struct TensorArrayPlusBool {
+    struct TensorArray tensors;
+    bool val;
 };
 
 struct RectPlusInt {
