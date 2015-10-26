@@ -61,7 +61,7 @@ function cv.imshow(t)
 	local winname = t.winname or "Window 1"
 	local image = assert(t.image)
     
-    C.imshow(winname, cv.wrap_tensors(image))
+    C.imshow(winname, cv.wrap_tensor(image))
 end
 
 function cv.waitKey(t)

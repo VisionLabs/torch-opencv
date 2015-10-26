@@ -79,7 +79,7 @@ function cv.inpaint(t)
     
     return cv.unwrap_tensors(
         C.inpaint(
-            cv.wrap_tensors(src), cv.wrap_tensors(inpaintMask), cv.wrap_tensors(dst), inpaintRadius, flags))
+            cv.wrap_tensor(src), cv.wrap_tensor(inpaintMask), cv.wrap_tensor(dst), inpaintRadius, flags))
 end
 
 function cv.fastNlMeansDenoising(t)
@@ -99,7 +99,7 @@ function cv.fastNlMeansDenoising(t)
         
         return cv.unwrap_tensors(
             C.fastNlMeansDenoising1(
-                cv.wrap_tensors(src), cv.wrap_tensors(dst), h, templateWindowSize, searchWindowSize))
+                cv.wrap_tensor(src), cv.wrap_tensor(dst), h, templateWindowSize, searchWindowSize))
     end
 
     local h = assert(t.h)
@@ -111,7 +111,7 @@ function cv.fastNlMeansDenoising(t)
 
     return cv.unwrap_tensors(
             C.fastNlMeansDenoising2(
-                cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(h),
+                cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(h),
                 templateWindowSize, searchWindowSize, normType))
 end
 
@@ -132,7 +132,7 @@ function cv.fastNlMeansDenoisingColored(t)
 
     return cv.unwrap_tensors(
         C.fastNlMeansDenoisingColored(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), h, hColor, templateWindowSize, searchWindowSize))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), h, hColor, templateWindowSize, searchWindowSize))
 end
 
 function cv.fastNlMeansDenoisingMulti(t)
@@ -160,15 +160,9 @@ function cv.fastNlMeansDenoisingMulti(t)
     -- h is a single number
     if type(t.h) == "number" or t.h == nil then
         h = t.h or 3
-        if #srcImgs == 1 then
-            return cv.unwrap_tensors(
-                C.fastNlMeansDenoising1(
-                    cv.wrap_tensors(srcImgs[1]), cv.wrap_tensors(dst), h, templateWindowSize, searchWindowSize))
-        end
-
         return cv.unwrap_tensors(
             C.fastNlMeansDenoisingMulti1(
-                cv.wrap_tensors(srcImgs), cv.wrap_tensors(dst), imgToDenoiseIndex, temporalWindowSize,
+                cv.wrap_tensors(srcImgs), cv.wrap_tensor(dst), imgToDenoiseIndex, temporalWindowSize,
                 h, templateWindowSize, searchWindowSize))
     end
 
@@ -180,17 +174,10 @@ function cv.fastNlMeansDenoisingMulti(t)
 
     local normType = t.normType or cv.NORM_L2
 
-    if #srcImgs == 1 then
-        return cv.unwrap_tensors(
-            C.fastNlMeansDenoising2(
-                cv.wrap_tensors(srcImgs[1]), cv.wrap_tensors(dst), cv.wrap_tensors(h),
-                templateWindowSize, searchWindowSize, normType))
-    end
-
     return cv.unwrap_tensors(
         C.fastNlMeansDenoisingMulti2(
-            cv.wrap_tensors(srcImgs), cv.wrap_tensors(dst), imgToDenoiseIndex, temporalWindowSize,
-            cv.wrap_tensors(h), templateWindowSize, searchWindowSize, normType))
+            cv.wrap_tensors(srcImgs), cv.wrap_tensor(dst), imgToDenoiseIndex, temporalWindowSize,
+            cv.wrap_tensor(h), templateWindowSize, searchWindowSize, normType))
 end
 
 function cv.fastNlMeansDenoisingColoredMulti(t)
@@ -217,15 +204,9 @@ function cv.fastNlMeansDenoisingColoredMulti(t)
     assert(templateWindowSize % 2 == 1)
     assert(searchWindowSize % 2 == 1)
 
-    if #srcImgs == 1 then
-        return cv.unwrap_tensors(
-            C.fastNlMeansDenoisingColored(
-                cv.wrap_tensors(srcImgs[1]), cv.wrap_tensors(dst), h, hColor, templateWindowSize, searchWindowSize))
-    end
-
     return cv.unwrap_tensors(
         C.fastNlMeansDenoisingColoredMulti(
-            cv.wrap_tensors(srcImgs), cv.wrap_tensors(dst), imgToDenoiseIndex, temporalWindowSize,
+            cv.wrap_tensors(srcImgs), cv.wrap_tensor(dst), imgToDenoiseIndex, temporalWindowSize,
             h, hColor, templateWindowSize, searchWindowSize))
 end
 
@@ -247,7 +228,7 @@ function cv.decolor(t)
 
     return cv.unwrap_tensors(
         C.decolor(
-            cv.wrap_tensors(src), cv.wrap_tensors(grayscale), cv.wrap_tensors(color_boost)))
+            cv.wrap_tensor(src), cv.wrap_tensor(grayscale), cv.wrap_tensor(color_boost)))
 end
 
 function cv.seamlessClone(t)
@@ -264,8 +245,8 @@ function cv.seamlessClone(t)
 
     return cv.unwrap_tensors(
         C.seamlessClone(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(mask),
-            p, cv.wrap_tensors(blend), flags))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(mask),
+            p, cv.wrap_tensor(blend), flags))
 end
 
 function cv.colorChange(t)
@@ -282,7 +263,7 @@ function cv.colorChange(t)
 
     return cv.unwrap_tensors(
         C.colorChange(
-            cv.wrap_tensors(src), cv.wrap_tensors(mask), cv.wrap_tensors(dst),
+            cv.wrap_tensor(src), cv.wrap_tensor(mask), cv.wrap_tensor(dst),
             red_mul, green_mul, blue_mul))
 end
 
@@ -299,7 +280,7 @@ function cv.illuminationChange(t)
 
     return cv.unwrap_tensors(
         C.illuminationChange(
-            cv.wrap_tensors(src), cv.wrap_tensors(mask), cv.wrap_tensors(dst),
+            cv.wrap_tensor(src), cv.wrap_tensor(mask), cv.wrap_tensor(dst),
             alpha, beta))
 end
 
@@ -318,7 +299,7 @@ function cv.textureFlattening(t)
 
     return cv.unwrap_tensors(
         C.textureFlattening(
-            cv.wrap_tensors(src), cv.wrap_tensors(mask), cv.wrap_tensors(dst),
+            cv.wrap_tensor(src), cv.wrap_tensor(mask), cv.wrap_tensor(dst),
             low_threshold, high_threshold, kernel_size))
 end
 
@@ -331,7 +312,7 @@ function cv.edgePreservingFilter(t)
 
     return cv.unwrap_tensors(
         C.edgePreservingFilter(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), flags, sigma_s, sigma_r))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), flags, sigma_s, sigma_r))
 end
 
 function cv.detailEnhance(t)
@@ -346,7 +327,7 @@ function cv.detailEnhance(t)
 
     return cv.unwrap_tensors(
         C.detailEnhance(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), sigma_s, sigma_r))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), sigma_s, sigma_r))
 end
 
 function cv.pencilSketch(t)
@@ -363,7 +344,7 @@ function cv.pencilSketch(t)
 
     return cv.unwrap_tensors(
         C.pencilSketch(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst1), cv.wrap_tensors(dst2),
+            cv.wrap_tensor(src), cv.wrap_tensor(dst1), cv.wrap_tensor(dst2),
             sigma_s, sigma_r, shade_factor))
 end
 
@@ -379,5 +360,5 @@ function cv.stylization(t)
 
     return cv.unwrap_tensors(
         C.stylization(
-            cv.wrap_tensors(src), cv.wrap_tensors(dst), sigma_s, sigma_r))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), sigma_s, sigma_r))
 end

@@ -6,6 +6,7 @@ photo module branch
 - fastNlMeansDenoisingColored
 - fastNlMeansDenoisingMulti(2)
 - fastNlMeansDenoisingColoredMulti
+- denoise_TVL1
 - decolor
 - seamlessClone
 - colorChange
