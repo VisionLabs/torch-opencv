@@ -4,15 +4,23 @@
 extern "C" struct TensorWrapper inpaint(struct TensorWrapper src, struct TensorWrapper inpaintMask,
                                     struct TensorWrapper dst, double inpaintRadius, int flags);
 
-extern "C" struct TensorWrapper fastNlMeansDenoisingCommon(struct TensorWrapper src, struct TensorWrapper dst,
-                                    struct FloatArray h, int templateWindowSize,
+extern "C" struct TensorWrapper fastNlMeansDenoising1(struct TensorWrapper src, struct TensorWrapper dst,
+                                    float h, int templateWindowSize,
+                                    int searchWindowSize);
+
+extern "C" struct TensorWrapper fastNlMeansDenoising2(struct TensorWrapper src, struct TensorWrapper dst,
+                                    struct TensorWrapper h, int templateWindowSize,
                                     int searchWindowSize, int normType);
 
 extern "C" struct TensorWrapper fastNlMeansDenoisingColored(struct TensorWrapper src, struct TensorWrapper dst,
                                     float h, float hColor, int templateWindowSize, int searchWindowSize);
 
-extern "C" struct TensorWrapper fastNlMeansDenoisingMultiCommon(struct TensorArray srcImgs, struct TensorWrapper dst,
-                                    int imgToDenoiseIndex, int temporalWindowSize, struct FloatArray h,
+extern "C" struct TensorWrapper fastNlMeansDenoisingMulti1(struct TensorArray srcImgs, struct TensorWrapper dst,
+                                    int imgToDenoiseIndex, int temporalWindowSize, float h,
+                                    int templateWindowSize, int searchWindowSize);
+
+extern "C" struct TensorWrapper fastNlMeansDenoisingMulti2(struct TensorArray srcImgs, struct TensorWrapper dst,
+                                    int imgToDenoiseIndex, int temporalWindowSize, struct TensorWrapper h,
                                     int templateWindowSize, int searchWindowSize, int normType);
 
 extern "C" struct TensorWrapper fastNlMeansDenoisingColoredMulti(struct TensorArray srcImgs, struct TensorWrapper dst,

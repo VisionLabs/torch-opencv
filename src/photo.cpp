@@ -13,29 +13,29 @@ extern "C" struct TensorWrapper inpaint(struct TensorWrapper src, struct TensorW
     return dst;
 }
 
-extern "C" struct TensorWrapper fastNlMeansDenoisingCommon(struct TensorWrapper src, struct TensorWrapper dst,
-                                    struct FloatArray h, int templateWindowSize,
-                                    int searchWindowSize, int normType)
+extern "C" struct TensorWrapper fastNlMeansDenoising1(struct TensorWrapper src, struct TensorWrapper dst,
+                                    float h, int templateWindowSize, int searchWindowSize)
 {
-    if (normType == -1) {
-        if (dst.isNull()) {
-            cv::Mat retval;
-            cv::fastNlMeansDenoising(src.toMat(), retval, *(h.data), templateWindowSize, searchWindowSize);
-            return TensorWrapper(retval);
-        } else {
-            cv::fastNlMeansDenoising(src.toMat(), dst.toMat(), *(h.data), templateWindowSize, searchWindowSize);
-            return dst;
-        }
-    }
-    std::vector<float> hvec;
-    hvec = h.toFloatList(hvec);
-
     if (dst.isNull()) {
         cv::Mat retval;
-        cv::fastNlMeansDenoising(src.toMat(), retval, hvec, templateWindowSize, searchWindowSize, normType);
+        cv::fastNlMeansDenoising(src.toMat(), retval, h, templateWindowSize, searchWindowSize);
         return TensorWrapper(retval);
     } else {
-        cv::fastNlMeansDenoising(src.toMat(), dst.toMat(), hvec, templateWindowSize, searchWindowSize, normType);
+        cv::fastNlMeansDenoising(src.toMat(), dst.toMat(), h, templateWindowSize, searchWindowSize);
+    }
+    return dst;
+}
+
+extern "C" struct TensorWrapper fastNlMeansDenoising2(struct TensorWrapper src, struct TensorWrapper dst,
+                                    struct TensorWrapper h, int templateWindowSize,
+                                    int searchWindowSize, int normType)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        cv::fastNlMeansDenoising(src.toMat(), retval, h.toMat(), templateWindowSize, searchWindowSize, normType);
+        return TensorWrapper(retval);
+    } else {
+        cv::fastNlMeansDenoising(src.toMat(), dst.toMat(), h.toMat(), templateWindowSize, searchWindowSize, normType);
     }
     return dst;
 }
@@ -53,33 +53,34 @@ extern "C" struct TensorWrapper fastNlMeansDenoisingColored(struct TensorWrapper
     return dst;
 }
 
-extern "C" struct TensorWrapper fastNlMeansDenoisingMultiCommon(struct TensorArray srcImgs, struct TensorWrapper dst,
-                                    int imgToDenoiseIndex, int temporalWindowSize, struct FloatArray h,
-                                    int templateWindowSize, int searchWindowSize, int normType)
+extern "C" struct TensorWrapper fastNlMeansDenoisingMulti1(struct TensorArray srcImgs, struct TensorWrapper dst,
+                                    int imgToDenoiseIndex, int temporalWindowSize, float h,
+                                    int templateWindowSize, int searchWindowSize)
 {
-    if (normType == -1) {
-        if (dst.isNull()) {
-            cv::Mat retval;
-            cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), retval, imgToDenoiseIndex, temporalWindowSize, *(h.data),
-                                        templateWindowSize, searchWindowSize);
-        
-            return TensorWrapper(retval);
-        } else {
-            cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), dst.toMat(), imgToDenoiseIndex, temporalWindowSize, *(h.data),
-                                        templateWindowSize, searchWindowSize);
-            return dst;
-        }
-    }
-    std::vector<float> hvec;
-    hvec = h.toFloatList(hvec);
-
     if (dst.isNull()) {
         cv::Mat retval;
-        cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), retval, imgToDenoiseIndex, temporalWindowSize, hvec,
+        cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), retval, imgToDenoiseIndex, temporalWindowSize, h,
+                                    templateWindowSize, searchWindowSize);
+    
+        return TensorWrapper(retval);
+    } else {
+        cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), dst.toMat(), imgToDenoiseIndex, temporalWindowSize, h,
+                                    templateWindowSize, searchWindowSize);
+    }
+    return dst;
+}
+
+extern "C" struct TensorWrapper fastNlMeansDenoisingMulti2(struct TensorArray srcImgs, struct TensorWrapper dst,
+                                    int imgToDenoiseIndex, int temporalWindowSize, struct TensorWrapper h,
+                                    int templateWindowSize, int searchWindowSize, int normType)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), retval, imgToDenoiseIndex, temporalWindowSize, h.toMat(),
                                         templateWindowSize, searchWindowSize, normType);
         return TensorWrapper(retval);
     } else {
-        cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), dst.toMat(), imgToDenoiseIndex, temporalWindowSize, hvec,
+        cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), dst.toMat(), imgToDenoiseIndex, temporalWindowSize, h.toMat(),
                                         templateWindowSize, searchWindowSize, normType);
     }
     return dst;

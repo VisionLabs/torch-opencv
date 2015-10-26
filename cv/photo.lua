@@ -7,22 +7,28 @@ ffi.cdef[[
 struct TensorWrapper inpaint(struct TensorWrapper src, struct TensorWrapper inpaintMask,
                             struct TensorWrapper dst, double inpaintRadius, int flags);
 
-struct TensorWrapper fastNlMeansDenoisingCommon(struct TensorWrapper src, struct TensorWrapper dst,
-                            struct FloatArray h, int templateWindowSize,
+struct TensorWrapper fastNlMeansDenoising1(struct TensorWrapper src, struct TensorWrapper dst,
+                            float h, int templateWindowSize,
+                            int searchWindowSize);
+
+struct TensorWrapper fastNlMeansDenoising2(struct TensorWrapper src, struct TensorWrapper dst,
+                            struct TensorWrapper h, int templateWindowSize,
                             int searchWindowSize, int normType);
 
 struct TensorWrapper fastNlMeansDenoisingColored(struct TensorWrapper src, struct TensorWrapper dst,
                             float h, float hColor, int templateWindowSize, int searchWindowSize);
 
-struct TensorWrapper fastNlMeansDenoisingMultiCommon(struct TensorArray srcImgs, struct TensorWrapper dst,
-                            int imgToDenoiseIndex, int temporalWindowSize, struct FloatArray h,
+struct TensorWrapper fastNlMeansDenoisingMulti1(struct TensorArray srcImgs, struct TensorWrapper dst,
+                            int imgToDenoiseIndex, int temporalWindowSize, float h,
+                            int templateWindowSize, int searchWindowSize);
+
+struct TensorWrapper fastNlMeansDenoisingMulti2(struct TensorArray srcImgs, struct TensorWrapper dst,
+                            int imgToDenoiseIndex, int temporalWindowSize, struct TensorWrapper h,
                             int templateWindowSize, int searchWindowSize, int normType);
 
 struct TensorWrapper fastNlMeansDenoisingColoredMulti(struct TensorArray srcImgs, struct TensorWrapper dst,
                             int imgToDenoiseIndex, int temporalWindowSize, float h,
                             float hColor, int templateWindowSize, int searchWindowSize);
-
-
 
 struct TensorWrapper decolor(struct TensorWrapper src, struct TensorWrapper grayscale,
                             struct TensorWrapper color_boost);
@@ -87,19 +93,22 @@ function cv.fastNlMeansDenoising(t)
 
     if type(t.h) == "number" or t.h == nil then
         h = t.h or 3
-        h = cv.newArray('Float', h)
-    
+        
         return cv.unwrap_tensors(
-            C.fastNlMeansDenoisingCommon(
-                cv.wrap_tensors(src), cv.wrap_tensors(dst), h, templateWindowSize, searchWindowSize, -1))
+            C.fastNlMeansDenoising1(
+                cv.wrap_tensors(src), cv.wrap_tensors(dst), h, templateWindowSize, searchWindowSize))
     end
 
-    local h        = cv.newArray('Float', assert(t.h))
+    local h = assert(t.h)
+    if type(h) == "table" then
+        h = torch.FloatTensor(h)
+    end
+
     local normType = t.normType or cv.NORM_L2
 
     return cv.unwrap_tensors(
-            C.fastNlMeansDenoisingCommon(
-                cv.wrap_tensors(src), cv.wrap_tensors(dst), h,
+            C.fastNlMeansDenoising2(
+                cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensors(h),
                 templateWindowSize, searchWindowSize, normType))
 end
 
@@ -148,34 +157,37 @@ function cv.fastNlMeansDenoisingMulti(t)
     -- h is a single number
     if type(t.h) == "number" or t.h == nil then
         h = t.h or 3
-        h = cv.newArray('Float', h)
-    
         if #srcImgs == 1 then
             return cv.unwrap_tensors(
-                C.fastNlMeansDenoisingCommon(
-                    cv.wrap_tensors(srcImgs[1]), cv.wrap_tensors(dst), h, templateWindowSize, searchWindowSize, -1))
+                C.fastNlMeansDenoising1(
+                    cv.wrap_tensors(srcImgs[1]), cv.wrap_tensors(dst), h, templateWindowSize, searchWindowSize))
         end
 
         return cv.unwrap_tensors(
-            C.fastNlMeansDenoisingMultiCommon(
+            C.fastNlMeansDenoisingMulti1(
                 cv.wrap_tensors(srcImgs), cv.wrap_tensors(dst), imgToDenoiseIndex, temporalWindowSize,
-                h, templateWindowSize, searchWindowSize, -1))
+                h, templateWindowSize, searchWindowSize))
     end
 
     -- h is a vector
-    local h        = cv.newArray('Float', assert(t.h))
+    local h = assert(t.h)
+    if type(h) == "table" then
+        h = torch.FloatTensor(h)
+    end
+
     local normType = t.normType or cv.NORM_L2
 
     if #srcImgs == 1 then
         return cv.unwrap_tensors(
-            C.fastNlMeansDenoisingCommon(
-                cv.wrap_tensors(srcImgs[1]), cv.wrap_tensors(dst), h, templateWindowSize, searchWindowSize, normType))
+            C.fastNlMeansDenoising2(
+                cv.wrap_tensors(srcImgs[1]), cv.wrap_tensors(dst), cv.wrap_tensors(h),
+                templateWindowSize, searchWindowSize, normType))
     end
 
     return cv.unwrap_tensors(
-        C.fastNlMeansDenoisingMultiCommon(
+        C.fastNlMeansDenoisingMulti2(
             cv.wrap_tensors(srcImgs), cv.wrap_tensors(dst), imgToDenoiseIndex, temporalWindowSize,
-            h, templateWindowSize, searchWindowSize, normType))
+            cv.wrap_tensors(h), templateWindowSize, searchWindowSize, normType))
 end
 
 function cv.fastNlMeansDenoisingColoredMulti(t)
