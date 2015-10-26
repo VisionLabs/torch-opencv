@@ -278,6 +278,8 @@ end
 --- ***************** Wrappers for small OpenCV classes *****************
 -- Use these for passing into functions. Example:
 
+-- r = cv.Rect(10, 10, 15, 25)
+-- OR
 -- r = cv.Rect{10, 10, 15, 25}
 -- OR
 -- r = cv.Rect{x=10, y=10, width=15, height=25}
@@ -289,44 +291,44 @@ end
 
 -- TODO: generate these straight in the code
 
-function cv.Rect(values)
-    return ffi.new('struct RectWrapper', values)
+function cv.Rect(...)
+    return ffi.new('struct RectWrapper', ...)
 end
 
-function cv.TermCriteria(data)
-    return ffi.new('struct TermCriteriaWrapper', data)
+function cv.TermCriteria(...)
+    return ffi.new('struct TermCriteriaWrapper', ...)
 end
 
-function cv.Scalar(data)
-    return ffi.new('struct ScalarWrapper', data)
+function cv.Scalar(...)
+    return ffi.new('struct ScalarWrapper', ...)
 end
 
-function cv.Moments(data)
-    return ffi.new('struct MomentsWrapper', data)
+function cv.Moments(...)
+    return ffi.new('struct MomentsWrapper', ...)
 end
 
-function cv.Size(data)
-    return ffi.new('struct SizeWrapper', data)
+function cv.Size(...)
+    return ffi.new('struct SizeWrapper', ...)
 end
 
-function cv.Size2f(data)
-    return ffi.new('struct Size2fWrapper', data)
+function cv.Size2f(...)
+    return ffi.new('struct Size2fWrapper', ...)
 end
 
-function cv.Vec3d(data)
-    return ffi.new('struct Vec3dWrapper', data)
+function cv.Vec3d(...)
+    return ffi.new('struct Vec3dWrapper', ...)
 end
 
-function cv.Point(data)
-    return ffi.new('struct PointWrapper', data)
+function cv.Point(...)
+    return ffi.new('struct PointWrapper', ...)
 end
 
-function cv.Point2f(data)
-    return ffi.new('struct Point2fWrapper', data)
+function cv.Point2f(...)
+    return ffi.new('struct Point2fWrapper', ...)
 end
 
-function cv.RotatedRect(data)
-    return ffi.new('struct RotatedRectWrapper', data)
+function cv.RotatedRect(...)
+    return ffi.new('struct RotatedRectWrapper', ...)
 end
 
 --- ***************** Other helper structs *****************
