@@ -1,6 +1,6 @@
 require 'cv.imgcodecs'
 require 'cv.highgui'
 
-im = cv.imread("/home/shrubb/Pictures/blending.jpg", cv.IMREAD_GRAYSCALE)
+im = cv.imread {filename="/home/shrubb/Pictures/blending.jpg", flags=cv.IMREAD_GRAYSCALE}
 cv.imshow {winname="Hello, Lua!", image=im}
-cv.waitKey{0}
+cv.waitKey{delay=0}
