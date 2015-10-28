@@ -284,7 +284,6 @@ function cv.illuminationChange(t)
             alpha, beta))
 end
 
-
 function cv.textureFlattening(t)
     local src            = assert(t.src)
     local mask           = assert(t.mask)

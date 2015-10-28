@@ -167,26 +167,18 @@ cv.NULLPTR = ffi.new('void *', nil)
 
 function cv.argcheck(t, rules)
     local retval = {}
-
     for i, argument in ipairs(rules) do
-        local userInputArg = t[argument[1]] or t[i]
-        print(type(t[argument[1]]), type(t[i]))
-        if userInputArg == nil and not (argument.optional or argument.default) then
+        local userInputArg = t[i]
+        
+        if userInputArg == nil and not argument.default and argument.default ~= nil then
             error('Argument #' .. i .. ' ("' .. argument[1] .. '") is required!')
         end
 
         local
         function identity(...) return ... end
-
-        table.insert(
-            retval,
-            (argument.operator or identity)(userInputArg or argument.default)
-        )
+        retval[i] = (argument.operator or identity)(userInputArg or argument.default)
     end
-
-    -- TODO: bugfix
-    -- doesn't work when there's a nil argument (such as dst in filters)!
-    return unpack(retval)
+    return unpack(retval, 1, table.maxn(retval))
 end
 
 --- ***************** Tensor <=> Mat conversion *****************
