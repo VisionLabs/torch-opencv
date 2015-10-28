@@ -163,6 +163,32 @@ require 'cv.constants'
 cv.INT_MAX = C.getIntMax()
 cv.NULLPTR = ffi.new('void *', nil)
 
+--- ***************** Argument checking & unpacking *****************
+
+function cv.argcheck(t, rules)
+    local retval = {}
+
+    for i, argument in ipairs(rules) do
+        local userInputArg = t[argument[1]] or t[i]
+        print(type(t[argument[1]]), type(t[i]))
+        if userInputArg == nil and not (argument.optional or argument.default) then
+            error('Argument #' .. i .. ' ("' .. argument[1] .. '") is required!')
+        end
+
+        local
+        function identity(...) return ... end
+
+        table.insert(
+            retval,
+            (argument.operator or identity)(userInputArg or argument.default)
+        )
+    end
+
+    -- TODO: bugfix
+    -- doesn't work when there's a nil argument (such as dst in filters)!
+    return unpack(retval)
+end
+
 --- ***************** Tensor <=> Mat conversion *****************
 
 local tensor_CV_code_by_letter = {
