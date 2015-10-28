@@ -267,12 +267,32 @@ function cv.colorChange(t)
             red_mul, green_mul, blue_mul))
 end
 
-function cv.illuminationChange(t)
+--[[function cv.illuminationChange(t)
     local src   = assert(t.src)
     local mask  = assert(t.mask)
     local dst   = t.dst
     local alpha = t.alpha or 0.2
     local beta  = t.beta or 0.4
+
+    if dst then
+        assert(dst:type() == src:type() and src:isSameSizeAs(dst))
+    end
+
+    return cv.unwrap_tensors(
+        C.illuminationChange(
+            cv.wrap_tensor(src), cv.wrap_tensor(mask), cv.wrap_tensor(dst),
+            alpha, beta))
+end]]
+
+function cv.illuminationChange(t)
+    local argRules = {
+        {"src"},
+        {"mask"},
+        {"dst", default = nil},
+        {"alpha", default = 0.2},
+        {"beta", default = 0.4},
+    }
+    local src, mask, dst, alpha, beta = cv.argcheck(t, argRules)
 
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))

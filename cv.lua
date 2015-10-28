@@ -168,8 +168,10 @@ cv.NULLPTR = ffi.new('void *', nil)
 function cv.argcheck(t, rules)
     local retval = {}
     for i, argument in ipairs(rules) do
-        local userInputArg = t[i]
+        local userInputArg = t[argument[1]] or t[i]
         
+        print(argument[1], type(t[argument[1]]), type(t[i]))
+
         if userInputArg == nil and not argument.default and argument.default ~= nil then
             error('Argument #' .. i .. ' ("' .. argument[1] .. '") is required!')
         end

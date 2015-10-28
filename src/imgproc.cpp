@@ -612,6 +612,7 @@ struct TensorArray convertMaps(
         return TensorArray();
     }
     THError("convertMaps: please specify either both or none of the dstmaps");
+    return TensorArray();
 }
 
 extern "C"
@@ -1334,7 +1335,7 @@ extern "C"
 double contourArea(
         struct TensorWrapper contour, bool oriented)
 {
-    cv::contourArea(contour.toMat(), oriented);
+    return cv::contourArea(contour.toMat(), oriented);
 }
 
 extern "C"
