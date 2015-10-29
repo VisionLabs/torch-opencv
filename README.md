@@ -19,3 +19,4 @@ photo module branch
 
 *To be implemented:*
 - Some frightening functions with patterns and structures.. 
+- 
