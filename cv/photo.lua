@@ -67,11 +67,14 @@ struct TensorWrapper stylization(struct TensorWrapper src, struct TensorWrapper 
 local C = ffi.load(libPath('photo'))
 
 function cv.inpaint(t)
-    local src           = assert(t.src)
-    local inpaintMask   = assert(t.inpaintMask)
-    local dst           = t.dst
-    local inpaintRadius = assert(t.inpaintRadius)
-    local flags         = assert(t.flags)
+    local argRules = {
+        {"src"},
+        {"inpaintMask"},
+        {"dst", default = nil},
+        {"inpaintRadius"},
+        {"flags"},
+    }
+    local src, inpaintMask, dst, inpaintRadius, flags = cv.argcheck(t, argRules)
     
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
@@ -116,12 +119,15 @@ function cv.fastNlMeansDenoising(t)
 end
 
 function cv.fastNlMeansDenoisingColored(t)
-    local src                = assert(t.src)
-    local dst                = t.dst
-    local h                  = t.h or 3
-    local hColor             = t.hColor or 3
-    local templateWindowSize = t.templateWindowSize or 7
-    local searchWindowSize   = t.searchWindowSize or 21
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"h", default = 3},
+        {"hColor", default = 3},
+        {"templateWindowSize", default = 7},
+        {"searchWindowSize", default = 21},
+    }
+    local src, dst, h, hColor, templateWindowSize, searchWindowSize = cv.argcheck(t, argRules)
     
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
@@ -181,14 +187,17 @@ function cv.fastNlMeansDenoisingMulti(t)
 end
 
 function cv.fastNlMeansDenoisingColoredMulti(t)
-    local srcImgs            = assert(t.srcImgs)
-    local dst                = t.dst
-    local imgToDenoiseIndex  = assert(t.imgToDenoiseIndex)
-    local temporalWindowSize = assert(t.temporalWindowSize)
-    local h                  = t.h or 3
-    local hColor             = t.hColor or 3
-    local templateWindowSize = t.templateWindowSize or 7
-    local searchWindowSize   = t.searchWindowSize or 21
+    local argRules = {
+        {"srcImgs"},
+        {"dst", default = nil},
+        {"imgToDenoiseIndex"},
+        {"temporalWindowSize"},
+        {"h", default = 3},
+        {"hColor", default = 3},
+        {"templateWindowSize", default = 7},
+        {"searchWindowSize", default = 21},
+    }
+    local srcImgs, dst, imgToDenoiseIndex, temporalWindowSize, h, hColor, templateWindowSize, searchWindowSize = cv.argcheck(t, argRules)
 
     if #srcImgs > 1 then 
         for i = 2, #srcImgs do
@@ -211,10 +220,13 @@ function cv.fastNlMeansDenoisingColoredMulti(t)
 end
 
 function cv.denoise_TVL1(t)
-    local observations = assert(t.observations)
-    local result       = t.result
-    local lambda       = t.lambda or 1.0
-    local niters       = t.niters or 30
+    local argRules = {
+        {"observations"},
+        {"result", default = nil},
+        {"lambda", default = 1.0},
+        {"niters", default = 30},
+    }
+    local observations, result, lambda, niters = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.denoise_TVL1(
@@ -222,9 +234,12 @@ function cv.denoise_TVL1(t)
 end
 
 function cv.decolor(t)
-    local src         = assert(t.src)
-    local grayscale   = t.grayscale
-    local color_boost = assert(t.color_boost)
+    local argRules = {
+        {"src"},
+        {"grayscale", default = nil},
+        {"color_boost"},
+    }
+    local src, grayscale, color_boost = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.decolor(
@@ -232,12 +247,15 @@ function cv.decolor(t)
 end
 
 function cv.seamlessClone(t)
-    local src   = assert(t.src)
-    local dst   = assert(t.dst)
-    local mask  = assert(t.mask)
-    local p     = cv.Point(assert(t.p))
-    local blend = t.blend
-    local flags = assert(t.flags)
+    local argRules = {
+        {"src"},
+        {"dst"},
+        {"mask"},
+        {"p", operator = cv.Point},
+        {"blend", default = nil},
+        {"flags"},
+    }
+    local src, dst, mask, p, blend, flags = cv.argcheck(t, argRules)
 
     if blend then
         assert(blend:type() == dst:type() and dst:isSameSizeAs(blend))
@@ -250,12 +268,15 @@ function cv.seamlessClone(t)
 end
 
 function cv.colorChange(t)
-    local src       = assert(t.src)
-    local mask      = assert(t.mask)
-    local dst       = t.dst
-    local red_mul   = t.red_mul or 1.0
-    local green_mul = t.green_mul or 1.0
-    local blue_mul  = t.blue_mul or 1.0
+    local argRules = {
+        {"src"},
+        {"mask"},
+        {"dst", default = nil},
+        {"red_mul", default = 1.0},
+        {"green_mul", default = 1.0},
+        {"blue_mul", default = 1.0},
+    }
+    local src, mask, dst, red_mul, green_mul, blue_mul = cv.argcheck(t, argRules)
 
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
@@ -268,23 +289,6 @@ function cv.colorChange(t)
 end
 
 function cv.illuminationChange(t)
-    local src   = assert(t.src)
-    local mask  = assert(t.mask)
-    local dst   = t.dst
-    local alpha = t.alpha or 0.2
-    local beta  = t.beta or 0.4
-
-    if dst then
-        assert(dst:type() == src:type() and src:isSameSizeAs(dst))
-    end
-
-    return cv.unwrap_tensors(
-        C.illuminationChange(
-            cv.wrap_tensor(src), cv.wrap_tensor(mask), cv.wrap_tensor(dst),
-            alpha, beta))
-end
-
---[[function cv.illuminationChange(t)
     local argRules = {
         {"src"},
         {"mask"},
@@ -302,15 +306,18 @@ end
         C.illuminationChange(
             cv.wrap_tensor(src), cv.wrap_tensor(mask), cv.wrap_tensor(dst),
             alpha, beta))
-end]]
+end
 
 function cv.textureFlattening(t)
-    local src            = assert(t.src)
-    local mask           = assert(t.mask)
-    local dst            = t.dst
-    local low_threshold  = t.low_threshold or 30
-    local high_threshold = t.high_threshold or 45
-    local kernel_size    = t.kernel_size or 3
+    local argRules = {
+        {"src"},
+        {"mask"},
+        {"dst", default = nil},
+        {"low_threshold", default = 30},
+        {"high_threshold", default = 45},
+        {"kernel_size", default = 3},
+    }
+    local src, mask, dst, low_threshold, high_threshold, kernel_size = cv.argcheck(t, argRules)
 
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
@@ -323,11 +330,14 @@ function cv.textureFlattening(t)
 end
 
 function cv.edgePreservingFilter(t)
-    local src     = assert(t.src)
-    local dst     = t.dst
-    local flags   = t.flags or 1
-    local sigma_s = t.sigma_s or 60
-    local sigma_r = t.sigma_r or 0.4
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"flags", default = 1},
+        {"sigma_s", default = 60},
+        {"sigma_r", default = 0.4},
+    }
+    local src, dst, flags, sigma_s, sigma_r = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.edgePreservingFilter(
@@ -335,10 +345,13 @@ function cv.edgePreservingFilter(t)
 end
 
 function cv.detailEnhance(t)
-    local src     = assert(t.src)
-    local dst     = t.dst
-    local sigma_s = t.sigma_s or 10
-    local sigma_r = t.sigma_r or 0.15
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"sigma_s", default = 10},
+        {"sigma_r", default = 0.15},
+    }
+    local src, dst, sigma_s, sigma_r = cv.argcheck(t, argRules)
     
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
@@ -350,12 +363,15 @@ function cv.detailEnhance(t)
 end
 
 function cv.pencilSketch(t)
-    local src          = assert(t.src)
-    local dst1         = t.dst1
-    local dst2         = t.dst2
-    local sigma_s      = t.sigma_s or 60
-    local sigma_r      = t.sigma_r or 0.07
-    local shade_factor = t.shade_factor or 0.02
+    local argRules = {
+        {"src"},
+        {"dst1", default = nil},
+        {"dst2", default = nil},
+        {"sigma_s", default = 60},
+        {"sigma_r", default = 0.07},
+        {"shade_factor", default = 0.02},
+    }
+    local src, dst1, dst2, sigma_s, sigma_r, shade_factor = cv.argcheck(t, argRules)
 
     if dst2 then
         assert(dst2:type() == src:type() and src:isSameSizeAs(dst2))
@@ -368,10 +384,13 @@ function cv.pencilSketch(t)
 end
 
 function cv.stylization(t)
-    local src     = assert(t.src)
-    local dst     = t.dst
-    local sigma_s = t.sigma_s or 60
-    local sigma_r = t.sigma_r or 0.45
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"sigma_s", default = 60},
+        {"sigma_r", default = 0.45},
+    }
+    local src, dst, sigma_s, sigma_r = cv.argcheck(t, argRules)
     
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))

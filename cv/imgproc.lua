@@ -422,32 +422,41 @@ local C = ffi.load(libPath('imgproc'))
 
 
 function cv.getGaussianKernel(t)
-    local ksize = assert(t.ksize)
-    local sigma = assert(t.sigma)
-    local ktype = t.ktype or cv.CV_64F
+    local argRules = {
+        {"ksize"},
+        {"sigma"},
+        {"ktype", default = cv.CV_64F},
+    }
+    local ksize, sigma, ktype = cv.argcheck(t, argRules)
     return cv.unwrap_tensor(C.getGaussianKernel(ksize, sigma, ktype))
 end
 
 
 function cv.getDerivKernels(t)
-    local dx        = assert(t.dx)
-    local dy        = assert(t.dy)
-    local ksize     = assert(t.ksize)
-    local ktype     = t.ktype or cv.CV_32F
-    local normalize = t.normalize or false
+    local argRules = {
+        {"dx"},
+        {"dy"},
+        {"ksize"},
+        {"normalize", default = false},
+        {"ktype", default = cv.CV_32F},
+    }
+    local dx, dy, ksize, normalize, ktype = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(C.getDerivKernels(dx, dy, ksize, normalize, ktype))
 end
 
 
 function cv.getGaborKernel(t)
-    local ksize = cv.Size(assert(t.ksize))
-    local sigma = assert(t.sigma)
-    local theta = assert(t.theta)
-    local lambd = assert(t.lambd)
-    local gamma = assert(t.gamma)
-    local psi   = t.psi or math.pi * 0.5
-    local ktype = t.ktype or cv.CV_64F
+    local argRules = {
+        {"ksize", operator = cv.Size},
+        {"sigma"},
+        {"theta"},
+        {"lambd"},
+        {"gamma"},
+        {"psi", default = math.pi * 0.5},
+        {"ktype", default = cv.CV_64F},
+    }
+    local ksize, sigma, theta, lambd, gamma, psi, ktype = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.getGaborKernel(ksize, sigma, theta, lambd, gamma, psi, ktype))
@@ -455,26 +464,27 @@ end
 
 
 function cv.getStructuringElement(t)
-    local shape =  assert(t.shape)
-    local ksize =  cv.Size(assert(t.ksize))
-    local anchor = cv.Point(t.anchor or {-1, -1})
+    local argRules = {
+        {"shape"},
+        {"ksize", operator = cv.Size},
+        {"anchor", default = {-1, -1}, operator = cv.Point},
+    }
+    local shape, ksize, anchor = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(C.getStructuringElement(shape, ksize, anchor))
 end
 
 
 function cv.medianBlur(t)
-    -- cv.medianBlur{src=X, dst=X, ksize} -- in-place
-    -- cv.medianBlur{src=X, dst=Y, ksize} -- output to dst (must be of same size & type)
-    -- cv.medianBlur{src=X, ksize}        -- output to return value
-    local src =   assert(t.src)
-    local dst =   assert(t.dst)
-    local ksize = assert(t.ksize)
+    local argRules = {
+        {"src"},
+        {"dst"},
+        {"ksize"},
+    }
+    local src, dst, ksize = cv.argcheck(t, argRules)
 
-    local srcChannels = src:size()[3]
     assert(srcChannels == 1 or srcChannels == 3 or srcChannels == 4)
 
-    local srcType = cv.tensorType(src)
     if ksize == 3 or ksize == 5 then
         assert(srcType == cv.CV_8U or srcType == cv.CV_32F)
     else
@@ -490,12 +500,15 @@ end
 
 
 function cv.GaussianBlur(t)
-    local src =        assert(t.src)
-    local dst =        t.dst
-    local ksize =      cv.Size(assert(t.ksize))
-    local sigmaX =     assert(t.sigmaX)
-    local sigmaY =     t.sigmaY or 0
-    local borderType = t.borderType or cv.BORDER_DEFAULT
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"ksize", operator = cv.Size},
+        {"sigmaX"},
+        {"sigmaY", default = 0},
+        {"borderType", default = cv.BORDER_DEFAULT},
+    }
+    local src, dst, ksize, sigmaX, sigmaY, borderType = cv.argcheck(t, argRules)
 
     assert(cv.tensorType(src) ~= cv.CV_8S and
            cv.tensorType(src) ~= cv.CV_32S)
@@ -510,16 +523,18 @@ end
 
 
 function cv.bilateralFilter(t)
-    local src =        assert(t.src)
-    local dst =        t.dst
-    local d =          assert(t.d)
-    local sigmaColor = assert(t.sigmaColor)
-    local sigmaSpace = assert(t.sigmaSpace)
-    local borderType = t.borderType or cv.BORDER_DEFAULT
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"d"},
+        {"sigmaColor"},
+        {"sigmaSpace"},
+        {"borderType", default = cv.BORDER_DEFAULT},
+    }
+    local src, dst, d, sigmaColor, sigmaSpace, borderType = cv.argcheck(t, argRules)
 
     assert(src:nDimension() == 2 or src:size()[3] == 3)
 
-    local srcType = cv.tensorType(src)
     assert(srcType == cv.CV_8U or srcType == cv.CV_32F)
 
     if dst then
@@ -533,14 +548,17 @@ end
 
 
 function cv.boxFilter(t)
-    local src =        assert(t.src)
-    local dst =        t.dst
-    local ddepth =     assert(t.ddepth)
-    local ksize =      cv.Size(assert(t.ksize))
-    local anchor = cv.Point(t.anchor or {-1, -1})
-    local normalize =  t.normalize
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"ddepth"},
+        {"ksize", operator = cv.Size},
+        {"anchor", default = {-1, -1}, operator = cv.Point},
+        {"normalize", default = nil},
+        {"borderType"},
+    }
+    local src, dst, ddepth, ksize, anchor, normalize, borderType = cv.argcheck(t, argRules)
     if normalize == nil then normalize = true end
-    local borderType = t.borderType or cv.BORDER_DEFAULT
 
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
@@ -553,15 +571,18 @@ function cv.boxFilter(t)
 end
 
 function cv.sqrBoxFilter(t)
+    local argRules = {
+        {"src"},
+        {"dst"},
+        {"ddepth"},
+        {"ksize"},
+        {"anchor"},
+        {"normalize"},
+        {"borderType"},
+    }
+    local src, dst, ddepth, ksize, anchor, normalize, borderType = cv.argcheck(t, argRules)
 
-    local src = assert(t.src)
-    local dst = t.dst
-    local ddepth = assert(t.ddepth)
-    local ksize = cv.Size(assert(t.ksize))
-    local anchor = t.anchor or {-1,-1}
-    local normalize =  t.normalize
     if normalize == nil then normalize = true end
-    local borderType = t.borderType or cv.BORDER_DEFAULT
 
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
@@ -574,11 +595,14 @@ end
 
 
 function cv.blur(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local ksize = cv.Size(assert(t.ksize))
-    local anchor = cv.Point(t.anchor or {-1,-1})
-    local borderType = t.borderType or cv.BORDER_DEFAULT
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"ksize", operator = cv.Size},
+        {"anchor", default = {-1,-1}, operator = cv.Point},
+        {"borderType", default = cv.BORDER_DEFAULT},
+    }
+    local src, dst, ksize, anchor, borderType = cv.argcheck(t, argRules)
 
     assert(cv.tensorType(src) ~= cv.CV_8S and
            cv.tensorType(src) ~= cv.CV_32S)
@@ -593,13 +617,16 @@ end
 
 
 function cv.filter2D(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local ddepth = assert(t.ddepth)
-    local kernel = assert(t.kernel)
-    local anchor = t.anchor or {-1,-1}
-    local delta = t.delta or 0
-    local borderType = t.borderType or cv.BORDER_DEFAULT
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"ddepth"},
+        {"kernel"},
+        {"anchor", default = {-1,-1}},
+        {"delta", default = 0},
+        {"borderType", default = cv.BORDER_DEFAULT},
+    }
+    local src, dst, ddepth, kernel, anchor, delta, borderType = cv.argcheck(t, argRules)
 
     assert(cv.checkFilterCombination(src, ddepth))
     if dst then
@@ -613,14 +640,17 @@ end
 
 
 function cv.sepFilter2D(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local ddepth = assert(t.ddepth)
-    local kernelX = assert(t.kernelX)
-    local kernelY = assert(t.kernelY)
-    local anchor = t.anchor or {-1,-1}
-    local delta = t.delta or 0
-    local borderType = t.borderType or cv.BORDER_DEFAULT
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"ddepth"},
+        {"kernelX"},
+        {"kernelY"},
+        {"anchor", default = {-1,-1}},
+        {"delta", default = 0},
+        {"borderType", default = cv.BORDER_DEFAULT},
+    }
+    local src, dst, ddepth, kernelX, kernelY, anchor, delta, borderType = cv.argcheck(t, argRules)
 
     assert(cv.checkFilterCombination(src, ddepth))
     if dst then
@@ -634,15 +664,18 @@ end
 
 
 function cv.Sobel(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local ddepth = assert(t.ddepth)
-    local dx = assert(t.dx)
-    local dy = assert(t.dy)
-    local ksize = t.ksize or 3
-    local scale = t.scale or 1
-    local delta = t.delta or 0
-    local borderType = t.borderType or cv.BORDER_DEFAULT
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"ddepth"},
+        {"dx"},
+        {"dy"},
+        {"ksize", default = 3},
+        {"scale", default = 1},
+        {"delta", default = 0},
+        {"borderType", default = cv.BORDER_DEFAULT},
+    }
+    local src, dst, ddepth, dx, dy, ksize, scale, delta, borderType = cv.argcheck(t, argRules)
 
     assert(cv.checkFilterCombination(src, ddepth))
     if dst then
@@ -656,14 +689,17 @@ end
 
 
 function cv.Scharr(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local ddepth = assert(t.ddepth)
-    local dx = assert(t.dx)
-    local dy = assert(t.dy)
-    local scale = t.scale or 1
-    local delta = t.delta or 0
-    local borderType = t.borderType or cv.BORDER_DEFAULT
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"ddepth"},
+        {"dx"},
+        {"dy"},
+        {"scale", default = 1},
+        {"delta", default = 0},
+        {"borderType", default = cv.BORDER_DEFAULT},
+    }
+    local src, dst, ddepth, dx, dy, scale, delta, borderType = cv.argcheck(t, argRules)
 
     assert(cv.checkFilterCombination(src, ddepth))
     if dst then
@@ -677,13 +713,16 @@ end
 
 
 function cv.Laplacian(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local ddepth = assert(t.ddepth)
-    local ksize = t.ksize or 1
-    local scale = t.scale or 1
-    local delta = t.delta or 0
-    local borderType = t.borderType or cv.BORDER_DEFAULT
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"ddepth"},
+        {"ksize", default = 1},
+        {"scale", default = 1},
+        {"delta", default = 0},
+        {"borderType", default = cv.BORDER_DEFAULT},
+    }
+    local src, dst, ddepth, ksize, scale, delta, borderType = cv.argcheck(t, argRules)
 
     assert(cv.checkFilterCombination(src, ddepth))
     if dst then
@@ -697,12 +736,15 @@ end
 
 
 function cv.Canny(t)
-    local image = assert(t.image)
-    local edges = t.edges
-    local threshold1 = assert(t.threshold1)
-    local threshold2 = assert(t.threshold2)
-    local apertureSize = t.apertureSize or 3
-    local L2gradient = t.L2gradient or false
+    local argRules = {
+        {"image"},
+        {"edges", default = nil},
+        {"threshold1"},
+        {"threshold2"},
+        {"apertureSize", default = 3},
+        {"L2gradient", default = false},
+    }
+    local image, edges, threshold1, threshold2, apertureSize, L2gradient = cv.argcheck(t, argRules)
 
     assert(cv.tensorType(image) == cv.CV_8U)
 
@@ -719,13 +761,15 @@ end
 
 
 function cv.cornerMinEigenVal(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local blockSize = assert(t.blockSize)
-    local ksize = t.ksize or 3
-    local borderType = t.borderType or cv.BORDER_DEFAULT
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"blockSize"},
+        {"ksize", default = 3},
+        {"borderType", default = cv.BORDER_DEFAULT},
+    }
+    local src, dst, blockSize, ksize, borderType = cv.argcheck(t, argRules)
 
-    local srcType = cv.tensorType(src)
     assert(src:nDimension() == 2 and (srcType == cv.CV_8U or srcType == cv.CV_32F))
     if dst then
         assert(dst:isSameSizeAs(src) and cv.tensorType(dst) == cv.CV_32F)
@@ -738,14 +782,16 @@ end
 
 
 function cv.cornerHarris(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local blockSize = assert(t.blockSize)
-    local ksize = assert(t.ksize)
-    local k = assert(t.k)
-    local borderType = t.borderType or cv.BORDER_DEFAULT
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"blockSize"},
+        {"ksize"},
+        {"k"},
+        {"borderType", default = cv.BORDER_DEFAULT},
+    }
+    local src, dst, blockSize, ksize, k, borderType = cv.argcheck(t, argRules)
 
-    local srcType = cv.tensorType(src)
     assert(src:nDimension() == 2 and (srcType == cv.CV_8U or srcType == cv.CV_32F))
 
     if dst then
@@ -759,13 +805,15 @@ end
 
 
 function cv.cornerEigenValsAndVecs(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local blockSize = assert(t.blockSize)
-    local ksize = assert(t.ksize)
-    local borderType = t.borderType or cv.BORDER_DEFAULT
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"blockSize"},
+        {"ksize"},
+        {"borderType", default = cv.BORDER_DEFAULT},
+    }
+    local src, dst, blockSize, ksize, borderType = cv.argcheck(t, argRules)
 
-    local srcType = cv.tensorType(src)
     assert(src:nDimension() == 2 and (srcType == cv.CV_8U or srcType == cv.CV_32F))
 
     if dst then
@@ -783,12 +831,14 @@ end
 
 
 function cv.preCornerDetect(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local ksize = assert(t.ksize)
-    local borderType = t.borderType or cv.BORDER_DEFAULT
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"ksize"},
+        {"borderType", default = cv.BORDER_DEFAULT},
+    }
+    local src, dst, ksize, borderType = cv.argcheck(t, argRules)
 
-    local srcType = cv.tensorType(src)
     assert(src:nDimension() == 2 and (srcType == cv.CV_8U or srcType == cv.CV_32F))
 
     if dst then
@@ -802,14 +852,17 @@ end
 
 
 function cv.HoughLines(t)
-    local image = assert(t.image)
-    local rho = assert(t.rho)
-    local theta = assert(t.theta)
-    local threshold = assert(t.threshold)
-    local srn = t.srn or 0
-    local stn = t.stn or 0
-    local min_theta = t.min_theta or 0
-    local max_theta = t.max_theta or cv.CV_PI
+    local argRules = {
+        {"image"},
+        {"rho"},
+        {"theta"},
+        {"threshold"},
+        {"srn", default = 0},
+        {"stn", default = 0},
+        {"min_theta", default = 0},
+        {"max_theta", default = cv.CV_PI},
+    }
+    local image, rho, theta, threshold, srn, stn, min_theta, max_theta = cv.argcheck(t, argRules)
 
     assert(image:nDimension() == 2 and cv.tensorType(image) == cv.CV_8U)
 
@@ -820,12 +873,15 @@ end
 
 
 function cv.HoughLinesP(t)
-    local image = assert(t.image)
-    local rho = assert(t.rho)
-    local theta = assert(t.theta)
-    local threshold = assert(t.threshold)
-    local minLineLength = t.minLineLength or 0
-    local maxLineGap = t.maxLineGap or 0
+    local argRules = {
+        {"image"},
+        {"rho"},
+        {"theta"},
+        {"threshold"},
+        {"minLineLength", default = 0},
+        {"maxLineGap", default = 0},
+    }
+    local image, rho, theta, threshold, minLineLength, maxLineGap = cv.argcheck(t, argRules)
 
     assert(image:nDimension() == 2 and cv.tensorType(image) == cv.CV_8U)
 
@@ -836,14 +892,17 @@ end
 
 
 function cv.HoughCircles(t)
-    local image = assert(t.image)
-    local method = assert(t.method)
-    local dp = assert(t.dp)
-    local minDist = assert(t.minDist)
-    local param1 = t.param1 or 100
-    local param2 = t.param2 or 100
-    local minRadius = t.minRadius or 0
-    local maxRadius = t.maxRadius or 0
+    local argRules = {
+        {"image"},
+        {"method"},
+        {"dp"},
+        {"minDist"},
+        {"param1", default = 100},
+        {"param2", default = 100},
+        {"minRadius", default = 0},
+        {"maxRadius", default = 0},
+    }
+    local image, method, dp, minDist, param1, param2, minRadius, maxRadius = cv.argcheck(t, argRules)
 
     assert(image:nDimension() == 2 and cv.tensorType(image) == cv.CV_8U)
 
@@ -854,11 +913,14 @@ end
 
 
 function cv.cornerSubPix(t)
-    local image = assert(t.image)
-    local corners = assert(t.corners)
-    local winSize = cv.Size(assert(t.winSize))
-    local zeroZone = cv.Size(assert(t.zeroZone))
-    local criteria = cv.TermCriteria(assert(t.criteria))
+    local argRules = {
+        {"image"},
+        {"corners"},
+        {"winSize", operator = cv.Size},
+        {"zeroZone", operator = cv.Size},
+        {"criteria", operator = cv.TermCriteria},
+    }
+    local image, corners, winSize, zeroZone, criteria = cv.argcheck(t, argRules)
 
     assert(image:nDimension() == 2)
     assert(corners:size()[2] == 2 and cv.tensorType(corners) == cv.CV_32F)
@@ -870,16 +932,18 @@ end
 
 
 function cv.goodFeaturesToTrack(t)
-    local image = assert(t.image)
-    local maxCorners = assert(t.maxCorners)
-    local qualityLevel = assert(t.qualityLevel)
-    local minDistance = assert(t.minDistance)
-    local mask = t.mask
-    local blockSize = t.blockSize or 3
-    local useHarrisDetector = t.useHarrisDetector or false
-    local k = t.k or 0.04
+    local argRules = {
+        {"image"},
+        {"maxCorners"},
+        {"qualityLevel"},
+        {"minDistance"},
+        {"mask", default = nil},
+        {"blockSize", default = 3},
+        {"useHarrisDetector", default = false},
+        {"k", default = 0.04},
+    }
+    local image, maxCorners, qualityLevel, minDistance, mask, blockSize, useHarrisDetector, k = cv.argcheck(t, argRules)
 
-    local imgType = cv.tensorType(image)
     assert(image:nDimension() == 2 and (imgType == cv.CV_32F or imgType == cv.CV_8U))
 
     if mask then
@@ -893,13 +957,16 @@ end
 
 
 function cv.erode(t)
-    local src =        assert(t.src)
-    local dst =        t.dst
-    local kernel = assert(t.kernel)
-    local iterations = 1
-    local anchor = cv.Point(t.anchor or {-1, -1})
-    local borderType = t.borderType or cv.BORDER_CONSTANT
-    local borderValue = cv.Scalar(t.borderValue or {0/0}) -- pass nan to detect default value
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"kernel"},
+        {"anchor", default = {-1, -1}, operator = cv.Point},
+        {"iterations", default = nil},
+        {"borderType", default = cv.BORDER_CONSTANT},
+        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar},
+    }
+    local src, dst, kernel, anchor, iterations, borderType, borderValue = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.erode(
@@ -909,13 +976,16 @@ end
 
 
 function cv.dilate(t)
-    local src =        assert(t.src)
-    local dst =        t.dst
-    local kernel = assert(t.kernel)
-    local iterations = 1
-    local anchor = cv.Point(t.anchor or {-1, -1})
-    local borderType = t.borderType or cv.BORDER_CONSTANT
-    local borderValue = cv.Scalar(t.borderValue or {0/0}) -- pass nan to detect default value
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"kernel"},
+        {"anchor", default = {-1, -1}, operator = cv.Point},
+        {"iterations", default = nil},
+        {"borderType", default = cv.BORDER_CONSTANT},
+        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar},
+    }
+    local src, dst, kernel, anchor, iterations, borderType, borderValue = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.dilate(
@@ -925,14 +995,17 @@ end
 
 
 function cv.morphologyEx(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local op = assert(t.op)
-    local kernel = assert(t.kernel)
-    local iterations = 1
-    local anchor = cv.Point(t.anchor or {-1, -1})
-    local borderType = t.borderType or cv.BORDER_CONSTANT
-    local borderValue = cv.Scalar(t.borderValue or {0/0}) -- pass nan to detect default value
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"op"},
+        {"kernel"},
+        {"anchor", default = {-1, -1}, operator = cv.Point},
+        {"iterations", default = nil},
+        {"borderType", default = cv.BORDER_CONSTANT},
+        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar},
+    }
+    local src, dst, op, kernel, anchor, iterations, borderType, borderValue = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.morphologyEx(
@@ -942,12 +1015,15 @@ end
 
 
 function cv.resize(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local dsize = cv.Size(t.dsize or {0, 0})
-    local fx = t.fx or 0
-    local fy = t.fy or 0
-    local interpolation = t.interpolation or cv.INTER_LINEAR
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"dsize", default = {0, 0}, operator = cv.Size},
+        {"fx", default = 0},
+        {"fy", default = 0},
+        {"interpolation", default = cv.INTER_LINEAR},
+    }
+    local src, dst, dsize, fx, fy, interpolation = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.resize(
@@ -956,13 +1032,16 @@ end
 
 
 function cv.warpAffine(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local M = assert(t.M)
-    local dsize = cv.Point(t.dsize or {0, 0})
-    local flags = t.flags or cv.INTER_LINEAR
-    local borderMode = t.borderMode or cv.BORDER_CONSTANT
-    local borderValue = cv.Scalar(t.borderValue or {0/0}) -- pass nan to detect default value
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"M"},
+        {"dsize", default = {0, 0}, operator = cv.Point},
+        {"flags", default = cv.INTER_LINEAR},
+        {"borderMode", default = cv.BORDER_CONSTANT},
+        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar},
+    }
+    local src, dst, M, dsize, flags, borderMode, borderValue = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.warpAffine(
@@ -972,13 +1051,16 @@ end
 
 
 function cv.warpPerspective(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local M = assert(t.M)
-    local dsize = cv.Size(t.dsize or {0, 0})
-    local flags = t.flags or cv.INTER_LINEAR
-    local borderMode = t.borderMode or cv.BORDER_CONSTANT
-    local borderValue = cv.Scalar(t.borderValue or {0/0}) -- pass nan to detect default value
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"M"},
+        {"dsize", default = {0, 0}, operator = cv.Size},
+        {"flags", default = cv.INTER_LINEAR},
+        {"borderMode", default = cv.BORDER_CONSTANT},
+        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar},
+    }
+    local src, dst, M, dsize, flags, borderMode, borderValue = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.warpPerspective(
@@ -988,13 +1070,16 @@ end
 
 
 function cv.remap(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local map1 = assert(t.map1)
-    local map2 = assert(t.map2)
-    local interpolation = assert(t.interpolation)
-    local borderMode = t.borderMode or cv.BORDER_CONSTANT
-    local borderValue = cv.Scalar(t.borderValue or {0, 0, 0, 0})
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"map1"},
+        {"map2"},
+        {"interpolation"},
+        {"borderMode", default = cv.BORDER_CONSTANT},
+        {"borderValue", default = {0, 0, 0, 0}, operator = cv.Scalar},
+    }
+    local src, dst, map1, map2, interpolation, borderMode, borderValue = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.remap(
@@ -1004,12 +1089,15 @@ end
 
 
 function cv.convertMaps(t)
-    local map1 = assert(t.map1)
-    local map2 = t.map2
-    local dstmap1 = assert(t.dstmap1)
-    local dstmap2 = assert(t.dstmap2)
-    local dstmap1type = assert(t.dstmap1type)
-    local nninterpolation = t.nninterpolation or false
+    local argRules = {
+        {"map1"},
+        {"map2", default = nil},
+        {"dstmap1"},
+        {"dstmap2"},
+        {"dstmap1type"},
+        {"nninterpolation", default = false},
+    }
+    local map1, map2, dstmap1, dstmap2, dstmap1type, nninterpolation = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.convertMaps(
@@ -1019,9 +1107,12 @@ end
 
 
 function cv.getRotationMatrix2D(t)
-    local center = cv.Point2f(assert(t.center))
-    local angle = assert(t.angle)
-    local scale = assert(t.scale)
+    local argRules = {
+        {"center", operator = cv.Point2f},
+        {"angle"},
+        {"scale"},
+    }
+    local center, angle, scale = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.getRotationMatrix2D(center, angle, scale))
@@ -1029,8 +1120,11 @@ end
 
 
 function cv.invertAffineTransform(t)
-    local M = assert(t.M)
-    local iM = t.iM
+    local argRules = {
+        {"M"},
+        {"iM", default = nil},
+    }
+    local M, iM = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.invertAffineTransform(cv.wrap_tensor(M), cv.wrap_tensor(iM)))
@@ -1038,8 +1132,11 @@ end
 
 
 function cv.getPerspectiveTransform(t)
-    local src = assert(t.src)
-    local dst = assert(t.dst)
+    local argRules = {
+        {"src"},
+        {"dst"},
+    }
+    local src, dst = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.getPerspectiveTransform(cv.wrap_tensor(src), cv.wrap_tensor(dst)))
@@ -1047,8 +1144,11 @@ end
 
 
 function cv.getAffineTransform(t)
-    local src = assert(t.src)
-    local dst = assert(t.dst)
+    local argRules = {
+        {"src"},
+        {"dst"},
+    }
+    local src, dst = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.getAffineTransform(cv.wrap_tensor(src), cv.wrap_tensor(dst)))
@@ -1056,11 +1156,14 @@ end
 
 
 function cv.getRectSubPix(t)
-    local image = assert(t.src)
-    local patchSize = cv.Size(assert(t.patchSize))
-    local center = cv.Point2f(assert(t.center))
-    local patch = t.patch
-    local patchType = t.patchType or -1
+    local argRules = {
+        {"image"},
+        {"patchSize", operator = cv.Size},
+        {"center", operator = cv.Point2f},
+        {"patch", default = nil},
+        {"patchType", default = -1},
+    }
+    local image, patchSize, center, patch, patchType = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.getRectSubPix(cv.wrap_tensor(image), patchSize, center,
@@ -1069,11 +1172,14 @@ end
 
 
 function cv.logPolar(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local center = cv.Point2f(assert(t.center))
-    local M = assert(t.M)
-    local flags = assert(t.flags)
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"center", operator = cv.Point2f},
+        {"M"},
+        {"flags"},
+    }
+    local src, dst, center, M, flags = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.logPolar(cv.wrap_tensor(src), cv.wrap_tensor(dst), center, M, flags))
@@ -1081,11 +1187,14 @@ end
 
 
 function cv.linearPolar(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local center = cv.Point2f(assert(t.center))
-    local maxRadius = assert(t.maxRadius)
-    local flags = assert(t.flags)
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"center", operator = cv.Point2f},
+        {"maxRadius"},
+        {"flags"},
+    }
+    local src, dst, center, maxRadius, flags = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.linearPolar(cv.wrap_tensor(src), cv.wrap_tensor(dst), center, maxRadius, flags))
@@ -1093,9 +1202,12 @@ end
 
 
 function cv.integral(t)
-    local src = assert(t.src)
-    local sum = t.sum
-    local sdepth = t.sdepth or -1
+    local argRules = {
+        {"src"},
+        {"sum", default = nil},
+        {"sdepth", default = -1},
+    }
+    local src, sum, sdepth = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.integral(cv.wrap_tensor(src), cv.wrap_tensor(sum), sdepth))
@@ -1128,38 +1240,50 @@ end
 
 
 function cv.accumulate(t)
-    local src = assert(t.src)
-    local sum = assert(t.sum)
-    local mask = t.mask
+    local argRules = {
+        {"src"},
+        {"dst"},
+        {"mask", default = nil},
+    }
+    local src, dst, mask = cv.argcheck(t, argRules)
 
     C.accumulate(cv.wrap_tensor(src), cv.wrap_tensor(sum), cv.wrap_tensor(mask))
 end
 
 
 function cv.accumulateSquare(t)
-    local src = assert(t.src)
-    local sum = assert(t.sum)
-    local mask = t.mask
+    local argRules = {
+        {"src"},
+        {"dst"},
+        {"mask", default = nil},
+    }
+    local src, dst, mask = cv.argcheck(t, argRules)
 
     C.accumulateSquare(cv.wrap_tensor(src), cv.wrap_tensor(sum), cv.wrap_tensor(mask))
 end
 
 
 function cv.accumulateProduct(t)
-    local src1 = assert(t.src1)
-    local src2 = assert(t.src2)
-    local sum = assert(t.sum)
-    local mask = t.mask
+    local argRules = {
+        {"src1"},
+        {"src2"},
+        {"dst"},
+        {"mask", default = nil},
+    }
+    local src1, src2, dst, mask = cv.argcheck(t, argRules)
 
     C.accumulateSquare(cv.wrap_tensor(src1), cv.wrap_tensor(src2), cv.wrap_tensor(sum), cv.wrap_tensor(mask))
 end
 
 
 function cv.accumulateWeighted(t)
-    local src = assert(t.src)
-    local sum = assert(t.sum)
-    local alpha = assert(t.alpha)
-    local mask = t.mask
+    local argRules = {
+        {"src"},
+        {"dst"},
+        {"alpha"},
+        {"mask", default = nil},
+    }
+    local src, dst, alpha, mask = cv.argcheck(t, argRules)
 
     C.accumulateWeighted(cv.wrap_tensor(src), cv.wrap_tensor(sum), alpha, cv.wrap_tensor(mask))
 end
@@ -1169,19 +1293,24 @@ end
 -- point    -> Point
 -- response -> number
 function cv.phaseCorrelate(t)
-    local src1 = assert(t.src1)
-    local src2 = assert(t.src2)
-    local window = t.window
+    local argRules = {
+        {"src1"},
+        {"src2"},
+        {"window", default = nil},
+    }
+    local src1, src2, window = cv.argcheck(t, argRules)
 
-    local result = C.phaseCorrelate(cv.wrap_tensor(src1), cv.wrap_tensor(src2), cv.wrap_tensor(window))
     return {x=result.v0, y=result.v1}, result.v2
 end
 
 
 function cv.createHanningWindow(t)
-    local dst = t.dst
-    local winSize = cv.Size(assert(t.winSize))
-    local type = assert(t.type)
+    local argRules = {
+        {"dst", default = nil},
+        {"winSize", operator = cv.Size},
+        {"type"},
+    }
+    local dst, winSize, type = cv.argcheck(t, argRules)
 
     if dst then
         assert(cv.tensorType(dst) == type)
@@ -1198,31 +1327,36 @@ end
 -- value     -> number
 -- binarized -> Tensor
 function cv.threshold(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local tresh = assert(t.tresh)
-    local maxval = assert(t.maxval)
-    local type = assert(t.type)
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"thresh"},
+        {"maxval"},
+        {"type"},
+    }
+    local src, dst, thresh, maxval, type = cv.argcheck(t, argRules)
 
     if dst then
         assert(cv.tensorType(dst) == type)
         assert(dst:isSameSizeAs(src))
     end
 
-    local result = C.threshold(cv.wrap_tensor(src), cv.wrap_tensor(dst),
                     tresh, maxval, type)
     return result.val, cv.unwrap_tensors(result.tensor)
 end
 
 
 function cv.adaptiveThreshold(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local maxValue = assert(t.maxValue)
-    local adaptiveMethod = assert(t.adaptiveMethod)
-    local thresholdType = assert(t.thresholdType)
-    local blockSize = assert(t.blockSize)
-    local C = assert(t.C)
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"maxValue"},
+        {"adaptiveMethod"},
+        {"thresholdType"},
+        {"blockSize"},
+        {"C"},
+    }
+    local src, dst, maxValue, adaptiveMethod, thresholdType, blockSize, C = cv.argcheck(t, argRules)
 
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
@@ -1236,10 +1370,13 @@ end
 
 
 function cv.pyrDown(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local dstSize = cv.Size(t.dstSize or {0,0})
-    local borderType = t.borderType or cv.BORDER_DEFAULT
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"dstSize", default = {0,0}, operator = cv.Size},
+        {"borderType", default = cv.BORDER_DEFAULT},
+    }
+    local src, dst, dstSize, borderType = cv.argcheck(t, argRules)
 
     if dst then
         assert(dst:type() == src:type())
@@ -1255,10 +1392,13 @@ end
 
 
 function cv.pyrUp(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local dstSize = cv.Size(t.dstSize or {0,0})
-    local borderType = t.borderType or cv.BORDER_DEFAULT
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"dstSize", default = {0,0}, operator = cv.Size},
+        {"borderType", default = cv.BORDER_DEFAULT},
+    }
+    local src, dst, dstSize, borderType = cv.argcheck(t, argRules)
 
     if dst then
         assert(dst:type() == src:type())
@@ -1274,10 +1414,13 @@ end
 
 
 function cv.buildPyramid(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local maxlevel = assert(t.maxlevel)
-    local borderType = t.borderType or cv.BORDER_DEFAULT
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"maxlevel"},
+        {"borderType", default = cv.BORDER_DEFAULT},
+    }
+    local src, dst, maxlevel, borderType = cv.argcheck(t, argRules)
 
     if dst then
         assert(#dst == maxlevel + 1)
@@ -1293,17 +1436,20 @@ end
 
 
 function cv.undistort(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local cameraMatrix = assert(t.cameraMatrix)
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"cameraMatrix"},
+        {"distCoeffs"},
+        {"newCameraMatrix"},
+    }
+    local src, dst, cameraMatrix, distCoeffs, newCameraMatrix = cv.argcheck(t, argRules)
     if type(cameraMatrix) == "table" then
         cameraMatrix = torch.FloatTensor(cameraMatrix)
     end
-    local distCoeffs = t.distCoeffs
     if type(distCoeffs) == "table" then
         distCoeffs = torch.FloatTensor(distCoeffs)
     end
-    local newCameraMatrix = t.newCameraMatrix
     if type(newCameraMatrix) == "table" then
         newCameraMatrix = torch.FloatTensor(newCameraMatrix)
     end
@@ -1321,25 +1467,28 @@ end
 
 
 function cv.initUndistortRectifyMap(t)
-    local cameraMatrix = assert(t.cameraMatrix)
+    local argRules = {
+        {"cameraMatrix"},
+        {"distCoeffs"},
+        {"R"},
+        {"newCameraMatrix"},
+        {"size"},
+        {"m1type"},
+        {"maps"},
+    }
+    local cameraMatrix, distCoeffs, R, newCameraMatrix, size, m1type, maps = cv.argcheck(t, argRules)
     if type(cameraMatrix) == "table" then
         cameraMatrix = torch.FloatTensor(cameraMatrix)
     end
-    local distCoeffs = t.distCoeffs
     if type(distCoeffs) == "table" then
         distCoeffs = torch.FloatTensor(distCoeffs)
     end
-    local R = t.R
     if type(R) == "table" then
         R = torch.FloatTensor(R)
     end
-    local newCameraMatrix = t.newCameraMatrix
     if type(newCameraMatrix) == "table" then
         newCameraMatrix = torch.FloatTensor(newCameraMatrix)
     end
-    local size = cv.Size(assert(t.size))
-    local m1type = assert(t.m1type)
-    local maps = t.maps
 
     return cv.unwrap_tensors(
         C.initUndistortRectifyMap(
@@ -1355,22 +1504,24 @@ end
 -- value      -> number
 -- map1, map2 -> Tensor
 function cv.initWideAngleProjMap(t)
-    local cameraMatrix = assert(t.cameraMatrix)
+    local argRules = {
+        {"cameraMatrix"},
+        {"distCoeffs"},
+        {"imageSize"},
+        {"destImageWidth"},
+        {"m1type"},
+        {"maps"},
+        {"projType"},
+        {"alpha"},
+    }
+    local cameraMatrix, distCoeffs, imageSize, destImageWidth, m1type, maps, projType, alpha = cv.argcheck(t, argRules)
     if type(cameraMatrix) == "table" then
         cameraMatrix = torch.FloatTensor(cameraMatrix)
     end
-    local distCoeffs = t.distCoeffs
     if type(distCoeffs) == "table" then
         distCoeffs = torch.FloatTensor(distCoeffs)
     end
-    local imageSize = cv.Size(assert(t.imageSize))
-    local destImageWidth = assert(t.destImageWidth)
-    local m1type = assert(t.m1type)
-    local maps = t.maps
-    local projType = assert(t.projType)
-    local alpha = assert(t.alpha)
     
-    local result = C.initWideAngleProjMap(
         cv.wrap_tensor(cameraMatrix), cv.wrap_tensor(distCoeffs),
         imageSize, destImageWidth, m1type, cv.wrap_tensors(maps),
         projType, alpha)
@@ -1379,28 +1530,31 @@ end
 
 
 function cv.calcHist(t)
-    local images = assert(t.images)
+    local argRules = {
+        {"images"},
+        {"channels"},
+        {"mask"},
+        {"hist"},
+        {"dims"},
+        {"histSize"},
+        {"ranges"},
+        {"uniform"},
+        {"accumulate"},
+    }
+    local images, channels, mask, hist, dims, histSize, ranges, uniform, accumulate = cv.argcheck(t, argRules)
     assert(type(images) == "table")
-    local channels = assert(t.channels)
     if type(channels) == "table" then
         channels = cv.newArray('Int', channels)
     end
-    local mask = t.mask
-    local hist = t.hist
-    local dims = assert(t.dims)
-    local histSize = assert(t.histSize)
     if type(histSize) == "table" then
         histSize = cv.newArray('Int', histSize)
     end
-    local ranges = assert(t.ranges)
     if type(ranges) == "table" then
         ranges = cv.FloatArrayOfArrays(ranges)
     end
-    local uniform = t.uniform
     if uniform == nil then 
         uniform = true 
     end
-    local accumulate = t.accumulate or false
     assert(hist or accumulate == false)
 
     return cv.unwrap_tensors(
@@ -1411,21 +1565,24 @@ end
 
 
 function cv.calcBackProject(t)
-    local images = assert(t.images)
+    local argRules = {
+        {"images"},
+        {"nimages"},
+        {"channels"},
+        {"hist"},
+        {"backProject"},
+        {"ranges"},
+        {"scale"},
+        {"uniform"},
+    }
+    local images, nimages, channels, hist, backProject, ranges, scale, uniform = cv.argcheck(t, argRules)
     assert(type(images) == "table")
-    local nimages = assert(t.nimages)
-    local channels = assert(t.channels)
     if type(channels) == "table" then
         channels = cv.newArray('Int', channels)
     end
-    local hist = assert(t.hist)
-    local backProject = t.backProject
-    local ranges = assert(t.ranges)
     if type(ranges) == "table" then
         ranges = cv.FloatArrayOfArrays(ranges)
     end
-    local scale = t.scale or 1
-    local uniform = t.uniform
     if uniform == nil then 
         uniform = true 
     end
@@ -1438,9 +1595,12 @@ end
 
 
 function cv.compareHist(t)
-    local H1 = assert(t.H1)
-    local H2 = assert(t.H2)
-    local method = assert(t.method)
+    local argRules = {
+        {"H1"},
+        {"H2"},
+        {"method"},
+    }
+    local H1, H2, method = cv.argcheck(t, argRules)
 
     return C.compareHist(cv.wrap_tensor(H1), cv.wrap_tensor(H2), method)
 end
@@ -1457,15 +1617,18 @@ end
 
 
 function cv.EMD(t)
-    local signature1 = assert(t.signature1)
-    local signature2 = assert(t.signature2)
-    local distType = assert(t.distType)
-    local cost = t.cost
-    local lowerBound = t.lowerBound or ffi.new('struct FloatArray', nil)
+    local argRules = {
+        {"signature1"},
+        {"signature2"},
+        {"distType"},
+        {"cost", default = nil},
+        {"lowerBound", default = ffi.new('struct FloatArray', nil, operator = ffi.new},
+        {"flow"},
+    }
+    local signature1, signature2, distType, cost, lowerBound, flow = cv.argcheck(t, argRules)
     if type(lowerBound) == "table" then
         lowerBound = cv.newArray(lowerBound)
     end
-    local flow = t.flow
 
     return C.EMD(
         cv.wrap_tensor(signature1), cv.wrap_tensor(signature2), distType,
@@ -1474,20 +1637,26 @@ end
 
 
 function cv.watershed(t)
-    local image = assert(t.image)
-    local markers = assert(t.markers)
+    local argRules = {
+        {"image"},
+        {"markers"},
+    }
+    local image, markers = cv.argcheck(t, argRules)
 
     C.watershed(cv.wrap_tensor(image), cv.wrap_tensor(markers))
 end
 
 
 function cv.pyrMeanShiftFiltering(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local sp = assert(t.sp)
-    local sr = assert(t.sr)
-    local maxLevel = t.maxLevel or 1
-    local termcrit = cv.TermCriteria(t.termcrit)
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"sp"},
+        {"sr"},
+        {"maxLevel", default = 1},
+        {"termcrit", default = nil, operator = cv.TermCriteria},
+    }
+    local src, dst, sp, sr, maxLevel, termcrit = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(C.pyrMeanShiftFiltering(
         cv.wrap_tensor(src), cv.wrap_tensor(dst), sp, sr, maxlevel, termcrit))
@@ -1495,13 +1664,16 @@ end
 
 
 function cv.grabCut(t)
-    local img = assert(t.img)
-    local mask = assert(t.mask)
-    local rect = cv.Rect(t.rect)
-    local bgdModel = assert(t.bgdModel)
-    local fgdModel = assert(t.fgdModel)
-    local iterCount = assert(t.iterCount)
-    local mode = t.mode or cv.GC_EVAL
+    local argRules = {
+        {"img"},
+        {"mask"},
+        {"rect", default = nil, operator = cv.Rect},
+        {"bgdModel"},
+        {"fgdModel"},
+        {"iterCount"},
+        {"mode", default = cv.GC_EVAL},
+    }
+    local img, mask, rect, bgdModel, fgdModel, iterCount, mode = cv.argcheck(t, argRules)
     
     C.grabCut(
         cv.wrap_tensor(img), cv.wrap_tensor(mask), rect,
@@ -1511,11 +1683,14 @@ end
 
 
 function cv.distanceTransform(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local distanceType = assert(t.distanceType)
-    local maskSize = assert(t.maskSize)
-    local dstType = t.dstType or cv.CV_32F
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"distanceType"},
+        {"maskSize"},
+        {"dstType", default = cv.CV_32F},
+    }
+    local src, dst, distanceType, maskSize, dstType = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.distanceTransform(
@@ -1524,12 +1699,15 @@ end
 
 
 function cv.distanceTransformWithLabels(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local labels = t.labels
-    local distanceType = assert(t.distanceType)
-    local maskSize = assert(t.maskSize)
-    local labelType = t.labelType or cv.DIST_LABEL_CCOMP
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"labels", default = nil},
+        {"distanceType"},
+        {"maskSize"},
+        {"labelType", default = cv.DIST_LABEL_CCOMP},
+    }
+    local src, dst, labels, distanceType, maskSize, labelType = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.distanceTransformWithLabels(
@@ -1541,15 +1719,17 @@ end
 -- area         -> number
 -- boundingRect -> RectWrapper
 function cv.floodFill(t)
-    local image = assert(t.image)
-    local mask = t.mask
-    local seedPoint = cv.Point(assert(t.seedPoint))
-    local newVal = cv.Scalar(assert(t.newVal))
-    local loDiff = cv.Scalar(t.loDiff or {0, 0, 0, 0})
-    local upDiff = cv.Scalar(t.upDiff or {0, 0, 0, 0})
-    local flags = t.flags or 4
+    local argRules = {
+        {"image"},
+        {"mask", default = nil},
+        {"seedPoint", operator = cv.Point},
+        {"newVal", operator = cv.Scalar},
+        {"loDiff", default = {0, 0, 0, 0}, operator = cv.Scalar},
+        {"upDiff", default = {0, 0, 0, 0}, operator = cv.Scalar},
+        {"flags", default = 4},
+    }
+    local image, mask, seedPoint, newVal, loDiff, upDiff, flags = cv.argcheck(t, argRules)
 
-    local result = C.floodFill(
         cv.wrap_tensor(image), cv.wrap_tensor(mask), seedPoint[1], 
         seedPoint[2], newVal, loDiff, upDiff, flags)
     return result.val, result.rect
@@ -1557,10 +1737,13 @@ end
 
 
 function cv.cvtColor(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local code = assert(t.code)
-    local dstCn = t.dstCn or 0
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"code"},
+        {"dstCn", default = 0},
+    }
+    local src, dst, code, dstCn = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(C.cvtColor(
         cv.wrap_tensor(src), cv.wrap_tensor(dst), code, dstCn))
@@ -1568,10 +1751,13 @@ end
 
 
 function cv.demosaicing(t)
-    local _src = assert(t.src)
-    local _dst = assert(t.dst)
-    local code = assert(t.code)
-    local dcn = t.dcn or 0
+    local argRules = {
+        {"_src"},
+        {"_dst"},
+        {"code"},
+        {"dcn", default = 0},
+    }
+    local _src, _dst, code, dcn = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(C.demosaicing(
         cv.wrap_tensor(_src), cv.wrap_tensor(_dst), code, dcn))
@@ -1579,8 +1765,11 @@ end
 
 
 function cv.moments(t)
-    local array = assert(t.array)
-    local binaryImage = t.binaryImage or false
+    local argRules = {
+        {"array"},
+        {"binaryImage", default = false},
+    }
+    local array, binaryImage = cv.argcheck(t, argRules)
 
     return C.moments(cv.wrap_tensor(array), binaryImage)
 end
@@ -1589,21 +1778,24 @@ end
 -- moments: Input moments computed with cv.moments()
 -- toTable: Output to table if true, otherwise output to Tensor. Default: true
 -- output : Optional. A Tensor of length 7 or a table; if provided, will output there
-function cv.HuMoments(t)
+--[[function cv.HuMoments(t)
     local moments = assert(t.moments)
     local outputType = t.outputType or 'table'
     local output = t.output
 
     return cv.arrayToLua(C.HuMoments(moments), outputType, output)
-end
+end]]
 
 
 function cv.matchTemplate(t)
-    local image = assert(t.image)
-    local templ = t.templ
-    local result = assert(t.result)
-    local method = assert(t.method)
-    local mask = t.mask
+    local argRules = {
+        {"image"},
+        {"templ", default = nil},
+        {"result"},
+        {"method"},
+        {"mask", default = nil},
+    }
+    local image, templ, result, method, mask = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(C.matchTemplate(
         cv.wrap_tensor(image), cv.wrap_tensor(templ), cv.wrap_tensor(result), method, cv.wrap_tensor(mask)))
@@ -1611,25 +1803,27 @@ end
 
 
 function cv.connectedComponents(t)
-    local image = assert(t.image)
-    local labels = assert(t.labels)
-    local connectivity = t.connectivity or 8
-    local ltype = t.ltype or cv.CV_32S
+    local argRules = {
+        {"image"},
+        {"labels"},
+        {"connectivity", default = 8},
+        {"ltype", default = cv.CV_32S},
+    }
+    local image, labels, connectivity, ltype = cv.argcheck(t, argRules)
 
-    local result = C.connectedComponents(cv.wrap_tensor(image), cv.wrap_tensor(labels), connectivity, ltype)
     return result.val, cv.unwrap_tensors(result.tensor)
 end
 
 
 function cv.connectedComponentsWithStats(t)
-    local image = assert(t.image)
-    local labels = assert(t.labels)
-    local stats = assert(t.stats)
-    local centroids = assert(t.centroids)
-    local connectivity = t.connectivity or 8
-    local ltype = t.ltype or cv.CV_32S
+    local argRules = {
+        {"image"},
+        {"outputTensors"},
+        {"connectivity", default = 8},
+        {"ltype", default = cv.CV_32S},
+    }
+    local image, outputTensors, connectivity, ltype = cv.argcheck(t, argRules)
 
-    local result = C.connectedComponentsWithStats(
         cv.wrap_tensor(image), 
         cv.wrap_tensors(labels, stats, centroids), 
         connectivity, 
@@ -1642,12 +1836,15 @@ end
 -- withHierarchy: boolean, to output hierarchy or not. Default: false
 -- other params: see OpenCV docs for findContours
 function cv.findContours(t)
-    local image = assert(t.image)
-    local hierarchy = t.hierarchy
-    local withHierarchy = t.withHierarchy or false
-    local mode = assert(t.mode)
-    local method = assert(t.method)
-    local offset = cv.Point(t.offset or {0, 0})
+    local argRules = {
+        {"image"},
+        {"withHierarchy", default = false},
+        {"hierarchy", default = nil},
+        {"mode"},
+        {"method"},
+        {"offset", default = {0, 0}, operator = cv.Point},
+    }
+    local image, withHierarchy, hierarchy, mode, method, offset = cv.argcheck(t, argRules)
 
     contours = cv.unwrap_tensors(
         C.findContours(
@@ -1664,25 +1861,34 @@ end
 
 
 function cv.approxPolyDP(t)
-    local curve = assert(t.curve)
-    local approxCurve = t.approxCurve
-    local epsilon = assert(t.epsilon)
-    local closed = assert(t.closed)
+    local argRules = {
+        {"curve"},
+        {"approxCurve", default = nil},
+        {"epsilon"},
+        {"closed"},
+    }
+    local curve, approxCurve, epsilon, closed = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(C.approxPolyDP(cv.wrap_tensor(curve), cv.wrap_tensor(approxCurve), epsilon, closed))
 end
 
 
 function cv.arcLength(t)
-    local curve = assert(t.curve)
-    local closed = assert(t.closed)
+    local argRules = {
+        {"curve"},
+        {"closed"},
+    }
+    local curve, closed = cv.argcheck(t, argRules)
     
     return C.arcLength(cv.wrap_tensor(curve), closed)
 end
 
 
 function cv.boundingRect(t)
-    local points = assert(t.points)
+    local argRules = {
+        {"points"},
+    }
+    local points = cv.argcheck(t, argRules)
     if type(points) == "table" then
         points = torch.FloatTensor(points)
     end
@@ -1692,19 +1898,25 @@ end
 
 
 function cv.contourArea(t)
-    local contour = assert(t.contour)
+    local argRules = {
+        {"contour"},
+        {"oriented"},
+    }
+    local contour, oriented = cv.argcheck(t, argRules)
     if type(contour) == "table" then
         contour = torch.FloatTensor(contour)
     end
 
-    local oriented = t.oriented or false
 
     return C.contourArea(cv.wrap_tensor(contour), oriented)
 end
 
 
 function cv.minAreaRect(t)
-    local points = assert(t.points)
+    local argRules = {
+        {"points"},
+    }
+    local points = cv.argcheck(t, argRules)
     if type(points) == "table" then
         points = torch.FloatTensor(points)
     end
@@ -1716,8 +1928,11 @@ end
 -- box: a RotatedRectWrapper
 -- points: optional; a 4x2 Tensor to hold the return value
 function cv.boxPoints(t)
-    local box = assert(t.box)
-    local points = t.points
+    local argRules = {
+        {"box"},
+        {"points", default = nil},
+    }
+    local box, points = cv.argcheck(t, argRules)
     -- check that points is a Tensor
     assert(not points or points.torch)
 
@@ -1727,12 +1942,16 @@ end
 -- points: a Tensor or a table of points
 -- return value: center, radius
 function cv.minEnclosingCircle(t)
-    local points = assert(t.points)
+    local argRules = {
+        {"points"},
+        {"center"},
+        {"radius"},
+    }
+    local points, center, radius = cv.argcheck(t, argRules)
     if type(points) == "table" then
         points = torch.FloatTensor(points)
     end
 
-    local result = C.minEnclosingCircle(cv.wrap_tensor(points))
     return cv.Point2f(result.v0, result.v1), result.v2
 end
 
@@ -1740,33 +1959,41 @@ end
 -- triangle: optional; a 3x2 Tensor to hold the return value
 -- return value: triangle_points, area
 function cv.minEnclosingTriangle(t)
-    local points = assert(t.points)
+    local argRules = {
+        {"points"},
+        {"triangle"},
+    }
+    local points, triangle = cv.argcheck(t, argRules)
     if type(points) == "table" then
         points = torch.FloatTensor(points)
     end
-    local triangle = t.triangle
     -- check that triangle is a Tensor
     assert(not triangle or triangle.torch)
 
-    local result = C.minEnclosingTriangle(cv.wrap_tensor(points), cv.wrap_tensor(triangle))
     return cv.unwrap_tensors(result.tensor), result.val
 end
 
 
 function cv.matchShapes(t)
-    local contour1 = assert(t.contour1)
-    local contour2 = assert(t.contour2)
-    local method = assert(t.method)
-    local parameter = t.parameter or 0
+    local argRules = {
+        {"contour1"},
+        {"contour2"},
+        {"method"},
+        {"parameter", default = 0},
+    }
+    local contour1, contour2, method, parameter = cv.argcheck(t, argRules)
 
     return C.matchShapes(cv.wrap_tensor(contour1), cv.wrap_tensor(contour2), method, parameter)
 end
 
 
 function cv.convexHull(t)
-    local points = assert(t.points)
-    local clockwise = t.clockwise or false
-    local returnPoints = t.returnPoints
+    local argRules = {
+        {"points"},
+        {"clockwise", default = false},
+        {"returnPoints", default = nil},
+    }
+    local points, clockwise, returnPoints = cv.argcheck(t, argRules)
     if returnPoints == nil then
          returnPoints = true
     end
@@ -1783,15 +2010,21 @@ end
 
 
 function cv.convexityDefects(t)
-    local contour = assert(t.contour)
-    local convexhull = assert(t.convexhull)
+    local argRules = {
+        {"contour"},
+        {"convexhull"},
+    }
+    local contour, convexhull = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(C.convexityDefects(cv.wrap_tensor(contour), cv.wrap_tensor(convexhull)))
 end
 
 
 function cv.isContourConvex(t)
-    local contour = assert(t.contour)
+    local argRules = {
+        {"contour"},
+    }
+    local contour = cv.argcheck(t, argRules)
 
     return C.isContourConvex(cv.wrap_tensor(contour))
 end
@@ -1801,9 +2034,12 @@ end
 -- handleNested: boolean
 -- return value: intersection
 function cv.intersectConvexConvex(t)
-    local _p1 = assert(t.contour1)
-    local _p2 = assert(t.contour2)
-    local handleNested = t.handleNested
+    local argRules = {
+        {"_p1"},
+        {"_p2"},
+        {"handleNested", default = nil},
+    }
+    local _p1, _p2, handleNested = cv.argcheck(t, argRules)
     if handleNested == nil then
         handleNested = true
     end
@@ -1814,18 +2050,24 @@ end
 
 
 function cv.fitEllipse(t)
-    local points = assert(t.points)
+    local argRules = {
+        {"points"},
+    }
+    local points = cv.argcheck(t, argRules)
 
     return C.fitEllipse(cv.wrap_tensor(points))
 end
 
 
 function cv.fitLine(t)
-    local points = assert(t.points)
-    local distType = assert(t.distType)
-    local param = assert(t.param)
-    local reps = assert(t.reps)
-    local aeps = assert(t.aeps)
+    local argRules = {
+        {"points"},
+        {"distType"},
+        {"param"},
+        {"reps"},
+        {"aeps"},
+    }
+    local points, distType, param, reps, aeps = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.fitLine(cv.wrap_tensor(points), distType, param, reps, aeps))
@@ -1833,17 +2075,23 @@ end
 
 
 function cv.pointPolygonTest(t)
-    local contour = assert(t.contour)
-    local pt = cv.Point2f(assert(t.pt))
-    local measureDist = assert(t.measureDist)
+    local argRules = {
+        {"contour"},
+        {"pt", operator = cv.Point2f},
+        {"measureDist"},
+    }
+    local contour, pt, measureDist = cv.argcheck(t, argRules)
 
     return C.pointPolygonTest(cv.wrap_tensor(contour), pt, measureDist)
 end
 
 
 function cv.rotatedRectangleIntersection(t)
-    local rect1 = cv.RotatedRect(assert(t.rect1))
-    local rect2 = cv.RotatedRect(assert(t.rect2))
+    local argRules = {
+        {"rect1", operator = cv.RotatedRect},
+        {"rect2", operator = cv.RotatedRect},
+    }
+    local rect1, rect2 = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.rotatedRectangleIntersection(rect1, rect2))
@@ -1851,11 +2099,14 @@ end
 
 
 function cv.blendLinear(t)
-    local src1 = assert(t.src1)
-    local src2 = assert(t.src2)
-    local weights1 = assert(t.weights1)
-    local weights2 = assert(t.weights2)
-    local dst = t.dst
+    local argRules = {
+        {"src1"},
+        {"src2"},
+        {"weights1"},
+        {"weights2"},
+        {"dst", default = nil},
+    }
+    local src1, src2, weights1, weights2, dst = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.blendLinear(cv.wrap_tensor(src1), cv.wrap_tensor(src2), cv.wrap_tensor(weights1), cv.wrap_tensor(weights2), cv.wrap_tensor(dst)))
@@ -1863,9 +2114,12 @@ end
 
 
 function cv.applyColorMap(t)
-    local src = assert(t.src)
-    local dst = t.dst
-    local colormap = assert(t.colormap)
+    local argRules = {
+        {"src"},
+        {"dst", default = nil},
+        {"colormap"},
+    }
+    local src, dst, colormap = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.applyColorMap(cv.wrap_tensor(src), cv.wrap_tensor(dst), colormap))
@@ -1873,33 +2127,39 @@ end
 
 
 function cv.line(t)
-    local img = assert(t.img)
-    local pt1 = cv.Point(assert(t.pt1))
-    local pt2 = cv.Point(assert(t.pt2))
-    local color = cv.Scalar(assert(t.color))
-    local thickness = t.thickness or 1
-    local lineType = t.lineType or cv.LINE_8
-    local shift = t.shift or 0
+    local argRules = {
+        {"img"},
+        {"pt1", operator = cv.Point},
+        {"pt2", operator = cv.Point},
+        {"color", operator = cv.Scalar},
+        {"thickness", default = 1},
+        {"lineType", default = cv.LINE_8},
+        {"shift", default = 0},
+    }
+    local img, pt1, pt2, color, thickness, lineType, shift = cv.argcheck(t, argRules)
 
     C.line(cv.wrap_tensor(img), pt1, pt2, color, thickness, lineType, shift)
 end
 
 
 function cv.arrowedLine(t)
-    local img = assert(t.img)
-    local pt1 = cv.Point(assert(t.pt1))
-    local pt2 = cv.Point(assert(t.pt2))
-    local color = cv.Scalar(assert(t.color))
-    local thickness = t.thickness or 1
-    local line_type = t.line_type or 8
-    local shift = t.shift or 0
-    local tipLength = t.tipLength or 0.1
+    local argRules = {
+        {"img"},
+        {"pt1", operator = cv.Point},
+        {"pt2", operator = cv.Point},
+        {"color", operator = cv.Scalar},
+        {"thickness", default = 1},
+        {"line_type", default = 8},
+        {"shift", default = 0},
+        {"tipLength", default = 0.1},
+    }
+    local img, pt1, pt2, color, thickness, line_type, shift, tipLength = cv.argcheck(t, argRules)
 
     C.arrowedLine(cv.wrap_tensor(img), pt1, pt2, color, thickness, line_type, shift, tipLength)
 end
 
 
-function cv.rectangle(t)
+--[[function cv.rectangle(t)
     local img = assert(t.img)
     local pt1
     local pt2
@@ -1921,101 +2181,122 @@ function cv.rectangle(t)
     else
         C.rectangle(cv.wrap_tensor(img), pt1, pt2, color, thickness, lineType, shift)
     end
-end
+end]]
 
 
 function cv.circle(t)
-    local img = assert(t.img)
-    local center = cv.Point(assert(t.center))
-    local radius = assert(t.radius)
-    local color = cv.Scalar(assert(t.color))
-    local thickness = t.thickness or 1
-    local lineType = t.lineType or cv.LINE_8
-    local shift = t.shift or 0
+    local argRules = {
+        {"img"},
+        {"center", operator = cv.Point},
+        {"radius"},
+        {"color", operator = cv.Scalar},
+        {"thickness", default = 1},
+        {"lineType", default = cv.LINE_8},
+        {"shift", default = 0},
+    }
+    local img, center, radius, color, thickness, lineType, shift = cv.argcheck(t, argRules)
 
     C.circle(cv.wrap_tensor(img), center, radius, color, thickness, lineType, shift)
 end
 
 
 function cv.ellipse(t)
-    local img = assert(t.img)
-    local center = cv.Point(assert(t.center))
-    local axes = cv.Size(assert(t.axes))
-    local angle = assert(t.angle)
-    local startAngle = assert(t.startAngle)
-    local endAngle = assert(t.endAngle)
-    local color = cv.Scalar(assert(t.color))
-    local thickness = t.thickness or 1
-    local lineType = t.lineType or cv.LINE_8
-    local shift = t.shift or 0
+    local argRules = {
+        {"img"},
+        {"center", operator = cv.Point},
+        {"axes", operator = cv.Size},
+        {"angle"},
+        {"startAngle"},
+        {"endAngle"},
+        {"color", operator = cv.Scalar},
+        {"thickness", default = 1},
+        {"lineType", default = cv.LINE_8},
+        {"shift", default = 0},
+    }
+    local img, center, axes, angle, startAngle, endAngle, color, thickness, lineType, shift = cv.argcheck(t, argRules)
 
     C.ellipse(cv.wrap_tensor(img), center, axes, angle, startAngle, endAngle, color, thickness, lineType, shift)
 end
 
 
 function cv.ellipseFromRect(t)
-    local img = assert(t.img)
-    local box = cv.RotatedRect(assert(t.box))
-    local color = cv.Scalar(assert(t.color))
-    local thickness = t.thickness or 1
-    local lineType = t.lineType or cv.LINE_8
+    local argRules = {
+        {"img"},
+        {"box", operator = cv.RotatedRect},
+        {"color", operator = cv.Scalar},
+        {"thickness", default = 1},
+        {"lineType", default = cv.LINE_8},
+    }
+    local img, box, color, thickness, lineType = cv.argcheck(t, argRules)
 
     C.ellipseFromRect(cv.wrap_tensor(img), box, color, thickness, lineType)
 end
 
 
 function cv.fillConvexPoly(t)
-    local img = assert(t.img)
-    local points = assert(t.points)
+    local argRules = {
+        {"img"},
+        {"points"},
+        {"color"},
+        {"lineType"},
+        {"shift"},
+    }
+    local img, points, color, lineType, shift = cv.argcheck(t, argRules)
     if type(points) == "table" then
         points = torch.FloatTensor(points)
     end
-    local color = cv.Scalar(assert(t.color))
-    local lineType = t.lineType or cv.LINE_8
-    local shift = t.shift or 0
 
     C.fillConvexPoly(cv.wrap_tensor(img), cv.wrap_tensor(points), color, lineType, shift)
 end
 
 
 function cv.fillPoly(t)
-    local img = assert(t.img)
-    local pts = assert(t.pts)
+    local argRules = {
+        {"img"},
+        {"pts"},
+        {"color"},
+        {"lineType"},
+        {"shift"},
+        {"offset"},
+    }
+    local img, pts, color, lineType, shift, offset = cv.argcheck(t, argRules)
     assert(type(pts) == 'table')
-    local color = cv.Scalar(assert(t.color))
-    local lineType = t.lineType or cv.LINE_8
-    local shift = t.shift or 0
-    local offset = cv.Point(t.offset or {0,0})
 
     C.fillPoly(cv.wrap_tensor(img), cv.wrap_tensors(pts), color, lineType, shift, offset)
 end
 
 
 function cv.polylines(t)
-    local img = assert(t.img)
-    local pts = assert(t.pts)
+    local argRules = {
+        {"img"},
+        {"pts"},
+        {"isClosed"},
+        {"color"},
+        {"thickness"},
+        {"lineType"},
+        {"shift"},
+    }
+    local img, pts, isClosed, color, thickness, lineType, shift = cv.argcheck(t, argRules)
     assert(type(pts) == 'table')
-    local isClosed = assert(t.isClosed)
-    local color = cv.Scalar(assert(t.color))
-    local thickness = t.thickness or 1
-    local lineType = t.lineType or cv.LINE_8
-    local shift = t.shift or 0
 
     C.polylines(cv.wrap_tensor(img), cv.wrap_tensors(pts), isClosed, color, thickness, lineType, shift)
 end
 
 
 function cv.drawContours(t)
-    local image = assert(t.image)
-    local contours = assert(t.contours)
+    local argRules = {
+        {"image"},
+        {"contours"},
+        {"contourIdx"},
+        {"color"},
+        {"thickness"},
+        {"lineType"},
+        {"hierarchy"},
+        {"maxLevel"},
+        {"offset"},
+    }
+    local image, contours, contourIdx, color, thickness, lineType, hierarchy, maxLevel, offset = cv.argcheck(t, argRules)
     assert(type(contours) == 'table')
-    local contourIdx = assert(t.contourIdx)
-    local color = cv.Scalar(assert(t.color))
-    local thickness = t.thickness or 1
-    local lineType = t.lineType or cv.LINE_8
-    local hierarchy = t.hierarchy
-    local maxLevel = t.maxLevel or cv.INT_MAX
-    local offset = t.offset or cv.Point
 
     C.drawContours(cv.wrap_tensor(image), cv.wrap_tensors(contours), contourIdx, color, thickness, lineType, cv.wrap_tensor(hierarchy), maxLevel, offset)
 end
@@ -2046,12 +2327,15 @@ end
 
 
 function cv.ellipse2Poly(t)
-    local center = cv.Point(assert(t.center))
-    local axes = cv.Size(assert(t.axes))
-    local angle = assert(t.angle)
-    local arcStart = assert(t.arcStart)
-    local arcEnd = assert(t.arcEnd)
-    local delta = assert(t.delta)
+    local argRules = {
+        {"center", operator = cv.Point},
+        {"axes", operator = cv.Size},
+        {"angle"},
+        {"arcStart"},
+        {"arcEnd"},
+        {"delta"},
+    }
+    local center, axes, angle, arcStart, arcEnd, delta = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.ellipse2Poly(center, axes, angle, arcStart, arcEnd, delta, pts))
@@ -2059,27 +2343,32 @@ end
 
 
 function cv.putText(t)
-    local img = assert(t.img)
-    local text = assert(t.text)
-    local org = cv.Point(assert(t.org))
-    local fontFace = assert(t.fontFace)
-    local fontScale = assert(t.fontScale)
-    local color = cv.Scalar(assert(t.color))
-    local thickness = t.thickness or 1
-    local lineType = t.lineType or cv.LINE_8
-    local bottomLeftOrigin = t.bottomLeftOrigin or false
+    local argRules = {
+        {"img"},
+        {"text"},
+        {"org", operator = cv.Point},
+        {"fontFace"},
+        {"fontScale"},
+        {"color", operator = cv.Scalar},
+        {"thickness", default = 1},
+        {"lineType", default = cv.LINE_8},
+        {"bottomLeftOrigin", default = false},
+    }
+    local img, text, org, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin = cv.argcheck(t, argRules)
 
     C.putText(cv.wrap_tensor(img), text, org, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin)
 end
 
 
 function cv.getTextSize(t)
-    local text = assert(t.text)
-    local fontFace = assert(t.fontFace)
-    local fontScale = assert(t.fontScale)
-    local thickness = assert(t.thickness)
+    local argRules = {
+        {"text"},
+        {"fontFace"},
+        {"fontScale"},
+        {"thickness"},
+    }
+    local text, fontFace, fontScale, thickness = cv.argcheck(t, argRules)
 
-    local result = C.getTextSize(text, fontFace, fontScale, thickness)
     return result.size, result.val
 end
 

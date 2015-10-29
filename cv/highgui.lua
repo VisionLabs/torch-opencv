@@ -58,27 +58,39 @@ void loadWindowParameters(const char *windowName);
 local C = ffi.load(libPath('highgui'))
 
 function cv.imshow(t)
-	local winname = t.winname or "Window 1"
-	local image = assert(t.image)
+    local argRules = {
+        {"winname", default = "Window 1"},
+        {"mat"},
+    }
+    local winname, mat = cv.argcheck(t, argRules)
     
     C.imshow(winname, cv.wrap_tensor(image))
 end
 
 function cv.waitKey(t)
-	local delay = t.delay or 0
+    local argRules = {
+        {"delay", default = 0},
+    }
+    local delay = cv.argcheck(t, argRules)
 
     return C.waitKey(delay or 0)
 end
 
 function cv.namedWindow(t)
-	local winname = t.winname or "Window 1"
-	local flags = t.flags or cv.WINDOW_AUTOSIZE
+    local argRules = {
+        {"winname", default = "Window 1"},
+        {"flags", default = cv.WINDOW_AUTOSIZE},
+    }
+    local winname, flags = cv.argcheck(t, argRules)
 
-	C.namedWindow(winname, flags)
+    C.namedWindow(winname, flags)
 end
 
 function cv.destroyWindow(t)
-    local winname = assert(t.winname)
+    local argRules = {
+        {"winname"},
+    }
+    local winname = cv.argcheck(t, argRules)
     
     return C.destroyWindow(winname)
 end
@@ -92,121 +104,169 @@ function cv.startWindowThread(t)
 end
 
 function cv.resizeWindow(t)
-    local winname = assert(t.winname)
-    local width = assert(t.width)
-    local height = assert(t.height)
+    local argRules = {
+        {"winname"},
+        {"width"},
+        {"height"},
+    }
+    local winname, width, height = cv.argcheck(t, argRules)
 
     return C.resizeWindow(winname, width, height)
 end
 
 function cv.moveWindow(t)
-    local winname = assert(t.winname)
-    local x = assert(t.x)
-    local y = assert(t.y)
+    local argRules = {
+        {"winname"},
+        {"x"},
+        {"y"},
+    }
+    local winname, x, y = cv.argcheck(t, argRules)
     
     return C.moveWindow(winname, x, y)
 end
 
 function cv.setWindowProperty(t)
-    local winname = assert(t.winname)
-    local prop_id = assert(t.prop_id)
-    local prop_value = assert(t.prop_value)
+    local argRules = {
+        {"winname"},
+        {"prop_id"},
+        {"prop_value"},
+    }
+    local winname, prop_id, prop_value = cv.argcheck(t, argRules)
     
     return C.setWindowProperty(winname, prop_id, prop_value)
 end
 
 function cv.setWindowTitle(t)
-    local winname = assert(t.winname)
-    local title = assert(t.title)
+    local argRules = {
+        {"winname"},
+        {"title"},
+    }
+    local winname, title = cv.argcheck(t, argRules)
     
     return C.setWindowTitle(winname, title)
 end
 
 function cv.getWindowProperty(t)
-    local winname = assert(t.winname)
-    local prop_id = assert(t.prop_id)
+    local argRules = {
+        {"winname"},
+        {"prop_id"},
+    }
+    local winname, prop_id = cv.argcheck(t, argRules)
     
     return C.getWindowProperty(winname, prop_id)
 end
 
 function cv.setMouseCallback(t)
-    local winname = assert(t.winname)
-    local onMouse = t.onMouse or nil
-    local userdata = assert(t.userdata)
+    local argRules = {
+        {"winname"},
+        {"onMouse", default = nil},
+        {"userdata"},
+    }
+    local winname, onMouse, userdata = cv.argcheck(t, argRules)
     
     return C.setMouseCallback(winname, onMouse, userdata)
 end
 
 function cv.getMouseWheelData(t)
-    local flags = assert(t.flags)
+    local argRules = {
+        {"flags"},
+    }
+    local flags = cv.argcheck(t, argRules)
     
     return C.getMouseWheelData(flags)
 end
 
 function cv.createTrackbar(t)
-    local trackbarname = assert(t.trackbarname)
-    local winname = assert(t.winname)
-    local value = t.value or nil
-    local count = assert(t.count)
-    local onChange = t.onChange or nil
-    local userdata = t.userdata or nil
+    local argRules = {
+        {"trackbarname"},
+        {"winname"},
+        {"value", default = nil},
+        {"count"},
+        {"onChange", default = nil},
+        {"userdata", default = nil},
+    }
+    local trackbarname, winname, value, count, onChange, userdata = cv.argcheck(t, argRules)
     
     return C.createTrackbar(trackbarname, winname, value, count, onChange, userdata)
 end
 
 function cv.getTrackbarPos(t)
-    local trackbarname = assert(t.trackbarname)
-    local winname = assert(t.winname)
+    local argRules = {
+        {"trackbarname"},
+        {"winname"},
+    }
+    local trackbarname, winname = cv.argcheck(t, argRules)
     
     return C.getTrackbarPos(trackbarname, winname)
 end
 
 function cv.setTrackbarPos(t)
-    local trackbarname = assert(t.trackbarname)
-    local winname = assert(t.winname)
-    local pos = assert(t.pos)
+    local argRules = {
+        {"trackbarname"},
+        {"winname"},
+        {"pos"},
+    }
+    local trackbarname, winname, pos = cv.argcheck(t, argRules)
     
     return C.setTrackbarPos(trackbarname, winname, pos)
 end
 
 function cv.setTrackbarMax(t)
-    local trackbarname = assert(t.trackbarname)
-    local winname = assert(t.winname)
-    local maxval = assert(t.maxval)
+    local argRules = {
+        {"trackbarname"},
+        {"winname"},
+        {"maxval"},
+    }
+    local trackbarname, winname, maxval = cv.argcheck(t, argRules)
     
     return C.setTrackbarMax(trackbarname, winname, maxval)
 end
 
 function cv.updateWindow(t)
-    local winname = assert(t.winname)
+    local argRules = {
+        {"winname"},
+    }
+    local winname = cv.argcheck(t, argRules)
     
     return C.updateWindow(winname)
 end
 
 function cv.displayOverlay(t)
-    local winname = assert(t.winname)
-    local text = assert(t.text)
-    local delayms = assert(t.delayms)
+    local argRules = {
+        {"winname"},
+        {"text"},
+        {"delayms"},
+    }
+    local winname, text, delayms = cv.argcheck(t, argRules)
     
     return C.displayOverlay(winname, text, delayms)
 end
 
 function cv.displayStatusBar(t)
-    local winname = assert(t.winname)
-    local text = assert(t.text)
-    local delayms = assert(t.delayms)
+    local argRules = {
+        {"winname"},
+        {"text"},
+        {"delayms"},
+    }
+    local winname, text, delayms = cv.argcheck(t, argRules)
     
     return C.displayStatusBar(winname, text, delayms)
 end
 
 function cv.saveWindowParameters(t)
-    local windowName = assert(t.windowName)
+    local argRules = {
+        {"windowName"},
+    }
+    local windowName = cv.argcheck(t, argRules)
     
     return C.saveWindowParameters(windowName)
 end
 
 function cv.loadWindowParameters(t)
-    local windowName = assert(t.windowName)
+    local argRules = {
+        {"windowName"},
+    }
+    local windowName = cv.argcheck(t, argRules)
     
     return C.loadWindowParameters(windowName)
 end
