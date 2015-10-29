@@ -267,7 +267,7 @@ function cv.colorChange(t)
             red_mul, green_mul, blue_mul))
 end
 
---[[function cv.illuminationChange(t)
+function cv.illuminationChange(t)
     local src   = assert(t.src)
     local mask  = assert(t.mask)
     local dst   = t.dst
@@ -282,9 +282,9 @@ end
         C.illuminationChange(
             cv.wrap_tensor(src), cv.wrap_tensor(mask), cv.wrap_tensor(dst),
             alpha, beta))
-end]]
+end
 
-function cv.illuminationChange(t)
+--[[function cv.illuminationChange(t)
     local argRules = {
         {"src"},
         {"mask"},
@@ -302,7 +302,7 @@ function cv.illuminationChange(t)
         C.illuminationChange(
             cv.wrap_tensor(src), cv.wrap_tensor(mask), cv.wrap_tensor(dst),
             alpha, beta))
-end
+end]]
 
 function cv.textureFlattening(t)
     local src            = assert(t.src)

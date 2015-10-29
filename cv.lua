@@ -170,7 +170,7 @@ function cv.argcheck(t, rules)
     for i, argument in ipairs(rules) do
         local userInputArg = t[argument[1]] or t[i]
         
-        print(argument[1], type(t[argument[1]]), type(t[i]))
+        --print(argument[1], type(t[argument[1]]), type(t[i]))
 
         if userInputArg == nil and not argument.default and argument.default ~= nil then
             error('Argument #' .. i .. ' ("' .. argument[1] .. '") is required!')
