@@ -32,12 +32,12 @@ function cv.imwrite(t)
 	local img = assert(t.img)
 	local params = torch.IntTensor(t.params or {})
 
-	return C.imwrite(filename, cv.wrap_tensors(img), cv.wrap_tensors(params))
+	return C.imwrite(filename, cv.wrap_tensor(img), cv.wrap_tensor(params))
 end
 
 function cv.imdecode(t)
 	local buf = assert(t.buf)
 	local flags = assert(t.flags)
 
-	return cv.unwrap_tensors(C.imdecode(cv.wrap_tensors(buf), flags))
+	return cv.unwrap_tensors(C.imdecode(cv.wrap_tensor(buf), flags))
 end
