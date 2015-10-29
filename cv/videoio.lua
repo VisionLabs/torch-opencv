@@ -77,7 +77,7 @@ do
 		local image = t.image
 		local flag = t.flag or 0
 
-		result = C.VideoCapture_retrieve(self.ptr, cv.wrap_tensors(image), flag)
+		result = C.VideoCapture_retrieve(self.ptr, cv.wrap_tensor(image), flag)
 		return result.val, cv.unwrap_tensors(result.tensor)
 	end
 
@@ -88,7 +88,7 @@ do
 	function VideoCapture:read(t)
 		local image = t.image
 
-		result = C.VideoCapture_read(self.ptr, cv.wrap_tensors(image))
+		result = C.VideoCapture_read(self.ptr, cv.wrap_tensor(image))
 		return result.val, cv.unwrap_tensors(result.tensor)
 	end
 
