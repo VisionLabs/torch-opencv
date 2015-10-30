@@ -60,7 +60,7 @@ local C = ffi.load(libPath('highgui'))
 function cv.imshow(t)
     local argRules = {
         {"winname", default = "Window 1"},
-        {"mat"},
+        {"mat"}
     }
     local winname, mat = cv.argcheck(t, argRules)
     
@@ -69,7 +69,7 @@ end
 
 function cv.waitKey(t)
     local argRules = {
-        {"delay", default = 0},
+        {"delay", default = 0}
     }
     local delay = cv.argcheck(t, argRules)
 
@@ -79,7 +79,7 @@ end
 function cv.namedWindow(t)
     local argRules = {
         {"winname", default = "Window 1"},
-        {"flags", default = cv.WINDOW_AUTOSIZE},
+        {"flags", default = cv.WINDOW_AUTOSIZE}
     }
     local winname, flags = cv.argcheck(t, argRules)
 
@@ -88,7 +88,7 @@ end
 
 function cv.destroyWindow(t)
     local argRules = {
-        {"winname"},
+        {"winname"}
     }
     local winname = cv.argcheck(t, argRules)
     
@@ -107,7 +107,7 @@ function cv.resizeWindow(t)
     local argRules = {
         {"winname"},
         {"width"},
-        {"height"},
+        {"height"}
     }
     local winname, width, height = cv.argcheck(t, argRules)
 
@@ -118,7 +118,7 @@ function cv.moveWindow(t)
     local argRules = {
         {"winname"},
         {"x"},
-        {"y"},
+        {"y"}
     }
     local winname, x, y = cv.argcheck(t, argRules)
     
@@ -129,7 +129,7 @@ function cv.setWindowProperty(t)
     local argRules = {
         {"winname"},
         {"prop_id"},
-        {"prop_value"},
+        {"prop_value"}
     }
     local winname, prop_id, prop_value = cv.argcheck(t, argRules)
     
@@ -139,7 +139,7 @@ end
 function cv.setWindowTitle(t)
     local argRules = {
         {"winname"},
-        {"title"},
+        {"title"}
     }
     local winname, title = cv.argcheck(t, argRules)
     
@@ -149,7 +149,7 @@ end
 function cv.getWindowProperty(t)
     local argRules = {
         {"winname"},
-        {"prop_id"},
+        {"prop_id"}
     }
     local winname, prop_id = cv.argcheck(t, argRules)
     
@@ -160,7 +160,7 @@ function cv.setMouseCallback(t)
     local argRules = {
         {"winname"},
         {"onMouse", default = nil},
-        {"userdata"},
+        {"userdata"}
     }
     local winname, onMouse, userdata = cv.argcheck(t, argRules)
     
@@ -169,7 +169,7 @@ end
 
 function cv.getMouseWheelData(t)
     local argRules = {
-        {"flags"},
+        {"flags"}
     }
     local flags = cv.argcheck(t, argRules)
     
@@ -183,7 +183,7 @@ function cv.createTrackbar(t)
         {"value", default = nil},
         {"count"},
         {"onChange", default = nil},
-        {"userdata", default = nil},
+        {"userdata", default = nil}
     }
     local trackbarname, winname, value, count, onChange, userdata = cv.argcheck(t, argRules)
     
@@ -193,7 +193,7 @@ end
 function cv.getTrackbarPos(t)
     local argRules = {
         {"trackbarname"},
-        {"winname"},
+        {"winname"}
     }
     local trackbarname, winname = cv.argcheck(t, argRules)
     
@@ -204,7 +204,7 @@ function cv.setTrackbarPos(t)
     local argRules = {
         {"trackbarname"},
         {"winname"},
-        {"pos"},
+        {"pos"}
     }
     local trackbarname, winname, pos = cv.argcheck(t, argRules)
     
@@ -215,7 +215,7 @@ function cv.setTrackbarMax(t)
     local argRules = {
         {"trackbarname"},
         {"winname"},
-        {"maxval"},
+        {"maxval"}
     }
     local trackbarname, winname, maxval = cv.argcheck(t, argRules)
     
@@ -224,7 +224,7 @@ end
 
 function cv.updateWindow(t)
     local argRules = {
-        {"winname"},
+        {"winname"}
     }
     local winname = cv.argcheck(t, argRules)
     
@@ -235,7 +235,7 @@ function cv.displayOverlay(t)
     local argRules = {
         {"winname"},
         {"text"},
-        {"delayms"},
+        {"delayms"}
     }
     local winname, text, delayms = cv.argcheck(t, argRules)
     
@@ -246,7 +246,7 @@ function cv.displayStatusBar(t)
     local argRules = {
         {"winname"},
         {"text"},
-        {"delayms"},
+        {"delayms"}
     }
     local winname, text, delayms = cv.argcheck(t, argRules)
     
@@ -255,7 +255,7 @@ end
 
 function cv.saveWindowParameters(t)
     local argRules = {
-        {"windowName"},
+        {"windowName"}
     }
     local windowName = cv.argcheck(t, argRules)
     
@@ -264,7 +264,7 @@ end
 
 function cv.loadWindowParameters(t)
     local argRules = {
-        {"windowName"},
+        {"windowName"}
     }
     local windowName = cv.argcheck(t, argRules)
     

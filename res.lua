@@ -86,33 +86,31 @@ function cv.inpaint(t)
 end
 
 function cv.fastNlMeansDenoising(t)
-    local argRules = {
-        {"src"},
-        {"dst", default = nil},
-        {"h", default = nil}
-        {"templateWindowSize", default = 7},
-        {"searchWindowSize", default = 21},
-        {"normType", default = cv.NORM_L2}
-    }
-    local src, dst, h, templateWindowSize, searchWindowSize, normType = cv.argcheck(t, argRules)
-    
+    local src                = assert(t.src)
+    local dst                = t.dst
+    local templateWindowSize = t.templateWindowSize or 7
+    local searchWindowSize   = t.searchWindowSize or 21
+
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
     end
 
     assert(templateWindowSize % 2 == 1)
 
-    if type(h) == "number" or h == nil then
-        h = h or 3
+    if type(t.h) == "number" or t.h == nil then
+        h = t.h or 3
         
         return cv.unwrap_tensors(
             C.fastNlMeansDenoising1(
                 cv.wrap_tensor(src), cv.wrap_tensor(dst), h, templateWindowSize, searchWindowSize))
     end
 
+    local h = assert(t.h)
     if type(h) == "table" then
         h = torch.FloatTensor(h)
     end
+
+    local normType = t.normType or cv.NORM_L2
 
     return cv.unwrap_tensors(
             C.fastNlMeansDenoising2(
@@ -143,26 +141,13 @@ function cv.fastNlMeansDenoisingColored(t)
             cv.wrap_tensor(src), cv.wrap_tensor(dst), h, hColor, templateWindowSize, searchWindowSize))
 end
 
-struct TensorWrapper fastNlMeansDenoisingMulti1(struct TensorArray srcImgs, struct TensorWrapper dst,
-                            int imgToDenoiseIndex, int temporalWindowSize, float h,
-                            int templateWindowSize, int searchWindowSize);
-
-struct TensorWrapper fastNlMeansDenoisingMulti2(struct TensorArray srcImgs, struct TensorWrapper dst,
-                            int imgToDenoiseIndex, int temporalWindowSize, struct TensorWrapper h,
-                            int templateWindowSize, int searchWindowSize, int normType);
-
 function cv.fastNlMeansDenoisingMulti(t)
-    local argRules = {
-        {"srcImgs"},
-        {"dst", default = nil},
-        {"imgToDenoiseIndex"},
-        {"temporalWindowSize"},
-        {"h", default = nil},
-        {"templateWindowSize", default = 7},
-        {"searchWindowSize", default = 21},
-        {"normType", default = cv.NORM_L2}
-    }
-    local srcImgs, dst, imgToDenoiseIndex, temporalWindowSize, h, templateWindowSize, searchWindowSize, normType = cv.argcheck(t, argRules)
+    local srcImgs            = assert(t.srcImgs)
+    local dst                = t.dst
+    local imgToDenoiseIndex  = assert(t.imgToDenoiseIndex)
+    local temporalWindowSize = assert(t.temporalWindowSize)
+    local templateWindowSize = t.templateWindowSize or 7
+    local searchWindowSize   = t.searchWindowSize or 21
 
     if #srcImgs > 1 then 
         for i = 2, #srcImgs do
@@ -188,9 +173,12 @@ function cv.fastNlMeansDenoisingMulti(t)
     end
 
     -- h is a vector
+    local h = assert(t.h)
     if type(h) == "table" then
         h = torch.FloatTensor(h)
     end
+
+    local normType = t.normType or cv.NORM_L2
 
     return cv.unwrap_tensors(
         C.fastNlMeansDenoisingMulti2(

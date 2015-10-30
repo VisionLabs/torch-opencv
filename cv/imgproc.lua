@@ -425,7 +425,7 @@ function cv.getGaussianKernel(t)
     local argRules = {
         {"ksize"},
         {"sigma"},
-        {"ktype", default = cv.CV_64F},
+        {"ktype", default = cv.CV_64F}
     }
     local ksize, sigma, ktype = cv.argcheck(t, argRules)
     return cv.unwrap_tensor(C.getGaussianKernel(ksize, sigma, ktype))
@@ -438,7 +438,7 @@ function cv.getDerivKernels(t)
         {"dy"},
         {"ksize"},
         {"normalize", default = false},
-        {"ktype", default = cv.CV_32F},
+        {"ktype", default = cv.CV_32F}
     }
     local dx, dy, ksize, normalize, ktype = cv.argcheck(t, argRules)
 
@@ -454,7 +454,7 @@ function cv.getGaborKernel(t)
         {"lambd"},
         {"gamma"},
         {"psi", default = math.pi * 0.5},
-        {"ktype", default = cv.CV_64F},
+        {"ktype", default = cv.CV_64F}
     }
     local ksize, sigma, theta, lambd, gamma, psi, ktype = cv.argcheck(t, argRules)
 
@@ -467,7 +467,7 @@ function cv.getStructuringElement(t)
     local argRules = {
         {"shape"},
         {"ksize", operator = cv.Size},
-        {"anchor", default = {-1, -1}, operator = cv.Point},
+        {"anchor", default = {-1, -1}, operator = cv.Point}
     }
     local shape, ksize, anchor = cv.argcheck(t, argRules)
 
@@ -479,9 +479,12 @@ function cv.medianBlur(t)
     local argRules = {
         {"src"},
         {"dst"},
-        {"ksize"},
+        {"ksize"}
     }
     local src, dst, ksize = cv.argcheck(t, argRules)
+    -- cv.medianBlur{src=X, dst=X, ksize} -- in-place
+    -- cv.medianBlur{src=X, dst=Y, ksize} -- output to dst (must be of same size & type)
+    -- cv.medianBlur{src=X, ksize}        -- output to return value
 
     assert(srcChannels == 1 or srcChannels == 3 or srcChannels == 4)
 
@@ -506,7 +509,7 @@ function cv.GaussianBlur(t)
         {"ksize", operator = cv.Size},
         {"sigmaX"},
         {"sigmaY", default = 0},
-        {"borderType", default = cv.BORDER_DEFAULT},
+        {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, ksize, sigmaX, sigmaY, borderType = cv.argcheck(t, argRules)
 
@@ -529,7 +532,7 @@ function cv.bilateralFilter(t)
         {"d"},
         {"sigmaColor"},
         {"sigmaSpace"},
-        {"borderType", default = cv.BORDER_DEFAULT},
+        {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, d, sigmaColor, sigmaSpace, borderType = cv.argcheck(t, argRules)
 
@@ -555,7 +558,7 @@ function cv.boxFilter(t)
         {"ksize", operator = cv.Size},
         {"anchor", default = {-1, -1}, operator = cv.Point},
         {"normalize", default = nil},
-        {"borderType"},
+        {"borderType"}
     }
     local src, dst, ddepth, ksize, anchor, normalize, borderType = cv.argcheck(t, argRules)
     if normalize == nil then normalize = true end
@@ -578,7 +581,7 @@ function cv.sqrBoxFilter(t)
         {"ksize"},
         {"anchor"},
         {"normalize"},
-        {"borderType"},
+        {"borderType"}
     }
     local src, dst, ddepth, ksize, anchor, normalize, borderType = cv.argcheck(t, argRules)
 
@@ -600,7 +603,7 @@ function cv.blur(t)
         {"dst", default = nil},
         {"ksize", operator = cv.Size},
         {"anchor", default = {-1,-1}, operator = cv.Point},
-        {"borderType", default = cv.BORDER_DEFAULT},
+        {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, ksize, anchor, borderType = cv.argcheck(t, argRules)
 
@@ -624,7 +627,7 @@ function cv.filter2D(t)
         {"kernel"},
         {"anchor", default = {-1,-1}},
         {"delta", default = 0},
-        {"borderType", default = cv.BORDER_DEFAULT},
+        {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, ddepth, kernel, anchor, delta, borderType = cv.argcheck(t, argRules)
 
@@ -648,7 +651,7 @@ function cv.sepFilter2D(t)
         {"kernelY"},
         {"anchor", default = {-1,-1}},
         {"delta", default = 0},
-        {"borderType", default = cv.BORDER_DEFAULT},
+        {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, ddepth, kernelX, kernelY, anchor, delta, borderType = cv.argcheck(t, argRules)
 
@@ -673,7 +676,7 @@ function cv.Sobel(t)
         {"ksize", default = 3},
         {"scale", default = 1},
         {"delta", default = 0},
-        {"borderType", default = cv.BORDER_DEFAULT},
+        {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, ddepth, dx, dy, ksize, scale, delta, borderType = cv.argcheck(t, argRules)
 
@@ -697,7 +700,7 @@ function cv.Scharr(t)
         {"dy"},
         {"scale", default = 1},
         {"delta", default = 0},
-        {"borderType", default = cv.BORDER_DEFAULT},
+        {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, ddepth, dx, dy, scale, delta, borderType = cv.argcheck(t, argRules)
 
@@ -720,7 +723,7 @@ function cv.Laplacian(t)
         {"ksize", default = 1},
         {"scale", default = 1},
         {"delta", default = 0},
-        {"borderType", default = cv.BORDER_DEFAULT},
+        {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, ddepth, ksize, scale, delta, borderType = cv.argcheck(t, argRules)
 
@@ -742,7 +745,7 @@ function cv.Canny(t)
         {"threshold1"},
         {"threshold2"},
         {"apertureSize", default = 3},
-        {"L2gradient", default = false},
+        {"L2gradient", default = false}
     }
     local image, edges, threshold1, threshold2, apertureSize, L2gradient = cv.argcheck(t, argRules)
 
@@ -766,7 +769,7 @@ function cv.cornerMinEigenVal(t)
         {"dst", default = nil},
         {"blockSize"},
         {"ksize", default = 3},
-        {"borderType", default = cv.BORDER_DEFAULT},
+        {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, blockSize, ksize, borderType = cv.argcheck(t, argRules)
 
@@ -788,7 +791,7 @@ function cv.cornerHarris(t)
         {"blockSize"},
         {"ksize"},
         {"k"},
-        {"borderType", default = cv.BORDER_DEFAULT},
+        {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, blockSize, ksize, k, borderType = cv.argcheck(t, argRules)
 
@@ -810,7 +813,7 @@ function cv.cornerEigenValsAndVecs(t)
         {"dst", default = nil},
         {"blockSize"},
         {"ksize"},
-        {"borderType", default = cv.BORDER_DEFAULT},
+        {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, blockSize, ksize, borderType = cv.argcheck(t, argRules)
 
@@ -835,7 +838,7 @@ function cv.preCornerDetect(t)
         {"src"},
         {"dst", default = nil},
         {"ksize"},
-        {"borderType", default = cv.BORDER_DEFAULT},
+        {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, ksize, borderType = cv.argcheck(t, argRules)
 
@@ -860,7 +863,7 @@ function cv.HoughLines(t)
         {"srn", default = 0},
         {"stn", default = 0},
         {"min_theta", default = 0},
-        {"max_theta", default = cv.CV_PI},
+        {"max_theta", default = cv.CV_PI}
     }
     local image, rho, theta, threshold, srn, stn, min_theta, max_theta = cv.argcheck(t, argRules)
 
@@ -879,7 +882,7 @@ function cv.HoughLinesP(t)
         {"theta"},
         {"threshold"},
         {"minLineLength", default = 0},
-        {"maxLineGap", default = 0},
+        {"maxLineGap", default = 0}
     }
     local image, rho, theta, threshold, minLineLength, maxLineGap = cv.argcheck(t, argRules)
 
@@ -900,7 +903,7 @@ function cv.HoughCircles(t)
         {"param1", default = 100},
         {"param2", default = 100},
         {"minRadius", default = 0},
-        {"maxRadius", default = 0},
+        {"maxRadius", default = 0}
     }
     local image, method, dp, minDist, param1, param2, minRadius, maxRadius = cv.argcheck(t, argRules)
 
@@ -918,7 +921,7 @@ function cv.cornerSubPix(t)
         {"corners"},
         {"winSize", operator = cv.Size},
         {"zeroZone", operator = cv.Size},
-        {"criteria", operator = cv.TermCriteria},
+        {"criteria", operator = cv.TermCriteria}
     }
     local image, corners, winSize, zeroZone, criteria = cv.argcheck(t, argRules)
 
@@ -940,7 +943,7 @@ function cv.goodFeaturesToTrack(t)
         {"mask", default = nil},
         {"blockSize", default = 3},
         {"useHarrisDetector", default = false},
-        {"k", default = 0.04},
+        {"k", default = 0.04}
     }
     local image, maxCorners, qualityLevel, minDistance, mask, blockSize, useHarrisDetector, k = cv.argcheck(t, argRules)
 
@@ -964,7 +967,7 @@ function cv.erode(t)
         {"anchor", default = {-1, -1}, operator = cv.Point},
         {"iterations", default = nil},
         {"borderType", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar},
+        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar}
     }
     local src, dst, kernel, anchor, iterations, borderType, borderValue = cv.argcheck(t, argRules)
 
@@ -983,7 +986,7 @@ function cv.dilate(t)
         {"anchor", default = {-1, -1}, operator = cv.Point},
         {"iterations", default = nil},
         {"borderType", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar},
+        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar}
     }
     local src, dst, kernel, anchor, iterations, borderType, borderValue = cv.argcheck(t, argRules)
 
@@ -1003,7 +1006,7 @@ function cv.morphologyEx(t)
         {"anchor", default = {-1, -1}, operator = cv.Point},
         {"iterations", default = nil},
         {"borderType", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar},
+        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar}
     }
     local src, dst, op, kernel, anchor, iterations, borderType, borderValue = cv.argcheck(t, argRules)
 
@@ -1021,7 +1024,7 @@ function cv.resize(t)
         {"dsize", default = {0, 0}, operator = cv.Size},
         {"fx", default = 0},
         {"fy", default = 0},
-        {"interpolation", default = cv.INTER_LINEAR},
+        {"interpolation", default = cv.INTER_LINEAR}
     }
     local src, dst, dsize, fx, fy, interpolation = cv.argcheck(t, argRules)
 
@@ -1039,7 +1042,7 @@ function cv.warpAffine(t)
         {"dsize", default = {0, 0}, operator = cv.Point},
         {"flags", default = cv.INTER_LINEAR},
         {"borderMode", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar},
+        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar}
     }
     local src, dst, M, dsize, flags, borderMode, borderValue = cv.argcheck(t, argRules)
 
@@ -1058,7 +1061,7 @@ function cv.warpPerspective(t)
         {"dsize", default = {0, 0}, operator = cv.Size},
         {"flags", default = cv.INTER_LINEAR},
         {"borderMode", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar},
+        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar}
     }
     local src, dst, M, dsize, flags, borderMode, borderValue = cv.argcheck(t, argRules)
 
@@ -1077,7 +1080,7 @@ function cv.remap(t)
         {"map2"},
         {"interpolation"},
         {"borderMode", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0, 0, 0, 0}, operator = cv.Scalar},
+        {"borderValue", default = {0, 0, 0, 0}, operator = cv.Scalar}
     }
     local src, dst, map1, map2, interpolation, borderMode, borderValue = cv.argcheck(t, argRules)
 
@@ -1095,7 +1098,7 @@ function cv.convertMaps(t)
         {"dstmap1"},
         {"dstmap2"},
         {"dstmap1type"},
-        {"nninterpolation", default = false},
+        {"nninterpolation", default = false}
     }
     local map1, map2, dstmap1, dstmap2, dstmap1type, nninterpolation = cv.argcheck(t, argRules)
 
@@ -1110,7 +1113,7 @@ function cv.getRotationMatrix2D(t)
     local argRules = {
         {"center", operator = cv.Point2f},
         {"angle"},
-        {"scale"},
+        {"scale"}
     }
     local center, angle, scale = cv.argcheck(t, argRules)
 
@@ -1122,7 +1125,7 @@ end
 function cv.invertAffineTransform(t)
     local argRules = {
         {"M"},
-        {"iM", default = nil},
+        {"iM", default = nil}
     }
     local M, iM = cv.argcheck(t, argRules)
 
@@ -1134,7 +1137,7 @@ end
 function cv.getPerspectiveTransform(t)
     local argRules = {
         {"src"},
-        {"dst"},
+        {"dst"}
     }
     local src, dst = cv.argcheck(t, argRules)
 
@@ -1146,7 +1149,7 @@ end
 function cv.getAffineTransform(t)
     local argRules = {
         {"src"},
-        {"dst"},
+        {"dst"}
     }
     local src, dst = cv.argcheck(t, argRules)
 
@@ -1161,7 +1164,7 @@ function cv.getRectSubPix(t)
         {"patchSize", operator = cv.Size},
         {"center", operator = cv.Point2f},
         {"patch", default = nil},
-        {"patchType", default = -1},
+        {"patchType", default = -1}
     }
     local image, patchSize, center, patch, patchType = cv.argcheck(t, argRules)
 
@@ -1177,7 +1180,7 @@ function cv.logPolar(t)
         {"dst", default = nil},
         {"center", operator = cv.Point2f},
         {"M"},
-        {"flags"},
+        {"flags"}
     }
     local src, dst, center, M, flags = cv.argcheck(t, argRules)
 
@@ -1192,7 +1195,7 @@ function cv.linearPolar(t)
         {"dst", default = nil},
         {"center", operator = cv.Point2f},
         {"maxRadius"},
-        {"flags"},
+        {"flags"}
     }
     local src, dst, center, maxRadius, flags = cv.argcheck(t, argRules)
 
@@ -1205,7 +1208,7 @@ function cv.integral(t)
     local argRules = {
         {"src"},
         {"sum", default = nil},
-        {"sdepth", default = -1},
+        {"sdepth", default = -1}
     }
     local src, sum, sdepth = cv.argcheck(t, argRules)
 
@@ -1243,7 +1246,7 @@ function cv.accumulate(t)
     local argRules = {
         {"src"},
         {"dst"},
-        {"mask", default = nil},
+        {"mask", default = nil}
     }
     local src, dst, mask = cv.argcheck(t, argRules)
 
@@ -1255,7 +1258,7 @@ function cv.accumulateSquare(t)
     local argRules = {
         {"src"},
         {"dst"},
-        {"mask", default = nil},
+        {"mask", default = nil}
     }
     local src, dst, mask = cv.argcheck(t, argRules)
 
@@ -1268,7 +1271,7 @@ function cv.accumulateProduct(t)
         {"src1"},
         {"src2"},
         {"dst"},
-        {"mask", default = nil},
+        {"mask", default = nil}
     }
     local src1, src2, dst, mask = cv.argcheck(t, argRules)
 
@@ -1281,7 +1284,7 @@ function cv.accumulateWeighted(t)
         {"src"},
         {"dst"},
         {"alpha"},
-        {"mask", default = nil},
+        {"mask", default = nil}
     }
     local src, dst, alpha, mask = cv.argcheck(t, argRules)
 
@@ -1296,7 +1299,7 @@ function cv.phaseCorrelate(t)
     local argRules = {
         {"src1"},
         {"src2"},
-        {"window", default = nil},
+        {"window", default = nil}
     }
     local src1, src2, window = cv.argcheck(t, argRules)
 
@@ -1308,7 +1311,7 @@ function cv.createHanningWindow(t)
     local argRules = {
         {"dst", default = nil},
         {"winSize", operator = cv.Size},
-        {"type"},
+        {"type"}
     }
     local dst, winSize, type = cv.argcheck(t, argRules)
 
@@ -1332,7 +1335,7 @@ function cv.threshold(t)
         {"dst", default = nil},
         {"thresh"},
         {"maxval"},
-        {"type"},
+        {"type"}
     }
     local src, dst, thresh, maxval, type = cv.argcheck(t, argRules)
 
@@ -1354,7 +1357,7 @@ function cv.adaptiveThreshold(t)
         {"adaptiveMethod"},
         {"thresholdType"},
         {"blockSize"},
-        {"C"},
+        {"C"}
     }
     local src, dst, maxValue, adaptiveMethod, thresholdType, blockSize, C = cv.argcheck(t, argRules)
 
@@ -1374,7 +1377,7 @@ function cv.pyrDown(t)
         {"src"},
         {"dst", default = nil},
         {"dstSize", default = {0,0}, operator = cv.Size},
-        {"borderType", default = cv.BORDER_DEFAULT},
+        {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, dstSize, borderType = cv.argcheck(t, argRules)
 
@@ -1396,7 +1399,7 @@ function cv.pyrUp(t)
         {"src"},
         {"dst", default = nil},
         {"dstSize", default = {0,0}, operator = cv.Size},
-        {"borderType", default = cv.BORDER_DEFAULT},
+        {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, dstSize, borderType = cv.argcheck(t, argRules)
 
@@ -1418,7 +1421,7 @@ function cv.buildPyramid(t)
         {"src"},
         {"dst", default = nil},
         {"maxlevel"},
-        {"borderType", default = cv.BORDER_DEFAULT},
+        {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, maxlevel, borderType = cv.argcheck(t, argRules)
 
@@ -1441,7 +1444,7 @@ function cv.undistort(t)
         {"dst", default = nil},
         {"cameraMatrix"},
         {"distCoeffs"},
-        {"newCameraMatrix"},
+        {"newCameraMatrix"}
     }
     local src, dst, cameraMatrix, distCoeffs, newCameraMatrix = cv.argcheck(t, argRules)
     if type(cameraMatrix) == "table" then
@@ -1474,7 +1477,7 @@ function cv.initUndistortRectifyMap(t)
         {"newCameraMatrix"},
         {"size"},
         {"m1type"},
-        {"maps"},
+        {"maps"}
     }
     local cameraMatrix, distCoeffs, R, newCameraMatrix, size, m1type, maps = cv.argcheck(t, argRules)
     if type(cameraMatrix) == "table" then
@@ -1512,7 +1515,7 @@ function cv.initWideAngleProjMap(t)
         {"m1type"},
         {"maps"},
         {"projType"},
-        {"alpha"},
+        {"alpha"}
     }
     local cameraMatrix, distCoeffs, imageSize, destImageWidth, m1type, maps, projType, alpha = cv.argcheck(t, argRules)
     if type(cameraMatrix) == "table" then
@@ -1539,7 +1542,7 @@ function cv.calcHist(t)
         {"histSize"},
         {"ranges"},
         {"uniform"},
-        {"accumulate"},
+        {"accumulate"}
     }
     local images, channels, mask, hist, dims, histSize, ranges, uniform, accumulate = cv.argcheck(t, argRules)
     assert(type(images) == "table")
@@ -1573,7 +1576,7 @@ function cv.calcBackProject(t)
         {"backProject"},
         {"ranges"},
         {"scale"},
-        {"uniform"},
+        {"uniform"}
     }
     local images, nimages, channels, hist, backProject, ranges, scale, uniform = cv.argcheck(t, argRules)
     assert(type(images) == "table")
@@ -1598,7 +1601,7 @@ function cv.compareHist(t)
     local argRules = {
         {"H1"},
         {"H2"},
-        {"method"},
+        {"method"}
     }
     local H1, H2, method = cv.argcheck(t, argRules)
 
@@ -1623,7 +1626,7 @@ function cv.EMD(t)
         {"distType"},
         {"cost", default = nil},
         {"lowerBound", default = ffi.new('struct FloatArray', nil, operator = ffi.new},
-        {"flow"},
+        {"flow"}
     }
     local signature1, signature2, distType, cost, lowerBound, flow = cv.argcheck(t, argRules)
     if type(lowerBound) == "table" then
@@ -1639,7 +1642,7 @@ end
 function cv.watershed(t)
     local argRules = {
         {"image"},
-        {"markers"},
+        {"markers"}
     }
     local image, markers = cv.argcheck(t, argRules)
 
@@ -1654,7 +1657,7 @@ function cv.pyrMeanShiftFiltering(t)
         {"sp"},
         {"sr"},
         {"maxLevel", default = 1},
-        {"termcrit", default = nil, operator = cv.TermCriteria},
+        {"termcrit", default = nil, operator = cv.TermCriteria}
     }
     local src, dst, sp, sr, maxLevel, termcrit = cv.argcheck(t, argRules)
 
@@ -1671,7 +1674,7 @@ function cv.grabCut(t)
         {"bgdModel"},
         {"fgdModel"},
         {"iterCount"},
-        {"mode", default = cv.GC_EVAL},
+        {"mode", default = cv.GC_EVAL}
     }
     local img, mask, rect, bgdModel, fgdModel, iterCount, mode = cv.argcheck(t, argRules)
     
@@ -1688,7 +1691,7 @@ function cv.distanceTransform(t)
         {"dst", default = nil},
         {"distanceType"},
         {"maskSize"},
-        {"dstType", default = cv.CV_32F},
+        {"dstType", default = cv.CV_32F}
     }
     local src, dst, distanceType, maskSize, dstType = cv.argcheck(t, argRules)
 
@@ -1705,7 +1708,7 @@ function cv.distanceTransformWithLabels(t)
         {"labels", default = nil},
         {"distanceType"},
         {"maskSize"},
-        {"labelType", default = cv.DIST_LABEL_CCOMP},
+        {"labelType", default = cv.DIST_LABEL_CCOMP}
     }
     local src, dst, labels, distanceType, maskSize, labelType = cv.argcheck(t, argRules)
 
@@ -1726,7 +1729,7 @@ function cv.floodFill(t)
         {"newVal", operator = cv.Scalar},
         {"loDiff", default = {0, 0, 0, 0}, operator = cv.Scalar},
         {"upDiff", default = {0, 0, 0, 0}, operator = cv.Scalar},
-        {"flags", default = 4},
+        {"flags", default = 4}
     }
     local image, mask, seedPoint, newVal, loDiff, upDiff, flags = cv.argcheck(t, argRules)
 
@@ -1741,7 +1744,7 @@ function cv.cvtColor(t)
         {"src"},
         {"dst", default = nil},
         {"code"},
-        {"dstCn", default = 0},
+        {"dstCn", default = 0}
     }
     local src, dst, code, dstCn = cv.argcheck(t, argRules)
 
@@ -1755,7 +1758,7 @@ function cv.demosaicing(t)
         {"_src"},
         {"_dst"},
         {"code"},
-        {"dcn", default = 0},
+        {"dcn", default = 0}
     }
     local _src, _dst, code, dcn = cv.argcheck(t, argRules)
 
@@ -1767,7 +1770,7 @@ end
 function cv.moments(t)
     local argRules = {
         {"array"},
-        {"binaryImage", default = false},
+        {"binaryImage", default = false}
     }
     local array, binaryImage = cv.argcheck(t, argRules)
 
@@ -1778,13 +1781,16 @@ end
 -- moments: Input moments computed with cv.moments()
 -- toTable: Output to table if true, otherwise output to Tensor. Default: true
 -- output : Optional. A Tensor of length 7 or a table; if provided, will output there
---[[function cv.HuMoments(t)
-    local moments = assert(t.moments)
-    local outputType = t.outputType or 'table'
-    local output = t.output
+function cv.HuMoments(t)
+    local argRules = {
+        {"moments"},
+        {"outputType", default = 'table'},
+        {"output", default = nil}
+    }
+    local moments, outputTYpe, output = cv.argcheck(t, argRules)
 
     return cv.arrayToLua(C.HuMoments(moments), outputType, output)
-end]]
+end
 
 
 function cv.matchTemplate(t)
@@ -1793,7 +1799,7 @@ function cv.matchTemplate(t)
         {"templ", default = nil},
         {"result"},
         {"method"},
-        {"mask", default = nil},
+        {"mask", default = nil}
     }
     local image, templ, result, method, mask = cv.argcheck(t, argRules)
 
@@ -1807,7 +1813,7 @@ function cv.connectedComponents(t)
         {"image"},
         {"labels"},
         {"connectivity", default = 8},
-        {"ltype", default = cv.CV_32S},
+        {"ltype", default = cv.CV_32S}
     }
     local image, labels, connectivity, ltype = cv.argcheck(t, argRules)
 
@@ -1820,7 +1826,7 @@ function cv.connectedComponentsWithStats(t)
         {"image"},
         {"outputTensors"},
         {"connectivity", default = 8},
-        {"ltype", default = cv.CV_32S},
+        {"ltype", default = cv.CV_32S}
     }
     local image, outputTensors, connectivity, ltype = cv.argcheck(t, argRules)
 
@@ -1842,7 +1848,7 @@ function cv.findContours(t)
         {"hierarchy", default = nil},
         {"mode"},
         {"method"},
-        {"offset", default = {0, 0}, operator = cv.Point},
+        {"offset", default = {0, 0}, operator = cv.Point}
     }
     local image, withHierarchy, hierarchy, mode, method, offset = cv.argcheck(t, argRules)
 
@@ -1865,7 +1871,7 @@ function cv.approxPolyDP(t)
         {"curve"},
         {"approxCurve", default = nil},
         {"epsilon"},
-        {"closed"},
+        {"closed"}
     }
     local curve, approxCurve, epsilon, closed = cv.argcheck(t, argRules)
 
@@ -1876,7 +1882,7 @@ end
 function cv.arcLength(t)
     local argRules = {
         {"curve"},
-        {"closed"},
+        {"closed"}
     }
     local curve, closed = cv.argcheck(t, argRules)
     
@@ -1886,7 +1892,7 @@ end
 
 function cv.boundingRect(t)
     local argRules = {
-        {"points"},
+        {"points"}
     }
     local points = cv.argcheck(t, argRules)
     if type(points) == "table" then
@@ -1900,7 +1906,7 @@ end
 function cv.contourArea(t)
     local argRules = {
         {"contour"},
-        {"oriented"},
+        {"oriented"}
     }
     local contour, oriented = cv.argcheck(t, argRules)
     if type(contour) == "table" then
@@ -1914,7 +1920,7 @@ end
 
 function cv.minAreaRect(t)
     local argRules = {
-        {"points"},
+        {"points"}
     }
     local points = cv.argcheck(t, argRules)
     if type(points) == "table" then
@@ -1930,7 +1936,7 @@ end
 function cv.boxPoints(t)
     local argRules = {
         {"box"},
-        {"points", default = nil},
+        {"points", default = nil}
     }
     local box, points = cv.argcheck(t, argRules)
     -- check that points is a Tensor
@@ -1945,7 +1951,7 @@ function cv.minEnclosingCircle(t)
     local argRules = {
         {"points"},
         {"center"},
-        {"radius"},
+        {"radius"}
     }
     local points, center, radius = cv.argcheck(t, argRules)
     if type(points) == "table" then
@@ -1961,7 +1967,7 @@ end
 function cv.minEnclosingTriangle(t)
     local argRules = {
         {"points"},
-        {"triangle"},
+        {"triangle"}
     }
     local points, triangle = cv.argcheck(t, argRules)
     if type(points) == "table" then
@@ -1979,7 +1985,7 @@ function cv.matchShapes(t)
         {"contour1"},
         {"contour2"},
         {"method"},
-        {"parameter", default = 0},
+        {"parameter", default = 0}
     }
     local contour1, contour2, method, parameter = cv.argcheck(t, argRules)
 
@@ -1991,7 +1997,7 @@ function cv.convexHull(t)
     local argRules = {
         {"points"},
         {"clockwise", default = false},
-        {"returnPoints", default = nil},
+        {"returnPoints", default = nil}
     }
     local points, clockwise, returnPoints = cv.argcheck(t, argRules)
     if returnPoints == nil then
@@ -2012,7 +2018,7 @@ end
 function cv.convexityDefects(t)
     local argRules = {
         {"contour"},
-        {"convexhull"},
+        {"convexhull"}
     }
     local contour, convexhull = cv.argcheck(t, argRules)
 
@@ -2022,7 +2028,7 @@ end
 
 function cv.isContourConvex(t)
     local argRules = {
-        {"contour"},
+        {"contour"}
     }
     local contour = cv.argcheck(t, argRules)
 
@@ -2037,7 +2043,7 @@ function cv.intersectConvexConvex(t)
     local argRules = {
         {"_p1"},
         {"_p2"},
-        {"handleNested", default = nil},
+        {"handleNested", default = nil}
     }
     local _p1, _p2, handleNested = cv.argcheck(t, argRules)
     if handleNested == nil then
@@ -2051,7 +2057,7 @@ end
 
 function cv.fitEllipse(t)
     local argRules = {
-        {"points"},
+        {"points"}
     }
     local points = cv.argcheck(t, argRules)
 
@@ -2065,7 +2071,7 @@ function cv.fitLine(t)
         {"distType"},
         {"param"},
         {"reps"},
-        {"aeps"},
+        {"aeps"}
     }
     local points, distType, param, reps, aeps = cv.argcheck(t, argRules)
 
@@ -2078,7 +2084,7 @@ function cv.pointPolygonTest(t)
     local argRules = {
         {"contour"},
         {"pt", operator = cv.Point2f},
-        {"measureDist"},
+        {"measureDist"}
     }
     local contour, pt, measureDist = cv.argcheck(t, argRules)
 
@@ -2089,7 +2095,7 @@ end
 function cv.rotatedRectangleIntersection(t)
     local argRules = {
         {"rect1", operator = cv.RotatedRect},
-        {"rect2", operator = cv.RotatedRect},
+        {"rect2", operator = cv.RotatedRect}
     }
     local rect1, rect2 = cv.argcheck(t, argRules)
 
@@ -2104,7 +2110,7 @@ function cv.blendLinear(t)
         {"src2"},
         {"weights1"},
         {"weights2"},
-        {"dst", default = nil},
+        {"dst", default = nil}
     }
     local src1, src2, weights1, weights2, dst = cv.argcheck(t, argRules)
 
@@ -2117,7 +2123,7 @@ function cv.applyColorMap(t)
     local argRules = {
         {"src"},
         {"dst", default = nil},
-        {"colormap"},
+        {"colormap"}
     }
     local src, dst, colormap = cv.argcheck(t, argRules)
 
@@ -2134,7 +2140,7 @@ function cv.line(t)
         {"color", operator = cv.Scalar},
         {"thickness", default = 1},
         {"lineType", default = cv.LINE_8},
-        {"shift", default = 0},
+        {"shift", default = 0}
     }
     local img, pt1, pt2, color, thickness, lineType, shift = cv.argcheck(t, argRules)
 
@@ -2151,7 +2157,7 @@ function cv.arrowedLine(t)
         {"thickness", default = 1},
         {"line_type", default = 8},
         {"shift", default = 0},
-        {"tipLength", default = 0.1},
+        {"tipLength", default = 0.1}
     }
     local img, pt1, pt2, color, thickness, line_type, shift, tipLength = cv.argcheck(t, argRules)
 
@@ -2159,7 +2165,7 @@ function cv.arrowedLine(t)
 end
 
 
---[[function cv.rectangle(t)
+function cv.rectangle(t)
     local img = assert(t.img)
     local pt1
     local pt2
@@ -2181,7 +2187,7 @@ end
     else
         C.rectangle(cv.wrap_tensor(img), pt1, pt2, color, thickness, lineType, shift)
     end
-end]]
+end
 
 
 function cv.circle(t)
@@ -2192,7 +2198,7 @@ function cv.circle(t)
         {"color", operator = cv.Scalar},
         {"thickness", default = 1},
         {"lineType", default = cv.LINE_8},
-        {"shift", default = 0},
+        {"shift", default = 0}
     }
     local img, center, radius, color, thickness, lineType, shift = cv.argcheck(t, argRules)
 
@@ -2211,7 +2217,7 @@ function cv.ellipse(t)
         {"color", operator = cv.Scalar},
         {"thickness", default = 1},
         {"lineType", default = cv.LINE_8},
-        {"shift", default = 0},
+        {"shift", default = 0}
     }
     local img, center, axes, angle, startAngle, endAngle, color, thickness, lineType, shift = cv.argcheck(t, argRules)
 
@@ -2225,7 +2231,7 @@ function cv.ellipseFromRect(t)
         {"box", operator = cv.RotatedRect},
         {"color", operator = cv.Scalar},
         {"thickness", default = 1},
-        {"lineType", default = cv.LINE_8},
+        {"lineType", default = cv.LINE_8}
     }
     local img, box, color, thickness, lineType = cv.argcheck(t, argRules)
 
@@ -2239,7 +2245,7 @@ function cv.fillConvexPoly(t)
         {"points"},
         {"color"},
         {"lineType"},
-        {"shift"},
+        {"shift"}
     }
     local img, points, color, lineType, shift = cv.argcheck(t, argRules)
     if type(points) == "table" then
@@ -2257,7 +2263,7 @@ function cv.fillPoly(t)
         {"color"},
         {"lineType"},
         {"shift"},
-        {"offset"},
+        {"offset"}
     }
     local img, pts, color, lineType, shift, offset = cv.argcheck(t, argRules)
     assert(type(pts) == 'table')
@@ -2274,7 +2280,7 @@ function cv.polylines(t)
         {"color"},
         {"thickness"},
         {"lineType"},
-        {"shift"},
+        {"shift"}
     }
     local img, pts, isClosed, color, thickness, lineType, shift = cv.argcheck(t, argRules)
     assert(type(pts) == 'table')
@@ -2293,7 +2299,7 @@ function cv.drawContours(t)
         {"lineType"},
         {"hierarchy"},
         {"maxLevel"},
-        {"offset"},
+        {"offset"}
     }
     local image, contours, contourIdx, color, thickness, lineType, hierarchy, maxLevel, offset = cv.argcheck(t, argRules)
     assert(type(contours) == 'table')
@@ -2333,7 +2339,7 @@ function cv.ellipse2Poly(t)
         {"angle"},
         {"arcStart"},
         {"arcEnd"},
-        {"delta"},
+        {"delta"}
     }
     local center, axes, angle, arcStart, arcEnd, delta = cv.argcheck(t, argRules)
 
@@ -2352,7 +2358,7 @@ function cv.putText(t)
         {"color", operator = cv.Scalar},
         {"thickness", default = 1},
         {"lineType", default = cv.LINE_8},
-        {"bottomLeftOrigin", default = false},
+        {"bottomLeftOrigin", default = false}
     }
     local img, text, org, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin = cv.argcheck(t, argRules)
 
@@ -2365,7 +2371,7 @@ function cv.getTextSize(t)
         {"text"},
         {"fontFace"},
         {"fontScale"},
-        {"thickness"},
+        {"thickness"}
     }
     local text, fontFace, fontScale, thickness = cv.argcheck(t, argRules)
 
