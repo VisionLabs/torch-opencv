@@ -62,6 +62,15 @@ struct TensorWrapper pencilSketch(struct TensorWrapper src, struct TensorWrapper
 
 struct TensorWrapper stylization(struct TensorWrapper src, struct TensorWrapper dst,
                             float sigma_s, float sigma_r);
+
+struct PtrWrapper Tonemap_ctor();
+
+struct TensorWrapper Tonemap_process(struct PtrWrapper ptr, struct TensorArray src, struct TensorWrapper dst);
+
+float Tonemap_getGamma(struct PtrWrapper ptr);
+
+void Tonemap_setGamma(struct PtrWrapper ptr, float gamma);
+
 ]]
 
 local C = ffi.load(libPath('photo'))
@@ -411,4 +420,36 @@ function cv.stylization(t)
     return cv.unwrap_tensors(
         C.stylization(
             cv.wrap_tensor(src), cv.wrap_tensor(dst), sigma_s, sigma_r))
+end
+
+-- Tonemap
+do
+    local Tonemap = torch.class('cv.Tonemap', 'cv.Algorithm')
+
+    function Tonemap:__init()
+        self.ptr = ffi.gc(C.Tonemap_ctor(), C.Algorithm_dtor)
+    end
+
+    function Tonemap:process(t)
+        local argRules = {
+            {"src"},
+            {"dst", default = nil}
+        }
+        local src, dst = cv.argcheck(t, argRules)
+    
+        return C.Tonemap_process(self.ptr, cv.wrap_tensors(src), cv.wrap_tensor(dst));
+    end
+
+    function Tonemap:getGamma()
+        return C.Tonemap_getGamma(self.ptr);
+    end
+
+    function setGamma(t)
+        local argRules = {
+            {"gamma"}
+        }
+
+        local gamma = cv.argcheck(t, argRules)
+        C.Tonmap_setGamma(self.ptr, gamma)
+    end
 end

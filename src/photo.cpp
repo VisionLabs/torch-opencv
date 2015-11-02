@@ -256,3 +256,30 @@ extern "C" struct TensorWrapper stylization(struct TensorWrapper src, struct Ten
     }
     return dst;
 }
+
+extern "C" struct TonemapPtr Tonemap_ctor()
+{
+    return cv::createTonemap().get();
+}
+
+extern "C" struct TensorWrapper Tonemap_process(struct TonemapPtr ptr, struct TensorArray src, struct TensorWrapper dst)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        ptr->process(src.toMatList(), retval);
+        return TensorWrapper(retval);
+    } else {
+        ptr->process(src.toMatList(), dst.toMat());
+    }
+    return dst;
+}
+
+extern "C" float Tonemap_getGamma(struct TonemapPtr ptr)
+{
+    return ptr->getGamma();
+}
+
+extern "C" void Tonemap_setGamma(struct TonemapPtr ptr, float gamma)
+{
+    ptr->setGamma(gamma);
+}

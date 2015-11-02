@@ -59,3 +59,18 @@ extern "C" struct TensorWrapper pencilSketch(struct TensorWrapper src, struct Te
 
 extern "C" struct TensorWrapper stylization(struct TensorWrapper src, struct TensorWrapper dst,
                                     float sigma_s, float sigma_r);
+
+struct TonemapPtr {
+    void *ptr;
+
+    inline cv::Tonemap * operator->() { return static_cast<cv::Tonemap *>(ptr); }
+    inline TonemapPtr(cv::Tonemap *ptr) { this->ptr = ptr; }
+};
+
+extern "C" struct TonemapPtr Tonemap_ctor();
+
+extern "C" struct TensorWrapper Tonemap_process(struct TonemapPtr ptr, struct TensorArray src, struct TensorWrapper dst);
+
+extern "C" float Tonemap_getGamma(struct TonemapPtr ptr);
+
+extern "C" void Tonemap_setGamma(struct TonemapPtr ptr, float gamma);
