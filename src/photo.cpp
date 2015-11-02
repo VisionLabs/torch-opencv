@@ -282,4 +282,5 @@ extern "C" float Tonemap_getGamma(struct TonemapPtr ptr)
 extern "C" void Tonemap_setGamma(struct TonemapPtr ptr, float gamma)
 {
     ptr->setGamma(gamma);
+    std::cout << gamma << std::endl;
 }

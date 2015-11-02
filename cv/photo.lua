@@ -62,15 +62,6 @@ struct TensorWrapper pencilSketch(struct TensorWrapper src, struct TensorWrapper
 
 struct TensorWrapper stylization(struct TensorWrapper src, struct TensorWrapper dst,
                             float sigma_s, float sigma_r);
-
-struct PtrWrapper Tonemap_ctor();
-
-struct TensorWrapper Tonemap_process(struct PtrWrapper ptr, struct TensorArray src, struct TensorWrapper dst);
-
-float Tonemap_getGamma(struct PtrWrapper ptr);
-
-void Tonemap_setGamma(struct PtrWrapper ptr, float gamma);
-
 ]]
 
 local C = ffi.load(libPath('photo'))
@@ -98,7 +89,7 @@ function cv.fastNlMeansDenoising(t)
     local argRules = {
         {"src"},
         {"dst", default = nil},
-        {"h", default = nil}
+        {"h", default = nil},
         {"templateWindowSize", default = 7},
         {"searchWindowSize", default = 21},
         {"normType", default = cv.NORM_L2}
@@ -151,14 +142,6 @@ function cv.fastNlMeansDenoisingColored(t)
         C.fastNlMeansDenoisingColored(
             cv.wrap_tensor(src), cv.wrap_tensor(dst), h, hColor, templateWindowSize, searchWindowSize))
 end
-
-struct TensorWrapper fastNlMeansDenoisingMulti1(struct TensorArray srcImgs, struct TensorWrapper dst,
-                            int imgToDenoiseIndex, int temporalWindowSize, float h,
-                            int templateWindowSize, int searchWindowSize);
-
-struct TensorWrapper fastNlMeansDenoisingMulti2(struct TensorArray srcImgs, struct TensorWrapper dst,
-                            int imgToDenoiseIndex, int temporalWindowSize, struct TensorWrapper h,
-                            int templateWindowSize, int searchWindowSize, int normType);
 
 function cv.fastNlMeansDenoisingMulti(t)
     local argRules = {
@@ -421,6 +404,19 @@ function cv.stylization(t)
         C.stylization(
             cv.wrap_tensor(src), cv.wrap_tensor(dst), sigma_s, sigma_r))
 end
+
+--- ***************** Classes *****************
+require 'cv.Classes'
+
+ffi.cdef[[
+struct PtrWrapper Tonemap_ctor();
+
+struct TensorWrapper Tonemap_process(struct PtrWrapper ptr, struct TensorArray src, struct TensorWrapper dst);
+
+float Tonemap_getGamma(struct PtrWrapper ptr);
+
+void Tonemap_setGamma(struct PtrWrapper ptr, float gamma);
+]]
 
 -- Tonemap
 do

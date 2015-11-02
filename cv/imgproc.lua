@@ -967,7 +967,7 @@ function cv.erode(t)
         {"anchor", default = {-1, -1}, operator = cv.Point},
         {"iterations", default = nil},
         {"borderType", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar}
+        {"borderValue", default = {0/0}} -- pass nan to detect default value, operator = cv.Scalar}
     }
     local src, dst, kernel, anchor, iterations, borderType, borderValue = cv.argcheck(t, argRules)
 
@@ -986,7 +986,7 @@ function cv.dilate(t)
         {"anchor", default = {-1, -1}, operator = cv.Point},
         {"iterations", default = nil},
         {"borderType", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar}
+        {"borderValue", default = {0/0}} -- pass nan to detect default value, operator = cv.Scalar}
     }
     local src, dst, kernel, anchor, iterations, borderType, borderValue = cv.argcheck(t, argRules)
 
@@ -1006,7 +1006,7 @@ function cv.morphologyEx(t)
         {"anchor", default = {-1, -1}, operator = cv.Point},
         {"iterations", default = nil},
         {"borderType", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar}
+        {"borderValue", default = {0/0}} -- pass nan to detect default value, operator = cv.Scalar}
     }
     local src, dst, op, kernel, anchor, iterations, borderType, borderValue = cv.argcheck(t, argRules)
 
@@ -1042,7 +1042,7 @@ function cv.warpAffine(t)
         {"dsize", default = {0, 0}, operator = cv.Point},
         {"flags", default = cv.INTER_LINEAR},
         {"borderMode", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar}
+        {"borderValue", default = {0/0}} -- pass nan to detect default value, operator = cv.Scalar}
     }
     local src, dst, M, dsize, flags, borderMode, borderValue = cv.argcheck(t, argRules)
 
@@ -1061,7 +1061,7 @@ function cv.warpPerspective(t)
         {"dsize", default = {0, 0}, operator = cv.Size},
         {"flags", default = cv.INTER_LINEAR},
         {"borderMode", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0/0} -- pass nan to detect default value, operator = cv.Scalar}
+        {"borderValue", default = {0/0}} -- pass nan to detect default value, operator = cv.Scalar}
     }
     local src, dst, M, dsize, flags, borderMode, borderValue = cv.argcheck(t, argRules)
 
@@ -1344,6 +1344,7 @@ function cv.threshold(t)
         assert(dst:isSameSizeAs(src))
     end
 
+    local result = C.threshold(cv.wrap_tensor(src), cv.wrap_tensor(dst),
                     tresh, maxval, type)
     return result.val, cv.unwrap_tensors(result.tensor)
 end
@@ -1525,6 +1526,7 @@ function cv.initWideAngleProjMap(t)
         distCoeffs = torch.FloatTensor(distCoeffs)
     end
     
+    local result = C.initWideAngleProjMap(
         cv.wrap_tensor(cameraMatrix), cv.wrap_tensor(distCoeffs),
         imageSize, destImageWidth, m1type, cv.wrap_tensors(maps),
         projType, alpha)
@@ -1625,7 +1627,7 @@ function cv.EMD(t)
         {"signature2"},
         {"distType"},
         {"cost", default = nil},
-        {"lowerBound", default = ffi.new('struct FloatArray', nil, operator = ffi.new},
+        {"lowerBound", default = ffi.new('struct FloatArray', nil)},
         {"flow"}
     }
     local signature1, signature2, distType, cost, lowerBound, flow = cv.argcheck(t, argRules)
@@ -1733,6 +1735,7 @@ function cv.floodFill(t)
     }
     local image, mask, seedPoint, newVal, loDiff, upDiff, flags = cv.argcheck(t, argRules)
 
+    local result = C.floodFill(
         cv.wrap_tensor(image), cv.wrap_tensor(mask), seedPoint[1], 
         seedPoint[2], newVal, loDiff, upDiff, flags)
     return result.val, result.rect
@@ -1830,6 +1833,7 @@ function cv.connectedComponentsWithStats(t)
     }
     local image, outputTensors, connectivity, ltype = cv.argcheck(t, argRules)
 
+    local result = C.connectedComponentsWithStats(
         cv.wrap_tensor(image), 
         cv.wrap_tensors(labels, stats, centroids), 
         connectivity, 
