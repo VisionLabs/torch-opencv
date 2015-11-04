@@ -82,6 +82,24 @@ end
 
 -- ***** Algorithm *****
 
+ffi.cdef[[
+struct PtrWrapper Algorithm_ctor();
+
+void Algorithm_dtor(struct PtrWrapper ptr);
+
+void Algorithm_clear(struct PtrWrapper ptr);
+
+void Algorithm_write(struct PtrWrapper ptr, struct PtrWrapper fileStorage);
+
+void Algorithm_read(struct PtrWrapper ptr, struct PtrWrapper fileNode);
+
+bool Algorithm_empty(struct PtrWrapper ptr);
+
+void Algorithm_save(struct PtrWrapper ptr, const char *filename);
+
+const char *Algorithm_getDefaultName(struct PtrWrapper ptr);
+]]
+
 do
     local Algorithm = torch.class('cv.Algorithm')
 

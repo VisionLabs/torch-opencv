@@ -2813,11 +2813,8 @@ do
         local density_th = t.density_th or 0.7
         local n_bins = t.n_bins or 1024
 
-        self.ptr = ffi.gc(
-            C.LineSegmentDetector_ctor(
-                refine, scale, sigma_scale, quant, ang_th, log_eps, density_th, n_bins), 
-            C.Algorithm_dtor
-        )
+        self.ptr = ffi.gc(C.LineSegmentDetector_ctor(refine, scale, sigma_scale, quant, ang_th, log_eps, density_th, n_bins),
+            C.Algorithm_dtor)
     end
 
     function LineSegmentDetector:detect(t)

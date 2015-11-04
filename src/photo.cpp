@@ -257,6 +257,8 @@ extern "C" struct TensorWrapper stylization(struct TensorWrapper src, struct Ten
     return dst;
 }
 
+//Classes
+
 extern "C" struct TonemapPtr Tonemap_ctor()
 {
     return cv::createTonemap().get();
@@ -282,5 +284,4 @@ extern "C" float Tonemap_getGamma(struct TonemapPtr ptr)
 extern "C" void Tonemap_setGamma(struct TonemapPtr ptr, float gamma)
 {
     ptr->setGamma(gamma);
-    std::cout << gamma << std::endl;
 }

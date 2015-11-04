@@ -440,12 +440,13 @@ do
         return C.Tonemap_getGamma(self.ptr);
     end
 
-    function setGamma(t)
+    function Tonemap:setGamma(t)
         local argRules = {
             {"gamma"}
         }
 
         local gamma = cv.argcheck(t, argRules)
+
         C.Tonmap_setGamma(self.ptr, gamma)
     end
 end
