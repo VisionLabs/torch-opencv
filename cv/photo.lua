@@ -418,7 +418,9 @@ float Tonemap_getGamma(struct PtrWrapper ptr);
 void Tonemap_setGamma(struct PtrWrapper ptr, float gamma);
 ]]
 
+
 -- Tonemap
+
 do
     local Tonemap = torch.class('cv.Tonemap', 'cv.Algorithm')
 
@@ -426,7 +428,8 @@ do
         self.ptr = ffi.gc(C.Tonemap_ctor(), C.Algorithm_dtor)
     end
 
-    function Tonemap:process(t)
+end
+  --[[function Tonemap:process(t)
         local argRules = {
             {"src"},
             {"dst", default = nil}
@@ -448,5 +451,4 @@ do
         local gamma = cv.argcheck(t, argRules)
 
         C.Tonmap_setGamma(self.ptr, gamma)
-    end
-end
+    end]]

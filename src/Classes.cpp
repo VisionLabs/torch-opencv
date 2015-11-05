@@ -2,14 +2,6 @@
 
 // FileNode
 
-struct FileNodePtr {
-    void *ptr;
-
-    inline cv::FileNode * operator->() { return static_cast<cv::FileNode *>(ptr); }
-    inline FileNodePtr(cv::FileNode *ptr) { this->ptr = ptr; }
-    inline cv::FileNode & operator*() { return *static_cast<cv::FileNode *>(this->ptr); }
-};
-
 extern "C"
 struct FileNodePtr FileNode_ctor() {
     return new cv::FileNode();
@@ -21,14 +13,6 @@ void FileNode_dtor(FileNodePtr ptr) {
 }
 
 // FileStorage
-
-struct FileStoragePtr {
-    void *ptr;
-
-    inline cv::FileStorage * operator->() { return static_cast<cv::FileStorage *>(ptr); }
-    inline FileStoragePtr(cv::FileStorage *ptr) { this->ptr = ptr; }
-    inline cv::FileStorage & operator*() { return *static_cast<cv::FileStorage *>(this->ptr); }
-};
 
 extern "C"
 struct FileStoragePtr FileStorage_ctor_default() {
@@ -66,13 +50,6 @@ const char *FileStorage_releaseAndGetString(FileStoragePtr ptr) {
 }
 
 // Algorithm
-
-struct AlgorithmPtr {
-    void *ptr;
-
-    inline cv::Algorithm * operator->() { return static_cast<cv::Algorithm *>(ptr); }
-    inline AlgorithmPtr(cv::Algorithm *ptr) { this->ptr = ptr; }
-};
 
 extern "C"
 struct AlgorithmPtr Algorithm_ctor() {
