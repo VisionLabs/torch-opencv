@@ -68,11 +68,11 @@ local C = ffi.load(libPath('photo'))
 
 function cv.inpaint(t)
     local argRules = {
-        {"src"},
-        {"inpaintMask"},
+        {"src", required = true},
+        {"inpaintMask", required = true},
         {"dst", default = nil},
-        {"inpaintRadius"},
-        {"flags"}
+        {"inpaintRadius", required = true},
+        {"flags", required = true}
     }
     local src, inpaintMask, dst, inpaintRadius, flags = cv.argcheck(t, argRules)
     
@@ -87,15 +87,15 @@ end
 
 function cv.fastNlMeansDenoising(t)
     local argRules = {
-        {"src"},
+        {"src", required = true},
         {"dst", default = nil},
         {"h", default = nil},
         {"templateWindowSize", default = 7},
         {"searchWindowSize", default = 21},
         {"normType", default = cv.NORM_L2}
     }
-    local src, dst, h, templateWindowSize, searchWindowSize, normType = cv.argcheck(t, argRules)
-    
+    local src, dst, h, templateWindowSize, searchWindowSize, h, normType = cv.argcheck(t, argRules)
+
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
     end
@@ -114,6 +114,7 @@ function cv.fastNlMeansDenoising(t)
         h = torch.FloatTensor(h)
     end
 
+
     return cv.unwrap_tensors(
             C.fastNlMeansDenoising2(
                 cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(h),
@@ -122,7 +123,7 @@ end
 
 function cv.fastNlMeansDenoisingColored(t)
     local argRules = {
-        {"src"},
+        {"src", required = true},
         {"dst", default = nil},
         {"h", default = 3},
         {"hColor", default = 3},
@@ -145,16 +146,16 @@ end
 
 function cv.fastNlMeansDenoisingMulti(t)
     local argRules = {
-        {"srcImgs"},
+        {"srcImgs", required = true},
         {"dst", default = nil},
-        {"imgToDenoiseIndex"},
-        {"temporalWindowSize"},
+        {"imgToDenoiseIndex", required = true},
+        {"temporalWindowSize", required = true},
         {"h", default = nil},
         {"templateWindowSize", default = 7},
         {"searchWindowSize", default = 21},
         {"normType", default = cv.NORM_L2}
     }
-    local srcImgs, dst, imgToDenoiseIndex, temporalWindowSize, h, templateWindowSize, searchWindowSize, normType = cv.argcheck(t, argRules)
+    local srcImgs, dst, imgToDenoiseIndex, temporalWindowSize, h, templateWindowSize, searchWindowSize, h, normType = cv.argcheck(t, argRules)
 
     if #srcImgs > 1 then 
         for i = 2, #srcImgs do
@@ -171,8 +172,8 @@ function cv.fastNlMeansDenoisingMulti(t)
     assert(searchWindowSize % 2 == 1)
 
     -- h is a single number
-    if type(t.h) == "number" or t.h == nil then
-        h = t.h or 3
+    if type(h) == "number" or h == nil then
+        h = h or 3
         return cv.unwrap_tensors(
             C.fastNlMeansDenoisingMulti1(
                 cv.wrap_tensors(srcImgs), cv.wrap_tensor(dst), imgToDenoiseIndex, temporalWindowSize,
@@ -184,6 +185,7 @@ function cv.fastNlMeansDenoisingMulti(t)
         h = torch.FloatTensor(h)
     end
 
+
     return cv.unwrap_tensors(
         C.fastNlMeansDenoisingMulti2(
             cv.wrap_tensors(srcImgs), cv.wrap_tensor(dst), imgToDenoiseIndex, temporalWindowSize,
@@ -192,10 +194,10 @@ end
 
 function cv.fastNlMeansDenoisingColoredMulti(t)
     local argRules = {
-        {"srcImgs"},
+        {"srcImgs", required = true},
         {"dst", default = nil},
-        {"imgToDenoiseIndex"},
-        {"temporalWindowSize"},
+        {"imgToDenoiseIndex", required = true},
+        {"temporalWindowSize", required = true},
         {"h", default = 3},
         {"hColor", default = 3},
         {"templateWindowSize", default = 7},
@@ -225,7 +227,7 @@ end
 
 function cv.denoise_TVL1(t)
     local argRules = {
-        {"observations"},
+        {"observations", required = true},
         {"result", default = nil},
         {"lambda", default = 1.0},
         {"niters", default = 30}
@@ -239,9 +241,9 @@ end
 
 function cv.decolor(t)
     local argRules = {
-        {"src"},
+        {"src", required = true},
         {"grayscale", default = nil},
-        {"color_boost"}
+        {"color_boost", required = true}
     }
     local src, grayscale, color_boost = cv.argcheck(t, argRules)
 
@@ -252,12 +254,12 @@ end
 
 function cv.seamlessClone(t)
     local argRules = {
-        {"src"},
-        {"dst"},
-        {"mask"},
-        {"p", operator = cv.Point},
+        {"src", required = true},
+        {"dst", required = true},
+        {"mask", required = true},
+        {"p", required = true, operator = cv.Point},
         {"blend", default = nil},
-        {"flags"}
+        {"flags", required = true}
     }
     local src, dst, mask, p, blend, flags = cv.argcheck(t, argRules)
 
@@ -273,8 +275,8 @@ end
 
 function cv.colorChange(t)
     local argRules = {
-        {"src"},
-        {"mask"},
+        {"src", required = true},
+        {"mask", required = true},
         {"dst", default = nil},
         {"red_mul", default = 1.0},
         {"green_mul", default = 1.0},
@@ -294,8 +296,8 @@ end
 
 function cv.illuminationChange(t)
     local argRules = {
-        {"src"},
-        {"mask"},
+        {"src", required = true},
+        {"mask", required = true},
         {"dst", default = nil},
         {"alpha", default = 0.2},
         {"beta", default = 0.4}
@@ -314,8 +316,8 @@ end
 
 function cv.textureFlattening(t)
     local argRules = {
-        {"src"},
-        {"mask"},
+        {"src", required = true},
+        {"mask", required = true},
         {"dst", default = nil},
         {"low_threshold", default = 30},
         {"high_threshold", default = 45},
@@ -335,7 +337,7 @@ end
 
 function cv.edgePreservingFilter(t)
     local argRules = {
-        {"src"},
+        {"src", required = true},
         {"dst", default = nil},
         {"flags", default = 1},
         {"sigma_s", default = 60},
@@ -350,7 +352,7 @@ end
 
 function cv.detailEnhance(t)
     local argRules = {
-        {"src"},
+        {"src", required = true},
         {"dst", default = nil},
         {"sigma_s", default = 10},
         {"sigma_r", default = 0.15}
@@ -368,7 +370,7 @@ end
 
 function cv.pencilSketch(t)
     local argRules = {
-        {"src"},
+        {"src", required = true},
         {"dst1", default = nil},
         {"dst2", default = nil},
         {"sigma_s", default = 60},
@@ -389,7 +391,7 @@ end
 
 function cv.stylization(t)
     local argRules = {
-        {"src"},
+        {"src", required = true},
         {"dst", default = nil},
         {"sigma_s", default = 60},
         {"sigma_r", default = 0.45}
@@ -404,51 +406,3 @@ function cv.stylization(t)
         C.stylization(
             cv.wrap_tensor(src), cv.wrap_tensor(dst), sigma_s, sigma_r))
 end
-
---- ***************** Classes *****************
-require 'cv.Classes'
-
-ffi.cdef[[
-struct PtrWrapper Tonemap_ctor();
-
-struct TensorWrapper Tonemap_process(struct PtrWrapper ptr, struct TensorArray src, struct TensorWrapper dst);
-
-float Tonemap_getGamma(struct PtrWrapper ptr);
-
-void Tonemap_setGamma(struct PtrWrapper ptr, float gamma);
-]]
-
-
--- Tonemap
-
-do
-    local Tonemap = torch.class('cv.Tonemap', 'cv.Algorithm')
-
-    function Tonemap:__init()
-        self.ptr = ffi.gc(C.Tonemap_ctor(), C.Algorithm_dtor)
-    end
-
-end
-  --[[function Tonemap:process(t)
-        local argRules = {
-            {"src"},
-            {"dst", default = nil}
-        }
-        local src, dst = cv.argcheck(t, argRules)
-    
-        return C.Tonemap_process(self.ptr, cv.wrap_tensors(src), cv.wrap_tensor(dst));
-    end
-
-    function Tonemap:getGamma()
-        return C.Tonemap_getGamma(self.ptr);
-    end
-
-    function Tonemap:setGamma(t)
-        local argRules = {
-            {"gamma"}
-        }
-
-        local gamma = cv.argcheck(t, argRules)
-
-        C.Tonmap_setGamma(self.ptr, gamma)
-    end]]

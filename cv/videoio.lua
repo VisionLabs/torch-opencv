@@ -38,67 +38,76 @@ double VideoCapture_get(struct PtrWrapper ptr, int propId);
 ]]
 
 do
-	local VideoCapture = torch.class('cv.VideoCapture')
+    local VideoCapture = torch.class('cv.VideoCapture')
 
-	-- v = cv.VideoCapture{}
-	-- OR
-	-- v = cv.VideoCapture{filename='../video.mp4'}
-	-- OR
-	-- v = cv.VideoCapture{device=2}
-	function VideoCapture:__init(t)
-		if t.filename then
-			self.ptr = ffi.gc(C.VideoCapture_ctor_filename(t.filename), C.VideoCapture_dtor)
-		elseif t.device then
-			self.ptr = ffi.gc(C.VideoCapture_ctor_device(t.device), C.VideoCapture_dtor)
-		else
-			self.ptr = ffi.gc(C.VideoCapture_ctor_default(), C.VideoCapture_dtor)
-		end
-	end
+    -- v = cv.VideoCapture{}
+    -- OR
+    -- v = cv.VideoCapture{filename='../video.mp4'}
+    -- OR
+    -- v = cv.VideoCapture{device=2}
+    function VideoCapture:__init(t)
+        if t.filename then
+            self.ptr = ffi.gc(C.VideoCapture_ctor_filename(t.filename), C.VideoCapture_dtor)
+        elseif t.device then
+            self.ptr = ffi.gc(C.VideoCapture_ctor_device(t.device), C.VideoCapture_dtor)
+        else
+            self.ptr = ffi.gc(C.VideoCapture_ctor_default(), C.VideoCapture_dtor)
+        end
+    end
 
-	function VideoCapture:open(t)
-		local device = assert(t.device)
-		
-		return C.VideoCapture_open(self.ptr, device)
-	end
+    function VideoCapture:open(t)
+        local argRules = {
+            {"device", required = true}
+        }
+        local device = cv.argcheck(t, argRules)
+        
+        return C.VideoCapture_open(self.ptr, device)
+    end
 
-	function VideoCapture:isOpened()
-		return C.VideoCapture_isOpened(self.ptr)
-	end
+    function VideoCapture:isOpened()
+        return C.VideoCapture_isOpened(self.ptr)
+    end
 
-	function VideoCapture:release()
-		C.VideoCapture_release(self.ptr)		
-	end
+    function VideoCapture:release()
+        C.VideoCapture_release(self.ptr)        
+    end
 
-	function VideoCapture:grab()
-		return C.VideoCapture_grab(self.ptr)
-	end
+    function VideoCapture:grab()
+        return C.VideoCapture_grab(self.ptr)
+    end
 
-	function VideoCapture:retrieve(t)
-		local image = t.image
-		local flag = t.flag or 0
+    function VideoCapture:retrieve(t)
+        local argRules = {
+            {"image", default = nil},
+            {"flag", default = 0}
+        }
+        local image, flag = cv.argcheck(t, argRules)
 
-		result = C.VideoCapture_retrieve(self.ptr, cv.wrap_tensor(image), flag)
-		return result.val, cv.unwrap_tensors(result.tensor)
-	end
+        result = C.VideoCapture_retrieve(self.ptr, cv.wrap_tensor(image), flag)
+        return result.val, cv.unwrap_tensors(result.tensor)
+    end
 
-	-- result, image = cap.read{}
-	-- OR
-	-- im = torch.FloatTensor(640, 480, 3)
-	-- result = cap.read{image=image}
-	function VideoCapture:read(t)
-		local image = t.image
+    -- result, image = cap.read{}
+    -- OR
+    -- im = torch.FloatTensor(640, 480, 3)
+    -- result = cap.read{image=image}
+    function VideoCapture:read(t)
+        local argRules = {
+            {"image", default = nil}
+        }
+        local image = cv.argcheck(t, argRules)
 
-		result = C.VideoCapture_read(self.ptr, cv.wrap_tensor(image))
-		return result.val, cv.unwrap_tensors(result.tensor)
-	end
+        result = C.VideoCapture_read(self.ptr, cv.wrap_tensor(image))
+        return result.val, cv.unwrap_tensors(result.tensor)
+    end
 
-	function VideoCapture:set(propId, value)
-		return C.VideoCapture_set(self.ptr, propId, value)
-	end
+    function VideoCapture:set(propId, value)
+        return C.VideoCapture_set(self.ptr, propId, value)
+    end
 
-	function VideoCapture:get(propId)
-		return C.VideoCapture_get(self.ptr, propId)
-	end
+    function VideoCapture:get(propId)
+        return C.VideoCapture_get(self.ptr, propId)
+    end
 end
 
 -- VideoWriter
@@ -128,53 +137,62 @@ int VideoWriter_fourcc(char c1, char c2, char c3, char c4);
 ]]
 
 do
-	local VideoWriter = torch.class('cv.VideoWriter')
+    local VideoWriter = torch.class('cv.VideoWriter')
 
-	function VideoWriter:__init(t)
-		if t.filename then
-			local filename = assert(t.filename)
-			local fourcc = assert(t.fourcc)
-			local fps = assert(t.fps)
-			local frameSize = cv.Size(assert(t.frameSize))
-			local isColor = t.isColor
-			if isColor == nil then isColor = true end
-			self.ptr = ffi.gc(C.VideoWriter_ctor(
-				filename, fourcc, fps, frameSize, isColor), 
-				C.VideoWriter_dtor)
-		else
-			self.ptr = ffi.gc(C.VideoWriter_ctor_default(), C.VideoWriter_dtor)
-		end
-	end
+    function VideoWriter:__init(t)
+        local argRules = {
+            {"filename", required = true},
+            {"fourcc", required = true},
+            {"fps", required = true},
+            {"frameSize", required = true, operator = cv.Size},
+            {"isColor", default = nil}
+        }
+        local filename, fourcc, fps, frameSize, isColor = cv.argcheck(t, argRules)
+        if t.filename then
+            if isColor == nil then isColor = true end
+            self.ptr = ffi.gc(C.VideoWriter_ctor(
+                filename, fourcc, fps, frameSize, isColor), 
+                C.VideoWriter_dtor)
+        else
+            self.ptr = ffi.gc(C.VideoWriter_ctor_default(), C.VideoWriter_dtor)
+        end
+    end
 
-	function VideoWriter:open(t)
-		local filename = assert(t.filename)
-		local fourcc = assert(t.fourcc)
-		local fps = assert(t.fps)
-		local frameSize = cv.Size(assert(t.frameSize))
-		local isColor = t.isColor
-		if isColor == nil then isColor = true end
-		
-		return C.VideoWriter_open(self.ptr, filename, fourcc, fps, frameSize, isColor)
-	end
+    function VideoWriter:open(t)
+        local argRules = {
+            {"filename", required = true},
+            {"fourcc", required = true},
+            {"fps", required = true},
+            {"frameSize", required = true, operator = cv.Size},
+            {"isColor", default = nil}
+        }
+        local filename, fourcc, fps, frameSize, isColor = cv.argcheck(t, argRules)
+        if isColor == nil then isColor = true end
+        
+        return C.VideoWriter_open(self.ptr, filename, fourcc, fps, frameSize, isColor)
+    end
 
-	function VideoWriter:isOpened()
-		return C.VideoWriter_isOpened(self.ptr)
-	end
+    function VideoWriter:isOpened()
+        return C.VideoWriter_isOpened(self.ptr)
+    end
 
-	function VideoWriter:release()
-		C.VideoWriter_release(self.ptr)		
-	end
+    function VideoWriter:release()
+        C.VideoWriter_release(self.ptr)     
+    end
 
-	function VideoWriter:write(t)
-		local image = assert(t.image)
-		C.VideoWriter_write(self.ptr, image)
-	end
+    function VideoWriter:write(t)
+        local argRules = {
+            {"image", required = true}
+        }
+        local image = cv.argcheck(t, argRules)
+        C.VideoWriter_write(self.ptr, image)
+    end
 
-	function VideoWriter:set(propId, value)
-		return C.VideoWriter_set(self.ptr, propId, value)
-	end
+    function VideoWriter:set(propId, value)
+        return C.VideoWriter_set(self.ptr, propId, value)
+    end
 
-	function VideoWriter:get(propId)
-		return C.VideoWriter_get(self.ptr, propId)
-	end
+    function VideoWriter:get(propId)
+        return C.VideoWriter_get(self.ptr, propId)
+    end
 end

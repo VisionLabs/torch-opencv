@@ -172,7 +172,7 @@ function cv.argcheck(t, rules)
         
         --print(argument[1], type(t[argument[1]]), type(t[i]))
 
-        if userInputArg == nil and not argument.default and argument.default ~= nil then
+        if userInputArg == nil and argument.required then
             error('Argument #' .. i .. ' ("' .. argument[1] .. '") is required!')
         end
 
