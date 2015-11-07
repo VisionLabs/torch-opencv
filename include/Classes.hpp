@@ -1,6 +1,24 @@
 #include <opencv2/core.hpp>
 #include <Common.hpp>
 
+// This is cv::Ptr with all fields made public
+// TODO I hope a safer solution to be here one day
+template <typename T>
+struct PublicPtr
+{
+public:
+    cv::detail::PtrOwner* owner;
+    T* stored;
+};
+
+// increfs a cv::Ptr and returns the pointer
+template <typename T>
+T *rescueObjectFromPtr(cv::Ptr<T> ptr) {
+    PublicPtr<T> *publicPtr = reinterpret_cast<PublicPtr<T> *>(&ptr);
+    publicPtr->owner->incRef();
+    return ptr.get();
+}
+
 // FileNode
 
 struct FileNodePtr {

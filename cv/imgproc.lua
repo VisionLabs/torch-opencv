@@ -2411,7 +2411,11 @@ end
 --- ***************** Classes *****************
 require 'cv.Classes'
 
+local Classes = ffi.load(libPath('Classes'))
+
 ffi.cdef[[
+void Algorithm_dtor(struct PtrWrapper ptr);
+
 void GeneralizedHough_setTemplate(
         struct PtrWrapper ptr, struct TensorWrapper templ, struct PointWrapper templCenter);
 
@@ -2522,7 +2526,7 @@ struct TensorArray LineSegmentDetector_detect(
         struct PtrWrapper ptr, struct TensorWrapper image,
         struct TensorWrapper lines, bool width, bool prec, bool nfa);
 
-void LineSegmentDetector_drawSegments(
+struct TensorWrapper LineSegmentDetector_drawSegments(
         struct PtrWrapper ptr, struct TensorWrapper image, struct TensorWrapper lines);
 
 int compareSegments(struct PtrWrapper ptr, struct SizeWrapper size, struct TensorWrapper lines1,
@@ -2583,23 +2587,26 @@ do
     local GeneralizedHough = torch.class('cv.GeneralizedHough', 'cv.Algorithm')
 
     function GeneralizedHough:setTemplate(t)
-        local argRules = {
-            {"templ", required = true},
-            {"templCenter", default = {-1, -1}, operator = cv.Point},
-            {"edges", required = true},
-            {"dx", required = true},
-            {"dy", required = true},
-            {"templCenter", default = {-1, -1}, operator = cv.Point}
-        }
-        local templ, templCenter, edges, dx, dy, templCenter = cv.argcheck(t, argRules)
-        if t.templ then            
-
-            C.GeneralizedHough_setTemplate(self.ptr, cv.wrap_tensor(templ), templCenter)
-        else
-
+        if t.dy or #t > 2 then
+            local argRules = {
+                {"edges", required = true},
+                {"dx", required = true},
+                {"dy", required = true},
+                {"templCenter", default = {-1, -1}, operator = cv.Point}
+            }
+            local edges, dx, dy, templCenter = cv.argcheck(t, argRules)
+            
             C.GeneralizedHough_setTemplate_edges(
-                self.ptr, cv.wrap_tensor(edges), cv.wrap_tensor(dx),
-                cv.wrap_tensor(dy), templCenter)
+                    self.ptr, cv.wrap_tensor(edges), cv.wrap_tensor(dx),
+                    cv.wrap_tensor(dy), templCenter)
+        else
+            local argRules = {
+                {"templ", required = true},
+                {"templCenter", default = {-1, -1}, operator = cv.Point}
+            }
+            local templ, templCenter = cv.argcheck(t, argRules)
+            
+            C.GeneralizedHough_setTemplate(self.ptr, cv.wrap_tensor(templ), templCenter)
         end
     end
 
@@ -2618,7 +2625,7 @@ do
 
             return cv.unwrap_tensors(
                 C.GeneralizedHough_detect(
-                    self.ptr, cv.wrap_tensor(image), cv.wrap_tensor(positions), votes))
+                       self.ptr, cv.wrap_tensor(image), cv.wrap_tensor(positions), votes))
         else
 
             return cv.unwrap_tensors(
@@ -2674,7 +2681,7 @@ do
     local GeneralizedHoughBallard = torch.class('cv.GeneralizedHoughBallard', 'cv.GeneralizedHough')
 
     function GeneralizedHoughBallard:__init()
-        self.ptr = ffi.gc(C.GeneralizedHoughBallard_ctor(), C.Algorithm_dtor)
+        self.ptr = ffi.gc(C.GeneralizedHoughBallard_ctor(), Classes.Algorithm_dtor)
     end
 
     function GeneralizedHoughBallard:setLevels(levels)
@@ -2700,7 +2707,7 @@ do
     local GeneralizedHoughGuil = torch.class('cv.GeneralizedHoughGuil', 'cv.GeneralizedHough')
 
     function GeneralizedHoughGuil:__init()
-        self.ptr = ffi.gc(C.GeneralizedHoughGuil_ctor(), C.Algorithm_dtor)
+        self.ptr = ffi.gc(C.GeneralizedHoughGuil_ctor(), Classes.Algorithm_dtor)
     end
 
     function GeneralizedHoughGuil:setXi(xi)
@@ -2806,7 +2813,7 @@ do
     local CLAHE = torch.class('cv.CLAHE', 'cv.Algorithm')
 
     function CLAHE:__init()
-        self.ptr = ffi.gc(C.CLAHE_ctor(), C.Algorithm_dtor)
+        self.ptr = ffi.gc(C.CLAHE_ctor(), Classes.Algorithm_dtor)
     end
 
     function CLAHE:setClipLimit(clipLimit)
@@ -2851,7 +2858,7 @@ do
         self.ptr = ffi.gc(
             C.LineSegmentDetector_ctor(
                 refine, scale, sigma_scale, quant, ang_th, log_eps, density_th, n_bins), 
-            C.Algorithm_dtor
+            Classes.Algorithm_dtor
         )
     end
 
@@ -2877,8 +2884,8 @@ do
         }
         local image, lines = cv.argcheck(t, argRules)
 
-        C.LineSegmentDetector_drawSegments(
-            self.ptr, cv.wrap_tensor(image), cv.wrap_tensor(lines))
+        return cv.unwrap_tensors(C.LineSegmentDetector_drawSegments(
+            self.ptr, cv.wrap_tensor(image), cv.wrap_tensor(lines)))
     end
 
     function LineSegmentDetector:compareSegments(t)

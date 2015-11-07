@@ -1624,7 +1624,7 @@ struct SizePlusInt getTextSize(
     return retval;
 }
 
-/****************** Algorithms ******************/
+/****************** Classes ******************/
 
 // GeneralizedHough
 
@@ -1728,7 +1728,7 @@ int GeneralizedHough_getMaxBufferSize(GeneralizedHoughPtr ptr)
 
 extern "C"
 struct GeneralizedHoughBallardPtr GeneralizedHoughBallard_ctor() {
-    return cv::createGeneralizedHoughBallard().get();
+    return rescueObjectFromPtr(cv::createGeneralizedHoughBallard());
 }
 
 extern "C"
@@ -1759,7 +1759,7 @@ double GeneralizedHoughBallard_getVotesThreshold(GeneralizedHoughBallardPtr ptr)
 
 extern "C"
 struct GeneralizedHoughGuilPtr GeneralizedHoughGuil_ctor() {
-    return cv::createGeneralizedHoughGuil().get();
+    return rescueObjectFromPtr(cv::createGeneralizedHoughGuil());
 }
 
 extern "C"
@@ -1898,7 +1898,7 @@ int GeneralizedHoughGuil_getPosThresh(GeneralizedHoughGuilPtr ptr)
 
 extern "C"
 struct CLAHEPtr CLAHE_ctor() {
-    return cv::createCLAHE().get();
+    return rescueObjectFromPtr(cv::createCLAHE());
 }
 
 extern "C"
@@ -1938,8 +1938,8 @@ struct LineSegmentDetectorPtr LineSegmentDetector_ctor(
         int refine, double scale, double sigma_scale, double quant,
         double ang_th, double log_eps, double density_th, int n_bins)
 {
-    return cv::createLineSegmentDetector(
-            refine, scale, sigma_scale, quant, ang_th, log_eps, density_th, n_bins).get();
+    return rescueObjectFromPtr(cv::createLineSegmentDetector(
+            refine, scale, sigma_scale, quant, ang_th, log_eps, density_th, n_bins));
 }
 
 extern "C"
@@ -1958,10 +1958,12 @@ struct TensorArray LineSegmentDetector_detect(
 }
 
 extern "C"
-void LineSegmentDetector_drawSegments(
+struct TensorWrapper LineSegmentDetector_drawSegments(
         struct LineSegmentDetectorPtr ptr, struct TensorWrapper image, struct TensorWrapper lines)
 {
-    ptr->drawSegments(image.toMat(), lines.toMat());
+    cv::Mat retval = image.toMat().clone();
+    ptr->drawSegments(retval, lines.toMat());
+    return TensorWrapper(retval);
 }
 
 extern "C"

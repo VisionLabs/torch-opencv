@@ -742,7 +742,7 @@ struct TensorArray LineSegmentDetector_detect(
         struct TensorWrapper lines, bool width, bool prec, bool nfa);
 
 extern "C"
-void LineSegmentDetector_drawSegments(
+struct TensorWrapper LineSegmentDetector_drawSegments(
         struct LineSegmentDetectorPtr ptr, struct TensorWrapper image, struct TensorWrapper lines);
 
 extern "C"

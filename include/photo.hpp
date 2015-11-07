@@ -1,4 +1,5 @@
 #include <Common.hpp>
+#include <Classes.hpp>
 #include <opencv2/photo.hpp>
 
 extern "C" struct TensorWrapper inpaint(struct TensorWrapper src, struct TensorWrapper inpaintMask,

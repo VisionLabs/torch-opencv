@@ -61,14 +61,12 @@ extern "C" struct TensorWrapper fastNlMeansDenoisingMulti1(struct TensorArray sr
         cv::Mat retval;
         cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), retval, imgToDenoiseIndex, temporalWindowSize, h,
                                     templateWindowSize, searchWindowSize);
-    
-        free(srcImgs.tensors);
+
         return TensorWrapper(retval);
     } else {
         cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), dst.toMat(), imgToDenoiseIndex, temporalWindowSize, h,
                                     templateWindowSize, searchWindowSize);
     }
-    free(srcImgs.tensors);
     return dst;
 }
 
@@ -81,13 +79,11 @@ extern "C" struct TensorWrapper fastNlMeansDenoisingMulti2(struct TensorArray sr
         std::cout << "!!!" << std::endl;
         cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), retval, imgToDenoiseIndex, temporalWindowSize, h.toMat(),
                                         templateWindowSize, searchWindowSize, normType);
-        free(srcImgs.tensors);
         return TensorWrapper(retval);
     } else {
         cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), dst.toMat(), imgToDenoiseIndex, temporalWindowSize, h.toMat(),
                                         templateWindowSize, searchWindowSize, normType);
     }
-    free(srcImgs.tensors);
     return dst;
 }
 
@@ -99,15 +95,13 @@ extern "C" struct TensorWrapper fastNlMeansDenoisingColoredMulti(struct TensorAr
         cv::Mat retval;
         cv::fastNlMeansDenoisingColoredMulti(srcImgs.toMatList(), retval, imgToDenoiseIndex, temporalWindowSize, h,
                                     hColor, templateWindowSize, searchWindowSize);
-    
-        free(srcImgs.tensors);
+
         return TensorWrapper(retval);
     } else {
         cv::fastNlMeansDenoisingColoredMulti(srcImgs.toMatList(), dst.toMat(), imgToDenoiseIndex, temporalWindowSize, h,
                                     hColor, templateWindowSize, searchWindowSize);
+        return dst;
     }
-    free(srcImgs.tensors);
-    return dst;
 }
 
 extern "C" struct TensorWrapper denoise_TVL1(struct TensorArray observations, struct TensorWrapper result,
@@ -116,13 +110,11 @@ extern "C" struct TensorWrapper denoise_TVL1(struct TensorArray observations, st
     if (result.isNull()) {
         cv::Mat retval;
         cv::denoise_TVL1(observations.toMatList(), retval, lambda, niters);
-        free(observations.tensors);
         return TensorWrapper(retval);
     } else {
         cv::Mat retval = result.toMat();
         cv::denoise_TVL1(observations.toMatList(), retval, lambda, niters);
     }
-    free(observations.tensors);
     return result;
 }
 
@@ -257,11 +249,11 @@ extern "C" struct TensorWrapper stylization(struct TensorWrapper src, struct Ten
     return dst;
 }
 
-//Classes
+/****************** Classes ******************/
 
 extern "C" struct TonemapPtr Tonemap_ctor()
 {
-    return cv::createTonemap().get();
+    return rescueObjectFromPtr(cv::createTonemap());
 }
 
 extern "C" struct TensorWrapper Tonemap_process(struct TonemapPtr ptr, struct TensorArray src, struct TensorWrapper dst)
