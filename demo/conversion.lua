@@ -17,7 +17,7 @@ local C = ffi.load(libPath('Tests'))
 -- prints Tensor from OpenCV
 function test_tensor_to_mat(tensor)
     assert(tensor:dim() <= 2 or tensor:dim() == 3 and tensor:size(3) <= 4)
-    C.test_tensor_to_mat(cv.wrap_tensors(tensor))
+    C.test_tensor_to_mat(cv.wrap_tensor(tensor))
 end
 
 -- creates a Mat and returns it as a Tensor

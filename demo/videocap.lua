@@ -5,14 +5,15 @@ require 'cv.highgui'
 require 'cv.videoio'
 require 'cv.imgproc'
 
-cap = cv.VideoCapture{device=0}
+local cap = cv.VideoCapture{device=0}
 if not cap:isOpened() then
 	print("Failed to open the default camera")
 	os.exit(-1)
 end
 
 cv.namedWindow{winname="edges", flags=cv.WINDOW_AUTOSIZE}
-_, frame = cap:read{}
+local _, frame = cap:read{}
+local edges
 
 while true do
 	edges = cv.cvtColor{src=frame, code=cv.COLOR_BGR2GRAY}
@@ -34,7 +35,7 @@ while true do
 	}
 
 	cv.imshow{winname="edges", image=edges}
-	if cv.waitKey(30) >= 0 then break end
+	if cv.waitKey{30} >= 0 then break end
 
-	cap:read{image=frame}
+	cap:read{frame}
 end
