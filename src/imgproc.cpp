@@ -1961,6 +1961,7 @@ extern "C"
 struct TensorWrapper LineSegmentDetector_drawSegments(
         struct LineSegmentDetectorPtr ptr, struct TensorWrapper image, struct TensorWrapper lines)
 {
+    // TODO are we able to not clone this?
     cv::Mat retval = image.toMat().clone();
     ptr->drawSegments(retval, lines.toMat());
     return TensorWrapper(retval);

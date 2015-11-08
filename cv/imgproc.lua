@@ -2908,12 +2908,12 @@ do
 
     function Subdiv2D:__init(t)
         local argRules = {
-            {"rect", default = nil, operator = cv.Rect}
+            {"rect", default = -1, operator = cv.Rect}
         }
         local rect = cv.argcheck(t, argRules)
 
-        if rect then
-            self.ptr = ffi.gc(C.Subdiv2D_ctor(cv.Rect(rect)), C.Subdiv2D_dtor)
+        if rect.x == -1 then
+            self.ptr = ffi.gc(C.Subdiv2D_ctor(rect), C.Subdiv2D_dtor)
         else
             self.ptr = ffi.gc(C.Subdiv2D_ctor_default(), C.Subdiv2D_dtor)
         end

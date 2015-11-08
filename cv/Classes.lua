@@ -19,11 +19,11 @@ void FileNode_dtor(struct PtrWrapper ptr);
 ]]
 
 do
-	local FileNode = torch.class('cv.FileNode')
+    local FileNode = torch.class('cv.FileNode')
 
-	function FileNode:__init()
-		self.ptr = ffi.gc(C.FileNode_ctor(), C.FileNode_dtor)
-	end
+    function FileNode:__init()
+        self.ptr = ffi.gc(C.FileNode_ctor(), C.FileNode_dtor)
+    end
 end
 
 -- ***** FileStorage *****
@@ -53,14 +53,14 @@ do
         local encoding = t.encoding or ''
 
         if source and flags then
-	        self.ptr = ffi.gc(C.FileStorage_ctor(source, flags, encoding), C.FileStorage_dtor)
-	    else
-	    	self.ptr = ffi.gc(C.FileStorage_ctor_default(), C.FileStorage_dtor)
-	    end
+            self.ptr = ffi.gc(C.FileStorage_ctor(source, flags, encoding), C.FileStorage_dtor)
+        else
+            self.ptr = ffi.gc(C.FileStorage_ctor_default(), C.FileStorage_dtor)
+        end
     end
 
     function FileStorage:open(t)
-    	local source = assert(t.source)
+        local source = assert(t.source)
         local flags = assert(t.flags)
         local encoding = t.encoding or ''
 
@@ -68,15 +68,15 @@ do
     end
 
     function FileStorage:isOpened()
-    	return C.FileStorage_isOpened(self.ptr)
+        return C.FileStorage_isOpened(self.ptr)
     end
 
     function FileStorage:release()
-    	C.FileStorage_release(self.ptr)
+        C.FileStorage_release(self.ptr)
     end
 
     function FileStorage:releaseAndGetString()
-    	return ffi.string(C.FileStorage_releaseAndGetString(self.ptr))
+        return ffi.string(C.FileStorage_releaseAndGetString(self.ptr))
     end
 end
 
@@ -112,22 +112,22 @@ do
     end
 
     function Algorithm:write(fileStorage)
-    	C.Algorithm_write(self.ptr, fileStorage.ptr)
+        C.Algorithm_write(self.ptr, fileStorage.ptr)
     end
 
     function Algorithm:read(fileNode)
-    	C.Algorithm_read(self.ptr, fileNode.ptr)
+        C.Algorithm_read(self.ptr, fileNode.ptr)
     end
 
     function Algorithm:empty()
-    	return C.Algorithm_empty(self.ptr)
+        return C.Algorithm_empty(self.ptr)
     end
 
     function Algorithm:save(filename)
-    	C.Algorithm_save(self.ptr, filename)
+        C.Algorithm_save(self.ptr, filename)
     end
 
     function Algorithm:getDefaultName()
-    	return C.Algorithm_getDefaultName(self.ptr)
+        return ffi.string(C.Algorithm_getDefaultName(self.ptr))
     end
 end
