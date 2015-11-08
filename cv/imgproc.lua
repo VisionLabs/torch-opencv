@@ -418,7 +418,7 @@ void putText(
 ]]
 
 
-local C = ffi.load(libPath('imgproc'))
+local C = ffi.load(cv.libPath('imgproc'))
 
 
 function cv.getGaussianKernel(t)
@@ -2415,7 +2415,7 @@ end
 --- ***************** Classes *****************
 require 'cv.Classes'
 
-local Classes = ffi.load(libPath('Classes'))
+local Classes = ffi.load(cv.libPath('Classes'))
 
 ffi.cdef[[
 void Algorithm_dtor(struct PtrWrapper ptr);

@@ -6,4 +6,4 @@ ffi.cdef[[
 
 ]]
 
-local C = ffi.load(libPath('ml'))
+local C = ffi.load(cv.libPath('ml'))

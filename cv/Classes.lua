@@ -8,7 +8,7 @@ struct PtrWrapper {
 };
 ]]
 
-local C = ffi.load(libPath('Classes'))
+local C = ffi.load(cv.libPath('Classes'))
 
 -- ***** FileNode *****
 

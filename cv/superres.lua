@@ -6,4 +6,4 @@ ffi.cdef[[
 
 ]]
 
-local C = ffi.load(libPath('superres'))
+local C = ffi.load(cv.libPath('superres'))

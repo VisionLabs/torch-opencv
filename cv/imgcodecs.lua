@@ -12,7 +12,7 @@ bool imwrite(const char *filename, struct TensorWrapper img, struct TensorWrappe
 struct TensorWrapper imdecode(struct TensorWrapper buf, int flags);
 ]]
 
-local C = ffi.load(libPath('imgcodecs'))
+local C = ffi.load(cv.libPath('imgcodecs'))
 
 function cv.imread(t)
     local argRules = {

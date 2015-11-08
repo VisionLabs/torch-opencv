@@ -64,7 +64,7 @@ struct TensorWrapper stylization(struct TensorWrapper src, struct TensorWrapper 
                             float sigma_s, float sigma_r);
 ]]
 
-local C = ffi.load(libPath('photo'))
+local C = ffi.load(cv.libPath('photo'))
 
 function cv.inpaint(t)
     local argRules = {

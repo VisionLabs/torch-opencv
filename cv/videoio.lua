@@ -2,7 +2,7 @@ require 'cv'
 
 local ffi = require 'ffi'
 
-local C = ffi.load(libPath('videoio'))
+local C = ffi.load(cv.libPath('videoio'))
 
 --- ***************** Classes *****************
 require 'cv.Classes'
@@ -46,9 +46,9 @@ do
     -- OR
     -- v = cv.VideoCapture{device=2}
     function VideoCapture:__init(t)
-        if t.filename then
+        if type(t.filename or t[1]) == 'string' then
             self.ptr = ffi.gc(C.VideoCapture_ctor_filename(t.filename), C.VideoCapture_dtor)
-        elseif t.device then
+        elseif type(t.device or t[1]) == 'number' then
             self.ptr = ffi.gc(C.VideoCapture_ctor_device(t.device), C.VideoCapture_dtor)
         else
             self.ptr = ffi.gc(C.VideoCapture_ctor_default(), C.VideoCapture_dtor)
@@ -101,11 +101,22 @@ do
         return result.val, cv.unwrap_tensors(result.tensor)
     end
 
-    function VideoCapture:set(propId, value)
+    function VideoCapture:set(t)
+        local argRules = {
+            {"propId", required = true},
+            {"value", required = true}
+        }
+        local propId, value = cv.argcheck(t, argRules)
+
         return C.VideoCapture_set(self.ptr, propId, value)
     end
 
-    function VideoCapture:get(propId)
+    function VideoCapture:get(t)
+        local argRules = {
+            {"propId", required = true}
+        }
+        local propId = cv.argcheck(t, argRules)
+        
         return C.VideoCapture_get(self.ptr, propId)
     end
 end
@@ -188,11 +199,22 @@ do
         C.VideoWriter_write(self.ptr, image)
     end
 
-    function VideoWriter:set(propId, value)
+    function VideoWriter:set(t)
+        local argRules = {
+            {"propId", required = true},
+            {"value", required = true}
+        }
+        local propId, value = cv.argcheck(t, argRules)
+
         return C.VideoWriter_set(self.ptr, propId, value)
     end
 
-    function VideoWriter:get(propId)
+    function VideoWriter:get(t)
+        local argRules = {
+            {"propId", required = true},
+        }
+        local propId = cv.argcheck(t, argRules)
+
         return C.VideoWriter_get(self.ptr, propId)
     end
 end

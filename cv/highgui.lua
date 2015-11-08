@@ -55,7 +55,7 @@ void saveWindowParameters(const char *windowName);
 void loadWindowParameters(const char *windowName);
 ]]
 
-local C = ffi.load(libPath('highgui'))
+local C = ffi.load(cv.libPath('highgui'))
 
 function cv.imshow(t)
     local argRules = {

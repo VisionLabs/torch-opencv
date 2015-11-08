@@ -6,4 +6,4 @@ ffi.cdef[[
 
 ]]
 
-local C = ffi.load(libPath('optflow'))
+local C = ffi.load(cv.libPath('optflow'))

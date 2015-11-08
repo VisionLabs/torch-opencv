@@ -2,7 +2,9 @@
 
 local ffi = require 'ffi'
 
-function libPath(libName)
+cv = {}
+
+function cv.libPath(libName)
     if     ffi.os == 'Windows' then
         return 'lib/' .. libName .. '.dll'
     elseif ffi.os == 'OSX' then
@@ -154,9 +156,7 @@ struct PointArrayOfArrays {
 
 ]]
 
-local C = ffi.load(libPath('Common'))
-
-cv = {}
+local C = ffi.load(cv.libPath('Common'))
 
 require 'cv.constants'
 

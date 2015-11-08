@@ -6,4 +6,4 @@ ffi.cdef[[
 
 ]]
 
-local C = ffi.load 'lib/libfeatures2d.so'
+local C = ffi.load(cv.libPath('features2d'))
