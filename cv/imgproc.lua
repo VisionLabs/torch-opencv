@@ -2189,29 +2189,33 @@ end
 function cv.rectangle(t)
     local argRules = {
         {"img", required = true},
+        {"pt1", required = true, operator = cv.Point},
+        {"pt2", required = true, operator = cv.Point},
         {"color", required = true, operator = cv.Scalar},
         {"thickness", default = 1},
         {"lineType", default = cv.LINE_8},
         {"shift", default = 0}
     }
-    local img, color, thickness, lineType, shift = cv.argcheck(t, argRules)
-    local pt1
-    local pt2
-    local rec
-    if t.rec then
-        rec = cv.Rect(t.rec)
-    else
-        pt1 = cv.Point(t.pt1)
-        pt2 = cv.Point(t.pt2)
-    end
-    assert((pt1 and pt2) or rec)
+    local img, pt1, pt2, color, thickness, lineType, shift = cv.argcheck(t, argRules)
 
-    if rec then
-        C.rectangle(cv.wrap_tensor(img), rec, color, thickness, lineType, shift)
-    else
-        C.rectangle(cv.wrap_tensor(img), pt1, pt2, color, thickness, lineType, shift)
-    end
+    C.rectangle(cv.wrap_tensor(img), pt1, pt2, color, thickness, lineType, shift)
 end
+
+function cv.rectangle2(t)
+    local argRules = {
+        {"img", required = true},
+        {"rec", required = true, operator = cv.Rect},
+        {"color", required = true, operator = cv.Scalar},
+        {"thickness", default = 1},
+        {"lineType", default = cv.LINE_8},
+        {"shift", default = 0}
+    }
+    local img, rec, color, thickness, lineType, shift = cv.argcheck(t, argRules)
+
+    C.rectangle2(cv.wrap_tensor(img), rec, color, thickness, lineType, shift)
+end
+
+
 
 
 function cv.circle(t)

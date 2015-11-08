@@ -1514,7 +1514,7 @@ void rectangle(
 }
 
 extern "C"
-void rectanglePts(
+void rectangle2(
         struct TensorWrapper img, struct RectWrapper rec, struct ScalarWrapper color, int thickness, int lineType, int shift)
 {
     cv::Mat imgMat(img);
