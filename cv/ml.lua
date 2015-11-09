@@ -86,12 +86,12 @@ cv.ml.VAR_NUMERICAL = 0
 cv.ml.VAR_ORDERED = 0
 
 ffi.cdef[[
-
+struct TensorWrapper TrainData_getSubVector(struct TensorWrapper vec, struct TensorWrapper idx);
 ]]
 
 local C = ffi.load(cv.libPath('ml'))
 
-function cv.ml.TrainData_getSubVector(t)
+function TrainData_getSubVector(t)
     local argRules = {
         {"vec", required = true},
         {"idx", required = true}
@@ -108,7 +108,103 @@ require 'cv.Classes'
 local Classes = ffi.load(cv.libPath('Classes'))
 
 ffi.cdef[[
+struct PtrWrapper ParamGrid_ctor(double _minVal, double _maxVal, double _logStep);
 
+struct PtrWrapper ParamGrid_ctor_default();
+
+struct PtrWrapper TrainData_ctor(
+        struct TensorWrapper samples, int layout, struct TensorWrapper responses,
+        struct TensorWrapper varIdx, struct TensorWrapper sampleIdx,
+        struct TensorWrapper sampleWeights, struct TensorWrapper varType);
+
+int TrainData_getLayout(struct PtrWrapper ptr);
+
+int TrainData_getNTrainSamples(struct PtrWrapper ptr);
+
+int TrainData_getNTestSamples(struct PtrWrapper ptr);
+
+int TrainData_getNSamples(struct PtrWrapper ptr);
+
+int TrainData_getNVars(struct PtrWrapper ptr);
+
+int TrainData_getNAllVars(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getSamples(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getMissing(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getTrainResponses(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getTrainNormCatResponses(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getTestResponses(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getTestNormCatResponses(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getResponses(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getNormCatResponses(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getSampleWeights(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getTrainSampleWeights(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getTestSampleWeights(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getVarIdx(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getVarType(struct PtrWrapper ptr);
+
+int TrainData_getResponseType(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getTrainSampleIdx(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getTestSampleIdx(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getDefaultSubstValues(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getClassLabels(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getCatOfs(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getCatMap(struct PtrWrapper ptr);
+
+void TrainData_shuffleTrainTest(struct PtrWrapper ptr);
+
+struct TensorWrapper TrainData_getSample(
+        struct PtrWrapper ptr, struct TensorWrapper varIdx, int sidx);
+
+struct TensorWrapper TrainData_getTrainSamples(
+        struct PtrWrapper ptr, int layout, bool compressSamples, bool compressVars);
+
+struct TensorWrapper TrainData_getValues(
+        struct PtrWrapper ptr, int vi, struct TensorWrapper sidx);
+
+struct TensorWrapper TrainData_getNormCatValues(
+        struct PtrWrapper ptr, int vi, struct TensorWrapper sidx);
+
+void TrainData_setTrainTestSplit(struct PtrWrapper ptr, int count, bool shuffle);
+
+void TrainData_setTrainTestSplitRatio(struct PtrWrapper ptr, double ratio, bool shuffle);
+
+int StatModel_getVarCount(struct PtrWrapper ptr);
+
+bool StatModel_empty(struct PtrWrapper ptr);
+
+bool StatModel_isTrained(struct PtrWrapper ptr);
+
+bool StatModel_isClassifier(struct PtrWrapper ptr);
+
+bool StatModel_train(struct PtrWrapper ptr, struct PtrWrapper trainData, int flags);
+
+bool StatModel_train_Mat(
+        struct PtrWrapper ptr, struct TensorWrapper samples, int layout, struct TensorWrapper responses);
+
+struct TensorPlusFloat StatModel_calcError(
+        struct PtrWrapper ptr, struct PtrWrapper data, bool test, struct TensorWrapper resp);
+
+struct TensorPlusFloat StatModel_predict(
+        struct PtrWrapper ptr, struct TensorWrapper samples, struct TensorWrapper results, int flags);
 ]]
 
 -- ParamGrid
@@ -156,115 +252,115 @@ do
         )
     end
 
-    function cv.ml.TrainData:getLayout()
+    function TrainData:getLayout()
         return C.TrainData_getLayout(self.ptr)
     end
 
-    function cv.ml.TrainData:getNTrainSamples()
+    function TrainData:getNTrainSamples()
         return C.TrainData_getNTrainSamples(self.ptr)
     end
 
-    function cv.ml.TrainData:getNTestSamples()
+    function TrainData:getNTestSamples()
         return C.TrainData_getNTestSamples(self.ptr)
     end
 
-    function cv.ml.TrainData:getNSamples()
+    function TrainData:getNSamples()
         return C.TrainData_getNSamples(self.ptr)
     end
 
-    function cv.ml.TrainData:getNVars()
+    function TrainData:getNVars()
         return C.TrainData_getNVars(self.ptr)
     end
 
-    function cv.ml.TrainData:getNAllVars()
+    function TrainData:getNAllVars()
         return C.TrainData_getNAllVars(self.ptr)
     end
 
-    function cv.ml.TrainData:getSamples()
+    function TrainData:getSamples()
         return cv.unwrap_tensors(C.TrainData_getSamples(self.ptr))
     end
 
-    function cv.ml.TrainData:getMissing()
+    function TrainData:getMissing()
         return cv.unwrap_tensors(C.TrainData_getMissing(self.ptr))
     end
 
-    function cv.ml.TrainData:getTrainResponses()
+    function TrainData:getTrainResponses()
         return cv.unwrap_tensors(C.TrainData_getTrainResponses(self.ptr))
     end
 
-    function cv.ml.TrainData:getTrainNormCatResponses()
+    function TrainData:getTrainNormCatResponses()
         return cv.unwrap_tensors(C.TrainData_getTrainNormCatResponses(self.ptr))
     end
 
-    function cv.ml.TrainData:getTestResponses()
+    function TrainData:getTestResponses()
         return cv.unwrap_tensors(C.TrainData_getTestResponses(self.ptr))
     end
 
-    function cv.ml.TrainData:getTestNormCatResponses()
+    function TrainData:getTestNormCatResponses()
         return cv.unwrap_tensors(C.TrainData_getTestNormCatResponses(self.ptr))
     end
 
-    function cv.ml.TrainData:getResponses()
+    function TrainData:getResponses()
         return cv.unwrap_tensors(C.TrainData_getResponses(self.ptr))
     end
 
-    function cv.ml.TrainData:getNormCatResponses()
+    function TrainData:getNormCatResponses()
         return cv.unwrap_tensors(C.TrainData_getNormCatResponses(self.ptr))
     end
 
-    function cv.ml.TrainData:getSampleWeights()
+    function TrainData:getSampleWeights()
         return cv.unwrap_tensors(C.TrainData_getSampleWeights(self.ptr))
     end
 
-    function cv.ml.TrainData:getTrainSampleWeights()
+    function TrainData:getTrainSampleWeights()
         return cv.unwrap_tensors(C.TrainData_getTrainSampleWeights(self.ptr))
     end
 
-    function cv.ml.TrainData:getTestSampleWeights()
+    function TrainData:getTestSampleWeights()
         return cv.unwrap_tensors(C.TrainData_getTestSampleWeights(self.ptr))
     end
 
-    function cv.ml.TrainData:getVarIdx()
+    function TrainData:getVarIdx()
         return cv.unwrap_tensors(C.TrainData_getVarIdx(self.ptr))
     end
 
-    function cv.ml.TrainData:getVarType()
+    function TrainData:getVarType()
         return cv.unwrap_tensors(C.TrainData_getVarType(self.ptr))
     end
 
-    function cv.ml.TrainData:getResponseType()
+    function TrainData:getResponseType()
         return C.TrainData_getResponseType(self.ptr)
     end
 
-    function cv.ml.TrainData:getTrainSampleIdx()
+    function TrainData:getTrainSampleIdx()
         return cv.unwrap_tensors(C.TrainData_getTrainSampleIdx(self.ptr))
     end
 
-    function cv.ml.TrainData:getTestSampleIdx()
+    function TrainData:getTestSampleIdx()
         return cv.unwrap_tensors(C.TrainData_getTestSampleIdx(self.ptr))
     end
 
-    function cv.ml.TrainData:getDefaultSubstValues()
+    function TrainData:getDefaultSubstValues()
         return cv.unwrap_tensors(C.TrainData_getDefaultSubstValues(self.ptr))
     end
 
-    function cv.ml.TrainData:getClassLabels()
+    function TrainData:getClassLabels()
         return cv.unwrap_tensors(C.TrainData_getClassLabels(self.ptr))
     end
 
-    function cv.ml.TrainData:getCatOfs()
+    function TrainData:getCatOfs()
         return cv.unwrap_tensors(C.TrainData_getCatOfs(self.ptr))
     end
 
-    function cv.ml.TrainData:getCatMap()
+    function TrainData:getCatMap()
         return cv.unwrap_tensors(C.TrainData_getCatMap(self.ptr))
     end
 
-    function cv.ml.TrainData:shuffleTrainTest()
+    function TrainData:shuffleTrainTest()
         C.TrainData_shuffleTrainTest(self.ptr)
     end
 
-    function cv.ml.TrainData:getCatCount(t)
+    function TrainData:getCatCount(t)
         local argRules = {
             {"vi", required = true}
         }
@@ -273,7 +369,7 @@ do
         return C.TrainData_getCatCount(self.ptr, vi)
     end
 
-    function cv.ml.TrainData:getSample(t)
+    function TrainData:getSample(t)
         local argRules = {
             {"varIdx", required = true},
             {"sidx", required = true}
@@ -284,7 +380,7 @@ do
             self.ptr, cv.wrap_tensor(varIdx), sidx))
     end
 
-    function cv.ml.TrainData:getTrainSamples(t)
+    function TrainData:getTrainSamples(t)
         local argRules = {
             {"layout", default = cv.ml.ROW_SAMPLE},
             {"compressSamples", default = true},
@@ -296,7 +392,7 @@ do
             self.ptr, layout, compressSamples, compressVars))
     end
 
-    function cv.ml.TrainData:getValues(t)
+    function TrainData:getValues(t)
         local argRules = {
             {"vi", required = true},
             {"sidx", required = true}
@@ -307,7 +403,7 @@ do
             self.ptr, vi, cv.wrap_tensor(sidx)))
     end
 
-    function cv.ml.TrainData:getNormCatValues(t)
+    function TrainData:getNormCatValues(t)
         local argRules = {
             {"vi", required = true},
             {"sidx", required = true}
@@ -318,8 +414,8 @@ do
             self.ptr, vi, cv.wrap_tensor(sidx)))
     end
 
-    function cv.ml.TrainData:setTrainTestSplit(t)
-        local argRules {
+    function TrainData:setTrainTestSplit(t)
+        local argRules = {
             {"count", required = true},
             {"shuffle", default = true}
         }
@@ -328,13 +424,80 @@ do
         C.TrainData_setTrainTestSplit(count, shuffle)
     end
 
-    function cv.ml.TrainData:setTrainTestSplitRatio(t)
-        local argRules {
+    function TrainData:setTrainTestSplitRatio(t)
+        local argRules = {
             {"ratio", required = true},
             {"shuffle", default = true}
         }
         local ratio, shuffle = cv.argcheck(t, argRules)
 
         C.TrainData_setTrainTestSplitRatio(ratio, shuffle)
+    end
+end
+
+-- StatModel
+
+do
+    local StatModel = torch.class('cv.ml.StatModel', 'cv.Algorithm')
+
+    function StatModel:getVarCount()
+        return C.StatModel_getVarCount(self.ptr)
+    end
+
+    function StatModel:empty()
+        return C.StatModel_empty(self.ptr)
+    end
+
+    function StatModel:isTrained()
+        return C.StatModel_isTrained(self.ptr)
+    end
+
+    function StatModel:isClassifier()
+        return C.StatModel_isClassifier(self.ptr)
+    end
+
+    function StatModel:train(t)
+        if torch.isTensor(t[1] or t.samples) then
+            local argRules = {
+                {"samples", required = true},
+                {"layout", required = true},
+                {"responses", required = true}
+            }
+            local samples, layout, responses = cv.argcheck(t, argRules)
+
+            return C.StatModel_train_Mat(self.ptr, cv.wrap_tensor(samples), layout, cv.wrap_tensor(responses))
+        else
+            local argRules = {
+                {"trainData", required = true},
+                {"flags", default = 0}
+            }
+            local trainData, flags = cv.argcheck(t, argRules)
+
+            return C.StatModel_train(self.ptr, trainData.ptr, flags)
+        end
+    end
+
+    function StatModel:calcError(t)
+        local argRules = {
+            {"data", required = true},
+            {"test", required = true},
+            {"resp", default = nil}
+        }
+        local data, test, resp = cv.argcheck(t, argRules)
+
+        result = C.StatModel_calcError(self.ptr, data.ptr, test, cv.wrap_tensor(resp))
+        return result.val, cv.unwrap_tensors(result.tensor)
+    end
+
+    function StatModel:predict(t)
+        local argRules = {
+            {"samples", required = true},
+            {"results", default = nil},
+            {"flags", default = 0}
+        }
+        local samples, results, flags = cv.argcheck(t, argRules)
+
+        result = C.StatModel_predict(samples, cv.wrap_tensor(results), flags)
+        return result.val, cv.unwrap_tensors(result.tensor)
     end
 end
