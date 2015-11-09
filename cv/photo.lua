@@ -463,6 +463,16 @@ void TonemapReinhard_setLightAdaptation(struct PtrWrapper ptr, float light_adapt
 float TonemapReinhard_getColorAdaptation(struct PtrWrapper ptr);
 
 void TonemapReinhard_setColorAdaptation(struct PtrWrapper ptr, float color_adapt);
+
+struct PtrWrapper TonemapMantiuk_ctor(float gamma, float scale, float saturation);
+
+float TonemapMantiuk_getScale(struct PtrWrapper ptr);
+
+void TonemapMantiuk_setScale(struct PtrWrapper ptr, float scale);
+
+float TonemapMantiuk_getSaturation(struct PtrWrapper ptr);
+
+void TonemapMantiuk_setSaturation(struct PtrWrapper ptr, float saturation);
 ]]
 
 -- Tonemap
@@ -673,4 +683,47 @@ do
 
         C.TonemapReinhard_setColorAdaptation(self.ptr, color_adapt)
     end    
+end
+
+-- TonemapMantiuk
+
+do
+    local TonemapMantiuk = torch.class('cv.TonemapMantiuk', 'cv.Tonemap');
+
+    function TonemapMantiuk:__init(t)
+        local argRules = {
+            {"gamma", default = 1.0},
+            {"scale", default = 0.7},
+            {"saturation", default = 1.0}
+        }
+        local gamma, scale, saturation = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.TonemapMantiuk_ctor(gamma, scale, saturation), Classes.Algorithm_dtor)
+    end
+
+    function TonemapMantiuk:getScale()
+        return C.TonemapMantiuk_getScale(self.ptr)
+    end
+
+    function TonemapMantiuk:setScale(t)
+        local argRules = {
+            {"scale", required = true}
+        }
+        local scale = cv.argcheck(t, argRules)
+
+        C.TonemapMantiuk_setScale(self.ptr, scale)
+    end
+
+    function TonemapMantiuk:getSaturation()
+        return C.TonemapMantiuk_getSaturation(self.ptr)
+    end
+
+    function TonemapMantiuk:setSaturation(t)
+        local argRules = {
+            {"saturation", required = true}
+        }
+        local saturation = cv.argcheck(t, argRules)
+
+        C.TonemapMantiuk_setSaturation(self.ptr, saturation)
+    end
 end

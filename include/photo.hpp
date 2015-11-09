@@ -146,3 +146,21 @@ extern "C" void TonemapReinhard_setLightAdaptation(struct TonemapReinhardPtr ptr
 extern "C" float TonemapReinhard_getColorAdaptation(struct TonemapReinhardPtr ptr);
 
 extern "C" void TonemapReinhard_setColorAdaptation(struct TonemapReinhardPtr ptr, float color_adapt);
+
+// TonemapMantiuk
+
+struct TonemapMantiukPtr {
+    void *ptr;
+    inline cv::TonemapMantiuk * operator->() { return static_cast<cv::TonemapMantiuk *>(ptr); }
+    inline TonemapMantiukPtr(cv::TonemapMantiuk *ptr) { this->ptr = ptr; }
+};
+
+extern "C" struct TonemapMantiukPtr TonemapMantiuk_ctor(float gamma, float scale, float saturation);
+
+extern "C" float TonemapMantiuk_getScale(struct TonemapMantiukPtr ptr);
+
+extern "C" void TonemapMantiuk_setScale(struct TonemapMantiukPtr ptr, float scale);
+
+extern "C" float TonemapMantiuk_getSaturation(struct TonemapMantiukPtr ptr);
+
+extern "C" void TonemapMantiuk_setSaturation(struct TonemapMantiukPtr ptr, float saturation);
