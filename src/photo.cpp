@@ -306,3 +306,47 @@ extern "C" void TonemapDrago_setBias(struct TonemapDragoPtr ptr, float bias)
 {
     ptr->setBias(bias);
 }
+
+// TonemapDurand
+
+extern "C" struct TonemapDurandPtr TonemapDurand_ctor(float gamma, float contrast, float saturation, float sigma_space, float sigma_color)
+{
+    return rescueObjectFromPtr(cv::createTonemapDurand(gamma, contrast, saturation, sigma_space, sigma_color));
+}
+
+extern "C" float TonemapDurand_getSaturation(struct TonemapDurandPtr ptr)
+{
+    return ptr->getSaturation();
+}
+
+extern "C" void TonemapDurand_setSaturation(struct TonemapDurandPtr ptr, float saturation)
+{
+    ptr->setSaturation(saturation);
+}
+extern "C" float TonemapDurand_getContrast(struct TonemapDurandPtr ptr)
+{
+    return ptr->getContrast();
+}
+
+extern "C" void TonemapDurand_setContrast(struct TonemapDurandPtr ptr, float contrast)
+{
+    ptr->setContrast(contrast);
+}
+extern "C" float TonemapDurand_getSigma_space(struct TonemapDurandPtr ptr)
+{
+    return ptr->getSigmaSpace();
+}
+
+extern "C" void TonemapDurand_setSigmaSpace(struct TonemapDurandPtr ptr, float sigma_space)
+{
+    ptr->setSigmaSpace(sigma_space);
+}
+extern "C" float TonemapDurand_getSigmaColor(struct TonemapDurandPtr ptr)
+{
+    return ptr->getSigmaColor();
+}
+
+extern "C" void TonemapDurand_setSigmaColor(struct TonemapDurandPtr ptr, float sigma_color)
+{
+    ptr->setSigmaColor(sigma_color);
+}

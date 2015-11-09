@@ -431,6 +431,24 @@ void TonemapDrago_setSaturation(struct PtrWrapper ptr, float saturation);
 float TonemapDrago_getBias(struct PtrWrapper ptr);
 
 void TonemapDrago_setBias(struct PtrWrapper ptr, float bias);
+
+struct PtrWrapper TonemapDurand_ctor(float gamma, float contrast, float saturation, float sigma_space, float sigma_color);
+
+float TonemapDurand_getSaturation(struct PtrWrapper ptr);
+
+void TonemapDurand_setSaturation(struct PtrWrapper ptr, float Saturation);
+
+float TonemapDurand_getContrast(struct PtrWrapper ptr);
+
+void TonemapDurand_setContrast(struct PtrWrapper ptr, float contrast);
+
+float TonemapDurand_getSigmaSpace(struct PtrWrapper ptr);
+
+void TonemapDurand_setSigmaSpace(struct PtrWrapper ptr, float sigma_space);
+
+float TonemapDurand_getSigmaColor(struct PtrWrapper ptr);
+
+void TonemapDurand_setSigmaColor(struct PtrWrapper ptr, float sigma_color);
 ]]
 
 -- Tonemap
@@ -480,7 +498,7 @@ do
         local argRules = {
             {"gamma", default = 1.0},
             {"saturation", default = 1.0},
-            {"bais", default = 0.85}
+            {"bias", default = 0.85}
         }
         local gamma, saturation, bias = cv.argcheck(t, argRules)
 
@@ -511,5 +529,76 @@ do
         local bias = cv.argcheck(t, argRules)
 
         C.TonemapDrago_setBias(self.ptr, bias)
+    end
+end
+
+-- TonemapDurand
+
+do
+    local TonemapDurand = torch.class('cv.TonemapDurand', 'cv.Tonemap');
+
+    function TonemapDurand:__init(t)
+        local argRules = {
+            {"gamma", default = 1.0},
+            {"contrast", default = 4.0},
+            {"saturation", default = 1.0},
+            {"sigma_space", default = 2.0},
+            {"sigma_color", default = 2.0}
+        }
+        local gamma, contrast, saturation, sigma_space, sigma_color = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.TonemapDurand_ctor(gamma, contrast, saturation, sigma_space, sigma_color), Classes.Algorithm_dtor)
+    end
+
+    function TonemapDurand:getSaturation()
+        return C.TonemapDurand_getSaturation(self.ptr)
+    end
+
+    function TonemapDurand:setSaturation(t)
+        local argRules = {
+            {"saturation", required = true}
+        }
+        local saturation = cv.argcheck(t, argRules)
+
+        C.TonemapDurand_setSaturation(self.ptr, saturation)
+    end
+
+    function TonemapDurand:getConstant()
+        return C.TonemapDurand_getConstant(self.ptr)
+    end
+
+    function TonemapDurand:setConstant(t)
+        local argRules = {
+            {"Constant", required = true}
+        }
+        local Constant = cv.argcheck(t, argRules)
+
+        C.TonemapDurand_setConstant(self.ptr, Constant)
+    end
+
+    function TonemapDurand:getSigmaSpace()
+        return C.TonemapDurand_getSigmaSpace(self.ptr)
+    end
+
+    function TonemapDurand:setSigmaSpace(t)
+        local argRules = {
+            {"sigma_space", required = true}
+        }
+        local sigma_space = cv.argcheck(t, argRules)
+
+        C.TonemapDurand_setSigmaSpace(self.ptr, sigma_space)
+    end
+
+    function TonemapDurand:getSigmaColor()
+        return C.TonemapDurand_getSigmaColor(self.ptr)
+    end
+
+    function TonemapDurand:setSigmaColor(t)
+        local argRules = {
+            {"sigma_color", required = true}
+        }
+        local sigma_color = cv.argcheck(t, argRules)
+
+        C.TonemapDurand_setSigmaColor(self.ptr, sigma_color)
     end
 end
