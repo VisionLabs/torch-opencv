@@ -449,6 +449,20 @@ void TonemapDurand_setSigmaSpace(struct PtrWrapper ptr, float sigma_space);
 float TonemapDurand_getSigmaColor(struct PtrWrapper ptr);
 
 void TonemapDurand_setSigmaColor(struct PtrWrapper ptr, float sigma_color);
+
+struct PtrWrapper TonemapReinhard_ctor(float gamma, float intensity, float light_adapt, float color_adapt);
+
+float TonemapReinhard_getIntensity(struct PtrWrapper ptr);
+
+void TonemapReinhard_setIntensity(struct PtrWrapper ptr, float intensity);
+
+float TonemapReinhard_getLightAdaptation(struct PtrWrapper ptr);
+
+void TonemapReinhard_setLightAdaptation(struct PtrWrapper ptr, float light_adapt);
+
+float TonemapReinhard_getColorAdaptation(struct PtrWrapper ptr);
+
+void TonemapReinhard_setColorAdaptation(struct PtrWrapper ptr, float color_adapt);
 ]]
 
 -- Tonemap
@@ -601,4 +615,62 @@ do
 
         C.TonemapDurand_setSigmaColor(self.ptr, sigma_color)
     end
+end
+
+-- TonemapReinhard
+
+do
+    local TonemapReinhard = torch.class('cv.TonemapReinhard', 'cv.Tonemap');
+
+    function TonemapReinhard:__init(t)
+        local argRules = {
+            {"gamma", default = 1.0},
+            {"intensity", default = 0.0},
+            {"light_adapt", default = 1.0},
+            {"sigma_space", default = 2.0},
+            {"sigma_color", default = 2.0}
+        }
+        local gamma, intensity, light_adapt, color_adapt = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.TonemapReinhard_ctor(gamma, intensity, light_adapt, color_adapt), Classes.Algorithm_dtor)
+    end
+
+    function TonemapReinhard:getIntensity()
+        return C.TonemapReinhard_getIntensity(self.ptr)
+    end
+
+    function TonemapReinhard:setIntensity(t)
+        local argRules = {
+            {"intensity", required = true}
+        }
+        local intensity = cv.argcheck(t, argRules)
+
+        C.TonemapReinhard_setIntensity(self.ptr, intensity)
+    end
+
+    function TonemapReinhard:getLightAdaptation()
+        return C.TonemapReinhard_getLightAdaptation(self.ptr)
+    end
+
+    function TonemapReinhard:setLightAdaptation(t)
+        local argRules = {
+            {"light_adapt", required = true}
+        }
+        local light_adapt = cv.argcheck(t, argRules)
+
+        C.TonemapReinhard_setLightAdaptation(self.ptr, light_adapt)
+    end
+
+    function TonemapReinhard:getColorAdaptation()
+        return C.TonemapReinhard_getColorAdaptation(self.ptr)
+    end
+
+    function TonemapReinhard:setColorAdaptation(t)
+        local argRules = {
+            {"color_adapt", required = true}
+        }
+        local color_adapt = cv.argcheck(t, argRules)
+
+        C.TonemapReinhard_setColorAdaptation(self.ptr, color_adapt)
+    end    
 end

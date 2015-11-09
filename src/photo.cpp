@@ -350,3 +350,38 @@ extern "C" void TonemapDurand_setSigmaColor(struct TonemapDurandPtr ptr, float s
 {
     ptr->setSigmaColor(sigma_color);
 }
+
+// TonemapReinhard
+
+extern "C" struct TonemapReinhardPtr TonemapReinhard_ctor(float gamma, float intensity, float light_adapt, float color_adapt)
+{
+    return rescueObjectFromPtr(cv::createTonemapReinhard(gamma, intensity, light_adapt, color_adapt));
+}
+
+extern "C" float TonemapReinhard_getIntensity(struct TonemapReinhardPtr ptr)
+{
+    return ptr->getIntensity();
+}
+
+extern "C" void TonemapReinhard_setIntensity(struct TonemapReinhardPtr ptr, float intensity)
+{
+    ptr->setIntensity(intensity);
+}
+extern "C" float TonemapReinhard_getLightAdaptation(struct TonemapReinhardPtr ptr)
+{
+    return ptr->getLightAdaptation();
+}
+
+extern "C" void TonemapReinhard_setLightAdaptation(struct TonemapReinhardPtr ptr, float light_adapt)
+{
+    ptr->setLightAdaptation(light_adapt);
+}
+extern "C" float TonemapReinhard_getColorAdaptation(struct TonemapReinhardPtr ptr)
+{
+    return ptr->getColorAdaptation();
+}
+
+extern "C" void TonemapReinhard_setColorAdaptation(struct TonemapReinhardPtr ptr, float color_adapt)
+{
+    ptr->setColorAdaptation(color_adapt);
+}
