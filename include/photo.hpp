@@ -61,6 +61,8 @@ extern "C" struct TensorWrapper pencilSketch(struct TensorWrapper src, struct Te
 extern "C" struct TensorWrapper stylization(struct TensorWrapper src, struct TensorWrapper dst,
                                     float sigma_s, float sigma_r);
 
+/****************** Classes ******************/
+
 struct TonemapPtr {
     void *ptr;
 

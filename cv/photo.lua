@@ -406,3 +406,52 @@ function cv.stylization(t)
         C.stylization(
             cv.wrap_tensor(src), cv.wrap_tensor(dst), sigma_s, sigma_r))
 end
+
+
+--- ***************** Classes *****************
+require 'cv.Classes'
+
+local Classes = ffi.load(cv.libPath('Classes'))
+
+ffi.cdef[[
+struct PtrWrapper Tonemap_ctor();
+
+struct TensorWrapper Tonemap_process(struct PtrWrapper ptr, struct TensorArray src, struct TensorWrapper dst);
+
+float Tonemap_getGamma(struct PtrWrapper ptr);
+
+void Tonemap_setGamma(struct PtrWrapper ptr, float gamma);
+]]
+
+-- Tonemap
+
+do
+    local Tonemap = torch.class('cv.Tonemap', 'cv.Algorithm')
+
+    function Tonemap:__init()
+        self.ptr = ffi.gc(C.Tonemap_ctor(), Classes.Algorithm_dtor)
+    end
+
+    function Tonemap:process(t)
+        local argRules = {
+            {"src", required = true},
+            {"dst", default = nil}
+        }
+        local src, dst = cv.argcheck(t, argRules)
+
+        C.Tonemap_process(self.ptr, cv.wrap_tensor(src), cv.wrap_tensor(dst));
+    end
+
+    function Tonemap:getGamma()
+        return C.Tonemap_getGamma(self.ptr);
+    end
+
+    function Tonemap:setGamma(t)
+        local argRules = {
+            {"gamma", required = true}
+        }
+        local gamma = cv.argcheck(t, argRules)
+
+        C.Tonemap_setGamma(self.ptr, gamma)
+    end 
+end
