@@ -63,6 +63,8 @@ extern "C" struct TensorWrapper stylization(struct TensorWrapper src, struct Ten
 
 /****************** Classes ******************/
 
+// Tonemap
+
 struct TonemapPtr {
     void *ptr;
 
@@ -70,10 +72,29 @@ struct TonemapPtr {
     inline TonemapPtr(cv::Tonemap *ptr) { this->ptr = ptr; }
 };
 
-extern "C" struct TonemapPtr Tonemap_ctor();
+extern "C" struct TonemapPtr Tonemap_ctor(float gamma);
 
 extern "C" struct TensorWrapper Tonemap_process(struct TonemapPtr ptr, struct TensorArray src, struct TensorWrapper dst);
 
 extern "C" float Tonemap_getGamma(struct TonemapPtr ptr);
 
 extern "C" void Tonemap_setGamma(struct TonemapPtr ptr, float gamma);
+
+// TonemapDrago
+
+struct TonemapDragoPtr {
+    void *ptr;
+
+    inline cv::TonemapDrago * operator->() { return static_cast<cv::TonemapDrago *>(ptr); }
+    inline TonemapDragoPtr(cv::TonemapDrago *ptr) { this->ptr = ptr; }
+};
+
+extern "C" struct TonemapDragoPtr TonemapDrago_ctor(float gamma, float saturation, float bias);
+
+extern "C" float TonemapDrago_getSaturation(struct TonemapDragoPtr ptr);
+
+extern "C" void TonemapDrago_setSaturation(struct TonemapDragoPtr ptr, float saturation);
+
+extern "C" float TonemapDrago_getBias(struct TonemapDragoPtr ptr);
+
+extern "C" void TonemapDrago_setBias(struct TonemapDragoPtr ptr, float bias);

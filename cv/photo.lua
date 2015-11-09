@@ -414,13 +414,23 @@ require 'cv.Classes'
 local Classes = ffi.load(cv.libPath('Classes'))
 
 ffi.cdef[[
-struct PtrWrapper Tonemap_ctor();
+struct PtrWrapper Tonemap_ctor(float gamma);
 
 struct TensorWrapper Tonemap_process(struct PtrWrapper ptr, struct TensorArray src, struct TensorWrapper dst);
 
 float Tonemap_getGamma(struct PtrWrapper ptr);
 
 void Tonemap_setGamma(struct PtrWrapper ptr, float gamma);
+
+struct PtrWrapper TonemapDrago_ctor(float gamma, float saturation, float bias);
+
+float TonemapDrago_getSaturation(struct PtrWrapper ptr);
+
+void TonemapDrago_setSaturation(struct PtrWrapper ptr, float saturation);
+
+float TonemapDrago_getBias(struct PtrWrapper ptr);
+
+void TonemapDrago_setBias(struct PtrWrapper ptr, float bias);
 ]]
 
 -- Tonemap
@@ -428,8 +438,13 @@ void Tonemap_setGamma(struct PtrWrapper ptr, float gamma);
 do
     local Tonemap = torch.class('cv.Tonemap', 'cv.Algorithm')
 
-    function Tonemap:__init()
-        self.ptr = ffi.gc(C.Tonemap_ctor(), Classes.Algorithm_dtor)
+    function Tonemap:__init(t)
+        local argRules = {
+            {"gamma", default = 1.0}
+        }
+        local gamma = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.Tonemap_ctor(gamma), Classes.Algorithm_dtor)
     end
 
     function Tonemap:process(t)
@@ -454,4 +469,47 @@ do
 
         C.Tonemap_setGamma(self.ptr, gamma)
     end 
+end
+
+-- TonemapDrago
+
+do
+    local TonemapDrago = torch.class('cv.TonemapDrago', 'cv.Tonemap')
+
+    function TonemapDrago:__init(t)
+        local argRules = {
+            {"gamma", default = 1.0},
+            {"saturation", default = 1.0},
+            {"bais", default = 0.85}
+        }
+        local gamma, saturation, bias = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.TonemapDrago_ctor(gamma, saturation, bias), Classes.Algorithm_dtor)
+    end
+
+    function TonemapDrago:getSaturation()
+        return C.TonemapDrago_getSaturation(self.ptr);
+    end
+
+    function TonemapDrago:setSaturation(t)
+        local argRules = {
+            {"saturation", required = true}
+        }
+        local saturation = cv.argcheck(t, argRules)
+
+        C.TonemapDrago_setSaturation(self.ptr, saturation)
+    end
+
+    function TonemapDrago:getBias()
+        return C.TonemapDrago_getBias(self.ptr);
+    end
+
+    function TonemapDrago:setBias(t)
+        local argRules = {
+            {"bias", required = true}
+        }
+        local bias = cv.argcheck(t, argRules)
+
+        C.TonemapDrago_setBias(self.ptr, bias)
+    end
 end
