@@ -171,3 +171,18 @@ extern "C"
 struct TensorPlusFloat StatModel_predict(
         struct StatModelPtr ptr, struct TensorWrapper samples, struct TensorWrapper results, int flags);
 
+struct NormalBayesClassifierPtr {
+    void *ptr;
+
+    inline ml::NormalBayesClassifier * operator->() { return static_cast<ml::NormalBayesClassifier *>(ptr); }
+    inline NormalBayesClassifierPtr(ml::NormalBayesClassifier *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+struct NormalBayesClassifierPtr NormalBayesClassifier_ctor();
+
+extern "C"
+struct TensorArrayPlusFloat NormalBayesClassifier_predictProb(
+        struct NormalBayesClassifierPtr ptr, struct TensorWrapper inputs,
+        struct TensorWrapper outputs, struct TensorWrapper outputProbs, int flags);
+

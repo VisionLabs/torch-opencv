@@ -205,6 +205,12 @@ struct TensorPlusFloat StatModel_calcError(
 
 struct TensorPlusFloat StatModel_predict(
         struct PtrWrapper ptr, struct TensorWrapper samples, struct TensorWrapper results, int flags);
+
+struct PtrWrapper NormalBayesClassifier_ctor();
+
+struct TensorArrayPlusFloat NormalBayesClassifier_predictProb(
+        struct PtrWrapper ptr, struct TensorWrapper inputs,
+        struct TensorWrapper outputs, struct TensorWrapper outputProbs, int flags);
 ]]
 
 -- ParamGrid
@@ -231,7 +237,7 @@ end
 -- TrainData
 
 do
-    local TrainData = torch.class('cv.ml.TrainData')
+    local TrainData = torch.class('cv.TrainData')
 
     function TrainData:__init(t)
         local argRules = {
@@ -382,7 +388,7 @@ do
 
     function TrainData:getTrainSamples(t)
         local argRules = {
-            {"layout", default = cv.ml.ROW_SAMPLE},
+            {"layout", default = cv.ROW_SAMPLE},
             {"compressSamples", default = true},
             {"compressVars", default = true}
         }
@@ -438,7 +444,7 @@ end
 -- StatModel
 
 do
-    local StatModel = torch.class('cv.ml.StatModel', 'cv.Algorithm')
+    local StatModel = torch.class('cv.StatModel', 'cv.Algorithm')
 
     function StatModel:getVarCount()
         return C.StatModel_getVarCount(self.ptr)
@@ -485,7 +491,7 @@ do
         }
         local data, test, resp = cv.argcheck(t, argRules)
 
-        result = C.StatModel_calcError(self.ptr, data.ptr, test, cv.wrap_tensor(resp))
+        local result = C.StatModel_calcError(self.ptr, data.ptr, test, cv.wrap_tensor(resp))
         return result.val, cv.unwrap_tensors(result.tensor)
     end
 
@@ -497,7 +503,31 @@ do
         }
         local samples, results, flags = cv.argcheck(t, argRules)
 
-        result = C.StatModel_predict(samples, cv.wrap_tensor(results), flags)
+        local result = C.StatModel_predict(samples, cv.wrap_tensor(results), flags)
         return result.val, cv.unwrap_tensors(result.tensor)
     end
+end
+
+-- NormalBayesClassifier
+
+do
+	local NormalBayesClassifier = torch.class('cv.NormalBayesClassifier', 'cv.StatModel')
+
+	function NormalBayesClassifier:__init()
+		self.ptr = C.NormalBayesClassifier_ctor()
+	end
+
+	function NormalBayesClassifier:predictProb(t)
+		local argRules = {
+			{"inputs", required = true},
+			{"outputs", required = true},
+			{"outputProbs", required = true},
+			{"flags", default = 0}
+		}
+		local inputs, outputs, outputProbs, flags = cv.argcheck(t, argRules)
+
+		local result = C.NormalBayesClassifier_predictProb(
+			cv.wrap_tensor(inputs), cv.wrap_tensor(outputs), cv.wrap_tensor(outputProbs), flags)
+		return result.val, cv.unwrap_tensors(result.tensors)
+	end
 end

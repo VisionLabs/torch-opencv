@@ -323,3 +323,30 @@ struct TensorPlusFloat StatModel_predict(
 
     return retval;
 }
+
+// NormalBayesClassifier
+
+extern "C"
+struct NormalBayesClassifierPtr NormalBayesClassifier_ctor()
+{
+    return rescueObjectFromPtr(ml::NormalBayesClassifier::create());
+}
+
+extern "C"
+struct TensorArrayPlusFloat NormalBayesClassifier_predictProb(
+        struct NormalBayesClassifierPtr ptr, struct TensorWrapper inputs,
+        struct TensorWrapper outputs, struct TensorWrapper outputProbs, int flags)
+{
+    TensorArrayPlusFloat retval;
+    std::vector<cv::Mat> result(2);
+    if (!outputs.isNull())      result[0] = outputs;
+    if (!outputProbs.isNull())  result[1] = outputProbs;
+
+    retval.val = ptr->predictProb(
+            inputs.toMat(),
+            outputs.isNull() ? result[0] : outputs.toMat(),
+            outputProbs.isNull() ? result[1] : outputs.toMat(),
+            flags);
+
+    return retval;
+}
