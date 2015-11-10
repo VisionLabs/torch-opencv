@@ -348,5 +348,189 @@ struct TensorArrayPlusFloat NormalBayesClassifier_predictProb(
             outputProbs.isNull() ? result[1] : outputs.toMat(),
             flags);
 
+    new (&retval.tensors) TensorArray(result);
+
     return retval;
 }
+
+// SVM
+
+extern "C"
+struct SVMPtr SVM_ctor()
+{
+    return rescueObjectFromPtr(ml::SVM::create());
+}
+
+extern "C"
+void SVM_setType(struct SVMPtr ptr, int val)
+{
+    ptr->setType(val);
+}
+
+extern "C"
+int SVM_getType(struct SVMPtr ptr)
+{
+    return ptr->getType();
+}
+
+extern "C"
+void SVM_setGamma(struct SVMPtr ptr, double val)
+{
+    ptr->setGamma(val);
+}
+
+extern "C"
+double SVM_getGamma(struct SVMPtr ptr)
+{
+    return ptr->getGamma();
+}
+
+extern "C"
+void SVM_setCoef0(struct SVMPtr ptr, double val)
+{
+    ptr->setCoef0(val);
+}
+
+extern "C"
+double SVM_getCoef0(struct SVMPtr ptr)
+{
+    return ptr->getCoef0();
+}
+
+extern "C"
+void SVM_setDegree(struct SVMPtr ptr, double val)
+{
+    ptr->setDegree(val);
+}
+
+extern "C"
+double SVM_getDegree(struct SVMPtr ptr)
+{
+    return ptr->getDegree();
+}
+
+extern "C"
+void SVM_setC(struct SVMPtr ptr, double val)
+{
+    ptr->setC(val);
+}
+
+extern "C"
+double SVM_getC(struct SVMPtr ptr)
+{
+    return ptr->getC();
+}
+
+extern "C"
+void SVM_setNu(struct SVMPtr ptr, double val)
+{
+    ptr->setNu(val);
+}
+
+extern "C"
+double SVM_getNu(struct SVMPtr ptr)
+{
+    return ptr->getNu();
+}
+
+extern "C"
+void SVM_setP(struct SVMPtr ptr, double val)
+{
+    ptr->setP(val);
+}
+
+extern "C"
+double SVM_getP(struct SVMPtr ptr)
+{
+    return ptr->getP();
+}
+
+extern "C"
+void SVM_setClassWeights(struct SVMPtr ptr, struct TensorWrapper val)
+{
+    ptr->setClassWeights(val.toMat());
+}
+
+extern "C"
+struct TensorWrapper SVM_getClassWeights(struct SVMPtr ptr)
+{
+    return TensorWrapper(ptr->getClassWeights());
+}
+
+extern "C"
+void SVM_setTermCriteria(struct SVMPtr ptr, struct TermCriteriaWrapper val)
+{
+    ptr->setTermCriteria(val);
+}
+
+extern "C"
+struct TermCriteriaWrapper SVM_getTermCriteria(struct SVMPtr ptr)
+{
+    return ptr->getTermCriteria();
+}
+
+extern "C"
+int SVM_getKernelType(struct SVMPtr ptr)
+{
+    return ptr->getKernelType();
+}
+
+extern "C"
+void SVM_setKernel(struct SVMPtr ptr, int val)
+{
+    ptr->setKernel(val);
+}
+
+// TODO this
+//extern "C"
+//void SVM_setCustomKernel(struct SVMPtr ptr, struct KernelPtr val)
+//{
+//    ptr->setCustomKernel(val);
+//}
+
+extern "C"
+bool SVM_trainAuto(
+        struct SVMPtr ptr, struct TrainDataPtr data, int kFold, struct ParamGridPtr Cgrid,
+        struct ParamGridPtr gammaGrid, struct ParamGridPtr pGrid, struct ParamGridPtr nuGrid,
+        struct ParamGridPtr coeffGrid, struct ParamGridPtr degreeGrid, bool balanced)
+{
+    cv::Ptr<ml::TrainData> dataPtr(static_cast<ml::TrainData *>(data));
+    rescueObjectFromPtr(dataPtr);
+
+    return ptr->trainAuto(
+            dataPtr, kFold, Cgrid, gammaGrid, pGrid,
+            nuGrid, coeffGrid, degreeGrid, balanced);
+}
+
+extern "C"
+struct TensorWrapper SVM_getSupportVectors(struct SVMPtr ptr)
+{
+    return TensorWrapper(ptr->getSupportVectors());
+}
+
+extern "C"
+struct TensorArrayPlusDouble SVM_getDecisionFunction(
+        struct SVMPtr ptr, int i, struct TensorWrapper alpha, struct TensorWrapper svidx)
+{
+    TensorArrayPlusDouble retval;
+    std::vector<cv::Mat> result;
+    if (!alpha.isNull()) result[0] = alpha;
+    if (!svidx.isNull()) result[1] = svidx;
+
+    retval.val = ptr->getDecisionFunction(
+            i,
+            alpha.isNull() ? result[0] : alpha.toMat(),
+            svidx.isNull() ? result[1] : svidx.toMat());
+
+    new (&retval.tensors) TensorArray(result);
+    return retval;
+}
+
+extern "C"
+struct ParamGridPtr SVM_getDefaultGrid(struct SVMPtr ptr, int param_id)
+{
+    ml::ParamGrid *result = new ml::ParamGrid;
+    *result = ptr->getDefaultGrid(param_id);
+    return result;
+}
+

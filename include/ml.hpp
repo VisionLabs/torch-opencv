@@ -12,6 +12,8 @@ struct ParamGridPtr {
 
     inline ml::ParamGrid * operator->() { return static_cast<ml::ParamGrid *>(ptr); }
     inline ParamGridPtr(ml::ParamGrid *ptr) { this->ptr = ptr; }
+
+    inline operator ml::ParamGrid & () { return *static_cast<ml::ParamGrid *>(ptr); }
 };
 
 struct TrainDataPtr {
@@ -186,3 +188,91 @@ struct TensorArrayPlusFloat NormalBayesClassifier_predictProb(
         struct NormalBayesClassifierPtr ptr, struct TensorWrapper inputs,
         struct TensorWrapper outputs, struct TensorWrapper outputProbs, int flags);
 
+struct SVMPtr {
+    void *ptr;
+
+    inline ml::SVM * operator->() { return static_cast<ml::SVM *>(ptr); }
+    inline SVMPtr(ml::SVM *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+struct SVMPtr SVM_ctor();
+
+extern "C"
+void SVM_setType(struct SVMPtr ptr, int val);
+
+extern "C"
+int SVM_getType(struct SVMPtr ptr);
+
+extern "C"
+void SVM_setGamma(struct SVMPtr ptr, double val);
+
+extern "C"
+double SVM_getGamma(struct SVMPtr ptr);
+
+extern "C"
+void SVM_setCoef0(struct SVMPtr ptr, double val);
+
+extern "C"
+double SVM_getCoef0(struct SVMPtr ptr);
+
+extern "C"
+void SVM_setDegree(struct SVMPtr ptr, double val);
+
+extern "C"
+double SVM_getDegree(struct SVMPtr ptr);
+
+extern "C"
+void SVM_setC(struct SVMPtr ptr, double val);
+
+extern "C"
+double SVM_getC(struct SVMPtr ptr);
+
+extern "C"
+void SVM_setNu(struct SVMPtr ptr, double val);
+
+extern "C"
+double SVM_getNu(struct SVMPtr ptr);
+
+extern "C"
+void SVM_setP(struct SVMPtr ptr, double val);
+
+extern "C"
+double SVM_getP(struct SVMPtr ptr);
+
+extern "C"
+void SVM_setClassWeights(struct SVMPtr ptr, struct TensorWrapper val);
+
+extern "C"
+struct TensorWrapper SVM_getClassWeights(struct SVMPtr ptr);
+
+extern "C"
+void SVM_setTermCriteria(struct SVMPtr ptr, struct TermCriteriaWrapper val);
+
+extern "C"
+struct TermCriteriaWrapper SVM_getTermCriteria(struct SVMPtr ptr);
+
+extern "C"
+int SVM_getKernelType(struct SVMPtr ptr);
+
+extern "C"
+void SVM_setKernel(struct SVMPtr ptr, int val);
+
+//extern "C"
+//void SVM_setCustomKernel(struct SVMPtr ptr, struct KernelPtr val);
+
+extern "C"
+bool SVM_trainAuto(
+        struct SVMPtr ptr, struct TrainDataPtr data, int kFold, struct ParamGridPtr Cgrid,
+        struct ParamGridPtr gammaGrid, struct ParamGridPtr pGrid, struct ParamGridPtr nuGrid,
+        struct ParamGridPtr coeffGrid, struct ParamGridPtr degreeGrid, bool balanced);
+
+extern "C"
+struct TensorWrapper SVM_getSupportVectors(struct SVMPtr ptr);
+
+extern "C"
+struct TensorArrayPlusDouble SVM_getDecisionFunction(
+        struct SVMPtr ptr, int i, struct TensorWrapper alpha, struct TensorWrapper svidx);
+
+extern "C"
+struct ParamGridPtr SVM_getDefaultGrid(struct SVMPtr ptr, int param_id);

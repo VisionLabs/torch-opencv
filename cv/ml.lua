@@ -211,6 +211,62 @@ struct PtrWrapper NormalBayesClassifier_ctor();
 struct TensorArrayPlusFloat NormalBayesClassifier_predictProb(
         struct PtrWrapper ptr, struct TensorWrapper inputs,
         struct TensorWrapper outputs, struct TensorWrapper outputProbs, int flags);
+
+struct PtrWrapper SVM_ctor();
+
+void SVM_setType(struct PtrWrapper ptr, int val);
+
+int SVM_getType(struct PtrWrapper ptr);
+
+void SVM_setGamma(struct PtrWrapper ptr, double val);
+
+double SVM_getGamma(struct PtrWrapper ptr);
+
+void SVM_setCoef0(struct PtrWrapper ptr, double val);
+
+double SVM_getCoef0(struct PtrWrapper ptr);
+
+void SVM_setDegree(struct PtrWrapper ptr, double val);
+
+double SVM_getDegree(struct PtrWrapper ptr);
+
+void SVM_setC(struct PtrWrapper ptr, double val);
+
+double SVM_getC(struct PtrWrapper ptr);
+
+void SVM_setNu(struct PtrWrapper ptr, double val);
+
+double SVM_getNu(struct PtrWrapper ptr);
+
+void SVM_setP(struct PtrWrapper ptr, double val);
+
+double SVM_getP(struct PtrWrapper ptr);
+
+void SVM_setClassWeights(struct PtrWrapper ptr, struct TensorWrapper val);
+
+struct TensorWrapper SVM_getClassWeights(struct PtrWrapper ptr);
+
+void SVM_setTermCriteria(struct PtrWrapper ptr, struct TermCriteriaWrapper val);
+
+struct TermCriteriaWrapper SVM_getTermCriteria(struct PtrWrapper ptr);
+
+int SVM_getKernelType(struct PtrWrapper ptr);
+
+void SVM_setKernel(struct PtrWrapper ptr, int val);
+
+//void SVM_setCustomKernel(struct PtrWrapper ptr, struct KernelPtr val);
+
+bool SVM_trainAuto(
+        struct PtrWrapper ptr, struct TrainDataPtr data, int kFold, struct ParamGridPtr Cgrid,
+        struct ParamGridPtr gammaGrid, struct ParamGridPtr pGrid, struct ParamGridPtr nuGrid,
+        struct ParamGridPtr coeffGrid, struct ParamGridPtr degreeGrid, bool balanced);
+
+struct TensorWrapper SVM_getSupportVectors(struct PtrWrapper ptr);
+
+struct TensorArrayPlusDouble SVM_getDecisionFunction(
+        struct PtrWrapper ptr, int i, struct TensorWrapper alpha, struct TensorWrapper svidx);
+
+struct ParamGridPtr SVM_getDefaultGrid(struct PtrWrapper ptr, int param_id);
 ]]
 
 -- ParamGrid
@@ -219,6 +275,10 @@ do
     local ParamGrid = torch.class('cv.ml.ParamGrid')
 
     function ParamGrid:__init(t)
+    	if type(t) ~= 'table' then
+    		self.ptr = t
+    	end
+
         if t[1] or t._minVal then
             local argRules = {
                 {"_minVal", required = true},
@@ -529,5 +589,200 @@ do
 		local result = C.NormalBayesClassifier_predictProb(
 			cv.wrap_tensor(inputs), cv.wrap_tensor(outputs), cv.wrap_tensor(outputProbs), flags)
 		return result.val, cv.unwrap_tensors(result.tensors)
+	end
+end
+
+-- SVM
+
+do
+	local SVM = torch.class('cv.SVM', 'cv.StatModel')
+
+	function SVM:__init()
+		self.ptr = ffi.gc(C.SVM_ctor(), Classes.Algorithm_dtor)
+	end
+
+	function SVM:setType(t)
+	    local argRules = {
+	        {"val", required = true}
+	    }
+	    local val = cv.argcheck(t, argRules)
+	    
+	    C.SVM_setType(self.ptr, val)
+	end
+
+	function SVM:getType()
+	    return C.SVM_getType(self.ptr)
+	end
+
+	function SVM:setGamma(t)
+	    local argRules = {
+	        {"val", required = true}
+	    }
+	    local val = cv.argcheck(t, argRules)
+	    
+	    C.SVM_setGamma(self.ptr, val)
+	end
+
+	function SVM:getGamma()
+	    return C.SVM_getGamma(self.ptr)
+	end
+
+	function SVM:setCoef0(t)
+	    local argRules = {
+	        {"val", required = true}
+	    }
+	    local val = cv.argcheck(t, argRules)
+	    
+	    C.SVM_setCoef0(self.ptr, val)
+	end
+
+	function SVM:getCoef0()
+	    return C.SVM_getCoef0(self.ptr)
+	end
+
+	function SVM:setDegree(t)
+	    local argRules = {
+	        {"val", required = true}
+	    }
+	    local val = cv.argcheck(t, argRules)
+	    
+	    C.SVM_setDegree(self.ptr, val)
+	end
+
+	function SVM:getDegree()
+	    return C.SVM_getDegree(self.ptr)
+	end
+
+	function SVM:setC(t)
+	    local argRules = {
+	        {"val", required = true}
+	    }
+	    local val = cv.argcheck(t, argRules)
+	    
+	    C.SVM_setC(self.ptr, val)
+	end
+
+	function SVM:getC()
+	    return C.SVM_getC(self.ptr)
+	end
+
+	function SVM:setNu(t)
+	    local argRules = {
+	        {"val", required = true}
+	    }
+	    local val = cv.argcheck(t, argRules)
+	    
+	    C.SVM_setNu(self.ptr, val)
+	end
+
+	function SVM:getNu()
+	    return C.SVM_getNu(self.ptr)
+	end
+
+	function SVM:setP(t)
+	    local argRules = {
+	        {"val", required = true}
+	    }
+	    local val = cv.argcheck(t, argRules)
+	    
+	    C.SVM_setP(self.ptr, val)
+	end
+
+	function SVM:getP()
+	    return C.SVM_getP(self.ptr)
+	end
+
+	function SVM:setClassWeights(t)
+	    local argRules = {
+	        {"val", required = true}
+	    }
+	    local val = cv.argcheck(t, argRules)
+	    
+	    C.SVM_setClassWeights(self.ptr, cv.wrap_tensor(val))
+	end
+
+	function SVM:getClassWeights()
+	    return cv.unwrap_tensors(C.SVM_getClassWeights(self.ptr))
+	end
+
+	function SVM:setTermCriteria(t)
+	    local argRules = {
+	        {"val", required = true, operator = cv.TermCriteria}
+	    }
+	    local val = cv.argcheck(t, argRules)
+	    
+	    C.SVM_setTermCriteria(self.ptr, val)
+	end
+
+	function SVM:getTermCriteria()
+	    return C.SVM_getTermCriteria(self.ptr)
+	end
+
+	function SVM:getKernelType()
+	    return C.SVM_getKernelType(self.ptr)
+	end
+
+	function SVM:setKernel(t)
+	    local argRules = {
+	        {"val", required = true}
+	    }
+	    local val = cv.argcheck(t, argRules)
+	    
+	    C.SVM_setKernel(self.ptr, val)
+	end
+
+	-- TODO this
+	-- function SVM:setCustomKernel(t)
+	--     local argRules = {
+	--         {"val", required = true}
+	--     }
+	--     local val = cv.argcheck(t, argRules)
+	    
+	--     C.SVM_setCustomKernel(self.ptr, val)
+	-- end
+
+	function SVM:trainAuto(t)
+		local argRules = {
+			{"data", required = true},
+			{"kFold", default = 10},
+			{"Cgrid", default = SVM.getDefaultGrid(cv.ml.SVM_C)},
+			{"gammaGrid", default = SVM.getDefaultGrid(cv.ml.SVM_GAMMA)},
+			{"pGrid", default = SVM.getDefaultGrid(cv.ml.SVM_P)},
+			{"nuGrid", default = SVM.getDefaultGrid(cv.ml.SVM_NU)},
+			{"coeffGrid", default = SVM.getDefaultGrid(cv.ml.SVM_COEF)},
+			{"degreeGrid", default = SVM.getDefaultGrid(cv.ml.SVM_DEGREE)},
+			{"balanced", default = false}
+		}
+		local data, kFold, Cgrid, gammaGrid, pGrid, nuGrid, coeffGrid, degreeGrid, balanced 
+			= cv.argcheck(t, argRules)
+
+		return C.SVM_trainAuto(self.ptr,
+			data.ptr, kFold, Cgrid.ptr, gammaGrid.ptr, pGrid.ptr, 
+			nuGrid.ptr, coeffGrid.ptr, degreeGrid.ptr, balanced)
+	end
+
+	function SVM:getSupportVectors()
+	    return cv.unwrap_tensors(C.SVM_getSupportVectors(self.ptr))
+	end
+
+	function SVM:getDecisionFunction(t)
+		local argRules = {
+	        {"i", required = true},
+	        {"alpha", default = nil},
+	        {"svidx", default = nil}
+	    }
+	    local i, alpha, svidx = cv.argcheck(t, argRules)
+
+	    local result = C.SVM_getDecisionFunction(self.ptr, i, cv.wrap_tensor(alpha), cv.wrap_tensor(svidx))
+	    return result.val, cv.unwrap_tensors(result.tensors)
+	end
+
+	function SVM:getDefaultGrid(t)
+		local argRules = {
+	        {"param_id", required = true}
+	    }
+	    local param_id = cv.argcheck(t, argRules)
+
+	    return cv.ParamGrid(C.SVM_getDefaultGrid(self.ptr, param_id))
 	end
 end
