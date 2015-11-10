@@ -84,6 +84,11 @@ struct TensorPlusDouble {
     double val;
 };
 
+struct TensorPlusFloat {
+    struct TensorWrapper tensor;
+    float val;
+};
+
 struct TensorPlusBool {
     struct TensorWrapper tensor;
     bool val;
@@ -97,6 +102,11 @@ struct TensorArrayPlusInt {
 struct TensorArrayPlusFloat {
     struct TensorArray tensors;
     float val;
+};
+
+struct TensorArrayPlusDouble {
+    struct TensorArray tensors;
+    double val;
 };
 
 struct TensorArrayPlusBool {

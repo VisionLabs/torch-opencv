@@ -487,7 +487,7 @@ do
         }
         local count, shuffle = cv.argcheck(t, argRules)
 
-        C.TrainData_setTrainTestSplit(count, shuffle)
+        C.TrainData_setTrainTestSplit(self.ptr, count, shuffle)
     end
 
     function TrainData:setTrainTestSplitRatio(t)
@@ -497,7 +497,7 @@ do
         }
         local ratio, shuffle = cv.argcheck(t, argRules)
 
-        C.TrainData_setTrainTestSplitRatio(ratio, shuffle)
+        C.TrainData_setTrainTestSplitRatio(self.ptr, ratio, shuffle)
     end
 end
 
@@ -563,7 +563,7 @@ do
         }
         local samples, results, flags = cv.argcheck(t, argRules)
 
-        local result = C.StatModel_predict(samples, cv.wrap_tensor(results), flags)
+        local result = C.StatModel_predict(self.ptr, cv.wrap_tensor(samples), cv.wrap_tensor(results), flags)
         return result.val, cv.unwrap_tensors(result.tensor)
     end
 end
@@ -587,7 +587,8 @@ do
 		local inputs, outputs, outputProbs, flags = cv.argcheck(t, argRules)
 
 		local result = C.NormalBayesClassifier_predictProb(
-			cv.wrap_tensor(inputs), cv.wrap_tensor(outputs), cv.wrap_tensor(outputProbs), flags)
+			self.ptr, cv.wrap_tensor(inputs), cv.wrap_tensor(outputs), 
+			cv.wrap_tensor(outputProbs), flags)
 		return result.val, cv.unwrap_tensors(result.tensors)
 	end
 end
