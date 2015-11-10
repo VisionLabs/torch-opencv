@@ -170,7 +170,7 @@ struct TensorPlusFloat StatModel_calcError(
         struct StatModelPtr ptr, struct TrainDataPtr data, bool test, struct TensorWrapper resp);
 
 extern "C"
-struct TensorPlusFloat StatModel_predict(
+float StatModel_predict(
         struct StatModelPtr ptr, struct TensorWrapper samples, struct TensorWrapper results, int flags);
 
 struct NormalBayesClassifierPtr {

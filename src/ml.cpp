@@ -307,21 +307,10 @@ struct TensorPlusFloat StatModel_calcError(
 }
 
 extern "C"
-struct TensorPlusFloat StatModel_predict(
+float StatModel_predict(
         struct StatModelPtr ptr, struct TensorWrapper samples, struct TensorWrapper results, int flags)
 {
-    TensorPlusFloat retval;
-
-    if (results.isNull()) {
-        cv::Mat resultsMat;
-        retval.val = ptr->predict(samples.toMat(), resultsMat, flags);
-        new (&retval.tensor) TensorWrapper(resultsMat);
-    } else {
-        retval.val = ptr->predict(samples.toMat(), results.toMat(), flags);
-        retval.tensor = results;
-    }
-
-    return retval;
+    return ptr->predict(samples.toMat(), TO_MAT_OR_NOARRAY(results), flags);
 }
 
 // NormalBayesClassifier

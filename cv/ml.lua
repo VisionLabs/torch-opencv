@@ -203,7 +203,7 @@ bool StatModel_train_Mat(
 struct TensorPlusFloat StatModel_calcError(
         struct PtrWrapper ptr, struct PtrWrapper data, bool test, struct TensorWrapper resp);
 
-struct TensorPlusFloat StatModel_predict(
+float StatModel_predict(
         struct PtrWrapper ptr, struct TensorWrapper samples, struct TensorWrapper results, int flags);
 
 struct PtrWrapper NormalBayesClassifier_ctor();
@@ -563,8 +563,7 @@ do
         }
         local samples, results, flags = cv.argcheck(t, argRules)
 
-        local result = C.StatModel_predict(self.ptr, cv.wrap_tensor(samples), cv.wrap_tensor(results), flags)
-        return result.val, cv.unwrap_tensors(result.tensor)
+        return C.StatModel_predict(self.ptr, cv.wrap_tensor(samples), cv.wrap_tensor(results), flags)
     end
 end
 
