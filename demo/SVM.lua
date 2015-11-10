@@ -2,6 +2,9 @@
 A translated demo from here:
 http://docs.opencv.org/3.0.0/d1/d73/tutorial_introduction_to_svm.html
 
+When running the above example in C++ (OpenCV 3.0.0), for some reason .getSupportVectors()
+outputs [-0.008130081, 0.008163265]. That's why here I've set kernel type to quadratic.
+
 Original version by @szagoruyko
 --]]
 
@@ -21,7 +24,8 @@ local trainingDataMat = torch.FloatTensor{ {501, 10}, {255, 10}, {501, 255}, {10
 -- Set up SVM's parameters
 local svm = cv.SVM()
 svm:setType  		{cv.ml.SVM_C_SVC}
-svm:setKernel		{cv.ml.SVM_LINEAR}
+svm:setKernel		{cv.ml.SVM_POLY}
+svm:setDegree 		{2}
 svm:setTermCriteria {cv.TermCriteria{cv.TermCriteria_MAX_ITER, 100, 1e-6}}
 
 -- Train the SVM
