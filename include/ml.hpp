@@ -2,7 +2,7 @@
 #include <Classes.hpp>
 #include <opencv2/ml.hpp>
 
-using namespace cv;
+namespace ml = cv::ml;
 
 extern "C"
 struct TensorWrapper TrainData_getSubVector(struct TensorWrapper vec, struct TensorWrapper idx);

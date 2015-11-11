@@ -592,6 +592,13 @@ do
 	end
 end
 
+-- KNearest
+
+do
+    local KNearest = torch.class('cv.KNearest', 'cv.StatModel')
+
+end
+
 -- SVM
 
 do
@@ -786,3 +793,46 @@ do
 	    return cv.ParamGrid(C.SVM_getDefaultGrid(self.ptr, param_id))
 	end
 end
+
+-- EM
+
+do
+    local EM = torch.class('cv.EM', 'cv.StatModel')
+
+end
+
+-- DTrees
+
+do
+    local DTrees = torch.class('cv.DTrees', 'cv.StatModel')
+
+end
+
+-- RTrees
+
+do
+    local RTrees = torch.class('cv.RTrees', 'cv.DTrees')
+
+end
+
+-- Boost
+
+do
+    local Boost = torch.class('cv.Boost', 'cv.DTrees')
+
+end
+
+-- ANN_MLP
+
+do
+    local ANN_MLP = torch.class('cv.ANN_MLP', 'cv.StatModel')
+
+end
+
+-- LogisticRegression
+
+do
+    local LogisticRegression = torch.class('cv.LogisticRegression', 'cv.StatModel')
+
+end
+
