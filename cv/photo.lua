@@ -473,6 +473,35 @@ void TonemapMantiuk_setScale(struct PtrWrapper ptr, float scale);
 float TonemapMantiuk_getSaturation(struct PtrWrapper ptr);
 
 void TonemapMantiuk_setSaturation(struct PtrWrapper ptr, float saturation);
+
+struct TensorArray AlignExposures_process(struct PtrWrapper ptr, struct TensorArray src, struct TensorArray dst,
+                            struct TensorWrapper times, struct TensorWrapper response);
+
+struct PtrWrapper AlignMTB_ctor(int max_bits, int exclude_range, bool cut);
+
+struct TensorArray AlignMTB_process1(struct PtrWrapper ptr, struct TensorArray src, struct TensorArray dst);
+
+struct TensorArray AlignMTB_process2(struct PtrWrapper ptr, struct TensorArray src, struct TensorArray dst,
+                            struct TensorWrapper times, struct TensorWrapper response);
+
+struct PointWrapper AlignMTB_calculateShift(struct PtrWrapper ptr, struct TensorWrapper img0, struct TensorWrapper img1);
+
+struct TensorWrapper AlignMTB_shiftMat(struct PtrWrapper ptr, struct TensorWrapper src,
+                            struct TensorWrapper dst, struct PointWrapper shift);
+
+void AlignMTB_computeBitmaps(struct PtrWrapper ptr, struct TensorWrapper img, struct TensorWrapper tb, struct TensorWrapper eb);
+
+int AlignMTB_getMaxBits(struct PtrWrapper ptr);
+
+void AlignMTB_setMaxBits(struct PtrWrapper ptr, int max_bits);
+
+int AlignMTB_getExcludeRange(struct PtrWrapper ptr);
+
+void AlignMTB_setExcludeRange(struct PtrWrapper ptr, int exclude_range);
+
+int AlignMTB_getCut(struct PtrWrapper ptr);
+
+void AlignMTB_setCut(struct PtrWrapper ptr, int cut);
 ]]
 
 -- Tonemap
@@ -496,7 +525,7 @@ do
         }
         local src, dst = cv.argcheck(t, argRules)
 
-        C.Tonemap_process(self.ptr, cv.wrap_tensor(src), cv.wrap_tensor(dst));
+        return C.Tonemap_process(self.ptr, cv.wrap_tensor(src), cv.wrap_tensor(dst));
     end
 
     function Tonemap:getGamma()
@@ -725,5 +754,148 @@ do
         local saturation = cv.argcheck(t, argRules)
 
         C.TonemapMantiuk_setSaturation(self.ptr, saturation)
+    end
+end
+
+-- AlignExposures
+
+do
+    local AlignExposures = torch.class('cv.AlignExposures', 'cv.Algorithm')
+
+    function AlignExposures:process(t)
+        local argRules = {
+            {"src", required = true},
+            {"dst", default = nil},
+            {"times", required = true},
+            {"response", required = true}
+        }
+        local src, dst, times, response = cv.argcheck(t, argRules)
+
+        if type(times) == "table" then
+            times = torch.FloatTensor(times)
+        end
+
+        return cv.unwrap_tensors(
+                C.AlignExposures_process(
+                    self.ptr, cv.wrap_tensors(src), cv.wrap_tensors(dst),
+                    cv.wrap_tensor(times), cv.wrap_tensor(response)))
+    end
+end
+
+-- AlignMTB
+do
+    local AlignMTB = torch.class('cv.AlignMTB', 'cv.AlignExposures')
+
+    function AlignMTB:__init(t)
+        local argRules = {
+            {"max_bits", default = 6},
+            {"exclude_range", default = 4},
+            {"cut", default = true}
+        }
+
+        local max_bits, exclude_range, cut = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.AlignMTB_ctor(max_bits, exclude_range, cut), Classes.Algorithm_dtor)
+    end
+
+    function AlignMTB:process(t)
+        local argRules = {
+            {"src", required = true},
+            {"dst", default = nil},
+            {"times", default = nil},
+            {"response", default = nil}
+        }
+        local src, dst, times, response = cv.argcheck(t, argRules)
+
+        if times == nil then
+            return cv.unwrap_tensors(
+                C.AlignMTB_process1(self.ptr, cv.wrap_tensors(src), cv.wrap_tensors(dst)))
+        end
+
+        if type(times) == "table" then
+            times = torch.FloatTensor(times)
+        end
+        
+        return cv.unwrap_tensors(
+                C.AlignMTB_process2(
+                    self.ptr, cv.wrap_tensors(src), cv.wrap_tensors(dst),
+                    cv.wrap_tensor(times), cv.wrap_tensor(response)))
+    end
+
+    function AlignMTB:calculateShift(t)
+        local argRules = {
+            {"img0", required = true},
+            {"img1", required = true}
+        }
+
+        local img0, img1 = cv.argcheck(t, argRules)
+        
+        resPoint = C.AlignMTB_calculateShift(self.ptr, cv.wrap_tensor(img0), cv.wrap_tensor(img1))
+        return {resPoint.x, resPoint.y}
+    end
+
+    function AlignMTB:shiftMat(t)
+        local argRules = {
+            {"src", required = true},
+            {"dst", default = nil},
+            {"shift", required = true, operator = cv.Point}
+        }
+
+        local src, dst, shift = cv.argcheck(t, argRules)
+
+        return cv.unwrap_tensors(
+            C.AlignMTB_shiftMat(self.ptr, cv.wrap_tensor(src), cv.wrap_tensor(dst), shift))
+    end
+
+    function AlignMTB:computeBitmaps(t)
+        local argRules = {
+            {"img", required = true},
+            {"tb", required = true},
+            {"eb", required = true}
+        }
+
+        local img, tb, eb = cv.argcheck(t, argRules)
+
+        return cv.unwrap_tensors(
+            C.AlignMTB_computeBitmaps(self.ptr, cv.wrap_tensor(img), cv.wrap_tensor(tb), cv.wrap_tensor(eb)))
+    end
+
+    function AlignMTB:getMaxBits()
+        return C.AlignMTB_getMaxBits(self.ptr)
+    end
+
+    function AlignMTB:setMaxBits(t)
+        local argRules = {
+            {"max_bits", required = true}
+        }
+        local max_bits = cv.argcheck(t, argRules)
+
+        C.AlignMTB_setMaxBits(self.ptr, max_bits)
+    end
+
+    function AlignMTB:getExcludeRange()
+        return C.AlignMTB_getExcludeRange(self.ptr)
+    end
+
+    function AlignMTB:setExcludeRange(t)
+        local argRules = {
+            {"exclude_range", required = true}
+        }
+        local exclude_range = cv.argcheck(t, argRules)
+
+        C.AlignMTB_setExcludeRange(self.ptr, exclude_range)
+    end
+
+    function AlignMTB:getCut()
+        return C.AlignMTB_getCut(self.ptr)
+    end
+
+    function AlignMTB:setCut(t)
+        local argRules = {
+            {"cut", required = true}
+        }
+        local cut = cv.argcheck(t, argRules)
+        
+        C.AlignMTB_setCut(self.ptr, cut)
     end
 end

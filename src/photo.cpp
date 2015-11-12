@@ -76,7 +76,6 @@ extern "C" struct TensorWrapper fastNlMeansDenoisingMulti2(struct TensorArray sr
 {
     if (dst.isNull()) {
         cv::Mat retval;
-        std::cout << "!!!" << std::endl;
         cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), retval, imgToDenoiseIndex, temporalWindowSize, h.toMat(),
                                         templateWindowSize, searchWindowSize, normType);
         return TensorWrapper(retval);
@@ -410,4 +409,113 @@ extern "C" float TonemapMantiuk_getSaturation(struct TonemapMantiukPtr ptr)
 extern "C" void TonemapMantiuk_setSaturation(struct TonemapMantiukPtr ptr, float saturation)
 {
     ptr->setSaturation(saturation);
+}
+
+// AlignExposures
+
+struct TensorArray AlignExposures_process(struct AlignExposuresPtr ptr, struct TensorArray src, struct TensorArray dst,
+                        struct TensorWrapper times, struct TensorWrapper response)
+{
+    if (dst.isNull()) {
+        auto retval = new std::vector<cv::Mat>(src);
+        ptr->process(src.toMatList(), *retval, times.toMat(), response.toMat());
+
+        return TensorArray(*retval);
+    } else {
+        auto retval = new std::vector<cv::Mat>(dst);
+        ptr->process(src.toMatList(), *retval, times.toMat(), response.toMat());
+        dst = *retval;
+    }
+    return dst;
+}
+
+// AlignMTB
+
+extern "C" struct AlignMTBPtr AlignMTB_ctor(int max_bits, int exclude_range, bool cut)
+{
+    return rescueObjectFromPtr(cv::createAlignMTB(max_bits, exclude_range, cut));
+}
+
+
+extern "C" struct TensorArray AlignMTB_process1(struct AlignMTBPtr ptr, struct TensorArray src, struct TensorArray dst)
+{
+    if (dst.isNull()) {
+        auto retval = new std::vector<cv::Mat>(src);
+        ptr->process(src.toMatList(), *retval);
+
+        return TensorArray(*retval);
+    } else {
+        auto retval = new std::vector<cv::Mat>(dst);
+        ptr->process(src.toMatList(), *retval);
+        dst = *retval;
+    }
+    return dst;
+}
+
+extern "C" struct TensorArray AlignMTB_process2(struct AlignMTBPtr ptr, struct TensorArray src, struct TensorArray dst,
+                            struct TensorWrapper times, struct TensorWrapper response)
+{
+    if (dst.isNull()) {
+        auto retval = new std::vector<cv::Mat>(src);
+        ptr->process(src.toMatList(), *retval, times.toMat(), response.toMat());
+
+        return TensorArray(*retval);
+    } else {
+        auto retval = new std::vector<cv::Mat>(dst);
+        ptr->process(src.toMatList(), *retval, times.toMat(), response.toMat());
+        dst = *retval;
+    }
+    return dst;
+}
+
+extern "C" struct PointWrapper AlignMTB_calculateShift(struct AlignMTBPtr ptr, struct TensorWrapper img0, struct TensorWrapper img1)
+{
+    return ptr->calculateShift(img0.toMat(), img1.toMat());
+}
+
+extern "C" struct TensorWrapper AlignMTB_shiftMat(struct AlignMTBPtr ptr, struct TensorWrapper src,
+                            struct TensorWrapper dst, struct PointWrapper shift)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        ptr->shiftMat(src.toMat(), retval, shift);
+        return TensorWrapper(retval);
+    } else {
+        ptr->shiftMat(src.toMat(), dst.toMat(), shift);
+    }
+    return dst;
+}
+
+extern "C" void AlignMTB_computeBitmaps(struct AlignMTBPtr ptr, struct TensorWrapper img,
+                            struct TensorWrapper tb, struct TensorWrapper eb)
+{
+    ptr->computeBitmaps(img.toMat(), tb.toMat(), eb.toMat());
+}
+
+extern "C" int AlignMTB_getMaxBits(struct AlignMTBPtr ptr)
+{
+    return ptr->getMaxBits();
+}
+
+extern "C" void AlignMTB_setMaxBits(struct AlignMTBPtr ptr, int max_bits)
+{
+    ptr->setMaxBits(max_bits);
+}
+extern "C" int AlignMTB_getExcludeRange(struct AlignMTBPtr ptr)
+{
+    return ptr->getExcludeRange();
+}
+
+extern "C" void AlignMTB_setExcludeRange(struct AlignMTBPtr ptr, int exclude_range)
+{
+    ptr->setExcludeRange(exclude_range);
+}
+extern "C" int AlignMTB_getCut(struct AlignMTBPtr ptr)
+{
+    return ptr->getCut();
+}
+
+extern "C" void AlignMTB_setCut(struct AlignMTBPtr ptr, int cut)
+{
+    ptr->setCut(cut);
 }

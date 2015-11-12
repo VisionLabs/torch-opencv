@@ -164,3 +164,49 @@ extern "C" void TonemapMantiuk_setScale(struct TonemapMantiukPtr ptr, float scal
 extern "C" float TonemapMantiuk_getSaturation(struct TonemapMantiukPtr ptr);
 
 extern "C" void TonemapMantiuk_setSaturation(struct TonemapMantiukPtr ptr, float saturation);
+
+// AlignExposures
+
+struct AlignExposuresPtr {
+    void *ptr;
+    inline cv::AlignExposures * operator->() { return static_cast<cv::AlignExposures *>(ptr); }
+    inline AlignExposuresPtr(cv::AlignExposures *ptr) { this->ptr = ptr; }
+};
+
+extern "C" struct TensorArray AlignExposures_process(struct AlignExposuresPtr ptr, struct TensorArray src, struct TensorArray dst,
+                        struct TensorWrapper times, struct TensorWrapper response);
+
+// AlignMTB
+
+struct AlignMTBPtr {
+    void *ptr;
+    inline cv::AlignMTB * operator->() { return static_cast<cv::AlignMTB *>(ptr); }
+    inline AlignMTBPtr(cv::AlignMTB *ptr) { this->ptr = ptr; }
+};
+
+extern "C" struct AlignMTBPtr AlignMTB_ctor(int max_bits, int exclude_range, bool cut);
+
+extern "C" struct TensorArray AlignMTB_process1(struct AlignMTBPtr ptr, struct TensorArray src, struct TensorArray dst);
+
+extern "C" struct TensorArray AlignMTB_process2(struct AlignMTBPtr ptr, struct TensorArray src, struct TensorArray dst,
+                            struct TensorWrapper times, struct TensorWrapper response);
+
+extern "C" struct PointWrapper AlignMTB_calculateShift(struct AlignMTBPtr ptr, struct TensorWrapper img0, struct TensorWrapper img1);
+
+extern "C" struct TensorWrapper AlignMTB_shiftMat(struct AlignMTBPtr ptr, struct TensorWrapper src,
+                            struct TensorWrapper dst, struct PointWrapper shift);
+
+extern "C" void AlignMTB_computeBitmaps(struct AlignMTBPtr ptr, struct TensorWrapper img,
+                            struct TensorWrapper tb, struct TensorWrapper eb);
+
+extern "C" int AlignMTB_getMaxBits(struct AlignMTBPtr ptr);
+
+extern "C" void AlignMTB_setMaxBits(struct AlignMTBPtr ptr, int max_bits);
+
+extern "C" int AlignMTB_getExcludeRange(struct AlignMTBPtr ptr);
+
+extern "C" void AlignMTB_setExcludeRange(struct AlignMTBPtr ptr, int exclude_range);
+
+extern "C" int AlignMTB_getCut(struct AlignMTBPtr ptr);
+
+extern "C" void AlignMTB_setCut(struct AlignMTBPtr ptr, int cut);
