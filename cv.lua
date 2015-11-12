@@ -178,17 +178,24 @@ cv.NULLPTR = ffi.new('void *', nil)
 function cv.argcheck(t, rules)
     local retval = {}
     for i, argument in ipairs(rules) do
-        local userInputArg = t[argument[1]] or t[i]
+        local userInputArg = t[argument[1]]
+        if userInputArg == nil then
+            userInputArg = t[i]
+        end
         
         --print(argument[1], type(t[argument[1]]), type(t[i]))
 
-        if userInputArg == nil and argument.required then
-            error('Argument #' .. i .. ' ("' .. argument[1] .. '") is required!')
+        if userInputArg == nil then
+            if argument.required then
+                error('Argument #' .. i .. ' ("' .. argument[1] .. '") is required!')
+            else
+                userInputArg = argument.default
+            end
         end
 
         local
         function identity(...) return ... end
-        retval[i] = (argument.operator or identity)(userInputArg or argument.default)
+        retval[i] = (argument.operator or identity)(userInputArg)
     end
     return unpack(retval, 1, table.maxn(retval))
 end
