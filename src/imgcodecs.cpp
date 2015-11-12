@@ -19,7 +19,10 @@ struct TensorArrayPlusBool imreadmulti(const char *filename, int flags)
 extern "C"
 bool imwrite(const char *filename, struct TensorWrapper img, struct TensorWrapper params)
 {
-    return cv::imwrite(filename, img.toMat(), params.toMat());
+    if (params.isNull())
+        return cv::imwrite(filename, img.toMat());
+    else
+        return cv::imwrite(filename, img.toMat(), params.toMat());
 }
 
 extern "C"

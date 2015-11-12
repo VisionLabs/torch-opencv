@@ -82,6 +82,7 @@ struct TermCriteriaWrapper {
     inline cv::TermCriteria orDefault(cv::TermCriteria defaultVal) {
         return (this->type == 0 ? defaultVal : *this);
     }
+    TermCriteriaWrapper(cv::TermCriteria && other);
 };
 
 struct ScalarWrapper {
@@ -174,6 +175,11 @@ struct TensorPlusBool {
 struct TensorArrayPlusFloat {
     struct TensorArray tensors;
     float val;
+};
+
+struct TensorArrayPlusDouble {
+    struct TensorArray tensors;
+    double val;
 };
 
 struct TensorArrayPlusInt {

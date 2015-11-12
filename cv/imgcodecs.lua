@@ -37,11 +37,12 @@ function cv.imwrite(t)
     local argRules = {
         {"filename", required = true},
         {"img", required = true},
-        {"params", default = {}, operator = torch.IntTensor}
+        {"params", default = nil, 
+            operator = function(...) if ... then return torch.IntTensor(...) end end}
     }
     local filename, img, params = cv.argcheck(t, argRules)
 
-    return C.imwrite(filename, cv.wrap_tensors(img), cv.wrap_tensors(params))
+    return C.imwrite(filename, cv.wrap_tensor(img), cv.wrap_tensor(params))
 end
 
 function cv.imdecode(t)
@@ -51,5 +52,5 @@ function cv.imdecode(t)
     }
     local buf, flags = cv.argcheck(t, argRules)
 
-    return cv.unwrap_tensors(C.imdecode(cv.wrap_tensors(buf), flags))
+    return cv.unwrap_tensors(C.imdecode(cv.wrap_tensor(buf), flags))
 end
