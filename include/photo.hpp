@@ -317,3 +317,19 @@ extern "C" void MergeMertens_setSaturationWeight(struct MergeMertensPtr ptr, flo
 extern "C" float MergeMertens_getExposureWeight(struct MergeMertensPtr ptr);
 
 extern "C" void MergeMertens_setExposureWeight(struct MergeMertensPtr ptr, float exposure_weight);
+
+// MergeRobertson
+
+struct MergeRobertsonPtr {
+    void *ptr;
+    inline cv::MergeRobertson * operator->() { return static_cast<cv::MergeRobertson *>(ptr); }
+    inline MergeRobertsonPtr(cv::MergeRobertson *ptr) { this->ptr = ptr; }
+};
+
+extern "C" struct MergeRobertsonPtr MergeRobertson_ctor();
+
+extern "C" struct TensorWrapper MergeRobertson_process1(struct MergeRobertsonPtr ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times, struct TensorWrapper response);
+
+extern "C" struct TensorWrapper MergeRobertson_process2(struct MergeRobertsonPtr ptr, struct TensorArray src,
+                            struct TensorWrapper dst, struct TensorWrapper times);

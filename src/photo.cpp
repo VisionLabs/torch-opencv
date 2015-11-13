@@ -712,3 +712,38 @@ extern "C" void MergeMertens_setExposureWeight(struct MergeMertensPtr ptr, float
 {
     ptr->setExposureWeight(exposure_weight);
 }
+
+// MergeRobertson
+
+extern "C" struct MergeRobertsonPtr MergeRobertson_ctor()
+{
+    return rescueObjectFromPtr(cv::createMergeRobertson());
+}
+
+extern "C" struct TensorWrapper MergeRobertson_process1(struct MergeRobertsonPtr ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times, struct TensorWrapper response)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        ptr->process(src.toMatList(), retval, times.toMat(), response.toMat());
+
+        return TensorWrapper(retval);
+    } else {
+        ptr->process(src.toMatList(), dst.toMat(), times.toMat(), response.toMat());
+    }
+    return dst;
+}
+
+extern "C" struct TensorWrapper MergeRobertson_process2(struct MergeRobertsonPtr ptr, struct TensorArray src,
+                            struct TensorWrapper dst, struct TensorWrapper times)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        ptr->process(src.toMatList(), retval, times.toMat());
+
+        return TensorWrapper(retval);
+    } else {
+        ptr->process(src.toMatList(), dst.toMat(), times.toMat());
+    }
+    return dst;
+}

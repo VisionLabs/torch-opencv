@@ -561,6 +561,14 @@ void MergeMertens_setSaturationWeight(struct PtrWrapper ptr, float saturation_we
 float MergeMertens_getExposureWeight(struct PtrWrapper ptr);
 
 void MergeMertens_setExposureWeight(struct PtrWrapper ptr, float exposure_weight);
+
+struct PtrWrapper MergeRobertson_ctor();
+
+struct TensorWrapper MergeRobertson_process1(struct PtrWrapper ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times, struct TensorWrapper response);
+
+struct TensorWrapper MergeRobertson_process2(struct PtrWrapper ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times);
 ]]
 
 -- Tonemap
@@ -1223,5 +1231,39 @@ do
         local exposure_weight = cv.argcheck(t, argRules)
 
         C.MergeMertens_setExposureWeight(self.ptr, exposure_weight)
+    end
+end
+
+-- MergeRobertson
+
+do
+    local MergeRobertson = torch.class('cv.MergeRobertson', 'cv.MergeExposures')
+
+    function MergeRobertson:__init(t)
+        self.ptr = ffi.gc(C.MergeRobertson_ctor(), Classes.Algorithm_dtor)
+    end
+
+    function MergeRobertson:process(t)
+        local argRules = {
+            {"src", required = true},
+            {"dst", default = nil},
+            {"times", required = true},
+            {"response", default = nil}
+        }
+        local src, dst, times, response = cv.argcheck(t, argRules)
+
+        if type(times) == "table" then
+            times = torch.FloatTensor(times)
+        end
+        
+        if response == nil then
+            return cv.unwrap_tensors(
+                C.MergeRobertson_process2(self.ptr, cv.wrap_tensors(src), cv.wrap_tensor(dst), cv.wrap_tensor(times)))
+        end
+
+        return cv.unwrap_tensors(
+                C.MergeRobertson_process1(
+                    self.ptr, cv.wrap_tensors(src), cv.wrap_tensor(dst),
+                    cv.wrap_tensor(times), cv.wrap_tensor(response)))
     end
 end
