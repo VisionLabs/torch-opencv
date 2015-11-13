@@ -572,3 +572,34 @@ extern "C" void CalibrateDebevec_setRandom(struct CalibrateDebevecPtr ptr, bool 
 {
     ptr->setRandom(random);
 }
+
+// CalibrateRobertson
+
+extern "C" struct CalibrateRobertsonPtr CalibrateRobertson_ctor(int max_iter, float threshold)
+{
+    return rescueObjectFromPtr(cv::createCalibrateRobertson(max_iter, threshold));
+}
+
+extern "C" int CalibrateRobertson_getMaxIter(struct CalibrateRobertsonPtr ptr)
+{
+    return ptr->getMaxIter();
+}
+
+extern "C" void CalibrateRobertson_setMaxIter(struct CalibrateRobertsonPtr ptr, int max_iter)
+{
+    ptr->setMaxIter(max_iter);
+}
+extern "C" float CalibrateRobertson_getThreshold(struct CalibrateRobertsonPtr ptr)
+{
+    return ptr->getThreshold();
+}
+
+extern "C" void CalibrateRobertson_setThreshold(struct CalibrateRobertsonPtr ptr, float threshold)
+{
+    ptr->setThreshold(threshold);
+}
+
+extern "C" struct TensorWrapper CalibrateRobertson_getRadiance(struct CalibrateRobertsonPtr ptr)
+{
+    return TensorWrapper(ptr->getRadiance());
+}

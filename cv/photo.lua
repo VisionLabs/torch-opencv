@@ -519,6 +519,18 @@ void CalibrateDebevec_setSamples(struct PtrWrapper ptr, int samples);
 bool CalibrateDebevec_getRandom(struct PtrWrapper ptr);
 
 void CalibrateDebevec_setRandom(struct PtrWrapper ptr, bool random);
+
+struct PtrWrapper CalibrateRobertson_ctor(int max_iter, float threshold);
+
+int CalibrateRobertson_getMaxIter(struct PtrWrapper ptr);
+
+void CalibrateRobertson_setMaxIter(struct PtrWrapper ptr, int max_iter);
+
+float CalibrateRobertson_getThreshold(struct PtrWrapper ptr);
+
+void CalibrateRobertson_setThreshold(struct PtrWrapper ptr, float threshold);
+
+struct TensorWrapper CalibrateRobertson_getRadiance(struct PtrWrapper ptr);
 ]]
 
 -- Tonemap
@@ -995,5 +1007,52 @@ do
         local random = cv.argcheck(t, argRules)
 
         C.CalibrateDebevec_setRandom(self.ptr, random)
+    end
+end
+
+-- CalibrateRobertson
+
+do
+    local CalibrateRobertson = torch.class('cv.CalibrateRobertson', 'cv.CalibrateCRF')
+
+    function CalibrateRobertson:__init(t)
+        local argRules = {
+            {"max_iter", default = 30},
+            {"threshold", default = 0.01}
+        }
+        
+        local max_iter, threshold = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.CalibrateRobertson_ctor(max_iter, threshold), Classes.Algorithm_dtor)
+    end
+
+    function CalibrateRobertson:getMaxIter()
+        return C.CalibrateRobertson_getMaxIter(self.ptr)
+    end
+
+    function CalibrateRobertson:setMaxIter(t)
+        local argRules = {
+            {"max_iter", required = true}
+        }
+        local max_iter = cv.argcheck(t, argRules)
+
+        C.CalibrateRobertson_setMaxIter(self.ptr, max_iter)
+    end
+
+    function CalibrateRobertson:getThreshold()
+        return C.CalibrateRobertson_getThreshold(self.ptr)
+    end
+
+    function CalibrateRobertson:setThreshold(t)
+        local argRules = {
+            {"threshold", required = true}
+        }
+        local threshold = cv.argcheck(t, argRules)
+
+        C.CalibrateRobertson_setThreshold(self.ptr, threshold)
+    end
+
+    function CalibrateRobertson:getRadiance()
+        return cv.unwrap_tensors(C.CalibrateRobertson_getRadiance(self.ptr))
     end
 end
