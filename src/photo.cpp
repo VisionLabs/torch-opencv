@@ -436,23 +436,7 @@ extern "C" struct AlignMTBPtr AlignMTB_ctor(int max_bits, int exclude_range, boo
     return rescueObjectFromPtr(cv::createAlignMTB(max_bits, exclude_range, cut));
 }
 
-
-extern "C" struct TensorArray AlignMTB_process1(struct AlignMTBPtr ptr, struct TensorArray src, struct TensorArray dst)
-{
-    if (dst.isNull()) {
-        auto retval = new std::vector<cv::Mat>(src);
-        ptr->process(src.toMatList(), *retval);
-
-        return TensorArray(*retval);
-    } else {
-        auto retval = new std::vector<cv::Mat>(dst);
-        ptr->process(src.toMatList(), *retval);
-        dst = *retval;
-    }
-    return dst;
-}
-
-extern "C" struct TensorArray AlignMTB_process2(struct AlignMTBPtr ptr, struct TensorArray src, struct TensorArray dst,
+extern "C" struct TensorArray AlignMTB_process1(struct AlignMTBPtr ptr, struct TensorArray src, struct TensorArray dst,
                             struct TensorWrapper times, struct TensorWrapper response)
 {
     if (dst.isNull()) {
@@ -463,6 +447,21 @@ extern "C" struct TensorArray AlignMTB_process2(struct AlignMTBPtr ptr, struct T
     } else {
         auto retval = new std::vector<cv::Mat>(dst);
         ptr->process(src.toMatList(), *retval, times.toMat(), response.toMat());
+        dst = *retval;
+    }
+    return dst;
+}
+
+extern "C" struct TensorArray AlignMTB_process2(struct AlignMTBPtr ptr, struct TensorArray src, struct TensorArray dst)
+{
+    if (dst.isNull()) {
+        auto retval = new std::vector<cv::Mat>(src);
+        ptr->process(src.toMatList(), *retval);
+
+        return TensorArray(*retval);
+    } else {
+        auto retval = new std::vector<cv::Mat>(dst);
+        ptr->process(src.toMatList(), *retval);
         dst = *retval;
     }
     return dst;
@@ -522,18 +521,16 @@ extern "C" void AlignMTB_setCut(struct AlignMTBPtr ptr, bool cut)
 
 // CalibreCRF
 
-extern "C" struct TensorArray CalibrateCRF_process(struct CalibrateCRFPtr ptr, struct TensorArray src, struct TensorArray dst,
+extern "C" struct TensorWrapper CalibrateCRF_process(struct CalibrateCRFPtr ptr, struct TensorArray src, struct TensorWrapper dst,
                             struct TensorWrapper times)
 {
     if (dst.isNull()) {
-        auto retval = new std::vector<cv::Mat>(src);
-        ptr->process(src.toMatList(), *retval, times.toMat());
+        cv::Mat retval;
+        ptr->process(src.toMatList(), retval, times.toMat());
 
-        return TensorArray(*retval);
+        return TensorWrapper(retval);
     } else {
-        auto retval = new std::vector<cv::Mat>(dst);
-        ptr->process(src.toMatList(), *retval, times.toMat());
-        dst = *retval;
+        ptr->process(src.toMatList(), dst.toMat(), times.toMat());
     }
     return dst;
 }
@@ -602,4 +599,116 @@ extern "C" void CalibrateRobertson_setThreshold(struct CalibrateRobertsonPtr ptr
 extern "C" struct TensorWrapper CalibrateRobertson_getRadiance(struct CalibrateRobertsonPtr ptr)
 {
     return TensorWrapper(ptr->getRadiance());
+}
+
+// MergeExposures
+extern "C" struct TensorWrapper MergeExposures_process(struct MergeExposuresPtr ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times, struct TensorWrapper response)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        ptr->process(src.toMatList(), retval, times.toMat(), response.toMat());
+
+        return TensorWrapper(retval);
+    } else {
+        ptr->process(src.toMatList(), dst.toMat(), times.toMat(), response.toMat());
+    }
+    return dst;
+}
+
+// MergeDebevec
+
+extern "C" struct MergeDebevecPtr MergeDebevec_ctor()
+{
+    return rescueObjectFromPtr(cv::createMergeDebevec());
+}
+
+extern "C" struct TensorWrapper MergeDebevec_process1(struct MergeDebevecPtr ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times, TensorWrapper response)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        ptr->process(src.toMatList(), retval, times.toMat(), response.toMat());
+
+        return TensorWrapper(retval);
+    } else {
+        ptr->process(src.toMatList(), dst.toMat(), times.toMat(), response.toMat());
+    }
+    return dst;
+}
+
+extern "C" struct TensorWrapper MergeDebevec_process2(struct MergeDebevecPtr ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        ptr->process(src.toMatList(), retval, times.toMat());
+
+        return TensorWrapper(retval);
+    } else {
+        ptr->process(src.toMatList(), dst.toMat(), times.toMat());
+    }
+    return dst;
+}
+
+// MergeMertens
+
+extern "C" struct MergeMertensPtr MergeMertens_ctor(float contrast_weight, float saturation_weight, float exposure_weight)
+{
+    return rescueObjectFromPtr(cv::createMergeMertens(contrast_weight, saturation_weight, exposure_weight));
+}
+
+extern "C" struct TensorWrapper MergeMertens_process1(struct MergeMertensPtr ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times, struct TensorWrapper response)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        ptr->process(src.toMatList(), retval, times.toMat(), response.toMat());
+
+        return TensorWrapper(retval);
+    } else {
+        ptr->process(src.toMatList(), dst.toMat(), times.toMat(), response.toMat());
+    }
+    return dst;
+}
+
+extern "C" struct TensorWrapper MergeMertens_process2(struct MergeMertensPtr ptr, struct TensorArray src, struct TensorWrapper dst)
+{
+    if (dst.isNull()) {
+        cv::Mat retval;
+        ptr->process(src.toMatList(), retval);
+
+        return TensorWrapper(retval);
+    } else {
+        ptr->process(src.toMatList(), dst.toMat());
+    }
+    return dst;
+}
+
+extern "C" float MergeMertens_getContrastWeight(struct MergeMertensPtr ptr)
+{
+    return ptr->getContrastWeight();
+}
+
+extern "C" void MergeMertens_setContrastWeight(struct MergeMertensPtr ptr, float contrast_weight)
+{
+    ptr->setContrastWeight(contrast_weight);
+}
+extern "C" float MergeMertens_getSaturationWeight(struct MergeMertensPtr ptr)
+{
+    return ptr->getSaturationWeight();
+}
+
+extern "C" void MergeMertens_setSaturationWeight(struct MergeMertensPtr ptr, float saturation_weight)
+{
+    ptr->setSaturationWeight(saturation_weight);
+}
+extern "C" float MergeMertens_getExposureWeight(struct MergeMertensPtr ptr)
+{
+    return ptr->getExposureWeight();
+}
+
+extern "C" void MergeMertens_setExposureWeight(struct MergeMertensPtr ptr, float exposure_weight)
+{
+    ptr->setExposureWeight(exposure_weight);
 }

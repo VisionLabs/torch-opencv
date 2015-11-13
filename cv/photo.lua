@@ -479,10 +479,10 @@ struct TensorArray AlignExposures_process(struct PtrWrapper ptr, struct TensorAr
 
 struct PtrWrapper AlignMTB_ctor(int max_bits, int exclude_range, bool cut);
 
-struct TensorArray AlignMTB_process1(struct PtrWrapper ptr, struct TensorArray src, struct TensorArray dst);
-
-struct TensorArray AlignMTB_process2(struct PtrWrapper ptr, struct TensorArray src, struct TensorArray dst,
+struct TensorArray AlignMTB_process1(struct PtrWrapper ptr, struct TensorArray src, struct TensorArray dst,
                             struct TensorWrapper times, struct TensorWrapper response);
+
+struct TensorArray AlignMTB_process2(struct PtrWrapper ptr, struct TensorArray src, struct TensorArray dst);
 
 struct PointWrapper AlignMTB_calculateShift(struct PtrWrapper ptr, struct TensorWrapper img0, struct TensorWrapper img1);
 
@@ -503,7 +503,7 @@ int AlignMTB_getCut(struct PtrWrapper ptr);
 
 void AlignMTB_setCut(struct PtrWrapper ptr, bool cut);
 
-struct TensorArray CalibrateCRF_process(struct PtrWrapper ptr, struct TensorArray src, struct TensorArray dst,
+struct TensorWrapper CalibrateCRF_process(struct PtrWrapper ptr, struct TensorArray src, struct TensorWrapper dst,
                             struct TensorWrapper times);
 
 struct PtrWrapper CalibrateDebevec_ctor(int samples, float lambda, bool random);
@@ -531,6 +531,36 @@ float CalibrateRobertson_getThreshold(struct PtrWrapper ptr);
 void CalibrateRobertson_setThreshold(struct PtrWrapper ptr, float threshold);
 
 struct TensorWrapper CalibrateRobertson_getRadiance(struct PtrWrapper ptr);
+
+struct TensorWrapper MergeExposures_process(struct PtrWrapper ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times, struct TensorWrapper response);
+
+struct PtrWrapper MergeDebevec_ctor();
+
+struct TensorWrapper MergeDebevec_process1(struct PtrWrapper ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times, struct TensorWrapper response);
+
+struct TensorWrapper MergeDebevec_process2(struct PtrWrapper ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times);
+
+struct PtrWrapper MergeMertens_ctor(float contrast_weight, float saturation_weight, float exposure_weight);
+
+struct TensorWrapper MergeMertens_process1(struct PtrWrapper ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times, struct TensorWrapper response);
+
+struct TensorWrapper MergeMertens_process2(struct PtrWrapper ptr, struct TensorArray src, struct TensorWrapper dst);
+
+float MergeMertens_getContrastWeight(struct PtrWrapper ptr);
+
+void MergeMertens_setContrastWeight(struct PtrWrapper ptr, float contrast_weight);
+
+float MergeMertens_getSaturationWeight(struct PtrWrapper ptr);
+
+void MergeMertens_setSaturationWeight(struct PtrWrapper ptr, float saturation_weight);
+
+float MergeMertens_getExposureWeight(struct PtrWrapper ptr);
+
+void MergeMertens_setExposureWeight(struct PtrWrapper ptr, float exposure_weight);
 ]]
 
 -- Tonemap
@@ -838,7 +868,7 @@ do
 
         if times == nil then
             return cv.unwrap_tensors(
-                C.AlignMTB_process1(self.ptr, cv.wrap_tensors(src), cv.wrap_tensors(dst)))
+                C.AlignMTB_process2(self.ptr, cv.wrap_tensors(src), cv.wrap_tensors(dst)))
         end
 
         if type(times) == "table" then
@@ -846,7 +876,7 @@ do
         end
         
         return cv.unwrap_tensors(
-                C.AlignMTB_process2(
+                C.AlignMTB_process1(
                     self.ptr, cv.wrap_tensors(src), cv.wrap_tensors(dst),
                     cv.wrap_tensor(times), cv.wrap_tensor(response)))
     end
@@ -949,7 +979,7 @@ do
 
         return cv.unwrap_tensors(
                 C.CalibrateCRF_process(
-                    self.ptr, cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensor(times)))
+                    self.ptr, cv.wrap_tensors(src), cv.wrap_tensor(dst), cv.wrap_tensor(times)))
     end
 end
 
@@ -1054,5 +1084,144 @@ do
 
     function CalibrateRobertson:getRadiance()
         return cv.unwrap_tensors(C.CalibrateRobertson_getRadiance(self.ptr))
+    end
+end
+
+-- MergeExposures
+
+do
+    local MergeExposures = torch.class('cv.MergeExposures', 'cv.Algorithm')
+
+    function MergeExposures:process(t)
+        local argRules = {
+            {"src", required = true},
+            {"dst", default = nil},
+            {"times", required = true},
+            {"response", required = true}
+        }
+        local src, dst, times, response = cv.argcheck(t, argRules)
+
+        if type(times) == "table" then
+            times = torch.FloatTensor(times)
+        end
+
+        return cv.unwrap_tensors(
+                C.MergeExposures_process(
+                    self.ptr, cv.wrap_tensors(src), cv.wrap_tensor(dst),
+                    cv.wrap_tensor(times), cv.wrap_tensor(response)))
+    end
+end
+
+-- MergeDebevec
+
+do
+    local MergeDebevec = torch.class('cv.MergeDebevec', 'cv.MergeExposures')
+
+    function MergeDebevec:__init(t)
+        self.ptr = ffi.gc(C.MergeDebevec_ctor(), Classes.Algorithm_dtor)
+    end
+
+    function MergeDebevec:process(t)
+        local argRules = {
+            {"src", required = true},
+            {"dst", default = nil},
+            {"times", required = true},
+            {"response", default = nil}
+        }
+        local src, dst, times, response = cv.argcheck(t, argRules)
+
+        if type(times) == "table" then
+            times = torch.FloatTensor(times)
+        end
+        
+        if response == nil then
+            return cv.unwrap_tensors(
+                C.MergeDebevec_process2(self.ptr, cv.wrap_tensors(src), cv.wrap_tensor(dst), cv.wrap_tensor(times)))
+        end
+
+        return cv.unwrap_tensors(
+                C.MergeDebevec_process1(
+                    self.ptr, cv.wrap_tensors(src), cv.wrap_tensor(dst),
+                    cv.wrap_tensor(times), cv.wrap_tensor(response)))
+    end
+end
+
+-- MergeMertens
+
+do
+    local MergeMertens = torch.class('cv.MergeMertens', 'cv.MergeExposures')
+
+    function MergeMertens:__init(t)
+        local argRules = {
+            {"contrast_weight", default = 1.0},
+            {"saturation_weight", default = 1.0},
+            {"exposure_weight", default = 0.0}
+        }
+        local contrast_weight, saturation_weight, exposure_weight = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.MergeMertens_ctor(contrast_weight, saturation_weight, exposure_weight), Classes.Algorithm_dtor)
+    end
+
+    function MergeMertens:process(t)
+        local argRules = {
+            {"src", required = true},
+            {"dst", default = nil},
+            {"times", default = nil},
+            {"response", default = nil}
+        }
+        local src, dst, times, response = cv.argcheck(t, argRules)
+
+        if times == nil then
+            return cv.unwrap_tensors(
+                C.MergeMertens_process2(self.ptr, cv.wrap_tensors(src), cv.wrap_tensor(dst)))
+        end
+
+        if type(times) == "table" then
+            times = torch.FloatTensor(times)
+        end
+        
+        return cv.unwrap_tensors(
+                C.MergeMertens_process1(
+                    self.ptr, cv.wrap_tensors(src), cv.wrap_tensor(dst),
+                    cv.wrap_tensor(times), cv.wrap_tensor(response)))
+    end
+
+    function MergeMertens:getContrastWeight()
+        return C.MergeMertens_getContrastWeight(self.ptr)
+    end
+
+    function MergeMertens:setContrastWeight(t)
+        local argRules = {
+            {"contrast_weight", required = true}
+        }
+        local contrast_weight = cv.argcheck(t, argRules)
+
+        C.MergeMertens_setContrastWeight(self.ptr, contrast_weight)
+    end
+
+    function MergeMertens:getSaturationWeight()
+        return C.MergeMertens_getSaturationWeight(self.ptr)
+    end
+
+    function MergeMertens:setSaturationWeight(t)
+        local argRules = {
+            {"saturation_weight", required = true}
+        }
+        local saturation_weight = cv.argcheck(t, argRules)
+
+        C.MergeMertens_setSaturationWeight(self.ptr, saturation_weight)
+    end
+
+    function MergeMertens:getExposureWeight()
+        return C.MergeMertens_getExposureWeight(self.ptr)
+    end
+
+    function MergeMertens:setExposureWeight(t)
+        local argRules = {
+            {"exposure_weight", required = true}
+        }
+        local exposure_weight = cv.argcheck(t, argRules)
+
+        C.MergeMertens_setExposureWeight(self.ptr, exposure_weight)
     end
 end

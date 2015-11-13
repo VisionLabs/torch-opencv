@@ -186,10 +186,10 @@ struct AlignMTBPtr {
 
 extern "C" struct AlignMTBPtr AlignMTB_ctor(int max_bits, int exclude_range, bool cut);
 
-extern "C" struct TensorArray AlignMTB_process1(struct AlignMTBPtr ptr, struct TensorArray src, struct TensorArray dst);
-
-extern "C" struct TensorArray AlignMTB_process2(struct AlignMTBPtr ptr, struct TensorArray src, struct TensorArray dst,
+extern "C" struct TensorArray AlignMTB_process1(struct AlignMTBPtr ptr, struct TensorArray src, struct TensorArray dst,
                             struct TensorWrapper times, struct TensorWrapper response);
+
+extern "C" struct TensorArray AlignMTB_process2(struct AlignMTBPtr ptr, struct TensorArray src, struct TensorArray dst);
 
 extern "C" struct PointWrapper AlignMTB_calculateShift(struct AlignMTBPtr ptr, struct TensorWrapper img0, struct TensorWrapper img1);
 
@@ -219,7 +219,7 @@ struct CalibrateCRFPtr {
     inline CalibrateCRFPtr(cv::CalibrateCRF *ptr) { this->ptr = ptr; }
 };
 
-extern "C" struct TensorArray CalibrateCRF_process(struct CalibrateCRFPtr ptr, struct TensorArray src, struct TensorArray dst,
+extern "C" struct TensorWrapper CalibrateCRF_process(struct CalibrateCRFPtr ptr, struct TensorArray src, struct TensorWrapper dst,
                             struct TensorWrapper times);
 
 // CalibrateDebevec
@@ -263,3 +263,57 @@ extern "C" float CalibrateRobertson_getThreshold(struct CalibrateRobertsonPtr pt
 extern "C" void CalibrateRobertson_setThreshold(struct CalibrateRobertsonPtr ptr, float threshold);
 
 extern "C" struct TensorWrapper CalibrateRobertson_getRadiance(struct CalibrateRobertsonPtr ptr);
+
+// MergeExposures
+
+struct MergeExposuresPtr {
+    void *ptr;
+    inline cv::MergeExposures * operator->() { return static_cast<cv::MergeExposures *>(ptr); }
+    inline MergeExposuresPtr(cv::MergeExposures *ptr) { this->ptr = ptr; }
+};
+
+extern "C" struct TensorWrapper MergeExposures_process(struct MergeExposuresPtr ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times, struct TensorWrapper response);
+
+// MergeDebevec
+
+struct MergeDebevecPtr {
+    void *ptr;
+    inline cv::MergeDebevec * operator->() { return static_cast<cv::MergeDebevec *>(ptr); }
+    inline MergeDebevecPtr(cv::MergeDebevec *ptr) { this->ptr = ptr; }
+};
+
+extern "C" struct MergeDebevecPtr MergeDebevec_ctor();
+
+extern "C" struct TensorWrapper MergeDebevec_process1(struct MergeDebevecPtr ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times, TensorWrapper response);
+
+extern "C" struct TensorWrapper MergeDebevec_process2(struct MergeDebevecPtr ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times);
+
+// MergeMertens
+
+struct MergeMertensPtr {
+    void *ptr;
+    inline cv::MergeMertens * operator->() { return static_cast<cv::MergeMertens *>(ptr); }
+    inline MergeMertensPtr(cv::MergeMertens *ptr) { this->ptr = ptr; }
+};
+
+extern "C" struct MergeMertensPtr MergeMertens_ctor(float contrast_weight, float saturation_weight, float exposure_weight);
+
+extern "C" struct TensorWrapper MergeMertens_process1(struct MergeMertensPtr ptr, struct TensorArray src, struct TensorWrapper dst,
+                            struct TensorWrapper times, struct TensorWrapper response);
+
+extern "C" struct TensorWrapper MergeMertens_process2(struct MergeMertensPtr ptr, struct TensorArray src, struct TensorWrapper dst);
+
+extern "C" float MergeMertens_getContrastWeight(struct MergeMertensPtr ptr);
+
+extern "C" void MergeMertens_setContrastWeight(struct MergeMertensPtr ptr, float contrast_weight);
+
+extern "C" float MergeMertens_getSaturationWeight(struct MergeMertensPtr ptr);
+
+extern "C" void MergeMertens_setSaturationWeight(struct MergeMertensPtr ptr, float saturation_weight);
+
+extern "C" float MergeMertens_getExposureWeight(struct MergeMertensPtr ptr);
+
+extern "C" void MergeMertens_setExposureWeight(struct MergeMertensPtr ptr, float exposure_weight);
