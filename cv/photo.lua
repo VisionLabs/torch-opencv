@@ -501,7 +501,24 @@ void AlignMTB_setExcludeRange(struct PtrWrapper ptr, int exclude_range);
 
 int AlignMTB_getCut(struct PtrWrapper ptr);
 
-void AlignMTB_setCut(struct PtrWrapper ptr, int cut);
+void AlignMTB_setCut(struct PtrWrapper ptr, bool cut);
+
+struct TensorArray CalibrateCRF_process(struct PtrWrapper ptr, struct TensorArray src, struct TensorArray dst,
+                            struct TensorWrapper times);
+
+struct PtrWrapper CalibrateDebevec_ctor(int samples, float lambda, bool random);
+
+float CalibrateDebevec_getLambda(struct PtrWrapper ptr);
+
+void CalibrateDebevec_setLambda(struct PtrWrapper ptr, float lambda);
+
+int CalibrateDebevec_getSamples(struct PtrWrapper ptr);
+
+void CalibrateDebevec_setSamples(struct PtrWrapper ptr, int samples);
+
+bool CalibrateDebevec_getRandom(struct PtrWrapper ptr);
+
+void CalibrateDebevec_setRandom(struct PtrWrapper ptr, bool random);
 ]]
 
 -- Tonemap
@@ -897,5 +914,86 @@ do
         local cut = cv.argcheck(t, argRules)
         
         C.AlignMTB_setCut(self.ptr, cut)
+    end
+end
+
+-- CalibrateCRF
+
+do
+    local CalibrateCRF = torch.class('cv.CalibrateCRF', 'cv.Algorithm')
+
+    function CalibrateCRF:process(t)
+        local argRules = {
+            {"src", required = true},
+            {"dst", default = nil},
+            {"times", required = true}
+        }
+
+        local src, dst, times = cv.argcheck(t, argRules)
+
+        if type(times) == "table" then
+            times = torch.FloatTensor(times)
+        end
+
+        return cv.unwrap_tensors(
+                C.CalibrateCRF_process(
+                    self.ptr, cv.wrap_tensors(src), cv.wrap_tensors(dst), cv.wrap_tensor(times)))
+    end
+end
+
+-- CalibrateDebevec
+
+do
+    local CalibrateDebevec = torch.class('cv.CalibrateDebevec', 'cv.CalibrateCRF')
+
+    function CalibrateDebevec:__init(t)
+        local argRules = {
+            {"samples", default = 70},
+            {"lambda", default = 10.0},
+            {"random", default = false}
+        }
+
+        local samples, lambda, random = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.CalibrateDebevec_ctor(samples, lambda, random), Classes.Algorithm_dtor)
+    end
+
+    function CalibrateDebevec:getLambda()
+        return C.CalibrateDebevec_getLambda(self.ptr)
+    end
+
+    function CalibrateDebevec:setLambda(t)
+        local argRules = {
+            {"lambda", required = true}
+        }
+        local lambda = cv.argcheck(t, argRules)
+
+        C.CalibrateDebevec_setLambda(self.ptr, lambda)
+    end
+
+    function CalibrateDebevec:getSamples()
+        return C.CalibrateDebevec_getSamples(self.ptr)
+    end
+
+    function CalibrateDebevec:setSamples(t)
+        local argRules = {
+            {"samples", required = true}
+        }
+        local samples = cv.argcheck(t, argRules)
+
+        C.CalibrateDebevec_setSamples(self.ptr, samples)
+    end
+
+    function CalibrateDebevec:getRandom()
+        return C.CalibrateDebevec_getRandom(self.ptr)
+    end
+
+    function CalibrateDebevec:setRandom(t)
+        local argRules = {
+            {"random", required = true}
+        }
+        local random = cv.argcheck(t, argRules)
+
+        C.CalibrateDebevec_setRandom(self.ptr, random)
     end
 end

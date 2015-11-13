@@ -510,12 +510,65 @@ extern "C" void AlignMTB_setExcludeRange(struct AlignMTBPtr ptr, int exclude_ran
 {
     ptr->setExcludeRange(exclude_range);
 }
-extern "C" int AlignMTB_getCut(struct AlignMTBPtr ptr)
+extern "C" bool AlignMTB_getCut(struct AlignMTBPtr ptr)
 {
     return ptr->getCut();
 }
 
-extern "C" void AlignMTB_setCut(struct AlignMTBPtr ptr, int cut)
+extern "C" void AlignMTB_setCut(struct AlignMTBPtr ptr, bool cut)
 {
     ptr->setCut(cut);
+}
+
+// CalibreCRF
+
+extern "C" struct TensorArray CalibrateCRF_process(struct CalibrateCRFPtr ptr, struct TensorArray src, struct TensorArray dst,
+                            struct TensorWrapper times)
+{
+    if (dst.isNull()) {
+        auto retval = new std::vector<cv::Mat>(src);
+        ptr->process(src.toMatList(), *retval, times.toMat());
+
+        return TensorArray(*retval);
+    } else {
+        auto retval = new std::vector<cv::Mat>(dst);
+        ptr->process(src.toMatList(), *retval, times.toMat());
+        dst = *retval;
+    }
+    return dst;
+}
+
+// CalibrateDebevec
+
+extern "C" struct CalibrateDebevecPtr CalibrateDebevec_ctor(int samples, float lambda, bool random)
+{
+    return rescueObjectFromPtr(cv::createCalibrateDebevec(samples, lambda, random));
+}
+
+extern "C" float CalibrateDebevec_getLambda(struct CalibrateDebevecPtr ptr)
+{
+    return ptr->getLambda();
+}
+
+extern "C" void CalibrateDebevec_setLambda(struct CalibrateDebevecPtr ptr, float lambda)
+{
+    ptr->setLambda(lambda);
+}
+extern "C" int CalibrateDebevec_getSamples(struct CalibrateDebevecPtr ptr)
+{
+    return ptr->getSamples();
+}
+
+extern "C" void CalibrateDebevec_setSamples(struct CalibrateDebevecPtr ptr, int samples)
+{
+    ptr->setSamples(samples);
+}
+extern "C" bool CalibrateDebevec_getRandom(struct CalibrateDebevecPtr ptr)
+{
+    return ptr->getRandom();
+}
+
+extern "C" void CalibrateDebevec_setRandom(struct CalibrateDebevecPtr ptr, bool random)
+{
+    ptr->setRandom(random);
 }
