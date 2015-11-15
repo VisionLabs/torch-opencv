@@ -4,8 +4,15 @@
 
 namespace ml = cv::ml;
 
-extern "C"
-struct TensorWrapper TrainData_getSubVector(struct TensorWrapper vec, struct TensorWrapper idx);
+struct TensorWrapper randMVNormal(
+        struct TensorWrapper mean, struct TensorWrapper cov, int nsamples, struct TensorWrapper samples);
+
+struct TensorArray randGaussMixture(
+        struct TensorWrapper means, struct TensorWrapper covs, struct TensorWrapper weights,
+        int nsamples, struct TensorWrapper samples, struct TensorWrapper sampClasses);
+
+struct TensorArray createConcentricSpheresTestSet(
+        int nsamples, int nfeatures, int nclasses, struct TensorWrapper samples, struct TensorWrapper responses);
 
 struct ParamGridPtr {
     void *ptr;
@@ -42,6 +49,9 @@ struct TrainDataPtr TrainData_ctor(
         struct TensorWrapper samples, int layout, struct TensorWrapper responses,
         struct TensorWrapper varIdx, struct TensorWrapper sampleIdx,
         struct TensorWrapper sampleWeights, struct TensorWrapper varType);
+
+extern "C"
+struct TensorWrapper TrainData_getSubVector(struct TensorWrapper vec, struct TensorWrapper idx);
 
 extern "C"
 int TrainData_getLayout(struct TrainDataPtr ptr);

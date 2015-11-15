@@ -91,23 +91,22 @@ struct TensorWrapper TrainData_getSubVector(struct TensorWrapper vec, struct Ten
 
 local C = ffi.load(cv.libPath('ml'))
 
-function TrainData_getSubVector(t)
-    local argRules = {
-        {"vec", required = true},
-        {"idx", required = true}
-    }
-    local vec, idx = cv.argcheck(t, argRules)
-
-    return cv.unwrap_tensors(
-        C.TrainData_getSubVector(cv.wrap_tensor(vec), cv.wrap_tensor(idx)))
-end
-
 --- ***************** Classes *****************
 require 'cv.Classes'
 
 local Classes = ffi.load(cv.libPath('Classes'))
 
 ffi.cdef[[
+struct TensorWrapper randMVNormal(
+        struct TensorWrapper mean, struct TensorWrapper cov, int nsamples, struct TensorWrapper samples);
+
+struct TensorArray randGaussMixture(
+        struct TensorWrapper means, struct TensorWrapper covs, struct TensorWrapper weights,
+        int nsamples, struct TensorWrapper samples, struct TensorWrapper sampClasses);
+
+struct TensorArray createConcentricSpheresTestSet(
+        int nsamples, int nfeatures, int nclasses, struct TensorWrapper samples, struct TensorWrapper responses);
+
 struct PtrWrapper ParamGrid_ctor(double _minVal, double _maxVal, double _logStep);
 
 struct PtrWrapper ParamGrid_ctor_default();
@@ -553,6 +552,17 @@ do
             cv.wrap_tensor(samples), layout, cv.wrap_tensor(responses), cv.wrap_tensor(varIdx), 
             cv.wrap_tensor(sampleIdx), cv.wrap_tensor(sampleWeights), cv.wrap_tensor(varType)
         )
+    end
+
+    function TrainData:getSubVector(t)
+        local argRules = {
+            {"vec", required = true},
+            {"idx", required = true}
+        }
+        local vec, idx = cv.argcheck(t, argRules)
+
+        return cv.unwrap_tensors(
+            C.TrainData_getSubVector(cv.wrap_tensor(vec), cv.wrap_tensor(idx)))
     end
 
     function TrainData:getLayout()

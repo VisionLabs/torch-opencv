@@ -1,10 +1,39 @@
 #include <ml.hpp>
 
-extern "C"
-struct TensorWrapper TrainData_getSubVector(
-        struct TensorWrapper vec, struct TensorWrapper idx)
+struct TensorWrapper randMVNormal(
+        struct TensorWrapper mean, struct TensorWrapper cov, int nsamples, struct TensorWrapper samples)
 {
-    return TensorWrapper(ml::TrainData::getSubVector(vec.toMat(), idx.toMat()));
+    if (samples.isNull()) {
+        cv::Mat retval;
+        ml::randMVNormal(mean.toMat(), cov.toMat(), nsamples, retval);
+        return TensorWrapper(retval);
+    } else {
+        ml::randMVNormal(mean.toMat(), cov.toMat(), nsamples, samples.toMat());
+        return samples;
+    }
+}
+
+struct TensorArray randGaussMixture(
+        struct TensorWrapper means, struct TensorWrapper covs, struct TensorWrapper weights,
+                       int nsamples, struct TensorWrapper samples, struct TensorWrapper sampClasses)
+{
+    std::vector<cv::Mat> retval(2);
+    if (!samples.isNull()) retval[0] = samples;
+    if (!sampClasses.isNull()) retval[1] = sampClasses;
+
+    ml::randGaussMixture(means.toMat(), covs.toMat(), weights.toMat(), nsamples, retval[0], retval[1]);
+    return TensorArray(retval);
+}
+
+struct TensorArray createConcentricSpheresTestSet(
+        int nsamples, int nfeatures, int nclasses, struct TensorWrapper samples, struct TensorWrapper responses)
+{
+    std::vector<cv::Mat> retval(2);
+    if (!samples.isNull()) retval[0] = samples;
+    if (!responses.isNull()) retval[1] = responses;
+
+    ml::createConcentricSpheresTestSet(nsamples, nfeatures, nclasses, retval[0], retval[1]);
+    return TensorArray(retval);
 }
 
 // ParamGrid
@@ -32,6 +61,13 @@ struct TrainDataPtr TrainData_ctor(
     return rescueObjectFromPtr(ml::TrainData::create(
             samples.toMat(), layout, responses.toMat(), varIdx.toMat(),
             sampleIdx.toMat(), sampleWeights.toMat(), varType.toMat()));
+}
+
+extern "C"
+struct TensorWrapper TrainData_getSubVector(
+        struct TensorWrapper vec, struct TensorWrapper idx)
+{
+    return TensorWrapper(ml::TrainData::getSubVector(vec.toMat(), idx.toMat()));
 }
 
 extern "C"
