@@ -325,6 +325,9 @@ struct EMPtr {
 };
 
 extern "C"
+struct EMPtr EM_ctor();
+
+extern "C"
 void EM_setClustersNumber(struct EMPtr ptr, int val);
 
 extern "C"
@@ -374,3 +377,116 @@ bool EM_trainM(
         struct TensorWrapper logLikelihoods, struct TensorWrapper labels,
         struct TensorWrapper probs);
 
+struct DTreesPtr {
+    void *ptr;
+
+    inline ml::DTrees * operator->() { return static_cast<ml::DTrees *>(ptr); }
+    inline DTreesPtr(ml::DTrees *ptr) { this->ptr = ptr; }
+};
+
+struct ConstNodeArray {
+    const ml::DTrees::Node *ptr;
+    int size;
+};
+
+struct ConstSplitArray {
+    const ml::DTrees::Split *ptr;
+    int size;
+};
+
+extern "C"
+struct DTreesPtr DTrees_ctor();
+
+extern "C"
+void DTrees_setMaxCategories(struct DTreesPtr ptr, int val);
+
+extern "C"
+int DTrees_getMaxCategories(struct DTreesPtr ptr);
+
+extern "C"
+void DTrees_setMaxDepth(struct DTreesPtr ptr, int val);
+
+extern "C"
+int DTrees_getMaxDepth(struct DTreesPtr ptr);
+
+extern "C"
+void DTrees_setMinSampleCount(struct DTreesPtr ptr, int val);
+
+extern "C"
+int DTrees_getMinSampleCount(struct DTreesPtr ptr);
+
+extern "C"
+void DTrees_setCVFolds(struct DTreesPtr ptr, int val);
+
+extern "C"
+int DTrees_getCVFolds(struct DTreesPtr ptr);
+
+extern "C"
+void DTrees_setUseSurrogates(struct DTreesPtr ptr, bool val);
+
+extern "C"
+bool DTrees_getUseSurrogates(struct DTreesPtr ptr);
+
+extern "C"
+void DTrees_setUse1SERule(struct DTreesPtr ptr, bool val);
+
+extern "C"
+bool DTrees_getUse1SERule(struct DTreesPtr ptr);
+
+extern "C"
+void DTrees_setTruncatePrunedTree(struct DTreesPtr ptr, bool val);
+
+extern "C"
+bool DTrees_getTruncatePrunedTree(struct DTreesPtr ptr);
+
+extern "C"
+void DTrees_setRegressionAccuracy(struct DTreesPtr ptr, float val);
+
+extern "C"
+float DTrees_getRegressionAccuracy(struct DTreesPtr ptr);
+
+extern "C"
+void DTrees_setPriors(struct DTreesPtr ptr, struct TensorWrapper val);
+
+extern "C"
+struct TensorWrapper DTrees_getPriors(struct DTreesPtr ptr);
+
+extern "C"
+struct TensorWrapper DTrees_getRoots(struct DTreesPtr ptr);
+
+extern "C"
+struct ConstNodeArray DTrees_getNodes(struct DTreesPtr ptr);
+
+extern "C"
+struct ConstSplitArray DTrees_getSplits(struct DTreesPtr ptr);
+
+extern "C"
+struct TensorWrapper DTrees_getSubsets(struct DTreesPtr ptr);
+
+struct RTreesPtr {
+    void *ptr;
+
+    inline ml::RTrees * operator->() { return static_cast<ml::RTrees *>(ptr); }
+    inline RTreesPtr(ml::RTrees *ptr) { this->ptr = ptr; }
+};
+
+struct BoostPtr {
+    void *ptr;
+
+    inline ml::Boost * operator->() { return static_cast<ml::Boost *>(ptr); }
+    inline BoostPtr(ml::Boost *ptr) { this->ptr = ptr; }
+};
+
+struct ANN_MLPPtr {
+    void *ptr;
+
+    inline ml::ANN_MLP * operator->() { return static_cast<ml::ANN_MLP *>(ptr); }
+    inline ANN_MLPPtr(ml::ANN_MLP *ptr) { this->ptr = ptr; }
+};
+
+struct LogisticRegressionPtr {
+    void *ptr;
+
+    inline ml::LogisticRegression * operator->() { return static_cast<ml::LogisticRegression *>(ptr); }
+    inline LogisticRegressionPtr(ml::LogisticRegression *ptr) { this->ptr = ptr; }
+};

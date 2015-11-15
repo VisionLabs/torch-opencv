@@ -280,16 +280,18 @@ void SVM_setKernel(struct PtrWrapper ptr, int val);
 //void SVM_setCustomKernel(struct PtrWrapper ptr, struct KernelPtr val);
 
 bool SVM_trainAuto(
-        struct PtrWrapper ptr, struct TrainDataPtr data, int kFold, struct ParamGridPtr Cgrid,
-        struct ParamGridPtr gammaGrid, struct ParamGridPtr pGrid, struct ParamGridPtr nuGrid,
-        struct ParamGridPtr coeffGrid, struct ParamGridPtr degreeGrid, bool balanced);
+        struct PtrWrapper ptr, struct TrainDataPtr data, int kFold, struct PtrWrapper Cgrid,
+        struct PtrWrapper gammaGrid, struct PtrWrapper pGrid, struct PtrWrapper nuGrid,
+        struct PtrWrapper coeffGrid, struct PtrWrapper degreeGrid, bool balanced);
 
 struct TensorWrapper SVM_getSupportVectors(struct PtrWrapper ptr);
 
 struct TensorArrayPlusDouble SVM_getDecisionFunction(
         struct PtrWrapper ptr, int i, struct TensorWrapper alpha, struct TensorWrapper svidx);
 
-struct ParamGridPtr SVM_getDefaultGrid(struct PtrWrapper ptr, int param_id);
+struct PtrWrapper SVM_getDefaultGrid(struct PtrWrapper ptr, int param_id);
+
+struct PtrWrapper EM_ctor();
 
 void EM_setClustersNumber(struct PtrWrapper ptr, int val);
 
@@ -327,6 +329,81 @@ bool EM_trainM(
         struct PtrWrapper ptr, struct TensorWrapper samples, struct TensorWrapper probs0,
         struct TensorWrapper logLikelihoods, struct TensorWrapper labels,
         struct TensorWrapper probs);
+
+struct Node {
+    double value; 
+    int classIdx; 
+    int parent; 
+    int left; 
+    int right;
+    int defaultDir;
+    int split;
+};
+
+struct Split {
+    int varIdx;
+    bool inversed;
+    float quality;
+    int next;
+    float c;
+    int subsetOfs;
+};
+
+struct ConstNodeArray {
+    struct Node *ptr;
+    int size;
+};
+
+struct ConstSplitArray {
+    struct Split *ptr;
+    int size;
+};
+
+struct PtrWrapper DTrees_ctor();
+
+void DTrees_setMaxCategories(struct PtrWrapper ptr, int val);
+
+int DTrees_getMaxCategories(struct PtrWrapper ptr);
+
+void DTrees_setMaxDepth(struct PtrWrapper ptr, int val);
+
+int DTrees_getMaxDepth(struct PtrWrapper ptr);
+
+void DTrees_setMinSampleCount(struct PtrWrapper ptr, int val);
+
+int DTrees_getMinSampleCount(struct PtrWrapper ptr);
+
+void DTrees_setCVFolds(struct PtrWrapper ptr, int val);
+
+int DTrees_getCVFolds(struct PtrWrapper ptr);
+
+void DTrees_setUseSurrogates(struct PtrWrapper ptr, bool val);
+
+bool DTrees_getUseSurrogates(struct PtrWrapper ptr);
+
+void DTrees_setUse1SERule(struct PtrWrapper ptr, bool val);
+
+bool DTrees_getUse1SERule(struct PtrWrapper ptr);
+
+void DTrees_setTruncatePrunedTree(struct PtrWrapper ptr, bool val);
+
+bool DTrees_getTruncatePrunedTree(struct PtrWrapper ptr);
+
+void DTrees_setRegressionAccuracy(struct PtrWrapper ptr, float val);
+
+float DTrees_getRegressionAccuracy(struct PtrWrapper ptr);
+
+void DTrees_setPriors(struct PtrWrapper ptr, struct TensorWrapper val);
+
+struct TensorWrapper DTrees_getPriors(struct PtrWrapper ptr);
+
+struct TensorWrapper DTrees_getRoots(struct PtrWrapper ptr);
+
+struct ConstNodeArray DTrees_getNodes(struct PtrWrapper ptr);
+
+struct ConstSplitArray DTrees_getSplits(struct PtrWrapper ptr);
+
+struct TensorWrapper DTrees_getSubsets(struct PtrWrapper ptr);
 
 ]]
 
@@ -1047,6 +1124,146 @@ end
 
 do
     local DTrees = torch.class('cv.DTrees', 'cv.StatModel')
+
+    function DTrees:__init()
+        self.ptr = ffi.gc(C.DTrees_ctor(), Classes.Algorithm_dtor)
+    end
+
+    function DTrees:setMaxCategories(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.DTrees_setMaxCategories(self.ptr, val)
+    end
+
+    function DTrees:getMaxCategories()
+        return C.DTrees_getMaxCategories(self.ptr)
+    end
+
+    function DTrees:setMaxDepth(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.DTrees_setMaxDepth(self.ptr, val)
+    end
+
+    function DTrees:getMaxDepth()
+        return C.DTrees_getMaxDepth(self.ptr)
+    end
+
+    function DTrees:setMinSampleCount(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.DTrees_setMinSampleCount(self.ptr, val)
+    end
+
+    function DTrees:getMinSampleCount()
+        return C.DTrees_getMinSampleCount(self.ptr)
+    end
+
+    function DTrees:setCVFolds(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.DTrees_setCVFolds(self.ptr, val)
+    end
+
+    function DTrees:getCVFolds()
+        return C.DTrees_getCVFolds(self.ptr)
+    end
+
+    function DTrees:setUseSurrogates(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.DTrees_setUseSurrogates(self.ptr, val)
+    end
+
+    function DTrees:getUseSurrogates()
+        return C.DTrees_getUseSurrogates(self.ptr)
+    end
+
+    function DTrees:setUse1SERule(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.DTrees_setUse1SERule(self.ptr, val)
+    end
+
+    function DTrees:getUse1SERule()
+        return C.DTrees_getUse1SERule(self.ptr)
+    end
+
+    function DTrees:setTruncatePrunedTree(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.DTrees_setTruncatePrunedTree(self.ptr, val)
+    end
+
+    function DTrees:getTruncatePrunedTree()
+        return C.DTrees_getTruncatePrunedTree(self.ptr)
+    end
+
+    function DTrees:setRegressionAccuracy(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.DTrees_setRegressionAccuracy(self.ptr, val)
+    end
+
+    function DTrees:getRegressionAccuracy()
+        return C.DTrees_getRegressionAccuracy(self.ptr)
+    end
+
+    function DTrees:setPriors(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.DTrees_setPriors(self.ptr, cv.wrap_tensor(val))
+    end
+
+    function DTrees:getPriors()
+        return cv.unwrap_tensors(C.DTrees_getPriors(self.ptr))
+    end
+
+    function DTrees:getRoots()
+        return cv.unwrap_tensors(C.DTrees_getRoots(self.ptr))
+    end
+
+    function DTrees:getNodes()
+        local result = C.DTrees_getNodes(self.ptr)
+        return result.ptr, result.size
+    end
+
+    function DTrees:getSplits()
+        local result = C.DTrees_getSplits(self.ptr)
+        return result.ptr, result.size
+    end
+
+    function DTrees:getSubsets()
+        return cv.unwrap_tensors(C.DTrees_getSubsets(self.ptr))
+    end
+
 
 end
 

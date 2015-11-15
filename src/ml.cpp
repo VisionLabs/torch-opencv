@@ -593,6 +593,12 @@ struct ParamGridPtr SVM_getDefaultGrid(struct SVMPtr ptr, int param_id)
 // EM
 
 extern "C"
+struct EMPtr EM_ctor()
+{
+    return rescueObjectFromPtr(ml::EM::create());
+}
+
+extern "C"
 void EM_setClustersNumber(struct EMPtr ptr, int val)
 {
     ptr->setClustersNumber(val);
@@ -689,3 +695,154 @@ bool EM_trainM(
             samples.toMat(), probs0.toMat(), TO_MAT_OR_NOARRAY(logLikelihoods),
             TO_MAT_OR_NOARRAY(labels), TO_MAT_OR_NOARRAY(probs));
 }
+
+// DTrees: Node
+
+// DTrees
+
+extern "C"
+struct DTreesPtr DTrees_ctor()
+{
+    return rescueObjectFromPtr(ml::DTrees::create());
+}
+
+extern "C"
+void DTrees_setMaxCategories(struct DTreesPtr ptr, int val)
+{
+    ptr->setMaxCategories(val);
+}
+
+extern "C"
+int DTrees_getMaxCategories(struct DTreesPtr ptr)
+{
+    return ptr->getMaxCategories();
+}
+
+extern "C"
+void DTrees_setMaxDepth(struct DTreesPtr ptr, int val)
+{
+    ptr->setMaxDepth(val);
+}
+
+extern "C"
+int DTrees_getMaxDepth(struct DTreesPtr ptr)
+{
+    return ptr->getMaxDepth();
+}
+
+extern "C"
+void DTrees_setMinSampleCount(struct DTreesPtr ptr, int val)
+{
+    ptr->setMinSampleCount(val);
+}
+
+extern "C"
+int DTrees_getMinSampleCount(struct DTreesPtr ptr)
+{
+    return ptr->getMinSampleCount();
+}
+
+extern "C"
+void DTrees_setCVFolds(struct DTreesPtr ptr, int val)
+{
+    ptr->setCVFolds(val);
+}
+
+extern "C"
+int DTrees_getCVFolds(struct DTreesPtr ptr)
+{
+    return ptr->getCVFolds();
+}
+
+extern "C"
+void DTrees_setUseSurrogates(struct DTreesPtr ptr, bool val)
+{
+    ptr->setUseSurrogates(val);
+}
+
+extern "C"
+bool DTrees_getUseSurrogates(struct DTreesPtr ptr)
+{
+    return ptr->getUseSurrogates();
+}
+
+extern "C"
+void DTrees_setUse1SERule(struct DTreesPtr ptr, bool val)
+{
+    ptr->setUse1SERule(val);
+}
+
+extern "C"
+bool DTrees_getUse1SERule(struct DTreesPtr ptr)
+{
+    return ptr->getUse1SERule();
+}
+
+extern "C"
+void DTrees_setTruncatePrunedTree(struct DTreesPtr ptr, bool val)
+{
+    ptr->setTruncatePrunedTree(val);
+}
+
+extern "C"
+bool DTrees_getTruncatePrunedTree(struct DTreesPtr ptr)
+{
+    return ptr->getTruncatePrunedTree();
+}
+
+extern "C"
+void DTrees_setRegressionAccuracy(struct DTreesPtr ptr, float val)
+{
+    ptr->setRegressionAccuracy(val);
+}
+
+extern "C"
+float DTrees_getRegressionAccuracy(struct DTreesPtr ptr)
+{
+    return ptr->getRegressionAccuracy();
+}
+
+extern "C"
+void DTrees_setPriors(struct DTreesPtr ptr, struct TensorWrapper val)
+{
+    ptr->setPriors(val);
+}
+
+extern "C"
+struct TensorWrapper DTrees_getPriors(struct DTreesPtr ptr)
+{
+    return TensorWrapper(ptr->getPriors());
+}
+
+extern "C"
+struct TensorWrapper DTrees_getRoots(struct DTreesPtr ptr)
+{
+    return TensorWrapper(cv::Mat(ptr->getRoots()));
+}
+
+extern "C"
+struct ConstNodeArray DTrees_getNodes(struct DTreesPtr ptr)
+{
+    const std::vector<ml::DTrees::Node> & result = ptr->getNodes();
+    ConstNodeArray retval;
+    retval.ptr = result.data();
+    retval.size = result.size();
+    return retval;
+}
+
+extern "C"
+struct ConstSplitArray DTrees_getSplits(struct DTreesPtr ptr)
+{
+    const std::vector<ml::DTrees::Split> & result = ptr->getSplits();
+    ConstSplitArray retval;
+    retval.ptr = result.data();
+    retval.size = result.size();
+    return retval;
+}
+
+extern "C"
+struct TensorWrapper DTrees_getSubsets(struct DTreesPtr ptr)
+{
+    return TensorWrapper(cv::Mat(ptr->getSubsets()));
+}
+
