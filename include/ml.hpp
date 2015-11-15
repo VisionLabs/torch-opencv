@@ -470,12 +470,51 @@ struct RTreesPtr {
     inline RTreesPtr(ml::RTrees *ptr) { this->ptr = ptr; }
 };
 
+extern "C"
+struct RTreesPtr RTrees_ctor();
+
+extern "C"
+void RTrees_setCalculateVarImportance(struct RTreesPtr ptr, bool val);
+
+extern "C"
+bool RTrees_getCalculateVarImportance(struct RTreesPtr ptr);
+
+extern "C"
+void RTrees_setActiveVarCount(struct RTreesPtr ptr, int val);
+
+extern "C"
+int RTrees_getActiveVarCount(struct RTreesPtr ptr);
+
+extern "C"
+void RTrees_setTermCriteria(struct RTreesPtr ptr, struct TermCriteriaWrapper val);
+
 struct BoostPtr {
     void *ptr;
 
     inline ml::Boost * operator->() { return static_cast<ml::Boost *>(ptr); }
     inline BoostPtr(ml::Boost *ptr) { this->ptr = ptr; }
 };
+
+extern "C"
+struct BoostPtr Boost_ctor();
+
+extern "C"
+void Boost_setBoostType(struct BoostPtr ptr, int val);
+
+extern "C"
+int Boost_getBoostType(struct BoostPtr ptr);
+
+extern "C"
+void Boost_setWeakCount(struct BoostPtr ptr, int val);
+
+extern "C"
+int Boost_getWeakCount(struct BoostPtr ptr);
+
+extern "C"
+void Boost_setWeightTrimRate(struct BoostPtr ptr, double val);
+
+extern "C"
+double Boost_getWeightTrimRate(struct BoostPtr ptr);
 
 struct ANN_MLPPtr {
     void *ptr;
@@ -484,9 +523,120 @@ struct ANN_MLPPtr {
     inline ANN_MLPPtr(ml::ANN_MLP *ptr) { this->ptr = ptr; }
 };
 
+extern "C"
+struct ANN_MLPPtr ANN_MLP_ctor();
+
+extern "C"
+void ANN_MLP_setTrainMethod(struct ANN_MLPPtr ptr, int method, double param1, double param2);
+
+extern "C"
+int ANN_MLP_getTrainMethod(struct ANN_MLPPtr ptr);
+
+extern "C"
+void ANN_MLP_setActivationFunction(struct ANN_MLPPtr ptr, int type, double param1, double param2);
+
+extern "C"
+void ANN_MLP_setLayerSizes(struct ANN_MLPPtr ptr, struct TensorWrapper val);
+
+extern "C"
+struct TensorWrapper ANN_MLP_getLayerSizes(struct ANN_MLPPtr ptr);
+
+extern "C"
+void ANN_MLP_setTermCriteria(struct ANN_MLPPtr ptr, struct TermCriteriaWrapper val);
+
+extern "C"
+struct TermCriteriaWrapper ANN_MLP_getTermCriteria(struct ANN_MLPPtr ptr);
+
+extern "C"
+void ANN_MLP_setBackpropWeightScale(struct ANN_MLPPtr ptr, double val);
+
+extern "C"
+double ANN_MLP_getBackpropWeightScale(struct ANN_MLPPtr ptr);
+
+extern "C"
+void ANN_MLP_setBackpropMomentumScale(struct ANN_MLPPtr ptr, double val);
+
+extern "C"
+double ANN_MLP_getBackpropMomentumScale(struct ANN_MLPPtr ptr);
+
+extern "C"
+void ANN_MLP_setRpropDW0(struct ANN_MLPPtr ptr, double val);
+
+extern "C"
+double ANN_MLP_getRpropDW0(struct ANN_MLPPtr ptr);
+
+extern "C"
+void ANN_MLP_setRpropDWPlus(struct ANN_MLPPtr ptr, double val);
+
+extern "C"
+double ANN_MLP_getRpropDWPlus(struct ANN_MLPPtr ptr);
+
+extern "C"
+void ANN_MLP_setRpropDWMinus(struct ANN_MLPPtr ptr, double val);
+
+extern "C"
+double ANN_MLP_getRpropDWMinus(struct ANN_MLPPtr ptr);
+
+extern "C"
+void ANN_MLP_setRpropDWMin(struct ANN_MLPPtr ptr, double val);
+
+extern "C"
+double ANN_MLP_getRpropDWMin(struct ANN_MLPPtr ptr);
+
+extern "C"
+void ANN_MLP_setRpropDWMax(struct ANN_MLPPtr ptr, double val);
+
+extern "C"
+double ANN_MLP_getRpropDWMax(struct ANN_MLPPtr ptr);
+
+extern "C"
+struct TensorWrapper ANN_MLP_getWeights(struct ANN_MLPPtr ptr, int layerIdx);
+
 struct LogisticRegressionPtr {
     void *ptr;
 
     inline ml::LogisticRegression * operator->() { return static_cast<ml::LogisticRegression *>(ptr); }
     inline LogisticRegressionPtr(ml::LogisticRegression *ptr) { this->ptr = ptr; }
 };
+
+extern "C"
+struct LogisticRegressionPtr LogisticRegression_ctor();
+
+extern "C"
+void LogisticRegression_setLearningRate(struct LogisticRegressionPtr ptr, double val);
+
+extern "C"
+double LogisticRegression_getLearningRate(struct LogisticRegressionPtr ptr);
+
+extern "C"
+void LogisticRegression_setIterations(struct LogisticRegressionPtr ptr, int val);
+
+extern "C"
+int LogisticRegression_getIterations(struct LogisticRegressionPtr ptr);
+
+extern "C"
+void LogisticRegression_setRegularization(struct LogisticRegressionPtr ptr, int val);
+
+extern "C"
+int LogisticRegression_getRegularization(struct LogisticRegressionPtr ptr);
+
+extern "C"
+void LogisticRegression_setTrainMethod(struct LogisticRegressionPtr ptr, int val);
+
+extern "C"
+int LogisticRegression_getTrainMethod(struct LogisticRegressionPtr ptr);
+
+extern "C"
+void LogisticRegression_setMiniBatchSize(struct LogisticRegressionPtr ptr, int val);
+
+extern "C"
+int LogisticRegression_getMiniBatchSize(struct LogisticRegressionPtr ptr);
+
+extern "C"
+void LogisticRegression_setTermCriteria(struct LogisticRegressionPtr ptr, struct TermCriteriaWrapper val);
+
+extern "C"
+struct TermCriteriaWrapper LogisticRegression_getTermCriteria(struct LogisticRegressionPtr ptr);
+
+extern "C"
+struct TensorWrapper LogisticRegression_get_learnt_thetas(struct LogisticRegressionPtr ptr);

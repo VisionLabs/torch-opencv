@@ -405,6 +405,105 @@ struct ConstSplitArray DTrees_getSplits(struct PtrWrapper ptr);
 
 struct TensorWrapper DTrees_getSubsets(struct PtrWrapper ptr);
 
+struct PtrWrapper RTrees_ctor();
+
+void RTrees_setCalculateVarImportance(struct PtrWrapper ptr, bool val);
+
+bool RTrees_getCalculateVarImportance(struct PtrWrapper ptr);
+
+void RTrees_setActiveVarCount(struct PtrWrapper ptr, int val);
+
+int RTrees_getActiveVarCount(struct PtrWrapper ptr);
+
+void RTrees_setTermCriteria(struct PtrWrapper ptr, struct TermCriteriaWrapper val);
+
+struct PtrWrapper Boost_ctor();
+
+void Boost_setBoostType(struct PtrWrapper ptr, int val);
+
+int Boost_getBoostType(struct PtrWrapper ptr);
+
+void Boost_setWeakCount(struct PtrWrapper ptr, int val);
+
+int Boost_getWeakCount(struct PtrWrapper ptr);
+
+void Boost_setWeightTrimRate(struct PtrWrapper ptr, double val);
+
+double Boost_getWeightTrimRate(struct PtrWrapper ptr);
+
+struct PtrWrapper ANN_MLP_ctor();
+
+void ANN_MLP_setTrainMethod(struct PtrWrapper ptr, int method, double param1, double param2);
+
+int ANN_MLP_getTrainMethod(struct PtrWrapper ptr);
+
+void ANN_MLP_setActivationFunction(struct PtrWrapper ptr, int type, double param1, double param2);
+
+void ANN_MLP_setLayerSizes(struct PtrWrapper ptr, struct TensorWrapper val);
+
+struct TensorWrapper ANN_MLP_getLayerSizes(struct PtrWrapper ptr);
+
+void ANN_MLP_setTermCriteria(struct PtrWrapper ptr, struct TermCriteriaWrapper val);
+
+struct TermCriteriaWrapper ANN_MLP_getTermCriteria(struct PtrWrapper ptr);
+
+void ANN_MLP_setBackpropWeightScale(struct PtrWrapper ptr, double val);
+
+double ANN_MLP_getBackpropWeightScale(struct PtrWrapper ptr);
+
+void ANN_MLP_setBackpropMomentumScale(struct PtrWrapper ptr, double val);
+
+double ANN_MLP_getBackpropMomentumScale(struct PtrWrapper ptr);
+
+void ANN_MLP_setRpropDW0(struct PtrWrapper ptr, double val);
+
+double ANN_MLP_getRpropDW0(struct PtrWrapper ptr);
+
+void ANN_MLP_setRpropDWPlus(struct PtrWrapper ptr, double val);
+
+double ANN_MLP_getRpropDWPlus(struct PtrWrapper ptr);
+
+void ANN_MLP_setRpropDWMinus(struct PtrWrapper ptr, double val);
+
+double ANN_MLP_getRpropDWMinus(struct PtrWrapper ptr);
+
+void ANN_MLP_setRpropDWMin(struct PtrWrapper ptr, double val);
+
+double ANN_MLP_getRpropDWMin(struct PtrWrapper ptr);
+
+void ANN_MLP_setRpropDWMax(struct PtrWrapper ptr, double val);
+
+double ANN_MLP_getRpropDWMax(struct PtrWrapper ptr);
+
+struct TensorWrapper ANN_MLP_getWeights(struct PtrWrapper ptr, int layerIdx);
+
+struct PtrWrapper LogisticRegression_ctor();
+
+void LogisticRegression_setLearningRate(struct PtrWrapper ptr, double val);
+
+double LogisticRegression_getLearningRate(struct PtrWrapper ptr);
+
+void LogisticRegression_setIterations(struct PtrWrapper ptr, int val);
+
+int LogisticRegression_getIterations(struct PtrWrapper ptr);
+
+void LogisticRegression_setRegularization(struct PtrWrapper ptr, int val);
+
+int LogisticRegression_getRegularization(struct PtrWrapper ptr);
+
+void LogisticRegression_setTrainMethod(struct PtrWrapper ptr, int val);
+
+int LogisticRegression_getTrainMethod(struct PtrWrapper ptr);
+
+void LogisticRegression_setMiniBatchSize(struct PtrWrapper ptr, int val);
+
+int LogisticRegression_getMiniBatchSize(struct PtrWrapper ptr);
+
+void LogisticRegression_setTermCriteria(struct PtrWrapper ptr, struct TermCriteriaWrapper val);
+
+struct TermCriteriaWrapper LogisticRegression_getTermCriteria(struct PtrWrapper ptr);
+
+struct TensorWrapper LogisticRegression_get_learnt_thetas(struct PtrWrapper ptr);
 ]]
 
 -- ParamGrid
@@ -1272,6 +1371,52 @@ end
 do
     local RTrees = torch.class('cv.RTrees', 'cv.DTrees')
 
+    function RTrees:__init()
+        self.ptr = ffi.gc(C.RTrees_ctor(), Classes.Algorithm_dtor)
+    end
+
+    function RTrees:setCalculateVarImportance(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.RTrees_setCalculateVarImportance(self.ptr, val)
+    end
+
+    function RTrees:getCalculateVarImportance()
+        return C.RTrees_getCalculateVarImportance(self.ptr)
+    end
+
+    function RTrees:setActiveVarCount(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.RTrees_setActiveVarCount(self.ptr, val)
+    end
+
+    function RTrees:getActiveVarCount()
+        return C.RTrees_getActiveVarCount(self.ptr)
+    end
+
+    function RTrees:setTermCriteria(t)
+        local argRules = {
+            {"val", required = true, operator = cv.TermCriteria}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.RTrees_setTermCriteria(self.ptr, val)
+    end
+
+    function RTrees:getTermCriteria()
+        return C.RTrees_getTermCriteria(self.ptr)
+    end
+
+    function RTrees:getVarImportance()
+        return cv.unwrap_tensors(C.RTrees_getVarImportance(self.ptr))
+    end
 end
 
 -- Boost
@@ -1279,6 +1424,48 @@ end
 do
     local Boost = torch.class('cv.Boost', 'cv.DTrees')
 
+    function Boost:__init()
+        self.ptr = ffi.gc(C.Boost_ctor(), Classes.Algorithm_dtor)
+    end
+
+    function Boost:setBoostType(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.Boost_setBoostType(self.ptr, val)
+    end
+
+    function Boost:getBoostType()
+        return C.Boost_getBoostType(self.ptr)
+    end
+
+    function Boost:setWeakCount(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.Boost_setWeakCount(self.ptr, val)
+    end
+
+    function Boost:getWeakCount()
+        return C.Boost_getWeakCount(self.ptr)
+    end
+
+    function Boost:setWeightTrimRate(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.Boost_setWeightTrimRate(self.ptr, val)
+    end
+
+    function Boost:getWeightTrimRate()
+        return C.Boost_getWeightTrimRate(self.ptr)
+    end
 end
 
 -- ANN_MLP
@@ -1286,6 +1473,169 @@ end
 do
     local ANN_MLP = torch.class('cv.ANN_MLP', 'cv.StatModel')
 
+    function ANN_MLP:__init()
+        self.ptr = ffi.gc(C.ANN_MLP_ctor(), Classes.Algorithm_dtor)
+    end
+
+    function ANN_MLP:setTrainMethod(t)
+        local argRules = {
+            {"method", required = true},
+            {"param1", default = 0},
+            {"param2", default = 0},
+        }
+        local method, param1, param2 = cv.argcheck(t, argRules)
+        
+        C.ANN_MLP_setTrainMethod(self.ptr, method, param1, param2)
+    end
+
+    function ANN_MLP:getTrainMethod()
+        return C.ANN_MLP_getTrainMethod(self.ptr)
+    end
+
+    function ANN_MLP:setActivationFunction(t)
+        local argRules = {
+            {"type", required = true},
+            {"param1", default = 0},
+            {"param2", default = 0},
+        }
+        local type, param1, param2 = cv.argcheck(t, argRules)
+        
+        C.ANN_MLP_setActivationFunction(self.ptr, type, param1, param2)
+    end
+
+    function ANN_MLP:getActivationFunction()
+        return C.ANN_MLP_getActivationFunction(self.ptr)
+    end
+
+    function ANN_MLP:setLayerSizes(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.ANN_MLP_setLayerSizes(self.ptr, cv.wrap_tensor(val))
+    end
+
+    function ANN_MLP:getLayerSizes()
+        return cv.unwrap_tensors(C.ANN_MLP_getLayerSizes(self.ptr))
+    end
+
+    function ANN_MLP:setTermCriteria(t)
+        local argRules = {
+            {"val", required = true, operator = cv.TermCriteria}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.ANN_MLP_setTermCriteria(self.ptr, val)
+    end
+
+    function ANN_MLP:getTermCriteria()
+        return C.ANN_MLP_getTermCriteria(self.ptr)
+    end
+
+    function ANN_MLP:setBackpropWeightScale(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.ANN_MLP_setBackpropWeightScale(self.ptr, val)
+    end
+
+    function ANN_MLP:getBackpropWeightScale()
+        return C.ANN_MLP_getBackpropWeightScale(self.ptr)
+    end
+
+    function ANN_MLP:setBackpropMomentumScale(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.ANN_MLP_setBackpropMomentumScale(self.ptr, val)
+    end
+
+    function ANN_MLP:getBackpropMomentumScale()
+        return C.ANN_MLP_getBackpropMomentumScale(self.ptr)
+    end
+
+    function ANN_MLP:setRpropDW0(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.ANN_MLP_setRpropDW0(self.ptr, val)
+    end
+
+    function ANN_MLP:getRpropDW0()
+        return C.ANN_MLP_getRpropDW0(self.ptr)
+    end
+
+    function ANN_MLP:setRpropDWPlus(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.ANN_MLP_setRpropDWPlus(self.ptr, val)
+    end
+
+    function ANN_MLP:getRpropDWPlus()
+        return C.ANN_MLP_getRpropDWPlus(self.ptr)
+    end
+
+    function ANN_MLP:setRpropDWMinus(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.ANN_MLP_setRpropDWMinus(self.ptr, val)
+    end
+
+    function ANN_MLP:getRpropDWMinus()
+        return C.ANN_MLP_getRpropDWMinus(self.ptr)
+    end
+
+    function ANN_MLP:setRpropDWMin(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.ANN_MLP_setRpropDWMin(self.ptr, val)
+    end
+
+    function ANN_MLP:getRpropDWMin()
+        return C.ANN_MLP_getRpropDWMin(self.ptr)
+    end
+
+    function ANN_MLP:setRpropDWMax(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.ANN_MLP_setRpropDWMax(self.ptr, val)
+    end
+
+    function ANN_MLP:getRpropDWMax()
+        return C.ANN_MLP_getRpropDWMax(self.ptr)
+    end
+
+    function ANN_MLP:setWeights(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.ANN_MLP_setWeights(self.ptr, val)
+    end
+
+    function ANN_MLP:getWeights()
+        return cv.unwrap_tensors(C.ANN_MLP_getWeights(self.ptr))
+    end
 end
 
 -- LogisticRegression
@@ -1293,5 +1643,89 @@ end
 do
     local LogisticRegression = torch.class('cv.LogisticRegression', 'cv.StatModel')
 
-end
+    function LogisticRegression:__init()
+        self.ptr = ffi.gc(C.LogisticRegression_ctor(), Classes.Algorithm_dtor)
+    end
 
+    function LogisticRegression:setLearningRate(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.LogisticRegression_setLearningRate(self.ptr, val)
+    end
+
+    function LogisticRegression:getLearningRate()
+        return C.LogisticRegression_getLearningRate(self.ptr)
+    end
+
+    function LogisticRegression:setIterations(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.LogisticRegression_setIterations(self.ptr, val)
+    end
+
+    function LogisticRegression:getIterations()
+        return C.LogisticRegression_getIterations(self.ptr)
+    end
+
+    function LogisticRegression:setRegularization(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.LogisticRegression_setRegularization(self.ptr, val)
+    end
+
+    function LogisticRegression:getRegularization()
+        return C.LogisticRegression_getRegularization(self.ptr)
+    end
+
+    function LogisticRegression:setTrainMethod(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.LogisticRegression_setTrainMethod(self.ptr, val)
+    end
+
+    function LogisticRegression:getTrainMethod()
+        return C.LogisticRegression_getTrainMethod(self.ptr)
+    end
+
+    function LogisticRegression:setMiniBatchSize(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.LogisticRegression_setMiniBatchSize(self.ptr, val)
+    end
+
+    function LogisticRegression:getMiniBatchSize()
+        return C.LogisticRegression_getMiniBatchSize(self.ptr)
+    end
+
+    function LogisticRegression:setTermCriteria(t)
+        local argRules = {
+            {"val", required = true, operator = cv.TermCriteria}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.LogisticRegression_setTermCriteria(self.ptr, val)
+    end
+
+    function LogisticRegression:getTermCriteria()
+        return C.LogisticRegression_getTermCriteria(self.ptr)
+    end
+
+    function LogisticRegression:get_learnt_thetas()
+        return cv.unwrap_tensors(C.LogisticRegression_get_learnt_thetas(self.ptr))
+    end
+end
