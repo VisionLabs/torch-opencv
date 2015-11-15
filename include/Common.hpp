@@ -94,6 +94,16 @@ struct ScalarWrapper {
     }
 };
 
+struct Vec2dWrapper {
+    double v0, v1;
+
+    inline operator cv::Vec2d() { return cv::Vec2d(v0, v1); }
+    inline Vec2dWrapper(const cv::Vec2d & other) {
+        this->v0 = other.val[0];
+        this->v1 = other.val[1];
+    }
+};
+
 struct Vec3dWrapper {
     double v0, v1, v2;
 };

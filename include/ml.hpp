@@ -188,6 +188,46 @@ struct TensorArrayPlusFloat NormalBayesClassifier_predictProb(
         struct NormalBayesClassifierPtr ptr, struct TensorWrapper inputs,
         struct TensorWrapper outputs, struct TensorWrapper outputProbs, int flags);
 
+struct KNearestPtr {
+    void *ptr;
+
+    inline ml::KNearest * operator->() { return static_cast<ml::KNearest *>(ptr); }
+    inline KNearestPtr(ml::KNearest *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+struct KNearestPtr KNearest_ctor();
+
+extern "C"
+void KNearest_setDefaultK(struct KNearestPtr ptr, int val);
+
+extern "C"
+int KNearest_getDefaultK(struct KNearestPtr ptr);
+
+extern "C"
+void KNearest_setIsClassifier(struct KNearestPtr ptr, bool val);
+
+extern "C"
+bool KNearest_getIsClassifier(struct KNearestPtr ptr);
+
+extern "C"
+void KNearest_setEmax(struct KNearestPtr ptr, int val);
+
+extern "C"
+int KNearest_getEmax(struct KNearestPtr ptr);
+
+extern "C"
+void KNearest_setAlgorithmType(struct KNearestPtr ptr, int val);
+
+extern "C"
+int KNearest_getAlgorithmType(struct KNearestPtr ptr);
+
+extern "C"
+float KNearest_findNearest(
+        struct KNearestPtr ptr, struct TensorWrapper samples, int k,
+        struct TensorWrapper results, struct TensorWrapper neighborResponses,
+        struct TensorWrapper dist);
+
 struct SVMPtr {
     void *ptr;
 
@@ -276,3 +316,61 @@ struct TensorArrayPlusDouble SVM_getDecisionFunction(
 
 extern "C"
 struct ParamGridPtr SVM_getDefaultGrid(struct SVMPtr ptr, int param_id);
+
+struct EMPtr {
+    void *ptr;
+
+    inline ml::EM * operator->() { return static_cast<ml::EM *>(ptr); }
+    inline EMPtr(ml::EM *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+void EM_setClustersNumber(struct EMPtr ptr, int val);
+
+extern "C"
+int EM_getClustersNumber(struct EMPtr ptr);
+
+extern "C"
+void EM_setCovarianceMatrixType(struct EMPtr ptr, int val);
+
+extern "C"
+int EM_getCovarianceMatrixType(struct EMPtr ptr);
+
+extern "C"
+void EM_setTermCriteria(struct EMPtr ptr, struct TermCriteriaWrapper val);
+
+extern "C"
+struct TermCriteriaWrapper EM_getTermCriteria(struct EMPtr ptr);
+
+extern "C"
+struct TensorWrapper EM_getWeights(struct EMPtr ptr);
+
+extern "C"
+struct TensorWrapper EM_getMeans(struct EMPtr ptr);
+
+extern "C"
+struct TensorArray EM_getCovs(struct EMPtr ptr);
+
+extern "C"
+struct Vec2dWrapper EM_predict2(
+        struct EMPtr ptr, struct TensorWrapper sample, struct TensorWrapper probs);
+
+extern "C"
+bool EM_trainEM(
+        struct EMPtr ptr, struct TensorWrapper samples,
+        struct TensorWrapper logLikelihoods,
+        struct TensorWrapper labels, struct TensorWrapper probs);
+
+extern "C"
+bool EM_trainE(
+        struct EMPtr ptr, struct TensorWrapper samples, struct TensorWrapper means0,
+        struct TensorWrapper covs0, struct TensorWrapper weights0,
+        struct TensorWrapper logLikelihoods, struct TensorWrapper labels,
+        struct TensorWrapper probs);
+
+extern "C"
+bool EM_trainM(
+        struct EMPtr ptr, struct TensorWrapper samples, struct TensorWrapper probs0,
+        struct TensorWrapper logLikelihoods, struct TensorWrapper labels,
+        struct TensorWrapper probs);
+

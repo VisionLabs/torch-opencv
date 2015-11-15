@@ -32,6 +32,8 @@ svm:setTermCriteria {cv.TermCriteria{cv.TermCriteria_MAX_ITER, 100, 1e-6}}
 svm:train{trainingDataMat, cv.ml.ROW_SAMPLE, labelsMat}
 
 -- Show the decision regions given by the SVM
+local timer = torch.Timer()
+
 local green, blue = torch.ByteTensor{0,255,0}, torch.ByteTensor{255,0,0}
 
 for i=1,im:size(1) do
@@ -41,6 +43,8 @@ for i=1,im:size(1) do
         im[{i,j,{}}]:copy(response == 1 and green or blue)
     end
 end
+
+print("SVM evaluation time: " .. timer:time().real .. " seconds")
 
 -- Show the training data
 local thickness = -1

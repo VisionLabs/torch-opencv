@@ -212,6 +212,29 @@ struct TensorArrayPlusFloat NormalBayesClassifier_predictProb(
         struct PtrWrapper ptr, struct TensorWrapper inputs,
         struct TensorWrapper outputs, struct TensorWrapper outputProbs, int flags);
 
+struct PtrWrapper KNearest_ctor();
+
+void KNearest_setDefaultK(struct PtrWrapper ptr, int val);
+
+int KNearest_getDefaultK(struct PtrWrapper ptr);
+
+void KNearest_setIsClassifier(struct PtrWrapper ptr, bool val);
+
+bool KNearest_getIsClassifier(struct PtrWrapper ptr);
+
+void KNearest_setEmax(struct PtrWrapper ptr, int val);
+
+int KNearest_getEmax(struct PtrWrapper ptr);
+
+void KNearest_setAlgorithmType(struct PtrWrapper ptr, int val);
+
+int KNearest_getAlgorithmType(struct PtrWrapper ptr);
+
+float KNearest_findNearest(
+        struct PtrWrapper ptr, struct TensorWrapper samples, int k,
+        struct TensorWrapper results, struct TensorWrapper neighborResponses,
+        struct TensorWrapper dist);
+
 struct PtrWrapper SVM_ctor();
 
 void SVM_setType(struct PtrWrapper ptr, int val);
@@ -267,6 +290,44 @@ struct TensorArrayPlusDouble SVM_getDecisionFunction(
         struct PtrWrapper ptr, int i, struct TensorWrapper alpha, struct TensorWrapper svidx);
 
 struct ParamGridPtr SVM_getDefaultGrid(struct PtrWrapper ptr, int param_id);
+
+void EM_setClustersNumber(struct PtrWrapper ptr, int val);
+
+int EM_getClustersNumber(struct PtrWrapper ptr);
+
+void EM_setCovarianceMatrixType(struct PtrWrapper ptr, int val);
+
+int EM_getCovarianceMatrixType(struct PtrWrapper ptr);
+
+void EM_setTermCriteria(struct PtrWrapper ptr, struct TermCriteriaWrapper val);
+
+struct TermCriteriaWrapper EM_getTermCriteria(struct PtrWrapper ptr);
+
+struct TensorWrapper EM_getWeights(struct PtrWrapper ptr);
+
+struct TensorWrapper EM_getMeans(struct PtrWrapper ptr);
+
+struct TensorArray EM_getCovs(struct PtrWrapper ptr);
+
+struct Vec2dWrapper EM_predict2(
+        struct PtrWrapper ptr, struct TensorWrapper sample, struct TensorWrapper probs);
+
+bool EM_trainEM(
+        struct PtrWrapper ptr, struct TensorWrapper samples, 
+        struct TensorWrapper logLikelihoods, 
+        struct TensorWrapper labels, struct TensorWrapper probs);
+
+bool EM_trainE(
+        struct PtrWrapper ptr, struct TensorWrapper samples, struct TensorWrapper means0,
+        struct TensorWrapper covs0, struct TensorWrapper weights0,
+        struct TensorWrapper logLikelihoods, struct TensorWrapper labels, 
+        struct TensorWrapper probs);
+
+bool EM_trainM(
+        struct PtrWrapper ptr, struct TensorWrapper samples, struct TensorWrapper probs0,
+        struct TensorWrapper logLikelihoods, struct TensorWrapper labels,
+        struct TensorWrapper probs);
+
 ]]
 
 -- ParamGrid
@@ -573,7 +634,7 @@ do
 	local NormalBayesClassifier = torch.class('cv.NormalBayesClassifier', 'cv.StatModel')
 
 	function NormalBayesClassifier:__init()
-		self.ptr = C.NormalBayesClassifier_ctor()
+		self.ptr = ffi.gc(C.NormalBayesClassifier_ctor(), Classes.Algorithm_dtor)
 	end
 
 	function NormalBayesClassifier:predictProb(t)
@@ -597,6 +658,75 @@ end
 do
     local KNearest = torch.class('cv.KNearest', 'cv.StatModel')
 
+    function KNearest:__init()
+        self.ptr = ffi.gc(C.KNearest_ctor(), Classes.Algorithm_dtor)
+    end
+
+    function KNearest:setDefaultK(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.KNearest_setDefaultK(self.ptr, val)
+    end
+
+    function KNearest:getDefaultK()
+        return C.KNearest_getDefaultK(self.ptr)
+    end
+
+    function KNearest:setIsClassifier(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.KNearest_setIsClassifier(self.ptr, val)
+    end
+
+    function KNearest:getIsClassifier()
+        return C.KNearest_getIsClassifier(self.ptr)
+    end
+
+    function KNearest:setEmax(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.KNearest_setEmax(self.ptr, val)
+    end
+
+    function KNearest:getEmax()
+        return C.KNearest_getEmax(self.ptr)
+    end
+
+    function KNearest:setAlgorithmType(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.KNearest_setAlgorithmType(self.ptr, val)
+    end
+
+    function KNearest:getAlgorithmType()
+        return C.KNearest_getAlgorithmType(self.ptr)
+    end
+
+    function KNearest:findNearest(t)
+        local argRules = {
+            {"samples", required = true},
+            {"k", required = true},
+            {"results", default = nil},
+            {"neighborResponses", default = nil},
+            {"dist", default = nil}
+        }
+        local samples, k, results, neighborResponses, dist = cv.argcheck(t, argRules)
+
+        return C.KNearest_findNearest(self.ptr, cv.wrap_tensor(samples), k, 
+            cv.wrap_tensor(results), cv.wrap_tensor(neighborResponses), cv.wrap_tensor(dist))
+    end
 end
 
 -- SVM
@@ -799,6 +929,118 @@ end
 do
     local EM = torch.class('cv.EM', 'cv.StatModel')
 
+    function EM:__init()
+        self.ptr = ffi.gc(C.EM_ctor(), Classes.Algorithm_dtor)
+    end
+
+    function EM:setClustersNumber(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.EM_setClustersNumber(self.ptr, val)
+    end
+
+    function EM:getClustersNumber()
+        return C.EM_getClustersNumber(self.ptr)
+    end
+
+    function EM:setCovarianceMatrixType(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.EM_setCovarianceMatrixType(self.ptr, val)
+    end
+
+    function EM:getCovarianceMatrixType()
+        return C.EM_getCovarianceMatrixType(self.ptr)
+    end
+
+    function EM:setTermCriteria(t)
+        local argRules = {
+            {"val", required = true, operator = cv.TermCriteria}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.EM_setTermCriteria(self.ptr, val)
+    end
+
+    function EM:getTermCriteria()
+        return C.EM_getTermCriteria(self.ptr)
+    end
+
+    function EM:getWeights()
+        return C.EM_getWeights(self.ptr)
+    end
+
+    function EM:getMeans()
+        return C.EM_getMeans(self.ptr)
+    end
+
+    function EM:getCovs()
+        return cv.unwrap_tensors(C.EM_getCovs(self.ptr), true)
+    end
+
+    function EM:predict2(t)
+        local argRules = {
+            {"sample", required = true},
+            {"probs", default = nil}
+        }
+        local sample, probs = cv.argcheck(t, argRules)
+
+        local result = C.EM_predict2(self.ptr, cv.wrap_tensor(sample), cv.wrap_tensor(probs))
+        return {result.v0, result.v1}
+    end
+
+    function EM:trainEM(t)
+        local argRules = {
+            {"samples", required = true},
+            {"logLikelihoods", default = nil},
+            {"labels", default = nil},
+            {"probs", default = nil}
+        }
+        local samples, logLikelihoods, labels, probs = cv.argcheck(t, argRules)
+
+        return C.EM_trainEM(self.ptr, cv.wrap_tensor(samples), cv.wrap_tensor(logLikelihoods),
+            cv.wrap_tensor(labels), cv.wrap_tensor(probs))
+    end
+
+    function EM:trainE(t)
+        local argRules = {
+            {"samples", required = true},
+            {"means0", required = true},
+            {"covs0", default = nil},
+            {"weights0", default = nil},
+            {"logLikelihoods", default = nil},
+            {"labels", default = nil},
+            {"probs", default = nil}
+        }
+        local samples, means0, covs0, weights0, logLikelihoods, labels, probs 
+            = cv.argcheck(t, argRules)
+
+        return C.EM_trainE(
+            self.ptr, cv.wrap_tensor(samples), cv.wrap_tensor(means0), 
+            cv.wrap_tensor(covs0), cv.wrap_tensor(weights0), 
+            cv.wrap_tensor(logLikelihoods), cv.wrap_tensor(labels), cv.wrap_tensor(probs))
+    end
+
+    function EM:trainM(t)
+        local argRules = {
+            {"samples", required = true},
+            {"probs0", required = true},
+            {"logLikelihoods", default = nil},
+            {"labels", default = nil},
+            {"probs", default = nil}
+        }
+        local samples, probs0, logLikelihoods, labels, probs = cv.argcheck(t, argRules)
+
+        return C.EM_trainM(
+            self.ptr, cv.wrap_tensor(samples), cv.wrap_tensor(probs0), 
+            cv.wrap_tensor(logLikelihoods), cv.wrap_tensor(labels), cv.wrap_tensor(probs))
+    end
 end
 
 -- DTrees

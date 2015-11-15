@@ -342,6 +342,73 @@ struct TensorArrayPlusFloat NormalBayesClassifier_predictProb(
     return retval;
 }
 
+// KNearest
+
+extern "C"
+struct KNearestPtr KNearest_ctor()
+{
+    return rescueObjectFromPtr(ml::KNearest::create());
+}
+
+extern "C"
+void KNearest_setDefaultK(struct KNearestPtr ptr, int val)
+{
+    ptr->setDefaultK(val);
+}
+
+extern "C"
+int KNearest_getDefaultK(struct KNearestPtr ptr)
+{
+    return ptr->getDefaultK();
+}
+
+extern "C"
+void KNearest_setIsClassifier(struct KNearestPtr ptr, bool val)
+{
+    ptr->setIsClassifier(val);
+}
+
+extern "C"
+bool KNearest_getIsClassifier(struct KNearestPtr ptr)
+{
+    return ptr->getIsClassifier();
+}
+
+extern "C"
+void KNearest_setEmax(struct KNearestPtr ptr, int val)
+{
+    ptr->setEmax(val);
+}
+
+extern "C"
+int KNearest_getEmax(struct KNearestPtr ptr)
+{
+    return ptr->getEmax();
+}
+
+extern "C"
+void KNearest_setAlgorithmType(struct KNearestPtr ptr, int val)
+{
+    ptr->setAlgorithmType(val);
+}
+
+extern "C"
+int KNearest_getAlgorithmType(struct KNearestPtr ptr)
+{
+    return ptr->getAlgorithmType();
+}
+
+extern "C"
+float KNearest_findNearest(
+        struct KNearestPtr ptr, struct TensorWrapper samples, int k,
+        struct TensorWrapper results, struct TensorWrapper neighborResponses,
+        struct TensorWrapper dist)
+{
+    return ptr->findNearest(
+            samples.toMat(), k, TO_MAT_OR_NOARRAY(results),
+            TO_MAT_OR_NOARRAY(neighborResponses), TO_MAT_OR_NOARRAY(dist));
+}
+
 // SVM
 
 extern "C"
@@ -523,3 +590,102 @@ struct ParamGridPtr SVM_getDefaultGrid(struct SVMPtr ptr, int param_id)
     return result;
 }
 
+// EM
+
+extern "C"
+void EM_setClustersNumber(struct EMPtr ptr, int val)
+{
+    ptr->setClustersNumber(val);
+}
+
+extern "C"
+int EM_getClustersNumber(struct EMPtr ptr)
+{
+    return ptr->getClustersNumber();
+}
+
+extern "C"
+void EM_setCovarianceMatrixType(struct EMPtr ptr, int val)
+{
+    ptr->setCovarianceMatrixType(val);
+}
+
+extern "C"
+int EM_getCovarianceMatrixType(struct EMPtr ptr)
+{
+    return ptr->getCovarianceMatrixType();
+}
+
+extern "C"
+void EM_setTermCriteria(struct EMPtr ptr, struct TermCriteriaWrapper val)
+{
+    ptr->setTermCriteria(val);
+}
+
+extern "C"
+struct TermCriteriaWrapper EM_getTermCriteria(struct EMPtr ptr)
+{
+    return ptr->getTermCriteria();
+}
+
+extern "C"
+struct TensorWrapper EM_getWeights(struct EMPtr ptr)
+{
+    return TensorWrapper(ptr->getWeights());
+}
+
+extern "C"
+struct TensorWrapper EM_getMeans(struct EMPtr ptr)
+{
+    return TensorWrapper(ptr->getMeans());
+}
+
+extern "C"
+struct TensorArray EM_getCovs(struct EMPtr ptr)
+{
+    std::vector<cv::Mat> retval;
+    ptr->getCovs(retval);
+    return TensorArray(retval);
+}
+
+extern "C"
+struct Vec2dWrapper EM_predict2(
+        struct EMPtr ptr, struct TensorWrapper sample, struct TensorWrapper probs)
+{
+    return ptr->predict2(sample.toMat(), TO_MAT_OR_NOARRAY(probs));
+}
+
+extern "C"
+bool EM_trainEM(
+        struct EMPtr ptr, struct TensorWrapper samples,
+        struct TensorWrapper logLikelihoods,
+        struct TensorWrapper labels, struct TensorWrapper probs)
+{
+    return ptr->trainEM(
+            samples.toMat(), TO_MAT_OR_NOARRAY(logLikelihoods),
+            TO_MAT_OR_NOARRAY(labels), TO_MAT_OR_NOARRAY(probs));
+}
+
+extern "C"
+bool EM_trainE(
+        struct EMPtr ptr, struct TensorWrapper samples, struct TensorWrapper means0,
+        struct TensorWrapper covs0, struct TensorWrapper weights0,
+        struct TensorWrapper logLikelihoods, struct TensorWrapper labels,
+        struct TensorWrapper probs)
+{
+    return ptr->trainE(
+            samples.toMat(), means0.toMat(), TO_MAT_OR_NOARRAY(covs0),
+            TO_MAT_OR_NOARRAY(weights0), TO_MAT_OR_NOARRAY(logLikelihoods),
+            TO_MAT_OR_NOARRAY(labels), TO_MAT_OR_NOARRAY(probs));
+}
+
+extern "C"
+bool EM_trainM(
+        struct EMPtr ptr, struct TensorWrapper samples, struct TensorWrapper probs0,
+        struct TensorWrapper logLikelihoods, struct TensorWrapper labels,
+        struct TensorWrapper probs)
+{
+    return ptr->trainM(
+            samples.toMat(), probs0.toMat(), TO_MAT_OR_NOARRAY(logLikelihoods),
+            TO_MAT_OR_NOARRAY(labels), TO_MAT_OR_NOARRAY(probs));
+}
