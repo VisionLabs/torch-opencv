@@ -47,6 +47,10 @@ struct ScalarWrapper {
     double v0, v1, v2, v3;
 };
 
+struct Vec2dWrapper {
+    double v0;
+};
+
 struct Vec3dWrapper {
     double v0, v1, v2;
 };
