@@ -1,4 +1,4 @@
-require 'cv'
+local cv = require 'cv._env'
 
 local ffi = require 'ffi'
 
@@ -54,3 +54,5 @@ function cv.imdecode(t)
 
     return cv.unwrap_tensors(C.imdecode(cv.wrap_tensor(buf), flags))
 end
+
+return cv

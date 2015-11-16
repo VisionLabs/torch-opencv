@@ -1,3 +1,4 @@
+local cv = require 'cv'
 require 'cv.imgcodecs'
 require 'cv.highgui'
 

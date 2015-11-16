@@ -1,5 +1,4 @@
-require 'cv'
-
+local cv = require 'cv._env'
 local ffi = require 'ffi'
 
 ffi.cdef[[
@@ -10,6 +9,15 @@ struct PtrWrapper {
 
 local C = ffi.load(cv.libPath('Classes'))
 
+-- torch.class requires modules to have its global table.
+-- Here's a workaround for that
+function cv.newTorchClass(...)
+    _G.cv = cv
+    local result = torch.class(...)
+    _G.cv = nil
+    return result
+end
+
 -- ***** FileNode *****
 
 ffi.cdef[[
@@ -19,7 +27,7 @@ void FileNode_dtor(struct PtrWrapper ptr);
 ]]
 
 do
-    local FileNode = torch.class('cv.FileNode')
+    local FileNode = cv.newTorchClass('cv.FileNode')
 
     function FileNode:__init()
         self.ptr = ffi.gc(C.FileNode_ctor(), C.FileNode_dtor)
@@ -45,7 +53,7 @@ const char *FileStorage_releaseAndGetString(struct PtrWrapper ptr);
 ]]
 
 do
-    local FileStorage = torch.class('cv.FileStorage')
+    local FileStorage = cv.newTorchClass('cv.FileStorage')
 
     function FileStorage:__init(t)
         local source = t.source
@@ -101,7 +109,7 @@ const char *Algorithm_getDefaultName(struct PtrWrapper ptr);
 ]]
 
 do
-    local Algorithm = torch.class('cv.Algorithm')
+    local Algorithm = cv.newTorchClass('cv.Algorithm')
 
     function Algorithm:__init()
         self.ptr = ffi.gc(C.Algorithm_ctor(), C.Algorithm_dtor)
@@ -131,3 +139,5 @@ do
         return ffi.string(C.Algorithm_getDefaultName(self.ptr))
     end
 end
+
+return cv

@@ -1,4 +1,4 @@
-require 'cv'
+local cv = require 'cv._env'
 
 local ffi = require 'ffi'
 
@@ -574,7 +574,7 @@ struct TensorWrapper MergeRobertson_process2(struct PtrWrapper ptr, struct Tenso
 -- Tonemap
 
 do
-    local Tonemap = torch.class('cv.Tonemap', 'cv.Algorithm')
+    local Tonemap = cv.newTorchClass('cv.Tonemap', 'cv.Algorithm')
 
     function Tonemap:__init(t)
         local argRules = {
@@ -612,7 +612,7 @@ end
 -- TonemapDrago
 
 do
-    local TonemapDrago = torch.class('cv.TonemapDrago', 'cv.Tonemap')
+    local TonemapDrago = cv.newTorchClass('cv.TonemapDrago', 'cv.Tonemap')
 
     function TonemapDrago:__init(t)
         local argRules = {
@@ -655,7 +655,7 @@ end
 -- TonemapDurand
 
 do
-    local TonemapDurand = torch.class('cv.TonemapDurand', 'cv.Tonemap');
+    local TonemapDurand = cv.newTorchClass('cv.TonemapDurand', 'cv.Tonemap');
 
     function TonemapDurand:__init(t)
         local argRules = {
@@ -726,7 +726,7 @@ end
 -- TonemapReinhard
 
 do
-    local TonemapReinhard = torch.class('cv.TonemapReinhard', 'cv.Tonemap');
+    local TonemapReinhard = cv.newTorchClass('cv.TonemapReinhard', 'cv.Tonemap');
 
     function TonemapReinhard:__init(t)
         local argRules = {
@@ -784,7 +784,7 @@ end
 -- TonemapMantiuk
 
 do
-    local TonemapMantiuk = torch.class('cv.TonemapMantiuk', 'cv.Tonemap');
+    local TonemapMantiuk = cv.newTorchClass('cv.TonemapMantiuk', 'cv.Tonemap');
 
     function TonemapMantiuk:__init(t)
         local argRules = {
@@ -827,7 +827,7 @@ end
 -- AlignExposures
 
 do
-    local AlignExposures = torch.class('cv.AlignExposures', 'cv.Algorithm')
+    local AlignExposures = cv.newTorchClass('cv.AlignExposures', 'cv.Algorithm')
 
     function AlignExposures:process(t)
         local argRules = {
@@ -851,7 +851,7 @@ end
 
 -- AlignMTB
 do
-    local AlignMTB = torch.class('cv.AlignMTB', 'cv.AlignExposures')
+    local AlignMTB = cv.newTorchClass('cv.AlignMTB', 'cv.AlignExposures')
 
     function AlignMTB:__init(t)
         local argRules = {
@@ -970,7 +970,7 @@ end
 -- CalibrateCRF
 
 do
-    local CalibrateCRF = torch.class('cv.CalibrateCRF', 'cv.Algorithm')
+    local CalibrateCRF = cv.newTorchClass('cv.CalibrateCRF', 'cv.Algorithm')
 
     function CalibrateCRF:process(t)
         local argRules = {
@@ -994,7 +994,7 @@ end
 -- CalibrateDebevec
 
 do
-    local CalibrateDebevec = torch.class('cv.CalibrateDebevec', 'cv.CalibrateCRF')
+    local CalibrateDebevec = cv.newTorchClass('cv.CalibrateDebevec', 'cv.CalibrateCRF')
 
     function CalibrateDebevec:__init(t)
         local argRules = {
@@ -1051,7 +1051,7 @@ end
 -- CalibrateRobertson
 
 do
-    local CalibrateRobertson = torch.class('cv.CalibrateRobertson', 'cv.CalibrateCRF')
+    local CalibrateRobertson = cv.newTorchClass('cv.CalibrateRobertson', 'cv.CalibrateCRF')
 
     function CalibrateRobertson:__init(t)
         local argRules = {
@@ -1098,7 +1098,7 @@ end
 -- MergeExposures
 
 do
-    local MergeExposures = torch.class('cv.MergeExposures', 'cv.Algorithm')
+    local MergeExposures = cv.newTorchClass('cv.MergeExposures', 'cv.Algorithm')
 
     function MergeExposures:process(t)
         local argRules = {
@@ -1123,7 +1123,7 @@ end
 -- MergeDebevec
 
 do
-    local MergeDebevec = torch.class('cv.MergeDebevec', 'cv.MergeExposures')
+    local MergeDebevec = cv.newTorchClass('cv.MergeDebevec', 'cv.MergeExposures')
 
     function MergeDebevec:__init(t)
         self.ptr = ffi.gc(C.MergeDebevec_ctor(), Classes.Algorithm_dtor)
@@ -1157,7 +1157,7 @@ end
 -- MergeMertens
 
 do
-    local MergeMertens = torch.class('cv.MergeMertens', 'cv.MergeExposures')
+    local MergeMertens = cv.newTorchClass('cv.MergeMertens', 'cv.MergeExposures')
 
     function MergeMertens:__init(t)
         local argRules = {
@@ -1237,7 +1237,7 @@ end
 -- MergeRobertson
 
 do
-    local MergeRobertson = torch.class('cv.MergeRobertson', 'cv.MergeExposures')
+    local MergeRobertson = cv.newTorchClass('cv.MergeRobertson', 'cv.MergeExposures')
 
     function MergeRobertson:__init(t)
         self.ptr = ffi.gc(C.MergeRobertson_ctor(), Classes.Algorithm_dtor)
@@ -1267,3 +1267,5 @@ do
                     cv.wrap_tensor(times), cv.wrap_tensor(response)))
     end
 end
+
+return cv

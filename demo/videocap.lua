@@ -1,6 +1,7 @@
 -- a translated demo from here:
 -- http://docs.opencv.org/3.0-beta/modules/videoio/doc/reading_and_writing_video.html
 
+local cv = require 'cv'
 require 'cv.highgui'
 require 'cv.videoio'
 require 'cv.imgproc'

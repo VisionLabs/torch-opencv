@@ -1,5 +1,4 @@
-require 'cv'
-
+local cv = require 'cv._env'
 local ffi = require 'ffi'
 
 ffi.cdef[[
@@ -2588,7 +2587,7 @@ void LineIterator_incr(struct PtrWrapper ptr);
 -- GeneralizedHough
 
 do
-    local GeneralizedHough = torch.class('cv.GeneralizedHough', 'cv.Algorithm')
+    local GeneralizedHough = cv.newTorchClass('cv.GeneralizedHough', 'cv.Algorithm')
 
     function GeneralizedHough:setTemplate(t)
         if t.dy or #t > 2 then
@@ -2682,7 +2681,7 @@ end
 -- GeneralizedHoughBallard
 
 do
-    local GeneralizedHoughBallard = torch.class('cv.GeneralizedHoughBallard', 'cv.GeneralizedHough')
+    local GeneralizedHoughBallard = cv.newTorchClass('cv.GeneralizedHoughBallard', 'cv.GeneralizedHough')
 
     function GeneralizedHoughBallard:__init()
         self.ptr = ffi.gc(C.GeneralizedHoughBallard_ctor(), Classes.Algorithm_dtor)
@@ -2708,7 +2707,7 @@ end
 -- GeneralizedHoughGuil
 
 do
-    local GeneralizedHoughGuil = torch.class('cv.GeneralizedHoughGuil', 'cv.GeneralizedHough')
+    local GeneralizedHoughGuil = cv.newTorchClass('cv.GeneralizedHoughGuil', 'cv.GeneralizedHough')
 
     function GeneralizedHoughGuil:__init()
         self.ptr = ffi.gc(C.GeneralizedHoughGuil_ctor(), Classes.Algorithm_dtor)
@@ -2814,7 +2813,7 @@ end
 -- CLAHE
 
 do
-    local CLAHE = torch.class('cv.CLAHE', 'cv.Algorithm')
+    local CLAHE = cv.newTorchClass('cv.CLAHE', 'cv.Algorithm')
 
     function CLAHE:__init()
         self.ptr = ffi.gc(C.CLAHE_ctor(), Classes.Algorithm_dtor)
@@ -2844,7 +2843,7 @@ end
 -- LineSegmentDetector
 
 do
-    local LineSegmentDetector = torch.class('cv.LineSegmentDetector', 'cv.Algorithm')
+    local LineSegmentDetector = cv.newTorchClass('cv.LineSegmentDetector', 'cv.Algorithm')
 
     function LineSegmentDetector:__init(t)
         local argRules = {
@@ -2908,7 +2907,7 @@ end
 -- Subdiv2D
 
 do
-    local Subdiv2D = torch.class('cv.Subdiv2D')
+    local Subdiv2D = cv.newTorchClass('cv.Subdiv2D')
 
     function Subdiv2D:__init(t)
         local argRules = {
@@ -3048,3 +3047,5 @@ function cv.LineIterator(t)
 
     return lineIter, nil, nil
 end
+
+return cv

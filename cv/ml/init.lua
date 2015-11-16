@@ -1,4 +1,4 @@
-require 'cv'
+local cv = require 'cv._env'
 
 local ffi = require 'ffi'
 
@@ -508,7 +508,7 @@ struct TensorWrapper LogisticRegression_get_learnt_thetas(struct PtrWrapper ptr)
 -- ParamGrid
 
 do
-    local ParamGrid = torch.class('cv.ml.ParamGrid')
+    local ParamGrid = cv.newTorchClass('cv.ml.ParamGrid')
 
     function ParamGrid:__init(t)
     	if type(t) ~= 'table' then
@@ -533,7 +533,7 @@ end
 -- TrainData
 
 do
-    local TrainData = torch.class('cv.TrainData')
+    local TrainData = cv.newTorchClass('cv.TrainData')
 
     function TrainData:__init(t)
         local argRules = {
@@ -751,7 +751,7 @@ end
 -- StatModel
 
 do
-    local StatModel = torch.class('cv.StatModel', 'cv.Algorithm')
+    local StatModel = cv.newTorchClass('cv.StatModel', 'cv.Algorithm')
 
     function StatModel:getVarCount()
         return C.StatModel_getVarCount(self.ptr)
@@ -817,7 +817,7 @@ end
 -- NormalBayesClassifier
 
 do
-	local NormalBayesClassifier = torch.class('cv.NormalBayesClassifier', 'cv.StatModel')
+	local NormalBayesClassifier = cv.newTorchClass('cv.NormalBayesClassifier', 'cv.StatModel')
 
 	function NormalBayesClassifier:__init()
 		self.ptr = ffi.gc(C.NormalBayesClassifier_ctor(), Classes.Algorithm_dtor)
@@ -842,7 +842,7 @@ end
 -- KNearest
 
 do
-    local KNearest = torch.class('cv.KNearest', 'cv.StatModel')
+    local KNearest = cv.newTorchClass('cv.KNearest', 'cv.StatModel')
 
     function KNearest:__init()
         self.ptr = ffi.gc(C.KNearest_ctor(), Classes.Algorithm_dtor)
@@ -918,7 +918,7 @@ end
 -- SVM
 
 do
-	local SVM = torch.class('cv.SVM', 'cv.StatModel')
+	local SVM = cv.newTorchClass('cv.SVM', 'cv.StatModel')
 
 	function SVM:__init()
 		self.ptr = ffi.gc(C.SVM_ctor(), Classes.Algorithm_dtor)
@@ -1113,7 +1113,7 @@ end
 -- EM
 
 do
-    local EM = torch.class('cv.EM', 'cv.StatModel')
+    local EM = cv.newTorchClass('cv.EM', 'cv.StatModel')
 
     function EM:__init()
         self.ptr = ffi.gc(C.EM_ctor(), Classes.Algorithm_dtor)
@@ -1232,7 +1232,7 @@ end
 -- DTrees
 
 do
-    local DTrees = torch.class('cv.DTrees', 'cv.StatModel')
+    local DTrees = cv.newTorchClass('cv.DTrees', 'cv.StatModel')
 
     function DTrees:__init()
         self.ptr = ffi.gc(C.DTrees_ctor(), Classes.Algorithm_dtor)
@@ -1379,7 +1379,7 @@ end
 -- RTrees
 
 do
-    local RTrees = torch.class('cv.RTrees', 'cv.DTrees')
+    local RTrees = cv.newTorchClass('cv.RTrees', 'cv.DTrees')
 
     function RTrees:__init()
         self.ptr = ffi.gc(C.RTrees_ctor(), Classes.Algorithm_dtor)
@@ -1432,7 +1432,7 @@ end
 -- Boost
 
 do
-    local Boost = torch.class('cv.Boost', 'cv.DTrees')
+    local Boost = cv.newTorchClass('cv.Boost', 'cv.DTrees')
 
     function Boost:__init()
         self.ptr = ffi.gc(C.Boost_ctor(), Classes.Algorithm_dtor)
@@ -1481,7 +1481,7 @@ end
 -- ANN_MLP
 
 do
-    local ANN_MLP = torch.class('cv.ANN_MLP', 'cv.StatModel')
+    local ANN_MLP = cv.newTorchClass('cv.ANN_MLP', 'cv.StatModel')
 
     function ANN_MLP:__init()
         self.ptr = ffi.gc(C.ANN_MLP_ctor(), Classes.Algorithm_dtor)
@@ -1651,7 +1651,7 @@ end
 -- LogisticRegression
 
 do
-    local LogisticRegression = torch.class('cv.LogisticRegression', 'cv.StatModel')
+    local LogisticRegression = cv.newTorchClass('cv.LogisticRegression', 'cv.StatModel')
 
     function LogisticRegression:__init()
         self.ptr = ffi.gc(C.LogisticRegression_ctor(), Classes.Algorithm_dtor)
@@ -1739,3 +1739,5 @@ do
         return cv.unwrap_tensors(C.LogisticRegression_get_learnt_thetas(self.ptr))
     end
 end
+
+return cv

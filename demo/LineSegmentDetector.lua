@@ -1,9 +1,10 @@
+local cv = require 'cv'
 require 'cv.highgui'
 require 'cv.imgproc'
 require 'cv.imgcodecs'
 
 if not arg[1] then
-	print('Usage: `th demo/filtering.lua path-to-image`\n')
+	print('Usage: `th demo/LineSegmentDetector.lua path-to-image`\n')
 	os.exit(0)
 end
 

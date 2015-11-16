@@ -1,4 +1,4 @@
-require 'cv'
+local cv = require 'cv._env'
 
 local ffi = require 'ffi'
 
@@ -38,7 +38,7 @@ double VideoCapture_get(struct PtrWrapper ptr, int propId);
 ]]
 
 do
-    local VideoCapture = torch.class('cv.VideoCapture')
+    local VideoCapture = cv.newTorchClass('cv.VideoCapture')
 
     -- v = cv.VideoCapture{}
     -- OR
@@ -148,7 +148,7 @@ int VideoWriter_fourcc(char c1, char c2, char c3, char c4);
 ]]
 
 do
-    local VideoWriter = torch.class('cv.VideoWriter')
+    local VideoWriter = cv.newTorchClass('cv.VideoWriter')
 
     function VideoWriter:__init(t)
         local argRules = {
@@ -218,3 +218,5 @@ do
         return C.VideoWriter_get(self.ptr, propId)
     end
 end
+
+return cv

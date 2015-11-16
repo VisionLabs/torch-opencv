@@ -1,3 +1,4 @@
+local cv = require 'cv'
 require 'cv.imgproc'
 
 r = cv.RotatedRect{center={50, 120}, size={40, 90}, angle=30}

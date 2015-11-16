@@ -1,4 +1,5 @@
 -- A couple of constant defs from Python cv2
+local cv = require 'cv._env'
 
 cv.ACCESS_FAST = 67108864
 cv.ACCESS_MASK = 50331648
@@ -1119,3 +1120,5 @@ cv._OutputArray_DEPTH_MASK_ALL = 127
 cv._OutputArray_DEPTH_MASK_ALL_BUT_8S = 125
 cv._OutputArray_DEPTH_MASK_FLT = 96
 cv.__UMAT_USAGE_FLAGS_32BIT = 2147483647
+
+return cv

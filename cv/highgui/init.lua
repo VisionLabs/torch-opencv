@@ -1,4 +1,4 @@
-require 'cv'
+local cv = require 'cv._env'
 
 local ffi = require 'ffi'
 
@@ -270,3 +270,5 @@ function cv.loadWindowParameters(t)
     
     return C.loadWindowParameters(windowName)
 end
+
+return cv

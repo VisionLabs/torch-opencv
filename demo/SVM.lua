@@ -8,6 +8,7 @@ outputs [-0.008130081, 0.008163265]. That's why here I've set kernel type to qua
 Original version by @szagoruyko
 --]]
 
+local cv = require 'cv'
 require 'cv.imgproc'
 require 'cv.imgcodecs'
 require 'cv.highgui'

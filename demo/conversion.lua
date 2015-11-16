@@ -1,8 +1,6 @@
 -- Currently no unit tests are present here.
 -- Let this be the future site for them
 
--- Run this from project root: "th tests/test_conversion.lua"
-
 local cv = require 'cv'
 
 local ffi = require 'ffi'
@@ -12,7 +10,7 @@ void test_tensor_to_mat(struct TensorWrapper tensor);
 struct TensorWrapper test_mat_to_tensor();
 ]]
 
-local C = ffi.load(libPath('Tests'))
+local C = ffi.load(cv.libPath('Tests'))
 
 -- prints Tensor from OpenCV
 function test_tensor_to_mat(tensor)

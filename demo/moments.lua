@@ -1,3 +1,4 @@
+local cv = require 'cv'
 require 'cv.imgproc'
 
 points = {
