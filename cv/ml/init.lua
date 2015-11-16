@@ -86,10 +86,41 @@ cv.ml.VAR_NUMERICAL = 0
 cv.ml.VAR_ORDERED = 0
 
 ffi.cdef[[
-struct TensorWrapper TrainData_getSubVector(struct TensorWrapper vec, struct TensorWrapper idx);
+struct TensorWrapper randMVNormal(
+        struct TensorWrapper mean, struct TensorWrapper cov, int nsamples, struct TensorWrapper samples);
+
+struct TensorArray createConcentricSpheresTestSet(
+        int nsamples, int nfeatures, int nclasses, struct TensorWrapper samples, struct TensorWrapper responses);
 ]]
 
 local C = ffi.load(cv.libPath('ml'))
+
+function cv.randMVNormal(t)
+    local argRules = {
+        {"mean", required = true},
+        {"cov", required = true},
+        {"nsamples", required = true},
+        {"samples", default = nil}
+    }
+    local mean, cov, nsamples, samples = cv.argcheck(t, argRules)
+
+    return cv.unwrap_tensors(C.randMVNormal(
+        cv.wrap_tensor(mean), cv.wrap_tensor(cov), nsamples, cv.wrap_tensor(samples)))
+end
+
+function cv.createConcentricSpheresTestSet(t)
+    local argRules = {
+        {"nsamples", required = true},
+        {"nfeatures", required = true},
+        {"nclasses", required = true},
+        {"samples", default = nil},
+        {"responses", default = nil}
+    }
+    local nsamples, nfeatures, nclasses, samples, responses = cv.argcheck(t, argRules)
+
+    return cv.unwrap_tensors(C.createConcentricSpheresTestSet(
+        nsamples, nfeatures, nclasses, cv.wrap_tensor(samples), cv.wrap_tensor(responses)))
+end
 
 --- ***************** Classes *****************
 require 'cv.Classes'
@@ -97,16 +128,6 @@ require 'cv.Classes'
 local Classes = ffi.load(cv.libPath('Classes'))
 
 ffi.cdef[[
-struct TensorWrapper randMVNormal(
-        struct TensorWrapper mean, struct TensorWrapper cov, int nsamples, struct TensorWrapper samples);
-
-struct TensorArray randGaussMixture(
-        struct TensorWrapper means, struct TensorWrapper covs, struct TensorWrapper weights,
-        int nsamples, struct TensorWrapper samples, struct TensorWrapper sampClasses);
-
-struct TensorArray createConcentricSpheresTestSet(
-        int nsamples, int nfeatures, int nclasses, struct TensorWrapper samples, struct TensorWrapper responses);
-
 struct PtrWrapper ParamGrid_ctor(double _minVal, double _maxVal, double _logStep);
 
 struct PtrWrapper ParamGrid_ctor_default();
@@ -115,6 +136,8 @@ struct PtrWrapper TrainData_ctor(
         struct TensorWrapper samples, int layout, struct TensorWrapper responses,
         struct TensorWrapper varIdx, struct TensorWrapper sampleIdx,
         struct TensorWrapper sampleWeights, struct TensorWrapper varType);
+
+struct TensorWrapper TrainData_getSubVector(struct TensorWrapper vec, struct TensorWrapper idx);
 
 int TrainData_getLayout(struct PtrWrapper ptr);
 

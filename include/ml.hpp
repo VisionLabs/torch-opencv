@@ -7,10 +7,6 @@ namespace ml = cv::ml;
 struct TensorWrapper randMVNormal(
         struct TensorWrapper mean, struct TensorWrapper cov, int nsamples, struct TensorWrapper samples);
 
-struct TensorArray randGaussMixture(
-        struct TensorWrapper means, struct TensorWrapper covs, struct TensorWrapper weights,
-        int nsamples, struct TensorWrapper samples, struct TensorWrapper sampClasses);
-
 struct TensorArray createConcentricSpheresTestSet(
         int nsamples, int nfeatures, int nclasses, struct TensorWrapper samples, struct TensorWrapper responses);
 

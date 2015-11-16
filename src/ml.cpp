@@ -13,18 +13,6 @@ struct TensorWrapper randMVNormal(
     }
 }
 
-struct TensorArray randGaussMixture(
-        struct TensorWrapper means, struct TensorWrapper covs, struct TensorWrapper weights,
-                       int nsamples, struct TensorWrapper samples, struct TensorWrapper sampClasses)
-{
-    std::vector<cv::Mat> retval(2);
-    if (!samples.isNull()) retval[0] = samples;
-    if (!sampClasses.isNull()) retval[1] = sampClasses;
-
-    ml::randGaussMixture(means.toMat(), covs.toMat(), weights.toMat(), nsamples, retval[0], retval[1]);
-    return TensorArray(retval);
-}
-
 struct TensorArray createConcentricSpheresTestSet(
         int nsamples, int nfeatures, int nclasses, struct TensorWrapper samples, struct TensorWrapper responses)
 {
