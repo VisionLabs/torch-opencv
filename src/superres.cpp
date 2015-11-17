@@ -27,6 +27,12 @@ struct FrameSourcePtr createFrameSource_Camera(int deviceId)
 }
 
 extern "C"
+void FrameSource_dtor(struct FrameSourcePtr ptr)
+{
+    delete static_cast<superres::FrameSource *>(ptr.ptr);
+}
+
+extern "C"
 struct TensorWrapper FrameSource_nextFrame(struct FrameSourcePtr ptr, struct TensorWrapper frame)
 {
     if (frame.isNull()) {
@@ -81,10 +87,8 @@ void SuperResolution_reset(struct SuperResolutionPtr ptr)
 extern "C"
 void SuperResolution_setInput(struct SuperResolutionPtr ptr, struct FrameSourcePtr frameSource)
 {
-    cv::Ptr<superres::FrameSource> frameSourcePtr(
-            static_cast<superres::FrameSource *>(frameSource.ptr));
-    rescueObjectFromPtr(frameSourcePtr);
-    ptr->setInput(frameSourcePtr);
+    ptr->setInput(
+        cv::makePtr(static_cast<superres::FrameSource *>(frameSource.ptr)));
 }
 
 extern "C"
@@ -204,9 +208,8 @@ int SuperResolution_getTemporalAreaRadius(struct SuperResolutionPtr ptr)
 extern "C"
 void SuperResolution_setOpticalFlow(struct SuperResolutionPtr ptr, struct DenseOpticalFlowExtPtr val)
 {
-    cv::Ptr<superres::DenseOpticalFlowExt> valPtr(
-            static_cast<superres::DenseOpticalFlowExt *>(val.ptr));
-    ptr->setOpticalFlow(rescueObjectFromPtr(valPtr));
+    ptr->setOpticalFlow(
+        cv::makePtr(static_cast<superres::DenseOpticalFlowExt *>(val.ptr)));
 }
 
 extern "C"
@@ -238,9 +241,15 @@ void DenseOpticalFlowExt_collectGarbage(struct DenseOpticalFlowExtPtr ptr)
 // FarnebackOpticalFlow
 
 extern "C"
-struct FarnebackOpticalFlowPtr FarnebackOpticalFlow_ctor()
+struct FarnebackOpticalFlowPtr createOptFlow_Farneback()
 {
     return rescueObjectFromPtr(superres::createOptFlow_Farneback());
+}
+
+extern "C"
+struct FarnebackOpticalFlowPtr createOptFlow_Farneback_CUDA()
+{
+    return rescueObjectFromPtr(superres::createOptFlow_Farneback_CUDA());
 }
 
 extern "C"

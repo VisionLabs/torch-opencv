@@ -24,6 +24,9 @@ extern "C"
 struct FrameSourcePtr createFrameSource_Camera(int deviceId);
 
 extern "C"
+void FrameSource_dtor(struct FrameSourcePtr ptr);
+
+extern "C"
 struct TensorWrapper FrameSource_nextFrame(struct FrameSourcePtr ptr, struct TensorWrapper frame);
 
 extern "C"
@@ -166,7 +169,10 @@ struct PyrLKOpticalFlowPtr {
 // FarnebackOpticalFlow
 
 extern "C"
-struct FarnebackOpticalFlowPtr FarnebackOpticalFlow_ctor();
+struct FarnebackOpticalFlowPtr createOptFlow_Farneback();
+
+extern "C"
+struct FarnebackOpticalFlowPtr createOptFlow_Farneback_CUDA();
 
 extern "C"
 void FarnebackOpticalFlow_setPyrScale(struct FarnebackOpticalFlowPtr ptr, double val);

@@ -98,3 +98,19 @@ void Algorithm_save(AlgorithmPtr ptr, const char *filename);
 
 extern "C"
 const char *Algorithm_getDefaultName(AlgorithmPtr ptr);
+
+// cv::Ptr
+
+struct CvPtrPtr {
+    void *ptr;
+
+    inline cv::Ptr<void> * operator->() { return static_cast<cv::Ptr<void> *>(ptr); }
+    inline CvPtrPtr(cv::Ptr<void> *ptr) { this->ptr = ptr; }
+    inline cv::Ptr<void> & operator*() { return *static_cast<cv::Ptr<void> *>(this->ptr); }
+};
+
+extern "C"
+void CvPtr_dtor(struct CvPtrPtr ptr)
+{
+    delete static_cast<cv::Ptr<void> *>(ptr.ptr);
+}

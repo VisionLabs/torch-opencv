@@ -11,6 +11,8 @@ struct PtrWrapper createFrameSource_Video_CUDA(const char *fileName);
 
 struct PtrWrapper createFrameSource_Camera(int deviceId);
 
+void FrameSource_dtor(struct PtrWrapper ptr);
+
 struct TensorWrapper FrameSource_nextFrame(struct PtrWrapper ptr, struct TensorWrapper frame);
 
 void FrameSource_reset(struct PtrWrapper ptr);
@@ -75,7 +77,9 @@ void DenseOpticalFlowExt_collectGarbage(struct PtrWrapper ptr);
 
 // FarnebackOpticalFlow
 
-struct PtrWrapper FarnebackOpticalFlow_ctor();
+struct PtrWrapper createOptFlow_Farneback();
+
+struct PtrWrapper createOptFlow_Farneback_CUDA();
 
 void FarnebackOpticalFlow_setPyrScale(struct PtrWrapper ptr, double val);
 
@@ -424,6 +428,7 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
+        self.optFlow = val
         C.SuperResolution_setOpticalFlow(self.ptr, val.ptr)
     end
 
@@ -452,10 +457,6 @@ end
 
 do
     local FarnebackOpticalFlow = cv.newTorchClass('cv.FarnebackOpticalFlow', 'cv.DenseOpticalFlowExt')
-
-    function FarnebackOpticalFlow:__init()
-        self.ptr = ffi.gc(C.FarnebackOpticalFlow_ctor(), Classes.Algorithm_dtor)
-    end
 
     function FarnebackOpticalFlow:setPyrScale(t)
         local argRules = {
@@ -565,10 +566,6 @@ end
 
 do
     local DualTVL1OpticalFlow = cv.newTorchClass('cv.DualTVL1OpticalFlow', 'cv.DenseOpticalFlowExt')
-
-    function DualTVL1OpticalFlow:__init()
-        self.ptr = ffi.gc(C.DualTVL1OpticalFlow_ctor(), Classes.Algorithm_dtor)
-    end
 
     function DualTVL1OpticalFlow:setTau(t)
         local argRules = {
