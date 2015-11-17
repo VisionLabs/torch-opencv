@@ -201,18 +201,39 @@ int SuperResolution_getTemporalAreaRadius(struct SuperResolutionPtr ptr)
     return ptr->getTemporalAreaRadius();
 }
 
-// TODO this
-//extern "C"
-//void SuperResolution_setOpticalFlow(struct SuperResolutionPtr ptr, int val)
-//{
-//    ptr->setOpticalFlow(val);
-//}
-//
-//extern "C"
-//int SuperResolution_getOpticalFlow(struct SuperResolutionPtr ptr)
-//{
-//    return ptr->getOpticalFlow();
-//}
+extern "C"
+void SuperResolution_setOpticalFlow(struct SuperResolutionPtr ptr, struct DenseOpticalFlowExtPtr val)
+{
+    cv::Ptr<superres::DenseOpticalFlowExt> valPtr(
+            static_cast<superres::DenseOpticalFlowExt *>(val.ptr));
+    ptr->setOpticalFlow(rescueObjectFromPtr(valPtr));
+}
+
+extern "C"
+struct DenseOpticalFlowExtPtr SuperResolution_getOpticalFlow(struct SuperResolutionPtr ptr)
+{
+    return rescueObjectFromPtr(ptr->getOpticalFlow());
+}
+
+// DenseOpticalFlowExt
+
+extern "C"
+struct TensorArray DenseOpticalFlowExt_calc(
+        struct DenseOpticalFlowExtPtr ptr, struct TensorWrapper frame0, struct TensorWrapper frame1,
+        struct TensorWrapper flow1, struct TensorWrapper flow2)
+{
+    std::vector<cv::Mat> retval(2);
+    if (!flow1.isNull()) retval[0] = flow1;
+    if (!flow2.isNull()) retval[1] = flow2;
+    ptr->calc(frame0.toMat(), frame1.toMat(), retval[0], retval[1]);
+    return TensorArray(retval);
+}
+
+extern "C"
+void DenseOpticalFlowExt_collectGarbage(struct DenseOpticalFlowExtPtr ptr)
+{
+    ptr->collectGarbage();
+}
 
 // FarnebackOpticalFlow
 

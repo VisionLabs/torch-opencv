@@ -108,6 +108,33 @@ void SuperResolution_setTemporalAreaRadius(struct SuperResolutionPtr ptr, int va
 extern "C"
 int SuperResolution_getTemporalAreaRadius(struct SuperResolutionPtr ptr);
 
+extern "C"
+void SuperResolution_setOpticalFlow(struct SuperResolutionPtr ptr, struct DenseOpticalFlowExtPtr val);
+
+extern "C"
+struct DenseOpticalFlowExtPtr SuperResolution_getOpticalFlow(struct SuperResolutionPtr ptr);
+
+struct DenseOpticalFlowExtPtr {
+    void *ptr;
+
+    inline superres::DenseOpticalFlowExt * operator->() { return static_cast<superres::DenseOpticalFlowExt *>(ptr); }
+    inline DenseOpticalFlowExtPtr(superres::DenseOpticalFlowExt *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+struct TensorArray DenseOpticalFlowExt_calc(
+        struct DenseOpticalFlowExtPtr ptr, struct TensorWrapper frame0, struct TensorWrapper frame1,
+        struct TensorWrapper flow1, struct TensorWrapper flow2);
+
+extern "C"
+void DenseOpticalFlowExt_collectGarbage(struct DenseOpticalFlowExtPtr ptr);
+
+extern "C"
+void SuperResolution_setOpticalFlow(struct SuperResolutionPtr ptr, struct DenseOpticalFlowExtPtr val);
+
+extern "C"
+struct DenseOpticalFlowExtPtr SuperResolution_getOpticalFlow(struct SuperResolutionPtr ptr);
+
 struct FarnebackOpticalFlowPtr {
     void *ptr;
 

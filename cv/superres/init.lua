@@ -63,6 +63,16 @@ void SuperResolution_setTemporalAreaRadius(struct PtrWrapper ptr, int val);
 
 int SuperResolution_getTemporalAreaRadius(struct PtrWrapper ptr);
 
+void SuperResolution_setOpticalFlow(struct PtrWrapper ptr, struct PtrWrapper val);
+
+struct PtrWrapper SuperResolution_getOpticalFlow(struct PtrWrapper ptr);
+
+struct TensorArray DenseOpticalFlowExt_calc(
+        struct PtrWrapper ptr, struct TensorWrapper frame0, struct TensorWrapper frame1,
+        struct TensorWrapper flow1, struct TensorWrapper flow2);
+
+void DenseOpticalFlowExt_collectGarbage(struct PtrWrapper ptr);
+
 // FarnebackOpticalFlow
 
 struct PtrWrapper FarnebackOpticalFlow_ctor();
@@ -235,6 +245,30 @@ function cv.createFrameSource_Camera(t)
     return retval
 end
 
+-- DenseOpticalFlowExt
+
+do
+    local DenseOpticalFlowExt = cv.newTorchClass('cv.DenseOpticalFlowExt', 'cv.Algorithm')
+
+    function DenseOpticalFlowExt:calc(t)
+        local argRules = {
+            {"frame0", required = true},
+            {"frame1", required = true},
+            {"flow1", required = true},
+            {"flow2", default = nil}
+        }
+        local frame0, frame1, flow1, flow2 = cv.argcheck(t, argRules)
+
+        return cv.unwrap_tensors(C.DenseOpticalFlowExt_calc(
+            self.ptr, cv.wrap_tensor(frame0), cv.wrap_tensor(frame1), 
+            cv.wrap_tensor(flow1), cv.wrap_tensor(flow2)))
+    end
+
+    function DenseOpticalFlowExt:collectGarbage()
+        C.DenseOpticalFlowExt_collectGarbage(self.ptr)
+    end
+end
+
 -- SuperResolution
 
 do
@@ -384,21 +418,22 @@ do
         return C.SuperResolution_getTemporalAreaRadius(self.ptr)
     end
 
-    -- TODO this
-    --[[
     function SuperResolution:setOpticalFlow(t)
         local argRules = {
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
         
-        C.SuperResolution_setOpticalFlow(self.ptr, val)
+        C.SuperResolution_setOpticalFlow(self.ptr, val.ptr)
     end
 
+    -- I hope you never use it
     function SuperResolution:getOpticalFlow()
-        return C.SuperResolution_getOpticalFlow(self.ptr)
+        local retval = torch.factory('cv.DenseOpticalFlowExt')()
+        -- dont destroy it
+        retval.ptr = C.SuperResolution_getOpticalFlow(self.ptr)
+        return retval
     end
-    --]]
 end
 
 function cv.createSuperResolution_BTVL1()
@@ -411,30 +446,6 @@ function cv.createSuperResolution_BTVL1_CUDA()
     local retval = torch.factory('cv.SuperResolution')()
     retval.ptr = ffi.gc(C.createSuperResolution_BTVL1_CUDA(), Classes.Algorithm_dtor)
     return retval
-end
-
--- DenseOpticalFlowExt
-
-do
-    local DenseOpticalFlowExt = cv.newTorchClass('cv.DenseOpticalFlowExt', 'cv.Algorithm')
-
-    function DenseOpticalFlowExt:calc(t)
-        local argRules = {
-            {"frame0", required = true},
-            {"frame1", required = true},
-            {"flow1", required = true},
-            {"flow2", default = nil}
-        }
-        local frame0, frame1, flow1, flow2 = cv.argcheck(t, argRules)
-
-        return cv.unwrap_tensors(C.DenseOpticalFlowExt_calc(
-            self.ptr, cv.wrap_tensor(frame0), cv.wrap_tensor(frame1), 
-            cv.wrap_tensor(flow1), cv.wrap_tensor(flow2)))
-    end
-
-    function DenseOpticalFlowExt:collectGarbage()
-        C.DenseOpticalFlowExt_collectGarbage(self.ptr)
-    end
 end
 
 -- FarnebackOpticalFlow
