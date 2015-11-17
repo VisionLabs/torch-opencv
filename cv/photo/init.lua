@@ -114,7 +114,6 @@ function cv.fastNlMeansDenoising(t)
         h = torch.FloatTensor(h)
     end
 
-
     return cv.unwrap_tensors(
             C.fastNlMeansDenoising2(
                 cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(h),
@@ -184,7 +183,6 @@ function cv.fastNlMeansDenoisingMulti(t)
     if type(h) == "table" then
         h = torch.FloatTensor(h)
     end
-
 
     return cv.unwrap_tensors(
         C.fastNlMeansDenoisingMulti2(
