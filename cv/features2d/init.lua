@@ -27,7 +27,7 @@ void KeyPointsFilter_runByImageBorder(struct PtrWrapper ptr, std::vector<cv::Key
 void KeyPointsFilter_test(struct Point2fWrapper temp);
 ]]
 
-ffi.cdef[[
+--[[ffi.cdef[[
 std::vector<cv::KeyPoint> AGAST(struct TensorWrapper image, std::vector<cv::KeyPoint> keypoints,
                 int threshold, bool nonmaxSuppression);
 ]]
@@ -57,7 +57,7 @@ do
     end
 end]]
 
-function AGAST(t)
+--[[function AGAST(t)
     local argRules = {
         {"image", required = true},
         {"keypoints", default = nil},
@@ -67,6 +67,6 @@ function AGAST(t)
     local image, keypoints, threshold, nonmaxSuppression = cv.argcheck(t, argRules)
 
     return C.AGAST(cv.wrap_tensor(image), keypoints, threshold, nonmaxSuppression)
-end
+end]]
 
 return cv

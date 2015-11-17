@@ -34,5 +34,5 @@ extern "C" void KeyPointsFilter_dtor(struct KeyPointsFilterPtr ptr);
 extern "C" void KeyPointsFilter_runByImageBorder(struct KeyPointsFilterPtr ptr, std::vector<cv::KeyPoint>& keypoints,
                     struct SizeWrapper imageSize, int borderSize);*/
 
-extern "C" std::vector<cv::KeyPoint> AGAST(struct TensorWrapper image, std::vector<cv::KeyPoint> keypoints,
-                int threshold, bool nonmaxSuppression);
+/*extern "C" std::vector<cv::KeyPoint> AGAST(struct TensorWrapper image, std::vector<cv::KeyPoint> keypoints,
+                int threshold, bool nonmaxSuppression);*/

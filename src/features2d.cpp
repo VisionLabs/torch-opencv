@@ -27,10 +27,10 @@ extern "C" void KeyPointsFilter_runByImageBorder(struct KeyPointsFilterPtr ptr, 
     ptr->runByImageBorder(keypoints, imageSize, borderSize);
 }*/
 
-extern "C" std::vector<cv::KeyPoint> AGAST(struct TensorWrapper image, std::vector<cv::KeyPoint> keypoints,
+/*extern "C" std::vector<cv::KeyPoint> AGAST(struct TensorWrapper image, std::vector<cv::KeyPoint> keypoints,
                 int threshold, bool nonmaxSuppression)
 {
     std::vector<cv::KeyPoint> retval;
     cv::AGAST(image.toMat(), retval, threshold, nonmaxSuppression);
     return retval;
-}
+}*/
