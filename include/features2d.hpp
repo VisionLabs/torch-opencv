@@ -1,9 +1,8 @@
 #include <Common.hpp>
 #include <Classes.hpp>
-//#include <opencv2/superres/optical_flow.hpp>
 #include <opencv2/features2d.hpp>
 
-/*struct KeyPointWrapper {
+struct KeyPointWrapper {
     struct Point2fWrapper pt;
     float size, angle, response;
     int octave, class_id;
@@ -15,11 +14,14 @@
 struct KeyPointArray {
     struct KeyPointWrapper *data;
     int size;
-};*/
+
+    KeyPointArray(const std::vector<cv::KeyPoint> & v);
+    operator std::vector<cv::KeyPoint>();
+};
 
 // KeyPointsFilter
 
-/*struct KeyPointsFilterPtr {
+struct KeyPointsFilterPtr {
     void *ptr;
 
     inline cv::KeyPointsFilter * operator->() { return static_cast<cv::KeyPointsFilter *>(ptr); }
@@ -31,8 +33,9 @@ extern "C" struct KeyPointsFilterPtr KeyPointsFilter_ctor();
 
 extern "C" void KeyPointsFilter_dtor(struct KeyPointsFilterPtr ptr);
 
-extern "C" void KeyPointsFilter_runByImageBorder(struct KeyPointsFilterPtr ptr, std::vector<cv::KeyPoint>& keypoints,
-                    struct SizeWrapper imageSize, int borderSize);*/
+extern "C" struct KeyPointArray KeyPointsFilter_runByImageBorder(
+        struct KeyPointArray keypoints,
+        struct SizeWrapper imageSize, int borderSize);
 
-/*extern "C" std::vector<cv::KeyPoint> AGAST(struct TensorWrapper image, std::vector<cv::KeyPoint> keypoints,
-                int threshold, bool nonmaxSuppression);*/
+extern "C" struct KeyPointArray AGAST(
+        struct TensorWrapper image, int threshold, bool nonmaxSuppression);

@@ -10,29 +10,35 @@ require 'cv.Classes'
 
 local Classes = ffi.load(cv.libPath('Classes'))
 
---[[ffi.cdef[[
+ffi.cdef[[
 struct KeyPointWrapper {
     struct Point2fWrapper pt;
     float size, angle, response;
     int octave, class_id;
 };
 
+struct KeyPointArray {
+    struct KeyPointWrapper *data;
+    int size;
+};
+
 struct PtrWrapper KeyPointsFilter_ctor();
 
 void KeyPointsFilter_dtor(struct PtrWrapper ptr);
 
-void KeyPointsFilter_runByImageBorder(struct PtrWrapper ptr, std::vector<cv::KeyPoint>& keypoints,
-                struct SizeWrapper imageSize, int borderSize);
+struct KeyPointArray KeyPointsFilter_runByImageBorder(
+        struct KeyPointArray keypoints,
+        struct SizeWrapper imageSize, int borderSize);
 
 void KeyPointsFilter_test(struct Point2fWrapper temp);
 ]]
 
---[[ffi.cdef[[
-std::vector<cv::KeyPoint> AGAST(struct TensorWrapper image, std::vector<cv::KeyPoint> keypoints,
-                int threshold, bool nonmaxSuppression);
+ffi.cdef[[
+struct KeyPointArray AGAST(
+        struct TensorWrapper image, int threshold, bool nonmaxSuppression);
 ]]
 
---[[function cv.KeyPoint(...)
+function cv.KeyPoint(...)
     return ffi.new('struct KeyPointWrapper', ...)
 end
 
@@ -53,20 +59,19 @@ do
         }
         local keypoints, imageSize, borderSize = cv.argcheck(t, argRules)
         
-        C.KeyPointsFilter_runByImageBorder(self.ptr, keypoints, imageSize, borderSize);
+        return C.KeyPointsFilter_runByImageBorder(keypoints, imageSize, borderSize);
     end
-end]]
+end
 
---[[function AGAST(t)
+function cv.AGAST(t)
     local argRules = {
         {"image", required = true},
-        {"keypoints", default = nil},
         {"threshold", required = true},
         {"nonmaxSuppression", default = true}
     }
-    local image, keypoints, threshold, nonmaxSuppression = cv.argcheck(t, argRules)
+    local image, threshold, nonmaxSuppression = cv.argcheck(t, argRules)
 
-    return C.AGAST(cv.wrap_tensor(image), keypoints, threshold, nonmaxSuppression)
-end]]
+    return C.AGAST(cv.wrap_tensor(image), threshold, nonmaxSuppression)
+end
 
 return cv
