@@ -47,9 +47,9 @@ do
     -- v = cv.VideoCapture{device=2}
     function VideoCapture:__init(t)
         if type(t.filename or t[1]) == 'string' then
-            self.ptr = ffi.gc(C.VideoCapture_ctor_filename(t.filename), C.VideoCapture_dtor)
+            self.ptr = ffi.gc(C.VideoCapture_ctor_filename(t.filename or t[1]), C.VideoCapture_dtor)
         elseif type(t.device or t[1]) == 'number' then
-            self.ptr = ffi.gc(C.VideoCapture_ctor_device(t.device), C.VideoCapture_dtor)
+            self.ptr = ffi.gc(C.VideoCapture_ctor_device(t.device or t[1]), C.VideoCapture_dtor)
         else
             self.ptr = ffi.gc(C.VideoCapture_ctor_default(), C.VideoCapture_dtor)
         end
