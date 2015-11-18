@@ -435,7 +435,7 @@ do
     -- I hope you never use it
     function SuperResolution:getOpticalFlow()
         local retval = torch.factory('cv.DenseOpticalFlowExt')()
-        -- dont destroy it
+        -- don't destroy it
         retval.ptr = C.SuperResolution_getOpticalFlow(self.ptr)
         return retval
     end

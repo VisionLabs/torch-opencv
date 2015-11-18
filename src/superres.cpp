@@ -65,6 +65,147 @@ struct SuperResolutionPtr createSuperResolution_BTVL1_CUDA()
     return rescueObjectFromPtr(superres::createSuperResolution_BTVL1_CUDA());
 }
 
+// A hack for accessing private fields
+// To be removed when https://github.com/VisionLabs/torch-opencv/issues/29 is closed
+
+class CV_EXPORTS SRes : public cv::Algorithm, public superres::FrameSource
+{
+public:
+    /** @brief Set input frame source for Super Resolution algorithm.
+
+    @param frameSource Input frame source
+     */
+    void setInput(const cv::Ptr<superres::FrameSource>& frameSource);
+
+    /** @brief Process next frame from input and return output result.
+
+    @param frame Output result
+     */
+    void nextFrame(cv::OutputArray frame);
+    void reset();
+
+    /** @brief Clear all inner buffers.
+    */
+    virtual void collectGarbage();
+
+    //! @brief Scale factor
+    /** @see setScale */
+    virtual int getScale() const = 0;
+    /** @copybrief getScale @see getScale */
+    virtual void setScale(int val) = 0;
+
+    //! @brief Iterations count
+    /** @see setIterations */
+    virtual int getIterations() const = 0;
+    /** @copybrief getIterations @see getIterations */
+    virtual void setIterations(int val) = 0;
+
+    //! @brief Asymptotic value of steepest descent method
+    /** @see setTau */
+    virtual double getTau() const = 0;
+    /** @copybrief getTau @see getTau */
+    virtual void setTau(double val) = 0;
+
+    //! @brief Weight parameter to balance data term and smoothness term
+    /** @see setLabmda */
+    virtual double getLabmda() const = 0;
+    /** @copybrief getLabmda @see getLabmda */
+    virtual void setLabmda(double val) = 0;
+
+    //! @brief Parameter of spacial distribution in Bilateral-TV
+    /** @see setAlpha */
+    virtual double getAlpha() const = 0;
+    /** @copybrief getAlpha @see getAlpha */
+    virtual void setAlpha(double val) = 0;
+
+    //! @brief Kernel size of Bilateral-TV filter
+    /** @see setKernelSize */
+    virtual int getKernelSize() const = 0;
+    /** @copybrief getKernelSize @see getKernelSize */
+    virtual void setKernelSize(int val) = 0;
+
+    //! @brief Gaussian blur kernel size
+    /** @see setBlurKernelSize */
+    virtual int getBlurKernelSize() const = 0;
+    /** @copybrief getBlurKernelSize @see getBlurKernelSize */
+    virtual void setBlurKernelSize(int val) = 0;
+
+    //! @brief Gaussian blur sigma
+    /** @see setBlurSigma */
+    virtual double getBlurSigma() const = 0;
+    /** @copybrief getBlurSigma @see getBlurSigma */
+    virtual void setBlurSigma(double val) = 0;
+
+    //! @brief Radius of the temporal search area
+    /** @see setTemporalAreaRadius */
+    virtual int getTemporalAreaRadius() const = 0;
+    /** @copybrief getTemporalAreaRadius @see getTemporalAreaRadius */
+    virtual void setTemporalAreaRadius(int val) = 0;
+
+    //! @brief Dense optical flow algorithm
+    /** @see setOpticalFlow */
+    virtual cv::Ptr<cv::superres::DenseOpticalFlowExt> getOpticalFlow() const = 0;
+    /** @copybrief getOpticalFlow @see getOpticalFlow */
+    virtual void setOpticalFlow(const cv::Ptr<cv::superres::DenseOpticalFlowExt> &val) = 0;
+
+//protected:
+    SRes();
+
+    virtual void initImpl(cv::Ptr<superres::FrameSource>& frameSource) = 0;
+    virtual void processImpl(cv::Ptr<superres::FrameSource>& frameSource, cv::OutputArray output) = 0;
+
+    bool isUmat_;
+
+//private:
+    cv::Ptr<superres::FrameSource> frameSource_;
+    bool firstCall_;
+};
+
+class BTVL1_B : public cv::superres::SuperResolution {
+public:
+    BTVL1_B();
+
+    int scale_;
+    int iterations_;
+    double tau_;
+    double lambda_;
+    double alpha_;
+    int btvKernelSize_;
+    int blurKernelSize_;
+    double blurSigma_;
+    int temporalAreaRadius_; // not used in some implementations
+    cv::Ptr <cv::superres::DenseOpticalFlowExt> opticalFlow_;
+
+    bool ocl_process(cv::InputArrayOfArrays src, cv::OutputArray dst, cv::InputArrayOfArrays forwardMotions,
+                     cv::InputArrayOfArrays backwardMotions, int baseIdx);
+
+    //Ptr<FilterEngine> filter_;
+    int curBlurKernelSize_;
+    double curBlurSigma_;
+    int curSrcType_;
+
+    std::vector<float> btvWeights_;
+    cv::UMat ubtvWeights_;
+
+    int curBtvKernelSize_;
+    double curAlpha_;
+
+    // Mat
+    std::vector<cv::Mat> lowResForwardMotions_;
+    std::vector<cv::Mat> lowResBackwardMotions_;
+
+    std::vector<cv::Mat> highResForwardMotions_;
+    std::vector<cv::Mat> highResBackwardMotions_;
+
+    std::vector<cv::Mat> forwardMaps_;
+    std::vector<cv::Mat> backwardMaps_;
+
+    cv::Mat highRes_;
+
+    cv::Mat diffTerm_, regTerm_;
+    cv::Mat a_, b_, c_;
+};
+
 extern "C"
 struct TensorWrapper SuperResolution_nextFrame(struct SuperResolutionPtr ptr, struct TensorWrapper frame)
 {
@@ -87,8 +228,10 @@ void SuperResolution_reset(struct SuperResolutionPtr ptr)
 extern "C"
 void SuperResolution_setInput(struct SuperResolutionPtr ptr, struct FrameSourcePtr frameSource)
 {
-    ptr->setInput(
-        cv::makePtr(static_cast<superres::FrameSource *>(frameSource.ptr)));
+    cv::Ptr<superres::FrameSource> tempPtr(
+            static_cast<superres::FrameSource *>(frameSource.ptr));
+    rescueObjectFromPtr(tempPtr);
+    ptr->setInput(tempPtr);
 }
 
 extern "C"
@@ -208,8 +351,15 @@ int SuperResolution_getTemporalAreaRadius(struct SuperResolutionPtr ptr)
 extern "C"
 void SuperResolution_setOpticalFlow(struct SuperResolutionPtr ptr, struct DenseOpticalFlowExtPtr val)
 {
-    ptr->setOpticalFlow(
-        cv::makePtr(static_cast<superres::DenseOpticalFlowExt *>(val.ptr)));
+    cv::Ptr<superres::DenseOpticalFlowExt> tempPtr(
+            static_cast<superres::DenseOpticalFlowExt *>(val.ptr));
+    rescueObjectFromPtr(tempPtr);
+
+    ptr->setOpticalFlow(tempPtr);
+
+    std::cout << "Setting this optical flow: " << tempPtr.get() << std::endl;
+    BTVL1_B * b = static_cast<BTVL1_B *>(ptr.ptr);
+    std::cout << "BTVL1_Base haz " << b->opticalFlow_.get() << std::endl;
 }
 
 extern "C"
