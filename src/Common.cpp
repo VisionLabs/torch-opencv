@@ -120,13 +120,10 @@ TensorArray::TensorArray(std::vector<cv::Mat> & matList):
 }
 
 TensorArray::operator std::vector<cv::Mat>() {
-    std::cout << this->size << " conv" << std::endl;
-    std::vector<cv::Mat> retval;
-    retval.resize(2);
+    std::vector<cv::Mat> retval(this->size);
     for (int i = 0; i < this->size; ++i) {
         // TODO: avoid temporary object
         retval[i] = this->tensors[i];
-        std::cout << i << " conv" << std::endl;
     }
     return retval;
 }

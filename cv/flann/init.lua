@@ -231,6 +231,7 @@ do
             {"params", required = true},
             {"distType", default = cv.FLANN_DIST_L2}
         }
+        local features, params, distType = cv.argcheck(t, argRules)
         
         C.Index_build(self.ptr, cv.wrap_tensor(features), params.ptr, distType)
     end
