@@ -38,6 +38,12 @@ struct ParamGridPtr ParamGrid_ctor_default()
     return new ml::ParamGrid();
 }
 
+extern "C"
+void ParamGrid_dtor(struct ParamGridPtr ptr)
+{
+    delete static_cast<ml::ParamGrid *>(ptr.ptr);
+}
+
 // TrainData
 
 extern "C"

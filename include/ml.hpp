@@ -41,6 +41,9 @@ extern "C"
 struct ParamGridPtr ParamGrid_ctor_default();
 
 extern "C"
+void ParamGrid_dtor(struct ParamGridPtr ptr);
+
+extern "C"
 struct TrainDataPtr TrainData_ctor(
         struct TensorWrapper samples, int layout, struct TensorWrapper responses,
         struct TensorWrapper varIdx, struct TensorWrapper sampleIdx,

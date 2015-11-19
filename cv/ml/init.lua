@@ -2,88 +2,88 @@ local cv = require 'cv._env'
 
 local ffi = require 'ffi'
 
-cv.ml = {}
+local ml = {}
 
-cv.ml.ANN_MLP_BACKPROP = 0
-cv.ml.ANN_MLP_GAUSSIAN = 2
-cv.ml.ANN_MLP_IDENTITY = 0
-cv.ml.ANN_MLP_NO_INPUT_SCALE = 2
-cv.ml.ANN_MLP_NO_OUTPUT_SCALE = 4
-cv.ml.ANN_MLP_RPROP = 1
-cv.ml.ANN_MLP_SIGMOID_SYM = 1
-cv.ml.ANN_MLP_UPDATE_WEIGHTS = 1
-cv.ml.BOOST_DISCRETE = 0
-cv.ml.BOOST_GENTLE = 3
-cv.ml.BOOST_LOGIT = 2
-cv.ml.BOOST_REAL = 1
-cv.ml.Boost_DISCRETE = 0
-cv.ml.Boost_GENTLE = 3
-cv.ml.Boost_LOGIT = 2
-cv.ml.Boost_REAL = 1
-cv.ml.COL_SAMPLE = 1
-cv.ml.DTREES_PREDICT_AUTO = 0
-cv.ml.DTREES_PREDICT_MASK = 768
-cv.ml.DTREES_PREDICT_MAX_VOTE = 512
-cv.ml.DTREES_PREDICT_SUM = 256
-cv.ml.DTrees_PREDICT_AUTO = 0
-cv.ml.DTrees_PREDICT_MASK = 768
-cv.ml.DTrees_PREDICT_MAX_VOTE = 512
-cv.ml.DTrees_PREDICT_SUM = 256
-cv.ml.EM_COV_MAT_DEFAULT = 1
-cv.ml.EM_COV_MAT_DIAGONAL = 1
-cv.ml.EM_COV_MAT_GENERIC = 2
-cv.ml.EM_COV_MAT_SPHERICAL = 0
-cv.ml.EM_DEFAULT_MAX_ITERS = 100
-cv.ml.EM_DEFAULT_NCLUSTERS = 5
-cv.ml.EM_START_AUTO_STEP = 0
-cv.ml.EM_START_E_STEP = 1
-cv.ml.EM_START_M_STEP = 2
-cv.ml.KNEAREST_BRUTE_FORCE = 1
-cv.ml.KNEAREST_KDTREE = 2
-cv.ml.KNearest_BRUTE_FORCE = 1
-cv.ml.KNearest_KDTREE = 2
-cv.ml.LOGISTIC_REGRESSION_BATCH = 0
-cv.ml.LOGISTIC_REGRESSION_MINI_BATCH = 1
-cv.ml.LOGISTIC_REGRESSION_REG_DISABLE = -1
-cv.ml.LOGISTIC_REGRESSION_REG_L1 = 0
-cv.ml.LOGISTIC_REGRESSION_REG_L2 = 1
-cv.ml.LogisticRegression_BATCH = 0
-cv.ml.LogisticRegression_MINI_BATCH = 1
-cv.ml.LogisticRegression_REG_DISABLE = -1
-cv.ml.LogisticRegression_REG_L1 = 0
-cv.ml.LogisticRegression_REG_L2 = 1
-cv.ml.ROW_SAMPLE = 0
-cv.ml.STAT_MODEL_COMPRESSED_INPUT = 2
-cv.ml.STAT_MODEL_PREPROCESSED_INPUT = 4
-cv.ml.STAT_MODEL_RAW_OUTPUT = 1
-cv.ml.STAT_MODEL_UPDATE_MODEL = 1
-cv.ml.SVM_C = 0
-cv.ml.SVM_CHI2 = 4
-cv.ml.SVM_COEF = 4
-cv.ml.SVM_CUSTOM = -1
-cv.ml.SVM_C_SVC = 100
-cv.ml.SVM_DEGREE = 5
-cv.ml.SVM_EPS_SVR = 103
-cv.ml.SVM_GAMMA = 1
-cv.ml.SVM_INTER = 5
-cv.ml.SVM_LINEAR = 0
-cv.ml.SVM_NU = 3
-cv.ml.SVM_NU_SVC = 101
-cv.ml.SVM_NU_SVR = 104
-cv.ml.SVM_ONE_CLASS = 102
-cv.ml.SVM_P = 2
-cv.ml.SVM_POLY = 1
-cv.ml.SVM_RBF = 2
-cv.ml.SVM_SIGMOID = 3
-cv.ml.StatModel_COMPRESSED_INPUT = 2
-cv.ml.StatModel_PREPROCESSED_INPUT = 4
-cv.ml.StatModel_RAW_OUTPUT = 1
-cv.ml.StatModel_UPDATE_MODEL = 1
-cv.ml.TEST_ERROR = 0
-cv.ml.TRAIN_ERROR = 1
-cv.ml.VAR_CATEGORICAL = 1
-cv.ml.VAR_NUMERICAL = 0
-cv.ml.VAR_ORDERED = 0
+ml.ANN_MLP_BACKPROP = 0
+ml.ANN_MLP_GAUSSIAN = 2
+ml.ANN_MLP_IDENTITY = 0
+ml.ANN_MLP_NO_INPUT_SCALE = 2
+ml.ANN_MLP_NO_OUTPUT_SCALE = 4
+ml.ANN_MLP_RPROP = 1
+ml.ANN_MLP_SIGMOID_SYM = 1
+ml.ANN_MLP_UPDATE_WEIGHTS = 1
+ml.BOOST_DISCRETE = 0
+ml.BOOST_GENTLE = 3
+ml.BOOST_LOGIT = 2
+ml.BOOST_REAL = 1
+ml.Boost_DISCRETE = 0
+ml.Boost_GENTLE = 3
+ml.Boost_LOGIT = 2
+ml.Boost_REAL = 1
+ml.COL_SAMPLE = 1
+ml.DTREES_PREDICT_AUTO = 0
+ml.DTREES_PREDICT_MASK = 768
+ml.DTREES_PREDICT_MAX_VOTE = 512
+ml.DTREES_PREDICT_SUM = 256
+ml.DTrees_PREDICT_AUTO = 0
+ml.DTrees_PREDICT_MASK = 768
+ml.DTrees_PREDICT_MAX_VOTE = 512
+ml.DTrees_PREDICT_SUM = 256
+ml.EM_COV_MAT_DEFAULT = 1
+ml.EM_COV_MAT_DIAGONAL = 1
+ml.EM_COV_MAT_GENERIC = 2
+ml.EM_COV_MAT_SPHERICAL = 0
+ml.EM_DEFAULT_MAX_ITERS = 100
+ml.EM_DEFAULT_NCLUSTERS = 5
+ml.EM_START_AUTO_STEP = 0
+ml.EM_START_E_STEP = 1
+ml.EM_START_M_STEP = 2
+ml.KNEAREST_BRUTE_FORCE = 1
+ml.KNEAREST_KDTREE = 2
+ml.KNearest_BRUTE_FORCE = 1
+ml.KNearest_KDTREE = 2
+ml.LOGISTIC_REGRESSION_BATCH = 0
+ml.LOGISTIC_REGRESSION_MINI_BATCH = 1
+ml.LOGISTIC_REGRESSION_REG_DISABLE = -1
+ml.LOGISTIC_REGRESSION_REG_L1 = 0
+ml.LOGISTIC_REGRESSION_REG_L2 = 1
+ml.LogisticRegression_BATCH = 0
+ml.LogisticRegression_MINI_BATCH = 1
+ml.LogisticRegression_REG_DISABLE = -1
+ml.LogisticRegression_REG_L1 = 0
+ml.LogisticRegression_REG_L2 = 1
+ml.ROW_SAMPLE = 0
+ml.STAT_MODEL_COMPRESSED_INPUT = 2
+ml.STAT_MODEL_PREPROCESSED_INPUT = 4
+ml.STAT_MODEL_RAW_OUTPUT = 1
+ml.STAT_MODEL_UPDATE_MODEL = 1
+ml.SVM_C = 0
+ml.SVM_CHI2 = 4
+ml.SVM_COEF = 4
+ml.SVM_CUSTOM = -1
+ml.SVM_C_SVC = 100
+ml.SVM_DEGREE = 5
+ml.SVM_EPS_SVR = 103
+ml.SVM_GAMMA = 1
+ml.SVM_INTER = 5
+ml.SVM_LINEAR = 0
+ml.SVM_NU = 3
+ml.SVM_NU_SVC = 101
+ml.SVM_NU_SVR = 104
+ml.SVM_ONE_CLASS = 102
+ml.SVM_P = 2
+ml.SVM_POLY = 1
+ml.SVM_RBF = 2
+ml.SVM_SIGMOID = 3
+ml.StatModel_COMPRESSED_INPUT = 2
+ml.StatModel_PREPROCESSED_INPUT = 4
+ml.StatModel_RAW_OUTPUT = 1
+ml.StatModel_UPDATE_MODEL = 1
+ml.TEST_ERROR = 0
+ml.TRAIN_ERROR = 1
+ml.VAR_CATEGORICAL = 1
+ml.VAR_NUMERICAL = 0
+ml.VAR_ORDERED = 0
 
 ffi.cdef[[
 struct TensorWrapper randMVNormal(
@@ -95,7 +95,7 @@ struct TensorArray createConcentricSpheresTestSet(
 
 local C = ffi.load(cv.libPath('ml'))
 
-function cv.randMVNormal(t)
+function ml.randMVNormal(t)
     local argRules = {
         {"mean", required = true},
         {"cov", required = true},
@@ -108,7 +108,7 @@ function cv.randMVNormal(t)
         cv.wrap_tensor(mean), cv.wrap_tensor(cov), nsamples, cv.wrap_tensor(samples)))
 end
 
-function cv.createConcentricSpheresTestSet(t)
+function ml.createConcentricSpheresTestSet(t)
     local argRules = {
         {"nsamples", required = true},
         {"nfeatures", required = true},
@@ -131,6 +131,8 @@ ffi.cdef[[
 struct PtrWrapper ParamGrid_ctor(double _minVal, double _maxVal, double _logStep);
 
 struct PtrWrapper ParamGrid_ctor_default();
+
+void ParamGrid_dtor(struct PtrWrapper ptr);
 
 struct PtrWrapper TrainData_ctor(
         struct TensorWrapper samples, int layout, struct TensorWrapper responses,
@@ -531,7 +533,7 @@ struct TensorWrapper LogisticRegression_get_learnt_thetas(struct PtrWrapper ptr)
 -- ParamGrid
 
 do
-    local ParamGrid = cv.newTorchClass('cv.ml.ParamGrid')
+    local ParamGrid = torch.class('ml.ParamGrid', ml)
 
     function ParamGrid:__init(t)
     	if type(t) ~= 'table' then
@@ -556,7 +558,7 @@ end
 -- TrainData
 
 do
-    local TrainData = cv.newTorchClass('cv.TrainData')
+    local TrainData = torch.class('ml.TrainData', ml)
 
     function TrainData:__init(t)
         local argRules = {
@@ -774,7 +776,7 @@ end
 -- StatModel
 
 do
-    local StatModel = cv.newTorchClass('cv.StatModel', 'cv.Algorithm')
+    local StatModel = torch.class('ml.StatModel', 'cv.Algorithm', ml)
 
     function StatModel:getVarCount()
         return C.StatModel_getVarCount(self.ptr)
@@ -840,7 +842,7 @@ end
 -- NormalBayesClassifier
 
 do
-	local NormalBayesClassifier = cv.newTorchClass('cv.NormalBayesClassifier', 'cv.StatModel')
+	local NormalBayesClassifier = torch.class('ml.NormalBayesClassifier', 'ml.StatModel', ml)
 
 	function NormalBayesClassifier:__init()
 		self.ptr = ffi.gc(C.NormalBayesClassifier_ctor(), Classes.Algorithm_dtor)
@@ -865,7 +867,7 @@ end
 -- KNearest
 
 do
-    local KNearest = cv.newTorchClass('cv.KNearest', 'cv.StatModel')
+    local KNearest = torch.class('ml.KNearest', 'ml.StatModel', ml)
 
     function KNearest:__init()
         self.ptr = ffi.gc(C.KNearest_ctor(), Classes.Algorithm_dtor)
@@ -941,7 +943,7 @@ end
 -- SVM
 
 do
-	local SVM = cv.newTorchClass('cv.SVM', 'cv.StatModel')
+	local SVM = torch.class('ml.SVM', 'ml.StatModel', ml)
 
 	function SVM:__init()
 		self.ptr = ffi.gc(C.SVM_ctor(), Classes.Algorithm_dtor)
@@ -1091,12 +1093,12 @@ do
 		local argRules = {
 			{"data", required = true},
 			{"kFold", default = 10},
-			{"Cgrid", default = SVM.getDefaultGrid(cv.ml.SVM_C)},
-			{"gammaGrid", default = SVM.getDefaultGrid(cv.ml.SVM_GAMMA)},
-			{"pGrid", default = SVM.getDefaultGrid(cv.ml.SVM_P)},
-			{"nuGrid", default = SVM.getDefaultGrid(cv.ml.SVM_NU)},
-			{"coeffGrid", default = SVM.getDefaultGrid(cv.ml.SVM_COEF)},
-			{"degreeGrid", default = SVM.getDefaultGrid(cv.ml.SVM_DEGREE)},
+			{"Cgrid", default = SVM.getDefaultGrid(ml.SVM_C)},
+			{"gammaGrid", default = SVM.getDefaultGrid(ml.SVM_GAMMA)},
+			{"pGrid", default = SVM.getDefaultGrid(ml.SVM_P)},
+			{"nuGrid", default = SVM.getDefaultGrid(ml.SVM_NU)},
+			{"coeffGrid", default = SVM.getDefaultGrid(ml.SVM_COEF)},
+			{"degreeGrid", default = SVM.getDefaultGrid(ml.SVM_DEGREE)},
 			{"balanced", default = false}
 		}
 		local data, kFold, Cgrid, gammaGrid, pGrid, nuGrid, coeffGrid, degreeGrid, balanced 
@@ -1136,7 +1138,7 @@ end
 -- EM
 
 do
-    local EM = cv.newTorchClass('cv.EM', 'cv.StatModel')
+    local EM = torch.class('ml.EM', 'ml.StatModel', ml)
 
     function EM:__init()
         self.ptr = ffi.gc(C.EM_ctor(), Classes.Algorithm_dtor)
@@ -1255,7 +1257,7 @@ end
 -- DTrees
 
 do
-    local DTrees = cv.newTorchClass('cv.DTrees', 'cv.StatModel')
+    local DTrees = torch.class('ml.DTrees', 'ml.StatModel', ml)
 
     function DTrees:__init()
         self.ptr = ffi.gc(C.DTrees_ctor(), Classes.Algorithm_dtor)
@@ -1402,7 +1404,7 @@ end
 -- RTrees
 
 do
-    local RTrees = cv.newTorchClass('cv.RTrees', 'cv.DTrees')
+    local RTrees = torch.class('ml.RTrees', 'ml.DTrees', ml)
 
     function RTrees:__init()
         self.ptr = ffi.gc(C.RTrees_ctor(), Classes.Algorithm_dtor)
@@ -1455,7 +1457,7 @@ end
 -- Boost
 
 do
-    local Boost = cv.newTorchClass('cv.Boost', 'cv.DTrees')
+    local Boost = torch.class('ml.Boost', 'ml.DTrees', ml)
 
     function Boost:__init()
         self.ptr = ffi.gc(C.Boost_ctor(), Classes.Algorithm_dtor)
@@ -1504,7 +1506,7 @@ end
 -- ANN_MLP
 
 do
-    local ANN_MLP = cv.newTorchClass('cv.ANN_MLP', 'cv.StatModel')
+    local ANN_MLP = torch.class('ml.ANN_MLP', 'ml.StatModel', ml)
 
     function ANN_MLP:__init()
         self.ptr = ffi.gc(C.ANN_MLP_ctor(), Classes.Algorithm_dtor)
@@ -1674,7 +1676,7 @@ end
 -- LogisticRegression
 
 do
-    local LogisticRegression = cv.newTorchClass('cv.LogisticRegression', 'cv.StatModel')
+    local LogisticRegression = torch.class('ml.LogisticRegression', 'ml.StatModel', ml)
 
     function LogisticRegression:__init()
         self.ptr = ffi.gc(C.LogisticRegression_ctor(), Classes.Algorithm_dtor)
@@ -1763,4 +1765,4 @@ do
     end
 end
 
-return cv
+return ml

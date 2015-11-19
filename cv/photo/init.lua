@@ -216,7 +216,7 @@ function cv.fastNlMeansDenoisingColoredMulti(t)
     assert(temporalWindowSize % 2 == 1)
     assert(templateWindowSize % 2 == 1)
     assert(searchWindowSize % 2 == 1)
-
+    
     return cv.unwrap_tensors(
         C.fastNlMeansDenoisingColoredMulti(
             cv.wrap_tensors(srcImgs), cv.wrap_tensor(dst), imgToDenoiseIndex, temporalWindowSize,
@@ -572,7 +572,7 @@ struct TensorWrapper MergeRobertson_process2(struct PtrWrapper ptr, struct Tenso
 -- Tonemap
 
 do
-    local Tonemap = cv.newTorchClass('cv.Tonemap', 'cv.Algorithm')
+    local Tonemap = torch.class('cv.Tonemap', 'cv.Algorithm', cv)
 
     function Tonemap:__init(t)
         local argRules = {
@@ -610,7 +610,7 @@ end
 -- TonemapDrago
 
 do
-    local TonemapDrago = cv.newTorchClass('cv.TonemapDrago', 'cv.Tonemap')
+    local TonemapDrago = torch.class('cv.TonemapDrago', 'cv.Tonemap', cv)
 
     function TonemapDrago:__init(t)
         local argRules = {
@@ -653,7 +653,7 @@ end
 -- TonemapDurand
 
 do
-    local TonemapDurand = cv.newTorchClass('cv.TonemapDurand', 'cv.Tonemap');
+    local TonemapDurand = torch.class('cv.TonemapDurand', 'cv.Tonemap', cv);
 
     function TonemapDurand:__init(t)
         local argRules = {
@@ -724,7 +724,7 @@ end
 -- TonemapReinhard
 
 do
-    local TonemapReinhard = cv.newTorchClass('cv.TonemapReinhard', 'cv.Tonemap');
+    local TonemapReinhard = torch.class('cv.TonemapReinhard', 'cv.Tonemap', cv);
 
     function TonemapReinhard:__init(t)
         local argRules = {
@@ -782,7 +782,7 @@ end
 -- TonemapMantiuk
 
 do
-    local TonemapMantiuk = cv.newTorchClass('cv.TonemapMantiuk', 'cv.Tonemap');
+    local TonemapMantiuk = torch.class('cv.TonemapMantiuk', 'cv.Tonemap', cv);
 
     function TonemapMantiuk:__init(t)
         local argRules = {
@@ -825,7 +825,7 @@ end
 -- AlignExposures
 
 do
-    local AlignExposures = cv.newTorchClass('cv.AlignExposures', 'cv.Algorithm')
+    local AlignExposures = torch.class('cv.AlignExposures', 'cv.Algorithm', cv)
 
     function AlignExposures:process(t)
         local argRules = {
@@ -849,7 +849,7 @@ end
 
 -- AlignMTB
 do
-    local AlignMTB = cv.newTorchClass('cv.AlignMTB', 'cv.AlignExposures')
+    local AlignMTB = torch.class('cv.AlignMTB', 'cv.AlignExposures', cv)
 
     function AlignMTB:__init(t)
         local argRules = {
@@ -968,7 +968,7 @@ end
 -- CalibrateCRF
 
 do
-    local CalibrateCRF = cv.newTorchClass('cv.CalibrateCRF', 'cv.Algorithm')
+    local CalibrateCRF = torch.class('cv.CalibrateCRF', 'cv.Algorithm', cv)
 
     function CalibrateCRF:process(t)
         local argRules = {
@@ -992,7 +992,7 @@ end
 -- CalibrateDebevec
 
 do
-    local CalibrateDebevec = cv.newTorchClass('cv.CalibrateDebevec', 'cv.CalibrateCRF')
+    local CalibrateDebevec = torch.class('cv.CalibrateDebevec', 'cv.CalibrateCRF', cv)
 
     function CalibrateDebevec:__init(t)
         local argRules = {
@@ -1049,7 +1049,7 @@ end
 -- CalibrateRobertson
 
 do
-    local CalibrateRobertson = cv.newTorchClass('cv.CalibrateRobertson', 'cv.CalibrateCRF')
+    local CalibrateRobertson = torch.class('cv.CalibrateRobertson', 'cv.CalibrateCRF', cv)
 
     function CalibrateRobertson:__init(t)
         local argRules = {
@@ -1096,7 +1096,7 @@ end
 -- MergeExposures
 
 do
-    local MergeExposures = cv.newTorchClass('cv.MergeExposures', 'cv.Algorithm')
+    local MergeExposures = torch.class('cv.MergeExposures', 'cv.Algorithm', cv)
 
     function MergeExposures:process(t)
         local argRules = {
@@ -1121,7 +1121,7 @@ end
 -- MergeDebevec
 
 do
-    local MergeDebevec = cv.newTorchClass('cv.MergeDebevec', 'cv.MergeExposures')
+    local MergeDebevec = torch.class('cv.MergeDebevec', 'cv.MergeExposures', cv)
 
     function MergeDebevec:__init(t)
         self.ptr = ffi.gc(C.MergeDebevec_ctor(), Classes.Algorithm_dtor)
@@ -1155,7 +1155,7 @@ end
 -- MergeMertens
 
 do
-    local MergeMertens = cv.newTorchClass('cv.MergeMertens', 'cv.MergeExposures')
+    local MergeMertens = torch.class('cv.MergeMertens', 'cv.MergeExposures', cv)
 
     function MergeMertens:__init(t)
         local argRules = {
@@ -1235,7 +1235,7 @@ end
 -- MergeRobertson
 
 do
-    local MergeRobertson = cv.newTorchClass('cv.MergeRobertson', 'cv.MergeExposures')
+    local MergeRobertson = torch.class('cv.MergeRobertson', 'cv.MergeExposures', cv)
 
     function MergeRobertson:__init(t)
         self.ptr = ffi.gc(C.MergeRobertson_ctor(), Classes.Algorithm_dtor)

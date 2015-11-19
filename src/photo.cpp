@@ -92,6 +92,9 @@ extern "C" struct TensorWrapper fastNlMeansDenoisingColoredMulti(struct TensorAr
 {
     if (dst.isNull()) {
         cv::Mat retval;
+        srcImgs.toMatList();
+        std::cout << "here";
+
         cv::fastNlMeansDenoisingColoredMulti(srcImgs.toMatList(), retval, imgToDenoiseIndex, temporalWindowSize, h,
                                     hColor, templateWindowSize, searchWindowSize);
 

@@ -2587,7 +2587,7 @@ void LineIterator_incr(struct PtrWrapper ptr);
 -- GeneralizedHough
 
 do
-    local GeneralizedHough = cv.newTorchClass('cv.GeneralizedHough', 'cv.Algorithm')
+    local GeneralizedHough = torch.class('cv.GeneralizedHough', 'cv.Algorithm', cv)
 
     function GeneralizedHough:setTemplate(t)
         if t.dy or #t > 2 then
@@ -2681,7 +2681,7 @@ end
 -- GeneralizedHoughBallard
 
 do
-    local GeneralizedHoughBallard = cv.newTorchClass('cv.GeneralizedHoughBallard', 'cv.GeneralizedHough')
+    local GeneralizedHoughBallard = torch.class('cv.GeneralizedHoughBallard', 'cv.GeneralizedHough', cv)
 
     function GeneralizedHoughBallard:__init()
         self.ptr = ffi.gc(C.GeneralizedHoughBallard_ctor(), Classes.Algorithm_dtor)
@@ -2707,7 +2707,7 @@ end
 -- GeneralizedHoughGuil
 
 do
-    local GeneralizedHoughGuil = cv.newTorchClass('cv.GeneralizedHoughGuil', 'cv.GeneralizedHough')
+    local GeneralizedHoughGuil = torch.class('cv.GeneralizedHoughGuil', 'cv.GeneralizedHough', cv)
 
     function GeneralizedHoughGuil:__init()
         self.ptr = ffi.gc(C.GeneralizedHoughGuil_ctor(), Classes.Algorithm_dtor)
@@ -2813,7 +2813,7 @@ end
 -- CLAHE
 
 do
-    local CLAHE = cv.newTorchClass('cv.CLAHE', 'cv.Algorithm')
+    local CLAHE = torch.class('cv.CLAHE', 'cv.Algorithm', cv)
 
     function CLAHE:__init()
         self.ptr = ffi.gc(C.CLAHE_ctor(), Classes.Algorithm_dtor)
@@ -2843,7 +2843,7 @@ end
 -- LineSegmentDetector
 
 do
-    local LineSegmentDetector = cv.newTorchClass('cv.LineSegmentDetector', 'cv.Algorithm')
+    local LineSegmentDetector = torch.class('cv.LineSegmentDetector', 'cv.Algorithm', cv)
 
     function LineSegmentDetector:__init(t)
         local argRules = {
@@ -2907,7 +2907,7 @@ end
 -- Subdiv2D
 
 do
-    local Subdiv2D = cv.newTorchClass('cv.Subdiv2D')
+    local Subdiv2D = torch.class('cv.Subdiv2D', cv)
 
     function Subdiv2D:__init(t)
         local argRules = {

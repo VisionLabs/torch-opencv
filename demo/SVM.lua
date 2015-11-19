@@ -12,7 +12,7 @@ local cv = require 'cv'
 require 'cv.imgproc'
 require 'cv.imgcodecs'
 require 'cv.highgui'
-require 'cv.ml'
+cv.ml = require 'cv.ml'
 
 -- Data for visual representation
 local width, height = 512, 512
@@ -23,7 +23,7 @@ local labelsMat = torch.IntTensor{1, -1, -1, -1}
 local trainingDataMat = torch.FloatTensor{ {501, 10}, {255, 10}, {501, 255}, {10, 501} }
 
 -- Set up SVM's parameters
-local svm = cv.SVM()
+local svm = cv.ml.SVM()
 svm:setType  		{cv.ml.SVM_C_SVC}
 svm:setKernel		{cv.ml.SVM_POLY}
 svm:setDegree 		{2}
@@ -39,7 +39,7 @@ local green, blue = torch.ByteTensor{0,255,0}, torch.ByteTensor{255,0,0}
 
 for i=1,im:size(1) do
     for j=1,im:size(2) do
-        local response, _ = svm:predict{torch.FloatTensor{{j, i}}}
+        local response = svm:predict{torch.FloatTensor{{j, i}}}
 
         im[{i,j,{}}]:copy(response == 1 and green or blue)
     end

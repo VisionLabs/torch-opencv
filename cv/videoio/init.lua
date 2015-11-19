@@ -38,7 +38,7 @@ double VideoCapture_get(struct PtrWrapper ptr, int propId);
 ]]
 
 do
-    local VideoCapture = cv.newTorchClass('cv.VideoCapture')
+    local VideoCapture = torch.class('cv.VideoCapture', cv)
 
     -- v = cv.VideoCapture{}
     -- OR
@@ -148,7 +148,7 @@ int VideoWriter_fourcc(char c1, char c2, char c3, char c4);
 ]]
 
 do
-    local VideoWriter = cv.newTorchClass('cv.VideoWriter')
+    local VideoWriter = torch.class('cv.VideoWriter', cv)
 
     function VideoWriter:__init(t)
         local argRules = {

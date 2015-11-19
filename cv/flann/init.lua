@@ -1,6 +1,8 @@
 local cv = require 'cv._env'
 require 'cv.Classes'
 
+local flann = {}
+
 local ffi = require 'ffi'
 
 ffi.cdef[[
@@ -65,11 +67,11 @@ int Index_getAlgorithm(struct PtrWrapper ptr);
 local C = ffi.load(cv.libPath('flann'))
 
 do
-    local IndexParams = cv.newTorchClass('cv.IndexParams')
+    local IndexParams = torch.class('flann.IndexParams', flann)
 end
 
 do
-    local KDTreeIndexParams = cv.newTorchClass('cv.KDTreeIndexParams', 'cv.IndexParams')
+    local KDTreeIndexParams = torch.class('flann.KDTreeIndexParams', 'flann.IndexParams', flann)
 
     function KDTreeIndexParams:__init(t)
         local argRules = {
@@ -82,7 +84,7 @@ do
 end
 
 do
-    local LinearIndexParams = cv.newTorchClass('cv.LinearIndexParams', 'cv.IndexParams')
+    local LinearIndexParams = torch.class('flann.LinearIndexParams', 'flann.IndexParams', flann)
 
     function LinearIndexParams:__init(t)
         self.ptr = ffi.gc(C.LinearIndexParams_ctor(), C.IndexParams_dtor)
@@ -90,7 +92,7 @@ do
 end
 
 do
-    local CompositeIndexParams = cv.newTorchClass('cv.CompositeIndexParams', 'cv.IndexParams')
+    local CompositeIndexParams = torch.class('flann.CompositeIndexParams', 'flann.IndexParams', flann)
 
     function CompositeIndexParams:__init(t)
         local argRules = {
@@ -108,7 +110,7 @@ do
 end
 
 do
-    local AutotunedIndexParams = cv.newTorchClass('cv.AutotunedIndexParams', 'cv.IndexParams')
+    local AutotunedIndexParams = torch.class('flann.AutotunedIndexParams', 'flann.IndexParams', flann)
 
     function AutotunedIndexParams:__init(t)
         local argRules = {
@@ -125,7 +127,7 @@ do
 end
 
 do
-    local HierarchicalClusteringIndexParams = cv.newTorchClass('cv.HierarchicalClusteringIndexParams', 'cv.IndexParams')
+    local HierarchicalClusteringIndexParams = torch.class('flann.HierarchicalClusteringIndexParams', 'flann.IndexParams', flann)
 
     function HierarchicalClusteringIndexParams:__init(t)
         local argRules = {
@@ -142,7 +144,7 @@ do
 end
 
 do
-    local KMeansIndexParams = cv.newTorchClass('cv.KMeansIndexParams', 'cv.IndexParams')
+    local KMeansIndexParams = torch.class('flann.KMeansIndexParams', 'flann.IndexParams', flann)
 
     function KMeansIndexParams:__init(t)
         local argRules = {
@@ -159,7 +161,7 @@ do
 end
 
 do
-    local LshIndexParams = cv.newTorchClass('cv.LshIndexParams', 'cv.IndexParams')
+    local LshIndexParams = torch.class('flann.LshIndexParams', 'flann.IndexParams', flann)
 
     function LshIndexParams:__init(t)
         local argRules = {
@@ -175,7 +177,7 @@ do
 end
 
 do
-    local SavedIndexParams = cv.newTorchClass('cv.SavedIndexParams', 'cv.IndexParams')
+    local SavedIndexParams = torch.class('flann.SavedIndexParams', 'flann.IndexParams', flann)
 
     function SavedIndexParams:__init(t)
         local argRules = {
@@ -188,7 +190,7 @@ do
 end
 
 do
-    local SearchParams = cv.newTorchClass('cv.SearchParams', 'cv.IndexParams')
+    local SearchParams = torch.class('flann.SearchParams', 'flann.IndexParams', flann)
 
     function SearchParams:__init(t)
         local argRules = {
@@ -203,10 +205,10 @@ do
     end
 end
 
-local defaultSearchParams = cv.SearchParams{}
+local defaultSearchParams = flann.SearchParams{}
 
 do
-    local Index = cv.newTorchClass('cv.Index')
+    local Index = torch.class('flann.Index', flann)
 
     function Index:__init(t)
         if not t or not (t[1] or t.features) then
@@ -299,4 +301,4 @@ do
     end
 end
 
-return cv
+return flann

@@ -1,5 +1,5 @@
 local cv = require 'cv'
-require 'cv.flann'
+cv.flann = require 'cv.flann'
 require 'cv.imgproc'
 require 'cv.highgui'
 
@@ -8,8 +8,8 @@ local N_samples, N_features, fieldSize, N_query = 300, 2, 600, 20
 local samples = torch.rand(N_samples, N_features):float() * fieldSize
 
 -- create the index
-local params = cv.KDTreeIndexParams{trees=4}
-local index = cv.Index{samples, params, cv.FLANN_DIST_EUCLIDEAN}
+local params = cv.flann.KDTreeIndexParams{trees=10}
+local index = cv.flann.Index{samples, params, cv.FLANN_DIST_EUCLIDEAN}
 
 -- generate query point
 local query = torch.rand(1, N_features):float() * fieldSize
