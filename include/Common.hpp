@@ -14,6 +14,8 @@ extern "C" int getIntMax() { return INT_MAX; }
 
 #define TO_MAT_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toMat())
 
+#define TO_MAT_LIST_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toMatList())
+
 struct TensorWrapper {
     void *tensorPtr;
     char typeCode;

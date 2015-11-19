@@ -44,7 +44,9 @@ struct KeyPointArray KeyPointsFilter_removeDuplicated(struct KeyPointArray keypo
 
 struct KeyPointArray KeyPointsFilter_retainBest(struct KeyPointArray keypoints, int npoints);
 
-struct KeyPointArray Feature2D_detect(struct PtrWrapper, struct TensorWrapper image, struct KeyPointArray keypoints,
+struct PtrWrapper Feature2D_ctor();
+
+struct KeyPointArray Feature2D_detect(struct PtrWrapper ptr, struct TensorWrapper image, struct KeyPointArray keypoints,
                         struct TensorWrapper mask);
 
 struct KeyPointMat Feature2D_detect2(struct PtrWrapper ptr, struct TensorArray images,
@@ -68,7 +70,7 @@ int Feature2D_defaultNorm(struct PtrWrapper ptr);
 
 bool Feature2D_empty(struct PtrWrapper ptr);
 
-
+struct PtrWrapper BRISK_ctor(int thresh, int octaves, float patternScale);
 
 
 
@@ -145,13 +147,17 @@ end
 -- Feature2D
 
 do
-    local Feature2D = cv.newTorchClass('cv.Feature2D', 'Classes.Algorithm')
+    local Feature2D = cv.newTorchClass('cv.Feature2D', 'cv.Algorithm')
+
+    function Feature2D:__init()
+        self.ptr = ffi.gc(C.Feature2D_ctor(), Classes.Algorithm_dtor)
+    end
 
     function Feature2D:detect(t)
         local argRules = {
             {"image", required = true},
             {"keypoints", required = true},
-            {"mask", default = noArray()}
+            {"mask", default = nil}
         }
         local image, keypoints, mask = cv.argcheck(t, argRules)
 
@@ -162,7 +168,7 @@ do
         local argRules = {
             {"images", required = true},
             {"keypoints", required = true},
-            {"masks", default = noArray()}
+            {"masks", default = nil}
         }
         local images, keypoints, masks = cv.argcheck(t, argRules)
 
@@ -205,23 +211,51 @@ do
                     keypoints, cv.wrap_tensors(descriptors), useProvidedKeypoints)
     end
 
-    function Feature2D:descriptorSize(t)
+    function Feature2D:descriptorSize()
         return C.Feature2D_descriptorSize(self.ptr)
     end
 
-    function Feature2D:descriptorType(t)
+    function Feature2D:descriptorType()
         return C.Feature2D_descriptorType(self.ptr)
     end
 
-    function Feature2D:defaultNorm(t)
+    function Feature2D:defaultNorm()
         return C.Feature2D_defaultNorm(self.ptr)
     end
 
-    function Feature2D:empty(t)
+    function Feature2D:empty()
         return C.Feature2D_empty(self.ptr)
     end
 end
 
+-- BRISK
+
+do
+    local BRISK = cv.newTorchClass('cv.BRISK', 'cv.Feature2D')
+
+    function BRISK:__init(t)
+        local argRules = {
+            {"thresh", default = 30},
+            {"octaves", default = 3},
+            {"patternScale", default = 1.0}
+        }
+        local thresh, octaves, patternScale = cv.argcheck(t, argRules)
+
+        --[[local argRules = {
+            {"radiusList", required = true},
+            {"numberList", required = true},
+            {"dMax", default = 5.85},
+            {"dMin", default = 8.2},
+            {"indexChange", default = nil}
+        }]]
+
+        self.ptr =  ffi.gc(C.BRISK_ctor(thresh, octaves, patternScale), Classes.Algorithm_dtor)
+    end
+
+        
+        
+
+end
 
 
 

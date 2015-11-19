@@ -64,6 +64,8 @@ struct Feature2DPtr {
     inline cv::Feature2D & operator*() { return *static_cast<cv::Feature2D *>(this->ptr); }
 };
 
+extern "C" struct Feature2DPtr Feature2D_ctor();
+
 extern "C" struct KeyPointArray Feature2D_detect(struct Feature2DPtr ptr, struct TensorWrapper image,
                         struct KeyPointArray keypoints, struct TensorWrapper mask);
 
@@ -87,6 +89,23 @@ extern "C" int Feature2D_descriptorType(struct Feature2DPtr ptr);
 extern "C" int Feature2D_defaultNorm(struct Feature2DPtr ptr);
 
 extern "C" bool Feature2D_empty(struct Feature2DPtr ptr);
+
+// BRISK
+
+struct BRISKPtr {
+    void *ptr;
+    inline cv::BRISK * operator->() { return static_cast<cv::BRISK *>(ptr); }
+    inline BRISKPtr(cv::BRISK *ptr) { this->ptr = ptr; }
+    inline cv::BRISK & operator*() { return *static_cast<cv::BRISK *>(this->ptr); }
+};
+
+extern "C" struct BRISKPtr BRISK_ctor(int thresh, int octaves, float patternScale);
+
+
+
+
+
+
 
 
 

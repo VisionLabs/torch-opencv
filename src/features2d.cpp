@@ -95,11 +95,16 @@ extern "C" struct KeyPointArray KeyPointsFilter_retainBest(struct KeyPointArray 
 
 // Feature2D
 
+extern "C" struct Feature2DPtr Feature2D_ctor()
+{
+    return new cv::Feature2D();
+}
+
 extern "C" struct KeyPointArray Feature2D_detect(struct Feature2DPtr ptr, struct TensorWrapper image,
                         struct KeyPointArray keypoints, struct TensorWrapper mask)
 {
     std::vector<cv::KeyPoint> keypointsVector(keypoints);
-    ptr->detect(image.toMat(), keypointsVector, mask.toMat());
+    ptr->detect(image.toMat(), keypointsVector, TO_MAT_OR_NOARRAY(mask));
     return KeyPointArray(keypointsVector);
 }
 
@@ -107,7 +112,7 @@ extern "C" struct KeyPointMat Feature2D_detect2(struct Feature2DPtr ptr, struct 
                         struct KeyPointMat keypoints, struct TensorArray masks)
 {
     std::vector<std::vector<cv::KeyPoint> > keypointsMat(keypoints);
-    ptr->detect(images.toMatList(), keypointsMat, masks.toMatList());
+    ptr->detect(images.toMatList(), keypointsMat, TO_MAT_LIST_OR_NOARRAY(masks));
     return KeyPointMat(keypointsMat);
 }
 
@@ -155,6 +160,21 @@ extern "C" bool Feature2D_empty(struct Feature2DPtr ptr)
 {
     return ptr->empty();
 }
+
+// BRISK
+
+extern "C" struct BRISKPtr BRISK_ctor(int thresh, int octaves, float patternScale)
+{
+    return rescueObjectFromPtr(cv::BRISK::create(thresh, octaves, patternScale));
+}
+
+
+
+
+
+
+
+
 
 
 
