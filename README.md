@@ -21,18 +21,31 @@ require 'cv.imgproc' -- image processing
 -- loading image from disk
 -- cv.imread loads image in row-major format
 
+--loadType: cv.IMREAD_UNCHANGED,  loads image as it is on disk.
 loadType = cv.IMREAD_UNCHANGED
 src = cv.imread{imagePath, loadType}
---loadType: cv.IMREAD_UNCHANGED,  loads image as it is on disk.
---loadType: cv.IMREAD_COLOR, loads (always) 3 channel image.
---loadType: cv.IMREAD_GRAYSCALE, returns grayscale converted image
-
 print(src:size())
-
  512
  512
    3
 [torch.LongStorage of size 3]
+
+--loadType: cv.IMREAD_COLOR, loads (always) 3 channel image.
+loadType = cv.IMREAD_COLOR
+src = cv.imread{imagePath, loadType}
+print(src:size())
+ 512
+ 512
+   3
+[torch.LongStorage of size 3]
+
+--loadType: cv.IMREAD_GRAYSCALE, returns grayscale converted image
+loadType = cv.IMREAD_GRAYSCALE
+src = cv.imread{imagePath, loadType}
+print(src:size())
+ 512
+ 512
+[torch.LongStorage of size 2]
 
 -- Saving image to disk
 cv.imwrite{imagePath, src}
