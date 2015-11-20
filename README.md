@@ -7,7 +7,7 @@ See [this page](https://github.com/VisionLabs/torch-opencv/wiki/Trying-it-out) f
 
 #Tutorial
 
-This section showcases code snippets to use basic image based Opencv functionalities.
+This section showcases code snippets to use basic image based Opencv functionalities. Using the famous Lena image for this purpose.
 
 ###Requiring torch-opencv
 ```lua
