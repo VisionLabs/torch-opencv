@@ -19,7 +19,7 @@ require 'cv.imgproc' -- image processing
 ###Reading/writing image
 ```lua
 -- loading image from disk
-src = cv.imread{imagePath, -1} -- -1 is for loading image as it is.
+src = cv.imread{imagePath, -1} -- -1 is for loading image as it is on disk. If second argument is not provided then output is always 3 channel image.
 -- cv.imread loads image in row-major format
 print(src:size())
 
