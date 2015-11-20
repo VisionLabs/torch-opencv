@@ -105,6 +105,8 @@ print(dst:size())
 
 ###Affine transformation
 ```lua
+![Alt text](./demo/lena.jpg?raw=true "Source Image")
+
 height = src:size(1)
 width = src:size(2)
 
