@@ -68,7 +68,7 @@ print(src:size())
 [torch.LongStorage of size 3]
 
 -- resize to fixed size
-dst = cv.resize{src=src, dsize={1632, 1224}, interpolation=cv.INTER_CUBIC}
+dst = cv.resize{src=src, dsize={1024, 1024}, interpolation=cv.INTER_CUBIC}
 print(dst:size())
 
  1024
