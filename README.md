@@ -105,7 +105,7 @@ print(dst:size())
 
 ###Affine transformation
 ```lua
-![Alt text](/demo/lena.jpg?raw=true "Source Image")
+![Alt text](https://github.com/sagarwaghmare69/torch-opencv/blob/master/demo/lena.jpg?raw=true?raw=true "Source Image")
 
 height = src:size(1)
 width = src:size(2)
