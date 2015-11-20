@@ -7,7 +7,7 @@ See [this page](https://github.com/VisionLabs/torch-opencv/wiki/Trying-it-out) f
 
 #Tutorial
 
-This document showcases code snippets to use basic image based Opencv functionalities.
+This section showcases code snippets to use basic image based Opencv functionalities.
 
 ###Requiring torch-opencv
 ```lua
