@@ -168,11 +168,114 @@ extern "C" struct BRISKPtr BRISK_ctor(int thresh, int octaves, float patternScal
     return rescueObjectFromPtr(cv::BRISK::create(thresh, octaves, patternScale));
 }
 
+extern "C" struct BRISKPtr BRISK_ctor2(struct TensorWrapper radiusList, struct TensorWrapper numberList,
+                        float dMax, float dMin, struct TensorWrapper indexChange)
+{
+    std::vector<int> indexVec = std::vector<int>();
+    if (!indexChange.isNull())
+        indexVec = std::vector<int>(indexChange.toMat());
 
+    return rescueObjectFromPtr(cv::BRISK::create(radiusList.toMat(), numberList.toMat(), dMax, dMin, indexVec));
+}
 
+// ORB
 
+extern "C" struct ORBPtr ORB_ctor(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel,
+                        int WTA_K, int scoreType, int patchSize, int fastThreshold)
+{
+    return rescueObjectFromPtr(cv::ORB::create(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel,
+                            WTA_K, scoreType, patchSize, fastThreshold));
+}
 
+extern "C" void ORB_setMaxFeatures(struct ORBPtr ptr, int maxFeatures)
+{
+    ptr->setMaxFeatures(maxFeatures);
+}
 
+extern "C" int ORB_getMaxFeatures(struct ORBPtr ptr)
+{
+    return ptr->getMaxFeatures();
+}
+
+extern "C" void ORB_setScaleFactor(struct ORBPtr ptr, int scaleFactor)
+{
+    ptr->setScaleFactor(scaleFactor);
+}
+
+extern "C" int ORB_getScaleFactor(struct ORBPtr ptr)
+{
+    return ptr->getScaleFactor();
+}
+
+extern "C" void ORB_setNLevels(struct ORBPtr ptr, int nlevels)
+{
+    ptr->setNLevels(nlevels);
+}
+
+extern "C" int ORB_getNLevels(struct ORBPtr ptr)
+{
+    return ptr->getNLevels();
+}
+
+extern "C" void ORB_setEdgeThreshold(struct ORBPtr ptr, int edgeThreshold)
+{
+    ptr->setEdgeThreshold(edgeThreshold);
+}
+
+extern "C" int ORB_getEdgeThreshold(struct ORBPtr ptr)
+{
+    return ptr->getEdgeThreshold();
+}
+
+extern "C" void ORB_setFirstLevel(struct ORBPtr ptr, int firstLevel)
+{
+    ptr->setFirstLevel(firstLevel);
+}
+
+extern "C" int ORB_getFirstLevel(struct ORBPtr ptr)
+{
+    return ptr->getFirstLevel();
+}
+
+extern "C" void ORB_setWTA_K(struct ORBPtr ptr, int wta_k)
+{
+    ptr->setWTA_K(wta_k);
+}
+
+extern "C" int ORB_getWTA_K(struct ORBPtr ptr)
+{
+    return ptr->getWTA_K();
+}
+
+extern "C" void ORB_setScoreType(struct ORBPtr ptr, int scoreType)
+{
+    ptr->setScoreType(scoreType);
+}
+
+extern "C" int ORB_getScoreType(struct ORBPtr ptr)
+{
+    return ptr->getScoreType();
+}
+
+extern "C" void ORB_setPatchSize(struct ORBPtr ptr, int patchSize)
+{
+    ptr->setPatchSize(patchSize);
+}
+
+extern "C" int ORB_getPatchSize(struct ORBPtr ptr)
+{
+    return ptr->getPatchSize();
+}
+
+extern "C" void ORB_setFastThreshold(struct ORBPtr ptr, int fastThreshold)
+{
+    ptr->setFastThreshold(fastThreshold);
+}
+
+extern "C" int ORB_getFastThreshold(struct ORBPtr ptr)
+{
+    return ptr->getFastThreshold();
+}
 
 
 

@@ -72,6 +72,52 @@ bool Feature2D_empty(struct PtrWrapper ptr);
 
 struct PtrWrapper BRISK_ctor(int thresh, int octaves, float patternScale);
 
+struct PtrWrapper BRISK_ctor2(struct TensorWrapper radiusList, struct TensorWrapper numberList,
+                        float dMax, float dMin, struct TensorWrapper indexChange);
+
+struct PtrWrapper ORB_ctor(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel,
+                        int WTA_K, int scoreType, int patchSize, int fastThreshold);
+
+void ORB_setMaxFeatures(struct PtrWrapper ptr, int maxFeatures);
+
+int ORB_getMaxFeatures(struct PtrWrapper ptr);
+
+void ORB_setScaleFactor(struct PtrWrapper ptr, int scaleFactor);
+
+int ORB_getScaleFactor(struct PtrWrapper ptr);
+
+void ORB_setNLevels(struct PtrWrapper ptr, int nlevels);
+
+int ORB_getNLevels(struct PtrWrapper ptr);
+
+void ORB_setEdgeThreshold(struct PtrWrapper ptr, int edgeThreshold);
+
+int ORB_getEdgeThreshold(struct PtrWrapper ptr);
+
+void ORB_setFirstLevel(struct PtrWrapper ptr, int firstLevel);
+
+int ORB_getFirstLevel(struct PtrWrapper ptr);
+
+void ORB_setWTA_K(struct PtrWrapper ptr, int wta_k);
+
+int ORB_getWTA_K(struct PtrWrapper ptr);
+
+void ORB_setScoreType(struct PtrWrapper ptr, int scoreType);
+
+int ORB_getScoreType(struct PtrWrapper ptr);
+
+void ORB_setPatchSize(struct PtrWrapper ptr, int patchSize);
+
+int ORB_getPatchSize(struct PtrWrapper ptr);
+
+void ORB_setFastThreshold(struct PtrWrapper ptr, int fastThreshold);
+
+int ORB_getFastThreshold(struct PtrWrapper ptr);
+
+
+
+
+
 
 
 
@@ -234,30 +280,186 @@ do
     local BRISK = cv.newTorchClass('cv.BRISK', 'cv.Feature2D')
 
     function BRISK:__init(t)
-        local argRules = {
-            {"thresh", default = 30},
-            {"octaves", default = 3},
-            {"patternScale", default = 1.0}
-        }
-        local thresh, octaves, patternScale = cv.argcheck(t, argRules)
+        if t.radiusList or type(t[1]) ~= "number" then
+            local argRules = {
+                {"radiusList", required = true},
+                {"numberList", required = true},
+                {"dMax", default = 5.85},
+                {"dMin", default = 8.2},
+                {"indexChange", default = nil}
+            }
+            local radiusList, numberList, dMax, dMin, indexChange = cv.argcheck(t, argRules)
 
-        --[[local argRules = {
-            {"radiusList", required = true},
-            {"numberList", required = true},
-            {"dMax", default = 5.85},
-            {"dMin", default = 8.2},
-            {"indexChange", default = nil}
-        }]]
+            if type(radiusList) == "table" then
+                radiusList = torch.FloatTensor(radiusList)
+            end
 
-        self.ptr =  ffi.gc(C.BRISK_ctor(thresh, octaves, patternScale), Classes.Algorithm_dtor)
+            if type(numberList) == "table" then
+                numberList = torch.IntTensor(numberList)
+            end
+
+            if type(indexChange) == "table" then
+                indexChange = torch.IntTensor(indexChange)
+            end
+
+            self.ptr =  ffi.gc(C.BRISK_ctor2(cv.wrap_tensor(radiusList), cv.wrap_tensor(numberList),
+                                    dMax, dMin, cv.wrap_tensor(indexChange)), Classes.Algorithm_dtor)
+        else
+            local argRules = {
+                {"thresh", default = 30},
+                {"octaves", default = 3},
+                {"patternScale", default = 1.0}
+            }
+            local thresh, octaves, patternScale = cv.argcheck(t, argRules)
+
+            self.ptr =  ffi.gc(C.BRISK_ctor(thresh, octaves, patternScale), Classes.Algorithm_dtor)
+        end
     end
 
-        
-        
 
 end
 
+-- ORB
 
+do
+    local ORB = cv.newTorchClass('cv.ORB', 'cv.Feature2D')
+
+    function ORB:__init(t)
+        local argRules = {
+            {"nfeatures", default = 500},
+            {"scaleFactor", default = 1.2},
+            {"nlevels", default = 8},
+            {"edgeThreshold", default = 31},
+            {"firstLevel", default = 0},
+            {"WTA_K", default = 2},
+            {"scoreType", default = 0},
+            {"patchSize", default = 31},
+            {"fastThreshold", default = 20}   
+        }
+        local nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize, fastThreshold = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.ORB_ctor(nfeatures, scaleFactor, nlevels, edgeThreshold,
+                                firstLevel, WTA_K, scoreType, patchSize, fastThreshold),
+                                Classes.Algorithm_dtor)    
+    end
+
+    function ORB:setMaxFeatures(t)
+        local argRules = {
+            {"maxFeatures", required = true}
+        }
+        local maxFeatures = cv.argcheck(t, argRules)
+
+        C.ORB_setMaxFeatures(self.ptr, maxFeatures)
+    end
+
+    function ORB:getMaxFeatures()
+        return C.ORB_getMaxFeatures(self.ptr)
+    end
+
+    function ORB:setScaleFactor(t)
+        local argRules = {
+            {"scaleFactor", required = true}
+        }
+        local scaleFactor = cv.argcheck(t, argRules)
+
+        C.ORB_setScaleFactor(self.ptr, scaleFactor)
+    end
+
+    function ORB:getScaleFactor()
+        return C.ORB_getScaleFactor(self.ptr)
+    end
+
+    function ORB:setNLevels(t)
+        local argRules = {
+            {"nlevels", required = true}
+        }
+        local nlevels = cv.argcheck(t, argRules)
+
+        C.ORB_setNLevels(self.ptr, nlevels)
+    end
+
+    function ORB:getNLevels()
+        return C.ORB_getNLevels(self.ptr)
+    end
+
+    function ORB:setEdgeThreshold(t)
+        local argRules = {
+            {"edgeThreshold", required = true}
+        }
+        local edgeThreshold = cv.argcheck(t, argRules)
+
+        C.ORB_setEdgeThreshold(self.ptr, edgeThreshold)
+    end
+
+    function ORB:getEdgeThreshold()
+        return C.ORB_getEdgeThreshold(self.ptr)
+    end
+
+    function ORB:setFirstLevel(t)
+        local argRules = {
+            {"firstLevel", required = true}
+        }
+        local firstLevel = cv.argcheck(t, argRules)
+
+        C.ORB_setFirstLevel(self.ptr, firstLevel)
+    end
+
+    function ORB:getFirstLevel()
+        return C.ORB_getFirstLevel(self.ptr)
+    end
+
+    function ORB:setWTA_K(t)
+        local argRules = {
+            {"wta_k", required = true}
+        }
+        local wta_k = cv.argcheck(t, argRules)
+
+        C.ORB_setWTA_K(self.ptr, wta_k)
+    end
+
+    function ORB:getWTA_K()
+        return C.ORB_getWTA_K(self.ptr)
+    end
+
+    function ORB:setScoreType(t)
+        local argRules = {
+            {"scoreType", required = true}
+        }
+        local scoreType = cv.argcheck(t, argRules)
+
+        C.ORB_setScoreType(self.ptr, scoreType)
+    end
+
+    function ORB:getScoreType()
+        return C.ORB_getScoreType(self.ptr)
+    end
+
+    function ORB:setPatchSize(t)
+        local argRules = {
+            {"patchSize", required = true}
+        }
+        local patchSize = cv.argcheck(t, argRules)
+
+        C.ORB_setPatchSize(self.ptr, patchSize)
+    end
+
+    function ORB:getPatchSize()
+        return C.ORB_getPatchSize(self.ptr)
+    end
+
+    function ORB:setFastThreshold(t)
+        local argRules = {
+            {"fastThreshold", required = true}
+        }
+        local fastThreshold = cv.argcheck(t, argRules)
+
+        C.ORB_setFastThreshold(self.ptr, fastThreshold)
+    end
+
+    function ORB:getFastThreshold()
+        return C.ORB_getFastThreshold(self.ptr)
+    end
+end
 
 
 
