@@ -10,10 +10,14 @@ See [this page](https://github.com/VisionLabs/torch-opencv/wiki/Trying-it-out) f
 This section showcases code snippets to use basic image based Opencv functionalities. Using the famous Lena image for this purpose.
 
 ###Requiring torch-opencv
+To access the Opencv functionalities in torch you would need to require it as follow. 
 ```lua
 local cv = require 'cv'
 require 'cv.imgcodecs' -- reading/writing images
 require 'cv.imgproc' -- image processing
+require 'cv.highgui' -- GUI
+require 'cv.ml' -- Machine Learning
+require 'cv.videoio' -- Video
 ```
 
 ###Reading/writing image
