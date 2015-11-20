@@ -118,7 +118,7 @@ M = cv.getRotationMatrix2D{center=center, angle=angle, scale=scale}
 -- This transformation matrix M has only rotation and scaling. You can add translation by adding [tx ty] to the last column of M.
 
 -- get transformed image
-dsize = cv.Size{width, height}--Not provided or zero then uses source image size
+dsize = cv.Size{width, height} -- if not provided or zero then uses source image size
 dst = cv.warpAffine{src=src, M=M, dsize=dsize, flags=cv.INTER_LINEAR}
 print(dst:size())
 
