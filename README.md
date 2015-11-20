@@ -105,6 +105,7 @@ print(dst:size())
 
 ###Affine transformation
 Source image
+
 ![Lena](demo/lena.jpg)
 
 ```lua
@@ -132,4 +133,5 @@ print(dst:size())
 ```
 
 Affine transformed image
+
 ![Transformed image](demo/lenaTrans.jpg)
