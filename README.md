@@ -29,17 +29,17 @@ cv.cvtColor{src=src, dst=dst, code=cv.COLOR_BGR2RGB}
 src = cv.imread{imagePath, -1} -- loads image in row-major format
 print(src:size())
 
- 2448
- 3264
-    3
+ 512
+ 512
+   3
 [torch.LongStorage of size 3]
 
 -- resize to fixed size
 dst = cv.resize{src=src, dsize={1632, 1224}, interpolation=cv.INTER_CUBIC}
 print(dst:size())
 
- 1224
- 1632
+ 1024
+ 1024
     3
 [torch.LongStorage of size 3]
 
@@ -48,8 +48,8 @@ scale = 0.25
 dst = cv.resize{src=src, fx=scale, fy=scale, interpolation=cv.INTER_AREA}
 print(dst:size())
 
- 612
- 816
+ 128
+ 128
    3
 [torch.LongStorage of size 3]
 ```
