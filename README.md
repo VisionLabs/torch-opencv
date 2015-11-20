@@ -46,7 +46,7 @@ print(src:size())
 [torch.LongStorage of size 3]
 ```
 
-You can use cv.IMREAD_GRAYSCALE to load
+You can use cv.IMREAD_GRAYSCALE to load image as grayscale.
 ```lua
 loadType = cv.IMREAD_GRAYSCALE
 src = cv.imread{imagePath, loadType}
@@ -54,8 +54,10 @@ print(src:size())
  512
  512
 [torch.LongStorage of size 2]
+```
 
--- Saving image to disk
+To save image to disk
+```lua
 cv.imwrite{imagePath, src}
 ```
 
