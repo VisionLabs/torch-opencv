@@ -104,6 +104,7 @@ print(dst:size())
 ```
 
 ###Affine transformation
+Source image
 ![Lena](demo/lena.jpg)
 
 ```lua
@@ -130,4 +131,5 @@ print(dst:size())
 [torch.LongStorage of size 3]
 ```
 
+Affine transformed image
 ![Transformed image](demo/lenaTrans.jpg)
