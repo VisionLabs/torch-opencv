@@ -10,7 +10,7 @@ See [this page](https://github.com/VisionLabs/torch-opencv/wiki/Trying-it-out) f
 This section showcases code snippets to use basic image based Opencv functionalities. Using the famous Lena image for this purpose.
 
 ###Requiring torch-opencv
-Opencv provides range of functionalities. You can require the needed ones. 
+Opencv provides range of functionalities. You can require them as required. 
 ```lua
 local cv = require 'cv'
 require 'cv.imgcodecs' -- reading/writing images
