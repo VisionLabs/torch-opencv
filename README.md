@@ -10,7 +10,7 @@ See [this page](https://github.com/VisionLabs/torch-opencv/wiki/Trying-it-out) f
 This section showcases code snippets to use basic image based Opencv functionalities. Using the famous Lena image for this purpose.
 
 ###Requiring torch-opencv
-To access the Opencv functionalities in torch you would need to require it as follow. 
+Opencv provides range of functionalities. You can require the needed ones. 
 ```lua
 local cv = require 'cv'
 require 'cv.imgcodecs' -- reading/writing images
@@ -22,6 +22,7 @@ require 'cv.videoio' -- Video
 
 ###Reading/writing image
 Opencv reads image in row major format and shape is (height, width, channels) unless the image is loaded as grayscale or it is grayscale and loaded with cv.IMREAD_UNCHANGED flag, in that case the shape is (height, width).
+cv.imread and cv.imwrite reverses channel order. If the image is in RGB on disk then after reading it becomes BGR (in memory) and vice-versa for imwrite.
 
 Loading image as it is on disk.
 ```lua
@@ -62,10 +63,10 @@ cv.imwrite{imagePath, src}
 ```
 
 ###Color Conversion
-cv.imread and cv.imwrite reverses color order. If the image is in RGB (on disk) format then after reading it becomes BGR (in memory) and vice-versa for imwrite.
-```lua
+Opencv provides optimized color conversion functions.
 
--- Convert BGR to YUV
+Convert BGR to YUV
+```lua
 dst = src:clone()
 cv.cvtColor{src=src, dst=dst, code=cv.COLOR_BGR2YUV}
 print(dst:size())
@@ -74,8 +75,10 @@ print(dst:size())
  512
    3
 [torch.LongStorage of size 3]
+```
 
--- Convert to grayscale
+Convert to grayscale
+```lua
 dst = cv.cvtColor{src=src, code=cv.COLOR_BGR2GRAY}
 print(dst:size())
 
