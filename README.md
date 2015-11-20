@@ -6,7 +6,6 @@ For complete info on the project, visit its [Wiki](https://github.com/VisionLabs
 See [this page](https://github.com/VisionLabs/torch-opencv/wiki/Trying-it-out) for a watching-demos quickstart.
 
 #Tutorial
-#Torch-Opencv
 
 This document showcases code snippets to use basic image based Opencv functionalities.
 
