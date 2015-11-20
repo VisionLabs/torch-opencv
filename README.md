@@ -21,11 +21,10 @@ require 'cv.videoio' -- Video
 ```
 
 ###Reading/writing image
-```lua
--- loading image from disk
--- cv.imread loads image in row-major format
+Opencv reads image in row major format and shape is (height, width, channels) unless the image is loaded as grayscale or it is grayscale and loaded with cv.IMREAD_UNCHANGED flag, in that case the shape is (height, width).
 
---loadType: cv.IMREAD_UNCHANGED,  loads image as it is on disk.
+Loading image as it is on disk.
+```lua
 loadType = cv.IMREAD_UNCHANGED
 src = cv.imread{imagePath, loadType}
 print(src:size())
@@ -33,7 +32,10 @@ print(src:size())
  512
    3
 [torch.LongStorage of size 3]
+```
 
+To load the image as color image use cv.IMREAD_COLOR flag.
+```lua
 --loadType: cv.IMREAD_COLOR, loads (always) 3 channel image.
 loadType = cv.IMREAD_COLOR
 src = cv.imread{imagePath, loadType}
@@ -42,8 +44,10 @@ print(src:size())
  512
    3
 [torch.LongStorage of size 3]
+```
 
---loadType: cv.IMREAD_GRAYSCALE, returns grayscale converted image
+You can use cv.IMREAD_GRAYSCALE to load
+```lua
 loadType = cv.IMREAD_GRAYSCALE
 src = cv.imread{imagePath, loadType}
 print(src:size())
