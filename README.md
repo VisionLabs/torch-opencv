@@ -88,15 +88,8 @@ print(dst:size())
 ```
 
 ###Resize image
+Resize an image to given fixed size.
 ```lua
-print(src:size())
-
- 512
- 512
-   3
-[torch.LongStorage of size 3]
-
--- resize to fixed size
 dst = cv.resize{src=src, dsize={1024, 1024}, interpolation=cv.INTER_CUBIC}
 print(dst:size())
 
@@ -104,8 +97,10 @@ print(dst:size())
  1024
     3
 [torch.LongStorage of size 3]
+```
 
--- resize by scale
+Resize image by a given factor. You can use different scaling factor for height and width.
+```lua
 scale = 0.25
 dst = cv.resize{src=src, fx=scale, fy=scale, interpolation=cv.INTER_AREA}
 print(dst:size())
@@ -121,6 +116,8 @@ Source image
 
 ![Lena](demo/lena.jpg)
 
+1) Get affine rotation/scaling matrix. ```lua
+
 ```lua
 height = src:size(1)
 width = src:size(2)
@@ -132,9 +129,16 @@ scale = 0.5
 
 -- get rotation matrix
 M = cv.getRotationMatrix2D{center=center, angle=angle, scale=scale}
--- This transformation matrix M has only rotation and scaling. You can add translation by adding [tx ty] to the last column of M.
+print(M:size())
+ 2
+ 3
+[torch.LongStorage of size 2]
+```
+Transformation matrix M provided by Opencv has only rotation and scaling. You can add translation by adding [translationX translationY] to the last column of M.
 
--- get transformed image
+
+2) Transforming image
+```lua
 dsize = cv.Size{width, height} -- if not provided or zero then uses source image size
 dst = cv.warpAffine{src=src, M=M, dsize=dsize, flags=cv.INTER_LINEAR}
 print(dst:size())
