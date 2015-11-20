@@ -54,8 +54,24 @@ cv.imwrite{imagePath, src}
 ###Color Conversion
 cv.imread and cv.imwrite reverses color order. If the image is in RGB (on disk) format then after reading it becomes BGR (in memory) and vice-versa for imwrite.
 ```lua
+
+-- Convert BGR to YUV
 dst = src:clone()
-cv.cvtColor{src=src, dst=dst, code=cv.COLOR_BGR2RGB}
+cv.cvtColor{src=src, dst=dst, code=cv.COLOR_BGR2YUV}
+print(dst:size())
+
+ 512
+ 512
+   3
+[torch.LongStorage of size 3]
+
+-- Convert to grayscale
+dst = cv.cvtColor{src=src, code=cv.COLOR_BGR2GRAY}
+print(dst:size())
+
+ 512
+ 512
+[torch.LongStorage of size 2]
 ```
 
 ###Resize image
