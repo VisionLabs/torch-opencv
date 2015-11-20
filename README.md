@@ -16,17 +16,31 @@ require 'cv.imgcodecs' -- reading/writing images
 require 'cv.imgproc' -- image processing
 ```
 
+###Reading/writing image
+```lua
+-- loading image from disk
+src = cv.imread{imagePath, -1} -- -1 is for loading image as it is.
+-- cv.imread loads image in row-major format
+print(src:size())
+
+ 512
+ 512
+   3
+[torch.LongStorage of size 3]
+
+-- Saving image to disk
+cv.imwrite{imagePath, src}
+```
+
 ###Color Conversion
 cv.imread and cv.imwrite reverses color order. If the image is in RGB (on disk) format then after reading it becomes BGR (in memory) and vice-versa for imwrite.
 ```lua
-src = cv.imread{imagePath, -1} -- loads image in row-major format
-dst = tensor:clone()
+dst = src:clone()
 cv.cvtColor{src=src, dst=dst, code=cv.COLOR_BGR2RGB}
 ```
 
 ###Resize image
 ```lua
-src = cv.imread{imagePath, -1} -- loads image in row-major format
 print(src:size())
 
  512
