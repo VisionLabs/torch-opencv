@@ -105,7 +105,6 @@ print(dst:size())
 
 ###Affine transformation
 ```lua
-src = cv.imread{imagePath, -1} -- loads image in row-major format
 height = src:size(1)
 width = src:size(2)
 
