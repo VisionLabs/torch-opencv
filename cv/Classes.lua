@@ -131,4 +131,10 @@ do
     end
 end
 
+-- cv::Ptr<>
+
+ffi.cdef[[
+void CvPtr_dtor(struct PtrWrapper ptr);
+]]
+
 return cv
