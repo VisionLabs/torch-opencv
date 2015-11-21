@@ -97,7 +97,7 @@ local Classes = ffi.load(cv.libPath('Classes'))
 -- BackgroundSubtractor
 
 do
-    local BackgroundSubtractor = cv.newTorchClass('cv.BackgroundSubtractor', 'cv.Algorithm')
+    local BackgroundSubtractor = torch.class('cv.BackgroundSubtractor', 'cv.Algorithm', cv)
 
     function BackgroundSubtractor:apply()
         local argRules = {
@@ -126,7 +126,7 @@ end
 -- BackgroundSubtractorMOG2
 
 do
-    local BackgroundSubtractorMOG2 = cv.newTorchClass('cv.BackgroundSubtractorMOG2', 'cv.BackgroundSubtractor')
+    local BackgroundSubtractorMOG2 = torch.class('cv.BackgroundSubtractorMOG2', 'cv.BackgroundSubtractor', cv)
 
     function BackgroundSubtractorMOG2:__init(t)
         local argRules = {
@@ -299,7 +299,7 @@ end
 -- BackgroundSubtractorKNN
 
 do
-    local BackgroundSubtractorKNN = cv.newTorchClass('cv.BackgroundSubtractorKNN', 'cv.BackgroundSubtractor')
+    local BackgroundSubtractorKNN = torch.class('cv.BackgroundSubtractorKNN', 'cv.BackgroundSubtractor', cv)
 
     function BackgroundSubtractorKNN:__init(t)
         local argRules = {
