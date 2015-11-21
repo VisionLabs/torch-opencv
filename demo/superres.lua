@@ -2,13 +2,13 @@
 -- Just to check sresolution works
 
 local cv = require 'cv'
-require 'cv.superres'
+cv.superres = require 'cv.superres'
 require 'cv.videoio'
 require 'cv.highgui'
 
-local camera = cv.createFrameSource_Camera{0}
-local sres = cv.createSuperResolution_BTVL1{}
-local optFlow = cv.createOptFlow_Farneback{}
+local camera = cv.superres.createFrameSource_Camera{0}
+local sres = cv.superres.createSuperResolution_BTVL1{}
+local optFlow = cv.superres.createOptFlow_Farneback{}
 
 -- These parameters are NOT realistic
 -- They're here just to show the example runs

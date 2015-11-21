@@ -2,6 +2,8 @@ local cv = require 'cv._env'
 
 local ffi = require 'ffi'
 
+local superres = {}
+
 ffi.cdef[[
 struct PtrWrapper createFrameSource();
 
@@ -194,7 +196,7 @@ require 'cv.Classes'
 local Classes = ffi.load(cv.libPath('Classes'))
 
 do
-    local FrameSource = cv.newTorchClass('cv.FrameSource')
+    local FrameSource = torch.class('cv.FrameSource', superres)
 
     function FrameSource:nextFrame(t)
         local argRules = {
@@ -210,13 +212,13 @@ do
     end
 end
 
-function cv.createFrameSource_Empty()
+function superres.createFrameSource_Empty()
     local retval = torch.factory('cv.FrameSource')()
     retval.ptr = ffi.gc(C.createFrameSource_Empty(), C.FrameSource_dtor)
     return retval
 end
 
-function cv.createFrameSource_Video(t)
+function superres.createFrameSource_Video(t)
     local argRules = {
         {"fileName", required = true}
     }
@@ -227,7 +229,7 @@ function cv.createFrameSource_Video(t)
     return retval
 end
 
-function cv.createFrameSource_Video_CUDA(t)
+function superres.createFrameSource_Video_CUDA(t)
     local argRules = {
         {"fileName", required = true}
     }
@@ -238,7 +240,7 @@ function cv.createFrameSource_Video_CUDA(t)
     return retval
 end
 
-function cv.createFrameSource_Camera(t)
+function superres.createFrameSource_Camera(t)
     local argRules = {
         {"deviceId", default = 0}
     }
@@ -252,7 +254,7 @@ end
 -- DenseOpticalFlowExt
 
 do
-    local DenseOpticalFlowExt = cv.newTorchClass('cv.DenseOpticalFlowExt', 'cv.Algorithm')
+    local DenseOpticalFlowExt = torch.class('cv.DenseOpticalFlowExt', 'cv.Algorithm', superres)
 
     function DenseOpticalFlowExt:calc(t)
         local argRules = {
@@ -276,7 +278,7 @@ end
 -- SuperResolution
 
 do
-    local SuperResolution = cv.newTorchClass('cv.SuperResolution', 'cv.Algorithm')
+    local SuperResolution = torch.class('cv.SuperResolution', 'cv.Algorithm', superres)
 
     function SuperResolution:nextFrame(t)
         local argRules = {
@@ -441,13 +443,13 @@ do
     end
 end
 
-function cv.createSuperResolution_BTVL1()
+function superres.createSuperResolution_BTVL1()
     local retval = torch.factory('cv.SuperResolution')()
     retval.ptr = ffi.gc(C.createSuperResolution_BTVL1(), Classes.Algorithm_dtor)
     return retval
 end
 
-function cv.createSuperResolution_BTVL1_CUDA()
+function superres.createSuperResolution_BTVL1_CUDA()
     local retval = torch.factory('cv.SuperResolution')()
     retval.ptr = ffi.gc(C.createSuperResolution_BTVL1_CUDA(), Classes.Algorithm_dtor)
     return retval
@@ -456,7 +458,7 @@ end
 -- FarnebackOpticalFlow
 
 do
-    local FarnebackOpticalFlow = cv.newTorchClass('cv.FarnebackOpticalFlow', 'cv.DenseOpticalFlowExt')
+    local FarnebackOpticalFlow = torch.class('cv.FarnebackOpticalFlow', 'cv.DenseOpticalFlowExt', superres)
 
     function FarnebackOpticalFlow:setPyrScale(t)
         local argRules = {
@@ -550,13 +552,13 @@ do
     end
 end
 
-function cv.createOptFlow_Farneback()
+function superres.createOptFlow_Farneback()
     local retval = torch.factory('cv.FarnebackOpticalFlow')()
     retval.ptr = ffi.gc(C.createOptFlow_Farneback(), Classes.Algorithm_dtor)
     return retval
 end
 
-function cv.createOptFlow_Farneback_CUDA()
+function superres.createOptFlow_Farneback_CUDA()
     local retval = torch.factory('cv.FarnebackOpticalFlow')()
     retval.ptr = ffi.gc(C.createOptFlow_Farneback_CUDA(), Classes.Algorithm_dtor)
     return retval
@@ -565,7 +567,7 @@ end
 -- DualTVL1OpticalFlow
 
 do
-    local DualTVL1OpticalFlow = cv.newTorchClass('cv.DualTVL1OpticalFlow', 'cv.DenseOpticalFlowExt')
+    local DualTVL1OpticalFlow = torch.class('cv.DualTVL1OpticalFlow', 'cv.DenseOpticalFlowExt', superres)
 
     function DualTVL1OpticalFlow:setTau(t)
         local argRules = {
@@ -672,13 +674,13 @@ do
     end
 end
 
-function cv.createOptFlow_DualTVL1()
+function superres.createOptFlow_DualTVL1()
     local retval = torch.factory('cv.DualTVL1OpticalFlow')()
     retval.ptr = ffi.gc(C.createOptFlow_DualTVL1(), Classes.Algorithm_dtor)
     return retval
 end
 
-function cv.createOptFlow_DualTVL1_CUDA()
+function superres.createOptFlow_DualTVL1_CUDA()
     local retval = torch.factory('cv.DualTVL1OpticalFlow')()
     retval.ptr = ffi.gc(C.createOptFlow_DualTVL1_CUDA(), Classes.Algorithm_dtor)
     return retval
@@ -687,7 +689,7 @@ end
 -- BroxOpticalFlow
 
 do
-    local BroxOpticalFlow = cv.newTorchClass('cv.BroxOpticalFlow', 'cv.DenseOpticalFlowExt')
+    local BroxOpticalFlow = torch.class('cv.BroxOpticalFlow', 'cv.DenseOpticalFlowExt', superres)
 
     function BroxOpticalFlow:setAlpha(t)
         local argRules = {
@@ -768,7 +770,7 @@ do
     end
 end
 
-function cv.createOptFlow_Brox_CUDA()
+function superres.createOptFlow_Brox_CUDA()
     local retval = torch.factory('cv.BroxOpticalFlow')()
     retval.ptr = ffi.gc(C.createOptFlow_Brox_CUDA(), Classes.Algorithm_dtor)
     return retval
@@ -777,7 +779,7 @@ end
 -- PyrLKOpticalFlow
 
 do
-    local PyrLKOpticalFlow = cv.newTorchClass('cv.PyrLKOpticalFlow', 'cv.DenseOpticalFlowExt')
+    local PyrLKOpticalFlow = torch.class('cv.PyrLKOpticalFlow', 'cv.DenseOpticalFlowExt', superres)
 
     function PyrLKOpticalFlow:setWindowSize(t)
         local argRules = {
@@ -819,10 +821,10 @@ do
     end
 end
 
-function cv.createOptFlow_PyrLK_CUDA()
+function superres.createOptFlow_PyrLK_CUDA()
     local retval = torch.factory('cv.PyrLKOpticalFlow')()
     retval.ptr = ffi.gc(C.createOptFlow_PyrLK_CUDA(), Classes.Algorithm_dtor)
     return retval
 end
 
-return cv
+return superres
