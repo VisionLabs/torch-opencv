@@ -88,7 +88,7 @@ print(dst:size())
 ```
 
 ###Image Resize
-Here is an exmaple of resizing an image to provided fixed size.
+Here is an exmaple to resize an image to fixed size.
 ```lua
 dst = cv.resize{src=src, dsize={1024, 1024}, interpolation=cv.INTER_CUBIC}
 print(dst:size())
