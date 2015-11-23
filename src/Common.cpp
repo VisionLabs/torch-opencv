@@ -208,3 +208,12 @@ SizeWrapper::SizeWrapper(const cv::Size & other) {
     this->height = other.height;
     this->width = other.width;
 }
+
+RectArray::RectArray(std::vector<cv::Rect> & vec) {
+    this->data = static_cast<RectWrapper *>(malloc(vec.size() * sizeof(RectWrapper)));
+    this->size = vec.size();
+
+    for (int i = 0; i < vec.size(); ++i) {
+        this->data[i] = vec[i];
+    }
+}
