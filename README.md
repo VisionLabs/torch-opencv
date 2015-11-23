@@ -23,7 +23,7 @@ require 'cv.videoio' -- Video
 ###Reading/writing image
 OpenCV reads image in row major format and shape is (height, width, channels) unless the image is loaded as grayscale or it is grayscale and loaded with ```cv.IMREAD_UNCHANGED``` flag, in that case the shape is (height, width). Functions ```cv.imread``` and ```cv.imwrite``` reverses the channel order. If the image is in RGB on disk then after reading it becomes BGR (in memory) and vice-versa for image writing.
 
-To load image as it is on disk.
+To load image as it is on disk use ```cv.IMREAD_UNCHANGED``` flag.
 ```lua
 loadType = cv.IMREAD_UNCHANGED
 src = cv.imread{imagePath, loadType}
@@ -34,7 +34,7 @@ print(src:size())
 [torch.LongStorage of size 3]
 ```
 
-To load the image as color image use cv.IMREAD_COLOR flag.
+To load the image as color image use ```cv.IMREAD_COLOR``` flag.
 ```lua
 --loadType: cv.IMREAD_COLOR, loads (always) 3 channel image.
 loadType = cv.IMREAD_COLOR
@@ -46,7 +46,7 @@ print(src:size())
 [torch.LongStorage of size 3]
 ```
 
-You can use cv.IMREAD_GRAYSCALE to load image as grayscale.
+You can use ```cv.IMREAD_GRAYSCALE``` to load image as grayscale. In this case the color is converted to grayscale. For this conversion the channels of the image are assumed to be in RGB order.
 ```lua
 loadType = cv.IMREAD_GRAYSCALE
 src = cv.imread{imagePath, loadType}
