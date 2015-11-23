@@ -119,7 +119,7 @@ Affine transformation is one of the most widely used image processing function. 
 
 ![Lena](demo/lena.jpg)
 
-Affine transformation in OpenCV is a two step process.
+Affine transformation is a two step process.
 
 1) Get affine rotation/scaling matrix.
 
