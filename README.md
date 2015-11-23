@@ -99,7 +99,7 @@ print(dst:size())
 [torch.LongStorage of size 3]
 ```
 
-We can also resize an image using scaling factotr. You can use different scaling factor for height and width.
+We can also resize an image using scaling factot. You can use different scaling factor for height and width.
 ```lua
 scaleX = 0.25
 scaleY = 0.35
@@ -113,7 +113,7 @@ print(dst:size())
 ```
 
 ###Affine transformation
-Affine transformation is one of the most widely used image processing. We will go through this functionality using following image as an example.
+Affine transformation is one of the most widely used image processing function. We will go through this functionality using following image as an example.
 
 **Source Image**
 
@@ -142,9 +142,9 @@ print(M:size())
 Transformation matrix M provided by Opencv has only rotation and scaling. You can add translation by adding [translationX translationY] to the last column of M.
 
 
-2) Transforming image
+2) Transforming Image (Affine Warp)
 ```lua
-dsize = cv.Size{width, height} -- if not provided or zero then uses source image size
+dsize = cv.Size{width, height} -- if not provided or zero then uses source image's size
 dst = cv.warpAffine{src=src, M=M, dsize=dsize, flags=cv.INTER_LINEAR}
 print(dst:size())
 
@@ -154,6 +154,6 @@ print(dst:size())
 [torch.LongStorage of size 3]
 ```
 
-Affine transformed image
+**Affine Transformed Image**
 
 ![Transformed image](demo/lenaTrans.jpg)
