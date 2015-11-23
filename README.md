@@ -7,10 +7,10 @@ See [this page](https://github.com/VisionLabs/torch-opencv/wiki/Trying-it-out) f
 
 #Tutorial
 
-This section showcases code snippets to use basic image based Opencv functionalities. Using the famous Lena image for this purpose.
+This section showcases code snippets to use basic image based [OpenCV](http://opencv.org/) functionalities. Using the famous Lena image for this purpose.
 
 ###Requiring torch-opencv
-Opencv provides range of functionalities. You can require them as required. 
+OpenCV provides range of functionalities. You can require them as required.
 ```lua
 local cv = require 'cv'
 require 'cv.imgcodecs' -- reading/writing images
@@ -21,8 +21,8 @@ require 'cv.videoio' -- Video
 ```
 
 ###Reading/writing image
-Opencv reads image in row major format and shape is (height, width, channels) unless the image is loaded as grayscale or it is grayscale and loaded with cv.IMREAD_UNCHANGED flag, in that case the shape is (height, width).
-cv.imread and cv.imwrite reverses channel order. If the image is in RGB on disk then after reading it becomes BGR (in memory) and vice-versa for imwrite.
+OpenCV reads image in row major format and shape is (height, width, channels) unless the image is loaded as grayscale or it is grayscale and loaded with ```cv.IMREAD_UNCHANGED``` flag, in that case the shape is (height, width).
+```cv.imread``` and ```cv.imwrite``` reverses channel order. If the image is in RGB on disk then after reading it becomes BGR (in memory) and vice-versa for imwrite.
 
 Loading image as it is on disk.
 ```lua
