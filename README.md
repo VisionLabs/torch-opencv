@@ -21,10 +21,9 @@ require 'cv.videoio' -- Video
 ```
 
 ###Reading/writing image
-OpenCV reads image in row major format and shape is (height, width, channels) unless the image is loaded as grayscale or it is grayscale and loaded with ```cv.IMREAD_UNCHANGED``` flag, in that case the shape is (height, width).
-```cv.imread``` and ```cv.imwrite``` reverses channel order. If the image is in RGB on disk then after reading it becomes BGR (in memory) and vice-versa for imwrite.
+OpenCV reads image in row major format and shape is (height, width, channels) unless the image is loaded as grayscale or it is grayscale and loaded with ```cv.IMREAD_UNCHANGED``` flag, in that case the shape is (height, width). Functions ```cv.imread``` and ```cv.imwrite``` reverses the channel order. If the image is in RGB on disk then after reading it becomes BGR (in memory) and vice-versa for image writing.
 
-Loading image as it is on disk.
+To load image as it is on disk.
 ```lua
 loadType = cv.IMREAD_UNCHANGED
 src = cv.imread{imagePath, loadType}
