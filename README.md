@@ -139,7 +139,7 @@ print(M:size())
  3
 [torch.LongStorage of size 2]
 ```
-Transformation matrix M provided by Opencv has only rotation and scaling. You can add translation by adding [translationX translationY] to the last column of M.
+Transformation matrix M provided by OpenCV has only rotation and scaling. You can add translation by adding [translationX translationY] to the last column of M.
 
 
 2) Transforming Image (Affine Warp)
