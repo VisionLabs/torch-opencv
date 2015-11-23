@@ -63,7 +63,7 @@ cv.imwrite{imagePath, src}
 Third argument to the function can compression specific parameter. E.g if compression is *JPEG* then the parameter is *JPEG* compression quality. If not provided then default values are used.
 
 ###Color Conversion
-Opencv provides optimized color conversion functions.
+OpenCV provides optimized color conversion functions.
 
 Convert BGR to YUV
 ```lua
