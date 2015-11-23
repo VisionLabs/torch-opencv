@@ -56,10 +56,11 @@ print(src:size())
 [torch.LongStorage of size 2]
 ```
 
-To save image to disk
+For saving image to disk use ```cv.imwrite```. Image compression is defined by the extension of the ```imagePath```.
 ```lua
 cv.imwrite{imagePath, src}
 ```
+Third argument to the function is compression specific parameter. E.g if compression is *JPEG* then the parameter is *JPEG* compression quality.
 
 ###Color Conversion
 Opencv provides optimized color conversion functions.
