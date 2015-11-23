@@ -142,7 +142,7 @@ print(M:size())
 Transformation matrix M provided by OpenCV has only rotation and scaling. You can add translation by adding ```[translationX  translationY]``` to the last column of M.
 
 
-2) Transforming Image (Affine Warp)
+2) Transforming Image (Affine Warp) using Rotation Matrix.
 ```lua
 dsize = cv.Size{width, height} -- if not provided or zero then uses source image's size
 dst = cv.warpAffine{src=src, M=M, dsize=dsize, flags=cv.INTER_LINEAR}
