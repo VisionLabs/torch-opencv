@@ -20,7 +20,7 @@ require 'cv.ml' -- Machine Learning
 require 'cv.videoio' -- Video
 ```
 
-###Reading/writing image
+###Reading/Writing Image
 OpenCV reads image in row major format and shape is (height, width, channels) unless the image is loaded as grayscale or it is grayscale and loaded with ```cv.IMREAD_UNCHANGED``` flag, in that case the shape is (height, width). Functions ```cv.imread``` and ```cv.imwrite``` reverses the channel order. If the image is in RGB on disk then after reading it becomes BGR (in memory) and vice-versa for image writing.
 
 To load image as it is on disk use ```cv.IMREAD_UNCHANGED``` flag.
@@ -63,7 +63,7 @@ cv.imwrite{imagePath, src}
 Third argument to the function can compression specific parameter. E.g if compression is *JPEG* then the parameter is *JPEG* compression quality. If not provided then default values are used.
 
 ###Color Conversion
-OpenCV provides optimized color conversion functions.
+OpenCV provides optimized color conversion functions. Following are couple of examples.
 
 Convert BGR to YUV
 ```lua
@@ -87,7 +87,7 @@ print(dst:size())
 [torch.LongStorage of size 2]
 ```
 
-###Resize image
+###Image Resize
 Resize an image to given fixed size.
 ```lua
 dst = cv.resize{src=src, dsize={1024, 1024}, interpolation=cv.INTER_CUBIC}
@@ -112,11 +112,15 @@ print(dst:size())
 ```
 
 ###Affine transformation
-Source image
+Affine transformation is one of the most widely used image processing. We will go through this functionality using following image as an example.
+
+**Source Image**
 
 ![Lena](demo/lena.jpg)
 
-1) Get affine rotation/scaling matrix. ```lua
+Affine transformation in OpenCV is a two step process.
+
+1) Get affine rotation/scaling matrix.
 
 ```lua
 height = src:size(1)
