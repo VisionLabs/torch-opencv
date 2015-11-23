@@ -60,7 +60,7 @@ For saving image to disk use ```cv.imwrite```. Image compression is defined by t
 ```lua
 cv.imwrite{imagePath, src}
 ```
-Third argument to the function is compression specific parameter. E.g if compression is *JPEG* then the parameter is *JPEG* compression quality.
+Third argument to the function can compression specific parameter. E.g if compression is *JPEG* then the parameter is *JPEG* compression quality. If not provided then default values are used.
 
 ###Color Conversion
 Opencv provides optimized color conversion functions.
