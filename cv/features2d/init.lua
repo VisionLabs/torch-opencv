@@ -114,9 +114,20 @@ void ORB_setFastThreshold(struct PtrWrapper ptr, int fastThreshold);
 
 int ORB_getFastThreshold(struct PtrWrapper ptr);
 
+struct PtrWrapper MSER_ctor(int _delta, int _min_area, int _max_area, double _max_variation, double _min_diversity,
+                        int _max_evolution, double _area_threshold, double _min_margin, int _edge_blur_size);
 
+void MSER_setDelta(struct PtrWrapper ptr, int delta);
 
+int MSER_getDelta(struct PtrWrapper ptr);
 
+void MSER_setMinArea(struct PtrWrapper ptr, int minArea);
+
+int MSER_getMinArea(struct PtrWrapper ptr);
+
+void MSER_setMaxArea(struct PtrWrapper ptr, int MaxArea);
+
+int MSER_getMaxArea(struct PtrWrapper ptr);
 
 
 
@@ -461,7 +472,70 @@ do
     end
 end
 
+-- MSER
 
+do 
+    local MSER = cv.newTorchClass('cv.MSER', 'cv.Feature2D')
+
+    function MSER:__init(t)
+        local argRules = {
+            {"_delta", default = 5},
+            {"_min_area", default = 60},
+            {"_max_area", default = 14400},
+            {"_max_variation", default = 0.25},
+            {"_min_diversity", default = 0.2},
+            {"_max_evolution", default = 200},
+            {"_area_threshold", default = 1.01},
+            {"_min_margin", default = 0.003},
+            {"_edge_blur_size", default = 5}   
+        }
+        local _delta, _min_area, _max_area, _max_variation, _min_diversity, _max_evolution,
+                _area_threshold, _min_margin, _edge_blur_size = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.MSER_ctor(_delta, _min_area, _max_area, _max_variation, _min_diversity, _max_evolution,
+                                _area_threshold, _min_margin, _edge_blur_size),
+                                Classes.Algorithm_dtor)    
+    end
+
+    function MSER:setDelta(t)
+        local argRules = {
+            {"delta", required = true}
+        }
+        local delta = cv.argcheck(t, argRules)
+
+        C.MSER_setDelta(self.ptr, delta)
+    end
+
+    function MSER:getDelta()
+        return C.MSER_getDelta(self.ptr)
+    end
+
+    function MSER:setMinArea(t)
+        local argRules = {
+            {"minArea", required = true}
+        }
+        local minArea = cv.argcheck(t, argRules)
+
+        C.MSER_setMinArea(self.ptr, minArea)
+    end
+
+    function MSER:getMinArea()
+        return C.MSER_getMinArea(self.ptr)
+    end
+
+    function MSER:setMaxArea(t)
+        local argRules = {
+            {"MaxArea", required = true}
+        }
+        local MaxArea = cv.argcheck(t, argRules)
+
+        C.MSER_setMaxArea(self.ptr, MaxArea)
+    end
+
+    function MSER:getMaxArea()
+        return C.MSER_getMaxArea(self.ptr)
+    end
+end
 
 
 

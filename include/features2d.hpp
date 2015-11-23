@@ -152,9 +152,29 @@ extern "C" void ORB_setFastThreshold(struct ORBPtr ptr, int fastThreshold);
 
 extern "C" int ORB_getFastThreshold(struct ORBPtr ptr);
 
+// MSER
 
+struct MSERPtr {
+    void *ptr;
+    inline cv::MSER * operator->() { return static_cast<cv::MSER *>(ptr); }
+    inline MSERPtr(cv::MSER *ptr) { this->ptr = ptr; }
+    inline cv::MSER & operator*() { return *static_cast<cv::MSER *>(this->ptr); }
+};
 
+extern "C" struct MSERPtr MSER_ctor(int _delta, int _min_area, int _max_area, double _max_variation, double _min_diversity,
+                        int _max_evolution, double _area_threshold, double _min_margin, int _edge_blur_size);
 
+extern "C" void MSER_setDelta(struct MSERPtr ptr, int delta);
+
+extern "C" int MSER_getDelta(struct MSERPtr ptr);
+
+extern "C" void MSER_setMinArea(struct MSERPtr ptr, int minArea);
+
+extern "C" int MSER_getMinArea(struct MSERPtr ptr);
+
+extern "C" void MSER_setMaxArea(struct MSERPtr ptr, int MaxArea);
+
+extern "C" int MSER_getMaxArea(struct MSERPtr ptr);
 
 
 
