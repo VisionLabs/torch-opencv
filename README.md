@@ -88,7 +88,7 @@ print(dst:size())
 ```
 
 ###Image Resize
-Resize an image to given fixed size.
+Here is an exmaple of resizing an image to provided fixed size.
 ```lua
 dst = cv.resize{src=src, dsize={1024, 1024}, interpolation=cv.INTER_CUBIC}
 print(dst:size())
@@ -99,13 +99,14 @@ print(dst:size())
 [torch.LongStorage of size 3]
 ```
 
-Resize image by a given factor. You can use different scaling factor for height and width.
+We can also resize an image using scaling factotr. You can use different scaling factor for height and width.
 ```lua
-scale = 0.25
-dst = cv.resize{src=src, fx=scale, fy=scale, interpolation=cv.INTER_AREA}
+scaleX = 0.25
+scaleY = 0.35
+dst = cv.resize{src=src, fx=scaleX, fy=scaleY, interpolation=cv.INTER_AREA}
 print(dst:size())
 
- 128
+ 179
  128
    3
 [torch.LongStorage of size 3]
