@@ -1042,7 +1042,7 @@ function cv.warpAffine(t)
         {"src", required = true},
         {"dst", default = nil},
         {"M", required = true},
-        {"dsize", default = {0, 0}, operator = cv.Point},
+        {"dsize", default = {0, 0}, operator = cv.Size},
         {"flags", default = cv.INTER_LINEAR},
         {"borderMode", default = cv.BORDER_CONSTANT},
         {"borderValue", default = {0/0} , operator = cv.Scalar}
