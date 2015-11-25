@@ -70,7 +70,7 @@ struct TensorWrapper readOpticalFlow(const char *path)
 }
 
 extern "C"
-bool writeOpticalFlow( const char *path, struct TensorWrapper flow )
+bool writeOpticalFlow(const char *path, struct TensorWrapper flow)
 {
     return optflow::writeOpticalFlow(path, flow.toMat());
 }
@@ -123,4 +123,30 @@ struct TensorPlusRectArray segmentMotion(
 
     new (&retval.rects) RectArray(rects);
     return retval;
+}
+
+// DenseOpticalFlowPtr is from video.hpp
+
+extern "C"
+struct DenseOpticalFlowPtr createOptFlow_DeepFlow_optflow()
+{
+    return rescueObjectFromPtr(optflow::createOptFlow_DeepFlow());
+}
+
+extern "C"
+struct DenseOpticalFlowPtr createOptFlow_SimpleFlow_optflow()
+{
+    return rescueObjectFromPtr(optflow::createOptFlow_SimpleFlow());
+}
+
+extern "C"
+struct DenseOpticalFlowPtr createOptFlow_Farneback_optflow()
+{
+    return rescueObjectFromPtr(optflow::createOptFlow_Farneback());
+}
+
+extern "C"
+struct DenseOpticalFlowPtr createOptFlow_SparseToDense_optflow()
+{
+    return rescueObjectFromPtr(optflow::createOptFlow_SparseToDense());
 }

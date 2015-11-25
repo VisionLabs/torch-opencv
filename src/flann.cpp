@@ -1,5 +1,4 @@
 #include <flann.hpp>
-#include <libtar.h>
 
 // Various IndexParams
 

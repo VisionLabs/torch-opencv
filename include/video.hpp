@@ -111,3 +111,10 @@ extern "C" void BackgroundSubtractorKNN_setShadowThreshold(struct BackgroundSubt
 extern "C" bool BackgroundSubtractorKNN_getDetectShadows(struct BackgroundSubtractorKNNPtr ptr);
 
 extern "C" void BackgroundSubtractorKNN_setDetectShadows(struct BackgroundSubtractorKNNPtr ptr, bool detectShadows);
+
+struct DenseOpticalFlowPtr {
+    void *ptr;
+
+    inline cv::DenseOpticalFlow * operator->() { return static_cast<cv::DenseOpticalFlow *>(ptr); }
+    inline DenseOpticalFlowPtr(cv::DenseOpticalFlow *ptr) { this->ptr = ptr; }
+};

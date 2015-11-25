@@ -5,7 +5,49 @@ local ffi = require 'ffi'
 local optflow = {}
 
 ffi.cdef[[
+struct TensorWrapper calcOpticalFlowSF(
+        struct TensorWrapper from, struct TensorWrapper to, struct TensorWrapper flow,
+        int layers, int averaging_block_size, int max_flow);
 
+struct TensorWrapper calcOpticalFlowSF_expanded(
+        struct TensorWrapper from, struct TensorWrapper to, struct TensorWrapper flow,
+        int layers, int averaging_block_size, int max_flow,
+        double sigma_dist, double sigma_color, int postprocess_window,
+        double sigma_dist_fix, double sigma_color_fix, double occ_thr,
+        int upscale_averaging_radius, double upscale_sigma_dist,
+        double upscale_sigma_color, double speed_up_thr);
+
+struct TensorWrapper calcOpticalFlowSparseToDense(
+        struct TensorWrapper from, struct TensorWrapper to, struct TensorWrapper flow,
+        int grid_step, int k, float sigma, bool use_post_proc, float fgs_lambda, float fgs_sigma);
+
+struct TensorWrapper readOpticalFlow(const char *path);
+
+bool writeOpticalFlow(const char *path, struct TensorWrapper flow);
+
+void updateMotionHistory(
+        struct TensorWrapper silhouette, struct TensorWrapper mhi,
+        double timestamp, double duration);
+
+struct TensorArray calcMotionGradient(
+        struct TensorWrapper mhi, struct TensorWrapper mask, struct TensorWrapper orientation,
+        double delta1, double delta2, int apertureSize);
+
+double calcGlobalOrientation(
+        struct TensorWrapper orientation, struct TensorWrapper mask,
+        struct TensorWrapper mhi, double timestamp, double duration);
+
+struct TensorPlusRectArray segmentMotion(
+        struct TensorWrapper mhi, struct TensorWrapper segmask,
+        double timestamp, double segThresh);
+
+struct PtrWrapper createOptFlow_DeepFlow_optflow();
+
+struct PtrWrapper createOptFlow_SimpleFlow_optflow();
+
+struct PtrWrapper createOptFlow_Farneback_optflow();
+
+struct PtrWrapper createOptFlow_SparseToDense_optflow();
 ]]
 
 local C = ffi.load(cv.libPath('optflow'))
@@ -139,7 +181,7 @@ function optflow.calcGlobalOrientation(t)
         cv.wrap_tensor(mhi), timestamp, duration)
 end
 
--- TODO: currently it's very slow. To be optimized in the future
+-- TODO: currently it's very slow. Optimize it in the future (avoid copying std::vector of rects!)
 function optflow.segmentMotion(t)
     local argRules = {
         {"mhi", required = true},
@@ -152,6 +194,30 @@ function optflow.segmentMotion(t)
     local result = C.segmentMotion(
         cv.wrap_tensor(mhi), cv.wrap_tensor(segmask), timestamp, segThresh)
     return cv.unwrap_tensors(result.tensor), result.rects
+end
+
+function optflow.createOptFlow_DeepFlow()
+    local retval = torch.factory('cv.DenseOpticalFlow')()
+    retval.ptr = C.createOptFlow_DeepFlow_optflow()
+    return retval
+end
+
+function optflow.createOptFlow_SimpleFlow()
+    local retval = torch.factory('cv.DenseOpticalFlow')()
+    retval.ptr = C.createOptFlow_SimpleFlow_optflow()
+    return retval
+end
+
+function optflow.createOptFlow_Farneback()
+    local retval = torch.factory('cv.DenseOpticalFlow')()
+    retval.ptr = C.createOptFlow_Farneback_optflow()
+    return retval
+end
+
+function optflow.createOptFlow_SparseToDense()
+    local retval = torch.factory('cv.DenseOpticalFlow')()
+    retval.ptr = C.createOptFlow_SparseToDense_optflow()
+    return retval
 end
 
 return optflow
