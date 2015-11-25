@@ -6,21 +6,19 @@ cv.superres = require 'cv.superres'
 require 'cv.videoio'
 require 'cv.highgui'
 
-local camera = cv.superres.createFrameSource_Camera{0}
 local sres = cv.superres.createSuperResolution_BTVL1{}
+
+local camera = cv.superres.createFrameSource_Camera{0}
+sres:setInput{camera}
+
 local optFlow = cv.superres.createOptFlow_Farneback{}
+sres:setOpticalFlow{optFlow}
 
 -- These parameters are NOT realistic
 -- They're here just to show the example runs
-sres:setInput{camera}
 sres:setScale{2}
 sres:setIterations{1}
 sres:setTemporalAreaRadius{1}
-
--- For some reason, an attempt to set custom optical flow algorithm results in a segfault
--- see https://github.com/VisionLabs/torch-opencv/issues/29
-
---sres:setOpticalFlow{optFlow}
 
 -- skip the first frame
 camera:nextFrame{}

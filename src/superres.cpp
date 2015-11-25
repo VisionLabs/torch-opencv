@@ -348,18 +348,23 @@ int SuperResolution_getTemporalAreaRadius(struct SuperResolutionPtr ptr)
     return ptr->getTemporalAreaRadius();
 }
 
+/* A dirty and unsafe hack for resolving virtual inheritance issue.
+ * If it stops working one day, we will have to:
+ *
+ * 1) create an enum that names all the DenseOpticalFlowExt virtual children (like FarnebackOpticalFlow)
+ * 2) when creating such a child (createOptFlow_Farneback), return not only void * ptr to it, but also enum's value
+ * 3) put this enum value to a Lua class (along with void * ptr)
+ * 4) in SuperResolution_setOpticalFlow, cast the void * ptr to one of these children types depending on the enum value
+ * */
+class FakeOpticalFlow : public virtual superres::DenseOpticalFlowExt {};
+
 extern "C"
 void SuperResolution_setOpticalFlow(struct SuperResolutionPtr ptr, struct DenseOpticalFlowExtPtr val)
 {
-    cv::Ptr<superres::DenseOpticalFlowExt> tempPtr(
-            static_cast<superres::DenseOpticalFlowExt *>(val.ptr));
+    cv::Ptr<FakeOpticalFlow> tempPtr(
+            static_cast<FakeOpticalFlow *>(val.ptr));
     rescueObjectFromPtr(tempPtr);
-
     ptr->setOpticalFlow(tempPtr);
-
-    std::cout << "Setting this optical flow: " << tempPtr.get() << std::endl;
-    BTVL1_B * b = static_cast<BTVL1_B *>(ptr.ptr);
-    std::cout << "BTVL1_Base haz " << b->opticalFlow_.get() << std::endl;
 }
 
 extern "C"
