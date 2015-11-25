@@ -152,6 +152,11 @@ struct RectArray {
     int size;
 };
 
+struct TensorPlusRectArray {
+    struct TensorWrapper tensor;
+    struct RectArray rects;
+};
+
 struct FloatArrayOfArrays {
     float **pointers;
     float *realData;

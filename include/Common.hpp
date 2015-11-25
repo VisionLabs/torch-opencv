@@ -254,6 +254,16 @@ struct PointArray {
 struct RectArray {
     struct RectWrapper *data;
     int size;
+
+    RectArray() {}
+    RectArray(std::vector<cv::Rect> & vec);
+};
+
+struct TensorPlusRectArray {
+    struct TensorWrapper tensor;
+    struct RectArray rects;
+
+    TensorPlusRectArray() {}
 };
 
 // Arrays of arrays
