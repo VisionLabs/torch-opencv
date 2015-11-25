@@ -4,11 +4,11 @@ require 'cv.imgproc'
 require 'cv.imgcodecs'
 
 if not arg[1] then
-	print('Usage: `th demo/LineSegmentDetector.lua path-to-image`\n')
+	print('Usage: `th demo/LineSegmentDetector.lua path-to-image`')
 	print('Now using demo/lena.jpg')
 end
 
-local image = cv.imread{arg[1], cv.IMREAD_GRAYSCALE}
+local image = cv.imread{arg[1] or 'demo/lena.jpg', cv.IMREAD_GRAYSCALE}
 
 local detector = cv.LineSegmentDetector{}
 local lines = detector:detect{image}
