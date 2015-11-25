@@ -84,7 +84,7 @@ int ORB_getMaxFeatures(struct PtrWrapper ptr);
 
 void ORB_setScaleFactor(struct PtrWrapper ptr, int scaleFactor);
 
-int ORB_getScaleFactor(struct PtrWrapper ptr);
+double ORB_getScaleFactor(struct PtrWrapper ptr);
 
 void ORB_setNLevels(struct PtrWrapper ptr, int nlevels);
 
@@ -134,6 +134,44 @@ int MSER_getMaxArea(struct PtrWrapper ptr);
 
 struct KeyPointArray AGAST(
         struct TensorWrapper image, int threshold, bool nonmaxSuppression);
+
+
+void BOWTrainer_dtor(struct PtrWrapper ptr);
+
+void BOWTrainer_add(struct PtrWrapper ptr, struct TensorWrapper descriptors);
+
+struct TensorArray BOWTrainer_getDescriptors(struct PtrWrapper ptr);
+
+int BOWTrainer_descriptorsCount(struct PtrWrapper ptr);
+
+void BOWTrainer_clear(struct PtrWrapper ptr);
+
+struct TensorWrapper BOWTrainer_cluster(struct PtrWrapper ptr);
+
+struct TensorWrapper BOWTrainer_cluster_descriptors(struct PtrWrapper ptr, struct TensorWrapper descriptors);
+
+struct PtrWrapper BOWKMeansTrainer_ctor(
+        int clusterCount, struct TermCriteriaWrapper termcrit,
+        int attempts, int flags);
+
+struct PtrWrapper BOWImgDescriptorExtractor_ctor(
+        struct PtrWrapper dextractor, struct PtrWrapper dmatcher);
+
+void BOWImgDescriptorExtractor_dtor(struct PtrWrapper ptr);
+
+void BOWImgDescriptorExtractor_setVocabulary(
+        struct PtrWrapper ptr, struct TensorWrapper vocabulary);
+
+struct TensorWrapper getVocabulary(struct PtrWrapper ptr);
+
+struct TensorWrapper compute(
+        struct PtrWrapper ptr, struct TensorWrapper image,
+        struct KeyPointArray keypoints, struct TensorWrapper imgDescriptor);
+
+int descriptorSize(struct PtrWrapper ptr);
+
+int descriptorType(struct PtrWrapper ptr);
+
 ]]
 
 function cv.KeyPoint(...)
@@ -143,7 +181,7 @@ end
 -- KeyPointsFilter
 
 do
-    local KeyPointsFilter = cv.newTorchClass('cv.KeyPointsFilter')
+    local KeyPointsFilter = torch.class('cv.KeyPointsFilter', cv)
 
     function KeyPointsFilter:__init()
         self.ptr = ffi.gc(C.KeyPointsFilter_ctor(), C.KeyPointsFilter_dtor)
@@ -204,7 +242,7 @@ end
 -- Feature2D
 
 do
-    local Feature2D = cv.newTorchClass('cv.Feature2D', 'cv.Algorithm')
+    local Feature2D = torch.class('cv.Feature2D', 'cv.Algorithm', cv)
 
     function Feature2D:__init()
         self.ptr = ffi.gc(C.Feature2D_ctor(), Classes.Algorithm_dtor)
@@ -288,7 +326,7 @@ end
 -- BRISK
 
 do
-    local BRISK = cv.newTorchClass('cv.BRISK', 'cv.Feature2D')
+    local BRISK = torch.class('cv.BRISK', 'cv.Feature2D', cv)
 
     function BRISK:__init(t)
         if t.radiusList or type(t[1]) ~= "number" then
@@ -333,7 +371,7 @@ end
 -- ORB
 
 do
-    local ORB = cv.newTorchClass('cv.ORB', 'cv.Feature2D')
+    local ORB = torch.class('cv.ORB', 'cv.Feature2D', cv)
 
     function ORB:__init(t)
         local argRules = {
@@ -475,7 +513,7 @@ end
 -- MSER
 
 do 
-    local MSER = cv.newTorchClass('cv.MSER', 'cv.Feature2D')
+    local MSER = torch.class('cv.MSER', 'cv.Feature2D', cv)
 
     function MSER:__init(t)
         local argRules = {
@@ -553,5 +591,124 @@ function cv.AGAST(t)
 
     return C.AGAST(cv.wrap_tensor(image), threshold, nonmaxSuppression)
 end
+
+
+
+
+-- BOWTrainer
+
+do
+    local BOWTrainer = torch.class('cv.BOWTrainer', cv)
+
+    function BOWTrainer:add(t)
+        local argRules = {
+            {"descriptors", required = true}
+        }
+        local descriptors = cv.argcheck(t, argRules)
+
+        C.BOWTrainer_add(self.ptr, cv.wrap_tensor(descriptors))
+    end
+
+    function BOWTrainer:getDescriptors(t)
+        return cv.unwrap_tensors(C.BOWTrainer_getDescriptors(self.ptr))
+    end
+
+    function BOWTrainer:descriptorsCount(t)
+        return C.BOWTrainer_descriptorsCount(self.ptr)
+    end
+
+    function BOWTrainer:clear(t)
+        C.BOWTrainer_clear(self.ptr)
+    end
+
+    function BOWTrainer:cluster(t)
+        if t[1] or t.descriptors then
+            local argRules = {
+                {"descriptors", required = true}
+            }
+            local descriptors = cv.argcheck(t, argRules)
+
+            return cv.unwrap_tensors(C.BOWTrainer_cluster_descriptors(
+                self.ptr, cv.wrap_tensor(descriptors)))
+        else
+            return cv.unwrap_tensors(C.BOWTrainer_cluster(self.ptr))
+        end
+    end
+end
+
+-- BOWKMeansTrainer
+
+do
+    local BOWKMeansTrainer = torch.class('cv.BOWKMeansTrainer', 'cv.BOWTrainer', cv)
+
+    function BOWKMeansTrainer:__init(t)
+        local argRules = {
+            {"clusterCount", required = true},
+            {"termcrit", default = 0, operator = cv.TermCriteria},
+            {"attempts", default = 3},
+            {"flags", default = cv.KMEANS_PP_CENTERS}
+        }
+        local clusterCount, termcrit, attempts, flags = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(
+            C.BOWKMeansTrainer_ctor(clusterCount, termcrit, attempts, flags),
+            C.BOWTrainer_dtor)
+    end
+end
+
+-- BOWImgDescriptorExtractor
+
+do
+    local BOWImgDescriptorExtractor = torch.class('cv.BOWImgDescriptorExtractor', cv)
+
+    function BOWImgDescriptorExtractor:__init(t)
+        local argRules = {
+            {"dextractor", required = true},
+            {"dmatcher", required = true}
+        }
+        local dextractor, dmatcher = cv.argcheck(t, argRules)
+
+        self.dextractor = dextractor
+        self.dmatcher = dmatcher
+
+        self.ptr = ffi.gc(
+            C.BOWImgDescriptorExtractor_ctor(dextractor.ptr, dmatcher.ptr),
+            C.BOWImgDescriptorExtractor_dtor)
+    end
+
+    function BOWImgDescriptorExtractor:setVocabulary(t)
+        local argRules = {
+            {"vocabulary", required = true}
+        }
+        local vocabulary = cv.argcheck(t, argRules)
+
+        C.BOWImgDescriptorExtractor_setVocabulary(self.ptr, cv.wrap_tensor(vocabulary))
+    end
+
+    function BOWImgDescriptorExtractor:getVocabulary(t)
+        return cv.unwrap_tensors(C.BOWImgDescriptorExtractor_getVocabulary(self.ptr))
+    end
+
+    function BOWImgDescriptorExtractor:compute(t)
+        local argRules = {
+            {"image", required = true},
+            {"keypoints", required = true},
+            {"imgDescriptor", default = nil}
+        }
+        local image, keypoints, imgDescriptor = cv.argcheck(t, argRules)
+
+        return cv.unwrap_tensors(C.BOWImgDescriptorExtractor_compute(
+            self.ptr, cv.wrap_tensor(image), keypoints, cv.wrap_tensor(imgDescriptor)))
+    end
+
+    function BOWImgDescriptorExtractor:descriptorSize()
+        return C.BOWImgDescriptorExtractor_descriptorSize(self.ptr)
+    end
+
+    function BOWImgDescriptorExtractor:descriptorType()
+        return C.BOWImgDescriptorExtractor_descriptorType(self.ptr)
+    end
+end
+
 
 return cv

@@ -202,7 +202,7 @@ extern "C" void ORB_setScaleFactor(struct ORBPtr ptr, int scaleFactor)
     ptr->setScaleFactor(scaleFactor);
 }
 
-extern "C" int ORB_getScaleFactor(struct ORBPtr ptr)
+extern "C" double ORB_getScaleFactor(struct ORBPtr ptr)
 {
     return ptr->getScaleFactor();
 }
@@ -326,4 +326,123 @@ extern "C" struct KeyPointArray AGAST(struct TensorWrapper image, int threshold,
     std::vector<cv::KeyPoint> result;
     cv::AGAST(image.toMat(), result, threshold, nonmaxSuppression);
     return KeyPointArray(result);
+}
+
+// BOWTrainer
+
+extern "C"
+void BOWTrainer_dtor(struct BOWTrainerPtr ptr)
+{
+    delete static_cast<cv::BOWTrainer *>(ptr.ptr);
+}
+
+extern "C"
+void BOWTrainer_add(struct BOWTrainerPtr ptr, struct TensorWrapper descriptors)
+{
+    ptr->add(descriptors.toMat());
+}
+
+extern "C"
+struct TensorArray BOWTrainer_getDescriptors(struct BOWTrainerPtr ptr)
+{
+    std::vector<cv::Mat> result = ptr->getDescriptors();
+    return TensorArray(result);
+}
+
+extern "C"
+int BOWTrainer_descriptorsCount(struct BOWTrainerPtr ptr)
+{
+    return ptr->descriptorsCount();
+}
+
+extern "C"
+void BOWTrainer_clear(struct BOWTrainerPtr ptr)
+{
+    ptr->clear();
+}
+
+extern "C"
+struct TensorWrapper BOWTrainer_cluster(struct BOWTrainerPtr ptr)
+{
+    return TensorWrapper(ptr->cluster());
+}
+
+extern "C"
+struct TensorWrapper BOWTrainer_cluster_descriptors(struct BOWTrainerPtr ptr, struct TensorWrapper descriptors)
+{
+    return TensorWrapper(ptr->cluster(descriptors.toMat()));
+}
+
+// BOWKMeansTrainer
+
+extern "C"
+struct BOWKMeansTrainerPtr BOWKMeansTrainer_ctor(
+        int clusterCount, struct TermCriteriaWrapper termcrit,
+        int attempts, int flags)
+{
+    return new cv::BOWKMeansTrainer(
+            clusterCount, termcrit.orDefault(cv::TermCriteria()), attempts, flags);
+}
+
+// BOWImgDescriptorExtractor
+
+extern "C"
+struct BOWImgDescriptorExtractorPtr BOWImgDescriptorExtractor_ctor(
+        struct Feature2DPtr dextractor, struct DescriptorMatcherPtr dmatcher)
+{
+    cv::Ptr<cv::Feature2D> dextractorPtr(static_cast<cv::Feature2D *>(dextractor.ptr));
+    cv::Ptr<cv::DescriptorMatcher> dmatcherPtr(static_cast<cv::DescriptorMatcher *>(dmatcher.ptr));
+    
+    return new cv::BOWImgDescriptorExtractor(
+            rescueObjectFromPtr(dextractorPtr),
+            rescueObjectFromPtr(dmatcherPtr));
+}
+
+extern "C"
+void BOWImgDescriptorExtractor_dtor(struct BOWImgDescriptorExtractorPtr ptr)
+{
+    delete static_cast<cv::BOWImgDescriptorExtractor *>(ptr.ptr);
+}
+
+extern "C"
+void BOWImgDescriptorExtractor_setVocabulary(
+        struct BOWImgDescriptorExtractorPtr ptr, struct TensorWrapper vocabulary)
+{
+    ptr->setVocabulary(vocabulary.toMat());
+}
+
+extern "C"
+struct TensorWrapper getVocabulary(struct BOWImgDescriptorExtractorPtr ptr)
+{
+    return TensorWrapper(ptr->getVocabulary().clone());
+}
+
+extern "C"
+struct TensorWrapper compute(
+        struct BOWImgDescriptorExtractorPtr ptr, struct TensorWrapper image,
+        struct KeyPointArray keypoints, struct TensorWrapper imgDescriptor)
+{
+    std::vector<cv::KeyPoint> keypointsVec = keypoints;
+
+    if (imgDescriptor.isNull()) {
+        cv::Mat retval;
+        ptr->compute2(image.toMat(), keypointsVec, retval);
+        return TensorWrapper(retval);
+    } else {
+        cv::Mat imgDescriptorMat = imgDescriptor;
+        ptr->compute2(image.toMat(), keypointsVec, imgDescriptorMat);
+        return imgDescriptor;
+    }
+}
+
+extern "C"
+int descriptorSize(struct BOWImgDescriptorExtractorPtr ptr)
+{
+    return ptr->descriptorSize();
+}
+
+extern "C"
+int descriptorType(struct BOWImgDescriptorExtractorPtr ptr)
+{
+    return ptr->descriptorType();
 }

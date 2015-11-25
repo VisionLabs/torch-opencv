@@ -122,7 +122,7 @@ extern "C" int ORB_getMaxFeatures(struct ORBPtr ptr);
 
 extern "C" void ORB_setScaleFactor(struct ORBPtr ptr, int scaleFactor);
 
-extern "C" int ORB_getScaleFactor(struct ORBPtr ptr);
+extern "C" double ORB_getScaleFactor(struct ORBPtr ptr);
 
 extern "C" void ORB_setNLevels(struct ORBPtr ptr, int nlevels);
 
@@ -182,3 +182,92 @@ extern "C" int MSER_getMaxArea(struct MSERPtr ptr);
 
 
 extern "C" struct KeyPointArray AGAST(struct TensorWrapper image, int threshold, bool nonmaxSuppression);
+
+// DescriptorMatcher
+
+struct DescriptorMatcherPtr {
+    void *ptr;
+    inline cv::DescriptorMatcher * operator->() { return static_cast<cv::DescriptorMatcher *>(ptr); }
+    inline DescriptorMatcherPtr(cv::DescriptorMatcher *ptr) { this->ptr = ptr; }
+    inline cv::DescriptorMatcher & operator*() { return *static_cast<cv::DescriptorMatcher *>(this->ptr); }
+};
+
+// BOWTrainer
+
+struct BOWTrainerPtr {
+    void *ptr;
+    inline cv::BOWTrainer * operator->() { return static_cast<cv::BOWTrainer *>(ptr); }
+    inline BOWTrainerPtr(cv::BOWTrainer *ptr) { this->ptr = ptr; }
+    inline cv::BOWTrainer & operator*() { return *static_cast<cv::BOWTrainer *>(this->ptr); }
+};
+
+// BOWKMeansTrainer
+
+struct BOWKMeansTrainerPtr {
+    void *ptr;
+    inline cv::BOWKMeansTrainer * operator->() { return static_cast<cv::BOWKMeansTrainer *>(ptr); }
+    inline BOWKMeansTrainerPtr(cv::BOWKMeansTrainer *ptr) { this->ptr = ptr; }
+    inline cv::BOWKMeansTrainer & operator*() { return *static_cast<cv::BOWKMeansTrainer *>(this->ptr); }
+};
+
+// BOWImgDescriptorExtractor
+
+struct BOWImgDescriptorExtractorPtr {
+    void *ptr;
+    inline cv::BOWImgDescriptorExtractor * operator->() { return static_cast<cv::BOWImgDescriptorExtractor *>(ptr); }
+    inline BOWImgDescriptorExtractorPtr(cv::BOWImgDescriptorExtractor *ptr) { this->ptr = ptr; }
+    inline cv::BOWImgDescriptorExtractor & operator*() { return *static_cast<cv::BOWImgDescriptorExtractor *>(this->ptr); }
+};
+
+// BOWTrainer
+
+extern "C"
+void BOWTrainer_dtor(struct BOWTrainerPtr ptr);
+
+extern "C"
+void BOWTrainer_add(struct BOWTrainerPtr ptr, struct TensorWrapper descriptors);
+
+extern "C"
+struct TensorArray BOWTrainer_getDescriptors(struct BOWTrainerPtr ptr);
+
+extern "C"
+int BOWTrainer_descriptorsCount(struct BOWTrainerPtr ptr);
+
+extern "C"
+void BOWTrainer_clear(struct BOWTrainerPtr ptr);
+
+extern "C"
+struct TensorWrapper BOWTrainer_cluster(struct BOWTrainerPtr ptr);
+
+extern "C"
+struct TensorWrapper BOWTrainer_cluster_descriptors(struct BOWTrainerPtr ptr, struct TensorWrapper descriptors);
+
+extern "C"
+struct BOWKMeansTrainerPtr BOWKMeansTrainer_ctor(
+        int clusterCount, struct TermCriteriaWrapper termcrit,
+        int attempts, int flags);
+
+extern "C"
+struct BOWImgDescriptorExtractorPtr BOWImgDescriptorExtractor_ctor(
+        struct Feature2DPtr dextractor, struct DescriptorMatcherPtr dmatcher);
+
+extern "C"
+void BOWImgDescriptorExtractor_dtor(struct BOWImgDescriptorExtractorPtr ptr);
+
+extern "C"
+void BOWImgDescriptorExtractor_setVocabulary(
+        struct BOWImgDescriptorExtractorPtr ptr, struct TensorWrapper vocabulary);
+
+extern "C"
+struct TensorWrapper getVocabulary(struct BOWImgDescriptorExtractorPtr ptr);
+
+extern "C"
+struct TensorWrapper compute(
+        struct BOWImgDescriptorExtractorPtr ptr, struct TensorWrapper image,
+        struct KeyPointArray keypoints, struct TensorWrapper imgDescriptor);
+
+extern "C"
+int descriptorSize(struct BOWImgDescriptorExtractorPtr ptr);
+
+extern "C"
+int descriptorType(struct BOWImgDescriptorExtractorPtr ptr);
