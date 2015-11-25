@@ -1,4 +1,4 @@
-local cv = require 'cv._env'
+--[[local cv = require 'cv._env'
 
 local ffi = require 'ffi'
 
@@ -50,7 +50,7 @@ struct PtrWrapper createOptFlow_Farneback_optflow();
 struct PtrWrapper createOptFlow_SparseToDense_optflow();
 ]]
 
-local C = ffi.load(cv.libPath('optflow'))
+--[[local C = ffi.load(cv.libPath('optflow'))
 
 function optflow.calcOpticalFlowSF(t)
     if t[7] or t.sigma_dist then
@@ -220,4 +220,4 @@ function optflow.createOptFlow_SparseToDense()
     return retval
 end
 
-return optflow
+return optflow]]

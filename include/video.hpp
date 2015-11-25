@@ -2,6 +2,28 @@
 #include <Classes.hpp>
 #include <opencv2/video.hpp>
 
+extern "C" struct RotatedRectWrapper CamShift(struct TensorWrapper probImage, struct RectWrapper window,
+                        struct TermCriteriaWrapper criteria);
+
+extern "C" int meanShift(struct TensorWrapper probImage, struct RectWrapper window,
+                        struct TermCriteriaWrapper criteria);
+
+extern "C" struct TensorArray buildOpticalFlowPyramid(struct TensorWrapper img, struct TensorArray pyramid,
+                        struct SizeWrapper winSize, int maxLevel, bool withDerivatives, int pyrBorder,
+                        int derivBorder, bool tryReuseInputImage);
+
+extern "C" struct TensorWrapper calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
+                        struct TensorWrapper nextImg, struct TensorWrapper prevPts,
+                        struct TensorWrapper nextPts, struct TensorWrapper status,
+                        struct TensorWrapper err, struct SizeWrapper winSize, int maxLevel,
+                        struct TermCriteriaWrapper criteria, int flags, double minEigThreshold);
+
+extern "C" struct TensorWrapper calcOpticalFlowFarneback(struct TensorWrapper prev, struct TensorWrapper next,
+                        struct TensorWrapper flow, double pyr_scale, int levels, int winsize,
+                        int iterations, int poly_n, double poly_sigma, int flags);
+
+extern "C" struct TensorWrapper estimateRigidTransform(struct TensorWrapper src, struct TensorWrapper dst, bool fullAffine);
+
 // BackgroundSubtractor
 
 struct BackgroundSubtractorPtr {
@@ -112,9 +134,3 @@ extern "C" bool BackgroundSubtractorKNN_getDetectShadows(struct BackgroundSubtra
 
 extern "C" void BackgroundSubtractorKNN_setDetectShadows(struct BackgroundSubtractorKNNPtr ptr, bool detectShadows);
 
-struct DenseOpticalFlowPtr {
-    void *ptr;
-
-    inline cv::DenseOpticalFlow * operator->() { return static_cast<cv::DenseOpticalFlow *>(ptr); }
-    inline DenseOpticalFlowPtr(cv::DenseOpticalFlow *ptr) { this->ptr = ptr; }
-};

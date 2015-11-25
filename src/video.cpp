@@ -1,5 +1,69 @@
 #include <video.hpp>
 
+extern "C" struct RotatedRectWrapper CamShift(struct TensorWrapper probImage, struct RectWrapper window, struct TermCriteriaWrapper criteria)
+{
+    cv::Rect rect = window;
+    return cv::CamShift(probImage.toMat(), rect, criteria);
+}
+
+extern "C" int meanShift(struct TensorWrapper probImage, struct RectWrapper window,
+                        struct TermCriteriaWrapper criteria)
+{
+    cv::Rect rect = window;
+    return cv::meanShift(probImage.toMat(), rect, criteria);
+}
+
+extern "C" struct TensorArray buildOpticalFlowPyramid(struct TensorWrapper img, struct TensorArray pyramid,
+                        struct SizeWrapper winSize, int maxLevel, bool withDerivatives, int pyrBorder,
+                        int derivBorder, bool tryReuseInputImage)
+{
+    if (pyramid.isNull()) {
+        std::vector<cv::Mat> retval;
+        cv::buildOpticalFlowPyramid(img.toMat(), retval, winSize, maxLevel,
+                    withDerivatives, pyrBorder, derivBorder, tryReuseInputImage);
+        return TensorArray(retval);
+    }
+    cv::buildOpticalFlowPyramid(img.toMat(), pyramid.toMatList(), winSize, maxLevel,
+                    withDerivatives, pyrBorder, derivBorder, tryReuseInputImage);
+    return pyramid;
+}
+
+extern "C" struct TensorWrapper calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
+                        struct TensorWrapper nextImg, struct TensorWrapper prevPts,
+                        struct TensorWrapper nextPts, struct TensorWrapper status,
+                        struct TensorWrapper err, struct SizeWrapper winSize, int maxLevel,
+                        struct TermCriteriaWrapper criteria, int flags, double minEigThreshold)
+{
+    cv::Mat statusMat;
+    if (!status.isNull())
+        statusMat = status.toMat();
+    cv::Mat errMat;
+    if (!err.isNull())
+        errMat = err.toMat();
+
+    cv::calcOpticalFlowPyrLK(prevImg.toMat(), nextImg.toMat(), prevPts.toMat(), nextPts.toMat(),
+                    statusMat, errMat, winSize, maxLevel,
+                    criteria.orDefault(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01)),
+                    flags, minEigThreshold);
+    return nextPts;
+}
+
+extern "C" struct TensorWrapper calcOpticalFlowFarneback(struct TensorWrapper prev, struct TensorWrapper next,
+                        struct TensorWrapper flow, double pyr_scale, int levels, int winsize,
+                        int iterations, int poly_n, double poly_sigma, int flags)
+{
+    cv::calcOpticalFlowFarneback(prev.toMat(), next.toMat(), flow.toMat(), pyr_scale,
+                    levels, winsize, iterations, poly_n, poly_sigma, flags);
+    return flow;
+}
+
+extern "C" struct TensorWrapper estimateRigidTransform(struct TensorWrapper src, struct TensorWrapper dst, bool fullAffine)
+{
+    cv::Mat retval;
+    retval = cv::estimateRigidTransform(src.toMat(), dst.toMat(), fullAffine);
+    return TensorWrapper(retval);
+}
+
 // BackgroundSubtractor
 
 extern "C" struct TensorWrapper BackgroundSubtractor_apply(struct BackgroundSubtractorPtr ptr, struct TensorWrapper image,

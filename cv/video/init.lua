@@ -89,6 +89,28 @@ void BackgroundSubtractorKNN_setShadowThreshold(struct PtrWrapper ptr, double sh
 bool BackgroundSubtractorKNN_getDetectShadows(struct PtrWrapper ptr);
 
 void BackgroundSubtractorKNN_setDetectShadows(struct PtrWrapper ptr, bool detectShadows);
+
+struct RotatedRectWrapper CamShift(struct TensorWrapper probImage, struct RectWrapper window,
+                        struct TermCriteriaWrapper criteria);
+
+int meanShift(struct TensorWrapper probImage, struct RectWrapper window,
+                        struct TermCriteriaWrapper criteria);
+
+struct TensorArray buildOpticalFlowPyramid(struct TensorWrapper img, struct TensorArray pyramid,
+                        struct SizeWrapper winSize, int maxLevel, bool withDerivatives, int pyrBorder,
+                        int derivBorder, bool tryReuseInputImage);
+
+struct TensorWrapper calcOpticalFlowPyrLK(struct TensorWrapper prevImg, struct TensorWrapper nextImg,
+                        struct TensorWrapper prevPts, struct TensorWrapper nextPts, struct TensorWrapper status,
+                        struct TensorWrapper err, struct SizeWrapper winSize, int maxLevel,
+                        struct TermCriteriaWrapper criteria, int flags, double minEigThreshold);
+
+struct TensorWrapper calcOpticalFlowFarneback(struct TensorWrapper prev, struct TensorWrapper next,
+                        struct TensorWrapper flow, double pyr_scale, int levels, int winsize,
+                        int iterations, int poly_n, double poly_sigma, int flags);
+
+struct TensorWrapper estimateRigidTransform(struct TensorWrapper src, struct TensorWrapper dst, bool fullAffine);
+
 ]]
 
 local C = ffi.load(cv.libPath('video'))
@@ -402,6 +424,96 @@ do
 
         C.BackgroundSubtractorKNN_setDetectShadows(self.ptr, detectShadows)
     end
+end
+
+function cv.CamShift(t)
+    local argRules = {
+        {"probImage", required = true},
+        {"window", required = true},
+        {"criteria", required = true, operator = cv.TermCriteria}
+    }
+    local probImage, window, criteria = cv.argcheck(t, argRules)
+
+    return C.CamShift(cv.wrap_tensor(probImage), window, criteria)
+end
+
+function cv.meanShift(t)
+    local argRules = {
+        {"probImage", required = true},
+        {"window", required = true},
+        {"criteria", required = true, operator = cv.TermCriteria}
+    }
+    local probImage, window, criteria = cv.argcheck(t, argRules)
+
+    return C.meanShift(cv.wrap_tensor(probImage), window, criteria)
+end
+
+function cv.buildOpticalFlowPyramid(t)
+    local argRules = {
+        {"img", required = true},
+        {"pyramid", default = nil},
+        {"winSize", required = true, operator = cv.Size},
+        {"maxLevel", required = true},
+        {"withDerivatives", default = true},
+        {"pyrBorder", default = cv.BORDER_REFLECT_101},
+        {"derivBorder", default = cv.BORDER_CONSTANT},
+        {"tryReuseInputImage", default = true}
+    }
+    local img, pyramid, winSize, maxLevel, withDerivatives, pyrBorder, derivBorder, tryReuseInputImage = cv.argcheck(t, argRules)
+
+    return cv.unwrap_tensors(C.buildOpticalFlowPyramid(cv.wrap_tensor(img), cv.wrap_tensors(pyramid), winSize, maxLevel,
+        withDerivatives, pyrBorder, derivBorder, tryReuseInputImage))
+end
+
+function cv.calcOpticalFlowPyrLK(t)
+    local argRules = {
+        {"prevImg", required = true},
+        {"nextImg", required = true},
+        {"prevPts", required = true},
+        {"nextPts", required = true},
+        {"status", default = nil},
+        {"err", default = nil},
+        {"winSize", default = {21, 21}, operator = cv.Size},
+        {"maxLevel", default = 3},
+        {"criteria", default = nil, operator = cv.TermCriteria},
+        {"flags", default = 0},
+        {"minEigThreshold", default = 1e-4}
+    }
+    local prevImg, nextImg, prevPts, nextPts, status, err, winSize, maxLevel, criteria, flags, minEigThreshold = cv.argcheck(t, argRules)
+
+    return cv.unwrap_tensors(C.calcOpticalFlowPyrLK(cv.wrap_tensor(prevImg), cv.wrap_tensor(nextImg),
+            cv.wrap_tensor(prevPts), cv.wrap_tensor(nextPts), cv.wrap_tensor(status),
+            cv.wrap_tensor(err), winSize, maxLevel, criteria, flags, minEigThreshold))
+end
+
+function cv.calcOpticalFlowFarneback(t)
+    local argRules = {
+        {"prev", required = true},
+        {"next", required = true},
+        {"flow", required = true},
+        {"pyr_scale", required = true},
+        {"levels", required = true},
+        {"winsize", required = true},
+        {"iterations", required = true},
+        {"poly_n", required = true},
+        {"poly_sigma", required = true},
+        {"flags", required = true}
+    }
+    local prev, next, flow, pyr_scale, levels, winsize, iterations, poly_n, poly_sigma, flags = cv.argcheck(t, argRules)
+
+    return cv.unwrap_tensors(C.calcOpticalFlowFarneback(cv.wrap_tensor(prev), cv.wrap_tensor(next), cv.wrap_tensor(flow),
+                pyr_scale, levels, winsize, iterations, poly_n, poly_sigma, flags))
+end
+
+function cv.estimateRigidTransform(t)
+    local argRules = {
+        {"src", required = true},
+        {"dst", required = true},
+        {"fullAffine", required = true}
+    }
+    local src, dst, fullAffine = cv.argcheck(t, argRules)
+
+    return cv.unwrap_tensors(C.estimateRigidTransform(cv.wrap_tensor(src), cv.wrap_tensor(dst), fullAffine))
 end
 
 return cv
