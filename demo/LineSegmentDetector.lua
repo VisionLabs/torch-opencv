@@ -5,7 +5,7 @@ require 'cv.imgcodecs'
 
 if not arg[1] then
 	print('Usage: `th demo/LineSegmentDetector.lua path-to-image`\n')
-	os.exit(0)
+	print('Now using demo/lena.jpg')
 end
 
 local image = cv.imread{arg[1], cv.IMREAD_GRAYSCALE}

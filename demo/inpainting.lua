@@ -4,8 +4,7 @@ require 'cv.imgcodecs'
 require 'cv.highgui'
 
 if not arg[1] or not arg[2] then
-    print('Usage: `th demo/inpainting.lua path_to_image path_to_mask`\n')
-    os.exit(0)
+    print('Usage: `th demo/inpainting.lua path_to_image path_to_mask`')
 end
 
 local image = cv.imread{arg[1]}
