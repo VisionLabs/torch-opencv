@@ -181,6 +181,25 @@ int DualTVL1OpticalFlow_getMedianFiltering(struct PtrWrapper ptr);
 void DualTVL1OpticalFlow_setUseInitialFlow(struct PtrWrapper ptr, bool val);
 
 bool DualTVL1OpticalFlow_getUseInitialFlow(struct PtrWrapper ptr);
+
+struct PtrWrapper BackgroundSubtractorMOG_ctor(int history, int nmixtures,
+                        double backgroundRatio, double noiseSigma);
+
+void BackgroundSubtractorMOG_setHistory(struct PtrWrapper ptr, int val);
+
+int BackgroundSubtractorMOG_getHistory(struct PtrWrapper ptr);
+
+void BackgroundSubtractorMOG_setNMixtures(struct PtrWrapper ptr, int val);
+
+int BackgroundSubtractorMOG_getNMixtures(struct PtrWrapper ptr);
+
+void BackgroundSubtractorMOG_setBackgroundRatio(struct PtrWrapper ptr, double backgroundRatio);
+
+double BackgroundSubtractorMOG_getBackgroundRatio(struct PtrWrapper ptr);
+
+void BackgroundSubtractorMOG_setNoiseSigma(struct PtrWrapper ptr, double noiseSigma);
+
+double BackgroundSubtractorMOG_getNoiseSigma(struct PtrWrapper ptr);
 ]]
 
 local C = ffi.load(cv.libPath('video'))
@@ -858,6 +877,76 @@ do
 
     function DualTVL1OpticalFlow:getUseInitialFlow()
         return C.DualTVL1OpticalFlow_getUseInitialFlow(self.ptr)
+    end
+end
+
+-- BackgroundSubtractorMOG
+
+do
+    BackgroundSubtractorMOG = torch.class('cv.BackgroundSubtractorMOG', 'cv.BackgroundSubtractor', cv)
+
+    function BackgroundSubtractorMOG:__init(t)
+        local argRules = {
+            {"history", default = 200},
+            {"nmixtures", default = 5},
+            {"backgroundRatio", default = 0.7},
+            {"noiseSigma", default = 0}
+        }
+        local history, nmixtures, backgroundRatio, noiseSigma = cv.argcheck(t, argRules)
+        
+        self.ptr = ffi.gc(C.BackgroundSubtractorMOG_ctor(history, nmixtures, backgroundRatio, noiseSigma), Classes.Algorithm_dtor)
+    end
+
+    function BackgroundSubtractorMOG:setHistory(t)
+        local argRules = {
+            {"nframes", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+
+        C.BackgroundSubtractorMOG_setHistory(self.ptr, val)
+    end
+
+    function BackgroundSubtractorMOG:getHistory()
+        return C.BackgroundSubtractorMOG_getHistory(self.ptr)
+    end
+
+    function BackgroundSubtractorMOG:setNMixtures(t)
+        local argRules = {
+            {"nmix", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+
+        C.BackgroundSubtractorMOG_setNMixtures(self.ptr, val)
+    end
+
+    function BackgroundSubtractorMOG:getNMixtures()
+        return C.BackgroundSubtractorMOG_getNMixtures(self.ptr)
+    end
+
+    function BackgroundSubtractorMOG:setBackgroundRatio(t)
+        local argRules = {
+            {"backgroundRatio", required = true}
+        }
+        local backgroundRatio = cv.argcheck(t, argRules)
+
+        C.BackgroundSubtractorMOG_setBackgroundRatio(self.ptr, backgroundRatio)
+    end
+
+    function BackgroundSubtractorMOG:getBackgroundRatio()
+        return C.BackgroundSubtractorMOG_getBackgroundRatio(self.ptr)
+    end
+
+    function BackgroundSubtractorMOG:setNoiseSigma(t)
+        local argRules = {
+            {"noiseSigma", required = true}
+        }
+        local noiseSigma = cv.argcheck(t, argRules)
+
+        C.BackgroundSubtractorMOG_setNoiseSigma(self.ptr, noiseSigma)
+    end
+
+    function BackgroundSubtractorMOG:getNoiseSigma()
+        return C.BackgroundSubtractorMOG_getNoiseSigma(self.ptr)
     end
 end
 

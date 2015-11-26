@@ -1,4 +1,4 @@
-/*#include <Common.hpp>
+#include <Common.hpp>
 #include <Classes.hpp>
 #include <video.hpp>
 #include <opencv2/optflow.hpp>
@@ -61,4 +61,4 @@ extern "C"
 struct DenseOpticalFlowPtr createOptFlow_Farneback_optflow();
 
 extern "C"
-struct DenseOpticalFlowPtr createOptFlow_SparseToDense_optflow();*/
+struct DenseOpticalFlowPtr createOptFlow_SparseToDense_optflow();

@@ -466,3 +466,51 @@ extern "C" bool DualTVL1OpticalFlow_getUseInitialFlow(struct DualTVL1OpticalFlow
 {
     return ptr->getUseInitialFlow();
 }
+
+// BackgroundSubtractorMOG
+
+extern "C" struct BackgroundSubtractorMOGPtr BackgroundSubtractorMOG_ctor(int history, int nmixtures,
+                        double backgroundRatio, double noiseSigma)
+{
+    return rescueObjectFromPtr(createBackgroundSubtractorMOG(history, nmixtures, backgroundRatio, noiseSigma));
+}
+
+extern "C" void BackgroundSubtractorMOG_setHistory(struct BackgroundSubtractorMOGPtr ptr, int val)
+{
+    ptr->setHistory(val);
+}
+
+extern "C" int BackgroundSubtractorMOG_getHistory(struct BackgroundSubtractorMOGPtr ptr)
+{
+    return ptr->getHistory();
+}
+
+extern "C" void BackgroundSubtractorMOG_setNMixtures(struct BackgroundSubtractorMOGPtr ptr, int val)
+{
+    ptr->setNMixtures(val);
+}
+
+extern "C" int BackgroundSubtractorMOG_getNMixtures(struct BackgroundSubtractorMOGPtr ptr)
+{
+    return ptr->getNMixtures();
+}
+
+extern "C" void BackgroundSubtractorMOG_setBackgroundRatio(struct BackgroundSubtractorMOGPtr ptr, double backgroundRatio)
+{
+    ptr->setBackgroundRatio(backgroundRatio);
+}
+
+extern "C" double BackgroundSubtractorMOG_getBackgroundRatio(struct BackgroundSubtractorMOGPtr ptr)
+{
+    return ptr->getBackgroundRatio();
+}
+
+extern "C" void BackgroundSubtractorMOG_setNoiseSigma(struct BackgroundSubtractorMOGPtr ptr, double noiseSigma)
+{
+    ptr->setNoiseSigma(noiseSigma);
+}
+
+extern "C" double BackgroundSubtractorMOG_getNoiseSigma(struct BackgroundSubtractorMOGPtr ptr)
+{
+    return ptr->getNoiseSigma();
+}

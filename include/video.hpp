@@ -1,6 +1,7 @@
 #include <Common.hpp>
 #include <Classes.hpp>
 #include <opencv2/video.hpp>
+#include <opencv2/bgsegm.hpp>
 
 extern "C" struct RotatedRectWrapper CamShift(struct TensorWrapper probImage, struct RectWrapper window,
                         struct TermCriteriaWrapper criteria);
@@ -231,3 +232,33 @@ extern "C" int DualTVL1OpticalFlow_getMedianFiltering(struct DualTVL1OpticalFlow
 extern "C" void DualTVL1OpticalFlow_setUseInitialFlow(struct DualTVL1OpticalFlowPtr ptr, bool val);
 
 extern "C" bool DualTVL1OpticalFlow_getUseInitialFlow(struct DualTVL1OpticalFlowPtr ptr);
+
+// BackgroundSubtractorMOG
+
+using namespace cv::bgsegm;
+
+struct BackgroundSubtractorMOGPtr {
+    void *ptr;
+    inline BackgroundSubtractorMOG * operator->() { return static_cast<BackgroundSubtractorMOG *>(ptr); }
+    inline BackgroundSubtractorMOGPtr(BackgroundSubtractorMOG *ptr) { this->ptr = ptr; }
+    inline BackgroundSubtractorMOG & operator*() { return *static_cast<BackgroundSubtractorMOG *>(this->ptr); }
+};
+
+extern "C" struct BackgroundSubtractorMOGPtr BackgroundSubtractorMOG_ctor(int history, int nmixtures,
+                        double backgroundRatio, double noiseSigma);
+
+extern "C" void BackgroundSubtractorMOG_setHistory(struct BackgroundSubtractorMOGPtr ptr, int val);
+
+extern "C" int BackgroundSubtractorMOG_getHistory(struct BackgroundSubtractorMOGPtr ptr);
+
+extern "C" void BackgroundSubtractorMOG_setNMixtures(struct BackgroundSubtractorMOGPtr ptr, int val);
+
+extern "C" int BackgroundSubtractorMOG_getNMixtures(struct BackgroundSubtractorMOGPtr ptr);
+
+extern "C" void BackgroundSubtractorMOG_setBackgroundRatio(struct BackgroundSubtractorMOGPtr ptr, double backgroundRatio);
+
+extern "C" double BackgroundSubtractorMOG_getBackgroundRatio(struct BackgroundSubtractorMOGPtr ptr);
+
+extern "C" void BackgroundSubtractorMOG_setNoiseSigma(struct BackgroundSubtractorMOGPtr ptr, double noiseSigma);
+
+extern "C" double BackgroundSubtractorMOG_getNoiseSigma(struct BackgroundSubtractorMOGPtr ptr);
