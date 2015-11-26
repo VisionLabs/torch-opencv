@@ -114,6 +114,9 @@ int ORB_getFastThreshold(struct PtrWrapper ptr);
 struct PtrWrapper MSER_ctor(int _delta, int _min_area, int _max_area, double _max_variation, double _min_diversity,
                         int _max_evolution, double _area_threshold, double _min_margin, int _edge_blur_size);
 
+struct TensorArray MSER_detectRegions(struct PtrWrapper ptr,
+        struct TensorWrapper image, struct TensorWrapper bboxes);
+
 void MSER_setDelta(struct PtrWrapper ptr, int delta);
 
 int MSER_getDelta(struct PtrWrapper ptr);
@@ -360,15 +363,16 @@ do
             {"edgeThreshold", default = 31},
             {"firstLevel", default = 0},
             {"WTA_K", default = 2},
-            {"scoreType", default = 0},
+            {"scoreType", default = cv.ORB_HARRIS_SCORE},
             {"patchSize", default = 31},
-            {"fastThreshold", default = 20}   
+            {"fastThreshold", default = 20}
         }
-        local nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize, fastThreshold = cv.argcheck(t, argRules)
+        local nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, 
+            scoreType, patchSize, fastThreshold = cv.argcheck(t, argRules)
 
         self.ptr = ffi.gc(C.ORB_ctor(nfeatures, scaleFactor, nlevels, edgeThreshold,
                                 firstLevel, WTA_K, scoreType, patchSize, fastThreshold),
-                                Classes.Algorithm_dtor)    
+                                Classes.Algorithm_dtor)
     end
 
     function ORB:setMaxFeatures(t)
@@ -512,6 +516,28 @@ do
         self.ptr = ffi.gc(C.MSER_ctor(_delta, _min_area, _max_area, _max_variation, _min_diversity, _max_evolution,
                                 _area_threshold, _min_margin, _edge_blur_size),
                                 Classes.Algorithm_dtor)    
+    end
+
+    function MSER:detectRegions(t)
+        local argRules = {
+            {"image", required = true},
+            {"bboxes", default = nil}
+        }
+        local image, bboxes = cv.argcheck(t, argRules)
+
+        if bboxes ~= nil then
+            assert(torch.isTensor(bboxes) and cv.tensorType(bboxes) == cv.CV_32S)
+            assert(bboxes:size()[2] == 4)
+        end
+
+        local result = C.MSER_detectRegions(self.ptr, 
+            cv.wrap_tensor(image), cv.wrap_tensor(bboxes))
+
+        result = cv.unwrap_tensors(result, true)
+        local msers = result[#result]
+        result[#result] = nil
+
+        return msers, result
     end
 
     function MSER:setDelta(t)

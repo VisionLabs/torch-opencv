@@ -188,11 +188,12 @@ extern "C"
 struct BRISKPtr BRISK_ctor2(struct TensorWrapper radiusList, struct TensorWrapper numberList,
                             float dMax, float dMin, struct TensorWrapper indexChange)
 {
-    std::vector<int> indexVec = std::vector<int>();
+    std::vector<int> indexVec;
     if (!indexChange.isNull())
-        indexVec = std::vector<int>(indexChange.toMat());
+        indexVec = indexChange.toMat();
 
-    return rescueObjectFromPtr(cv::BRISK::create(radiusList.toMat(), numberList.toMat(), dMax, dMin, indexVec));
+    return rescueObjectFromPtr(cv::BRISK::create(
+            radiusList.toMat(), numberList.toMat(), dMax, dMin, indexVec));
 }
 
 // ORB
@@ -324,6 +325,44 @@ struct MSERPtr MSER_ctor(int _delta, int _min_area, int _max_area, double _max_v
 }
 
 extern "C"
+struct TensorArray MSER_detectRegions(struct MSERPtr ptr,
+        struct TensorWrapper image, struct TensorWrapper bboxes)
+{
+    std::vector<std::vector<cv::Point>> result;
+    cv::Mat bboxesMat = bboxes;
+    std::vector<cv::Rect> bboxesVec(bboxesMat.rows);
+    for (int row = 0; row < bboxesMat.rows; ++row) {
+        int *rowPtr = reinterpret_cast<int*>(bboxesMat.ptr(row));
+        bboxesVec[row].x = *rowPtr++;
+        bboxesVec[row].y = *rowPtr++;
+        bboxesVec[row].width = *rowPtr++;
+        bboxesVec[row].height = *rowPtr++;
+    }
+
+    ptr->detectRegions(image.toMat(), result, bboxesVec);
+
+    bboxesMat.create(bboxesVec.size(), 4, CV_32S);
+    for (int row = 0; row < bboxesMat.rows; ++row) {
+        int *rowPtr = reinterpret_cast<int*>(bboxesMat.ptr(row));
+        *rowPtr++ = bboxesVec[row].x;
+        *rowPtr++ = bboxesVec[row].y;
+        *rowPtr++ = bboxesVec[row].width;
+        *rowPtr++ = bboxesVec[row].height;
+    }
+
+    TensorArray retval;
+    retval.size = result.size() + 1;
+    retval.tensors = static_cast<TensorWrapper *>(
+            malloc(retval.size * sizeof(TensorWrapper)));
+    for (int i = 0; i < result.size(); ++i) {
+        new (retval.tensors + i) TensorWrapper(cv::Mat(result[i]));
+    }
+    new (retval.tensors + retval.size - 1) TensorWrapper(bboxesMat);
+
+    return retval;
+}
+
+extern "C"
 void MSER_setDelta(struct MSERPtr ptr, int delta)
 {
     ptr->setDelta(delta);
@@ -359,8 +398,17 @@ int MSER_getMaxArea(struct MSERPtr ptr)
     return ptr->getMaxArea();
 }
 
+extern "C"
+void MSER_setPass2Only(struct MSERPtr ptr, bool Pass2Only)
+{
+    ptr->setPass2Only(Pass2Only);
+}
 
-
+extern "C"
+bool MSER_getPass2Only(struct MSERPtr ptr)
+{
+    return ptr->getPass2Only();
+}
 
 
 

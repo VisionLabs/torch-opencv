@@ -21,7 +21,7 @@ struct TensorWrapper {
 
 struct TensorArray {
     struct TensorWrapper *tensors;
-    short size;
+    int size;
 };
 
 void *malloc(size_t size);

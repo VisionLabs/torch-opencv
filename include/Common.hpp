@@ -33,7 +33,7 @@ struct TensorWrapper {
 
 struct TensorArray {
     struct TensorWrapper *tensors;
-    short size;
+    int size;
 
     TensorArray();
     TensorArray(std::vector<cv::Mat> & matList);
