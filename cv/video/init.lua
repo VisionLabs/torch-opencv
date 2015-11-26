@@ -111,6 +111,22 @@ struct TensorWrapper calcOpticalFlowFarneback(struct TensorWrapper prev, struct 
 
 struct TensorWrapper estimateRigidTransform(struct TensorWrapper src, struct TensorWrapper dst, bool fullAffine);
 
+double findTransformECC(struct TensorWrapper templateImage, struct TensorWrapper inputImage,
+                        struct TensorWrapper warpMatrix, int motionType, struct TermCriteriaWrapper criteria,
+                        struct TensorWrapper inputMask);
+
+struct PtrWrapper KalmanFilter_ctor_default();
+
+struct PtrWrapper KalmanFilter_ctor(int dynamParams, int measureParams, int controlParams, int type);
+
+void KalmanFilter_dtor(struct PtrWrapper ptr);
+
+void KalmanFilter_init(struct PtrWrapper ptr, int dynamParams, int measureParams, int controlParams, int type);
+
+struct TensorWrapper KalmanFilter_predict(struct PtrWrapper ptr, struct TensorWrapper control);
+
+struct TensorWrapper KalmanFilter_correct(struct PtrWrapper ptr, struct TensorWrapper measurement);
+
 ]]
 
 local C = ffi.load(cv.libPath('video'))
@@ -514,6 +530,93 @@ function cv.estimateRigidTransform(t)
     local src, dst, fullAffine = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(C.estimateRigidTransform(cv.wrap_tensor(src), cv.wrap_tensor(dst), fullAffine))
+end
+
+function findTransformECC(t)
+    local argRules = {
+        {"templateImage", required = true},
+        {"inputImage", required = true},
+        {"warpMatrix", required = true},
+        {"motionType", default = cv.MOTION_AFFINE},
+        {"criteria", default = nil, operator = cv.TermCriteria},
+        {"inputMask", default = nil}
+    }
+    local templateImage, inputImage, warpMatrix, motionType, criteria, inputMask = cv.argcheck(t, argRules)
+
+    return C.findTransformECC(cv.wrap_tensor(templateImage), cv.wrap_tensor(inputImage),
+                cv.wrap_tensor(warpMatrix), motionType, criteria, cv.wrap_tensor(inputMask))
+end
+
+-- KalmanFilter
+
+do
+    local KalmanFilter = torch.class('cv.KalmanFilter', cv)
+
+    function KalmanFilter:__init(t)
+        if table.getn(t) == 0 then
+            self.ptr = ffi.gc(C.KalmanFilter_ctor_default(), C.KalmanFilter_dtor)
+        else
+            local argRules = {
+                {"dynamParams", required = true},
+                {"measureParams", required = true},
+                {"controlParams", default = 0},
+                {"type", default = cv.CV_32F}
+            }
+            
+            local dynamParams, measureParams, controlParams, type = cv.argcheck(t, argRules)
+
+            self.ptr = ffi.gc(C.KalmanFilter_ctor(dynamParams, measureParams, controlParams, type), C.KalmanFilter_dtor)
+        end
+        self.statePre = nil
+        self.statePost = nil
+        self.transitionMatrix = nil
+        self.controlMatrix = nil
+        self.measurementMatrix = nil
+        self.processNoiseCov = nil
+        self.measurementNoiseCov = nil
+        self.errorCovPre = nil
+        self.gain = nil
+        self.errorCovPost = nil
+        
+        self.temp1 = nil
+        self.temp2 = nil
+        self.temp3 = nil
+        self.temp4 = nil
+        self.temp5 = nil
+    end
+
+    function KalmanFilter:init(t)
+        local argRules = {
+            {"dynamParams", required = true},
+            {"measureParams", required = true},
+            {"controlParams", default = 0},
+            {"type", default = cv.CV_32F}
+        }
+            
+        local dynamParams, measureParams, controlParams, type = cv.argcheck(t, argRules)
+
+        C.KalmanFilter_init(self.ptr, dynamParams, measureParams, controlParams, type)
+    end
+
+    function KalmanFilter:predict(t)
+        local argRules = {
+            {"control", defauil = nil}
+        }
+
+        local control = cv.argcheck(t, argRules)
+
+        return cv.unwrap_tensors(C.KalmanFilter_predict(self.ptr, cv.wrap_tensor(control)))
+    end
+
+    function KalmanFilter:correct(t)
+        local argRules = {
+            {"measurement", required = true}
+        }
+
+        local measurement = cv.argcheck(t, argRules)
+
+        return cv.unwrap_tensors(C.KalmanFilter_predict(self.ptr, cv.wrap_tensor(measurement)))
+    end
 end
 
 return cv

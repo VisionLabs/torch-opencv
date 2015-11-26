@@ -24,6 +24,10 @@ extern "C" struct TensorWrapper calcOpticalFlowFarneback(struct TensorWrapper pr
 
 extern "C" struct TensorWrapper estimateRigidTransform(struct TensorWrapper src, struct TensorWrapper dst, bool fullAffine);
 
+extern "C" double findTransformECC(struct TensorWrapper templateImage, struct TensorWrapper inputImage,
+                        struct TensorWrapper warpMatrix, int motionType, struct TermCriteriaWrapper criteria,
+                        struct TensorWrapper inputMask);
+
 // BackgroundSubtractor
 
 struct BackgroundSubtractorPtr {
@@ -134,3 +138,23 @@ extern "C" bool BackgroundSubtractorKNN_getDetectShadows(struct BackgroundSubtra
 
 extern "C" void BackgroundSubtractorKNN_setDetectShadows(struct BackgroundSubtractorKNNPtr ptr, bool detectShadows);
 
+// KalmanFilter
+
+struct KalmanFilterPtr {
+    void *ptr;
+    inline cv::KalmanFilter * operator->() { return static_cast<cv::KalmanFilter *>(ptr); }
+    inline KalmanFilterPtr(cv::KalmanFilter *ptr) { this->ptr = ptr; }
+    inline cv::KalmanFilter & operator*() { return *static_cast<cv::KalmanFilter *>(this->ptr); }
+};
+
+extern "C" struct KalmanFilterPtr KalmanFilter_ctor_default();
+
+extern "C" struct KalmanFilterPtr KalmanFilter_ctor(int dynamParams, int measureParams, int controlParams, int type);
+
+extern "C" void KalmanFilter_dtor(struct KalmanFilterPtr ptr);
+
+extern "C" void KalmanFilter_init(struct KalmanFilterPtr ptr, int dynamParams, int measureParams, int controlParams, int type);
+
+extern "C" struct TensorWrapper KalmanFilter_predict(struct KalmanFilterPtr ptr, struct TensorWrapper control);
+
+extern "C" struct TensorWrapper KalmanFilter_correct(struct KalmanFilterPtr ptr, struct TensorWrapper measurement);

@@ -64,6 +64,15 @@ extern "C" struct TensorWrapper estimateRigidTransform(struct TensorWrapper src,
     return TensorWrapper(retval);
 }
 
+extern "C" double findTransformECC(struct TensorWrapper templateImage, struct TensorWrapper inputImage,
+                        struct TensorWrapper warpMatrix, int motionType, struct TermCriteriaWrapper criteria,
+                        struct TensorWrapper inputMask)
+{
+    return cv::findTransformECC(templateImage.toMat(), inputImage.toMat(), warpMatrix.toMat(),
+                    motionType, criteria.orDefault(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 50, 0.001)),
+                    TO_MAT_OR_NOARRAY(inputMask));
+}
+
 // BackgroundSubtractor
 
 extern "C" struct TensorWrapper BackgroundSubtractor_apply(struct BackgroundSubtractorPtr ptr, struct TensorWrapper image,
@@ -275,4 +284,41 @@ extern "C" bool BackgroundSubtractorKNN_getDetectShadows(struct BackgroundSubtra
 extern "C" void BackgroundSubtractorKNN_setDetectShadows(struct BackgroundSubtractorKNNPtr ptr, bool detectShadows)
 {
     ptr->setDetectShadows(detectShadows);
+}
+
+// KalmanFilter
+
+extern "C" struct KalmanFilterPtr KalmanFilter_ctor_default()
+{
+    return new cv::KalmanFilter();
+}
+
+extern "C" struct KalmanFilterPtr KalmanFilter_ctor(int dynamParams, int measureParams, int controlParams, int type)
+{
+    return new cv::KalmanFilter(dynamParams, measureParams, controlParams, type);
+}
+
+extern "C" void KalmanFilter_dtor(struct KalmanFilterPtr ptr)
+{
+    delete static_cast<cv::KalmanFilter *>(ptr.ptr);
+}
+
+extern "C" void KalmanFilter_init(struct KalmanFilterPtr ptr, int dynamParams, int measureParams, int controlParams, int type)
+{
+    ptr->init(dynamParams, measureParams, controlParams, type);
+}
+
+extern "C" struct TensorWrapper KalmanFilter_predict(struct KalmanFilterPtr ptr, struct TensorWrapper control)
+{
+    cv::Mat retval = cv::Mat();
+    if (!control.isNull())
+        retval = control.toMat();
+    cv::Mat res = ptr->predict(retval);
+    return TensorWrapper(res);
+}
+
+extern "C" struct TensorWrapper KalmanFilter_correct(struct KalmanFilterPtr ptr, struct TensorWrapper measurement)
+{
+    cv::Mat res = ptr->correct(measurement.toMat());
+    return TensorWrapper(res);
 }
