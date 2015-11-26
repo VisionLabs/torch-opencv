@@ -127,6 +127,60 @@ struct TensorWrapper KalmanFilter_predict(struct PtrWrapper ptr, struct TensorWr
 
 struct TensorWrapper KalmanFilter_correct(struct PtrWrapper ptr, struct TensorWrapper measurement);
 
+struct TensorWrapper DenseOpticalFlow_calc(struct PtrWrapper ptr, struct TensorWrapper I0,
+                        struct TensorWrapper I1, struct TensorWrapper flow);
+
+void DenseOpticalFlow_collectGarbage(struct PtrWrapper ptr);
+
+struct PtrWrapper DualTVL1OpticalFlow_ctor();
+
+void DualTVL1OpticalFlow_setTau(struct PtrWrapper ptr, double val);
+
+double DualTVL1OpticalFlow_getTau(struct PtrWrapper ptr);
+
+void DualTVL1OpticalFlow_setLambda(struct PtrWrapper ptr, double val);
+
+double DualTVL1OpticalFlow_getLambda(struct PtrWrapper ptr);
+
+void DualTVL1OpticalFlow_setTheta(struct PtrWrapper ptr, double val);
+
+double DualTVL1OpticalFlow_getTheta(struct PtrWrapper ptr);
+
+void DualTVL1OpticalFlow_setGamma(struct PtrWrapper ptr, double val);
+
+double DualTVL1OpticalFlow_getGamma(struct PtrWrapper ptr);
+
+void DualTVL1OpticalFlow_setEpsilon(struct PtrWrapper ptr, double val);
+
+double DualTVL1OpticalFlow_getEpsilon(struct PtrWrapper ptr);
+
+void DualTVL1OpticalFlow_setScaleStep(struct PtrWrapper ptr, double val);
+
+double DualTVL1OpticalFlow_getScaleStep(struct PtrWrapper ptr);
+
+void DualTVL1OpticalFlow_setScalesNumber(struct PtrWrapper ptr, int val);
+
+int DualTVL1OpticalFlow_getScalesNumber(struct PtrWrapper ptr);
+
+void DualTVL1OpticalFlow_setWarpingsNumber(struct PtrWrapper ptr, int val);
+
+int DualTVL1OpticalFlow_getWarpingsNumber(struct PtrWrapper ptr);
+
+void DualTVL1OpticalFlow_setInnerIterations(struct PtrWrapper ptr, int val);
+
+int DualTVL1OpticalFlow_getInnerIterations(struct PtrWrapper ptr);
+
+void DualTVL1OpticalFlow_setOuterIterations(struct PtrWrapper ptr, int val);
+
+int DualTVL1OpticalFlow_getOuterIterations(struct PtrWrapper ptr);
+
+void DualTVL1OpticalFlow_setMedianFiltering(struct PtrWrapper ptr, int val);
+
+int DualTVL1OpticalFlow_getMedianFiltering(struct PtrWrapper ptr);
+
+void DualTVL1OpticalFlow_setUseInitialFlow(struct PtrWrapper ptr, bool val);
+
+bool DualTVL1OpticalFlow_getUseInitialFlow(struct PtrWrapper ptr);
 ]]
 
 local C = ffi.load(cv.libPath('video'))
@@ -159,7 +213,7 @@ do
         return cv.unwrap_tensors(
             C.BackgroundSubtractor_getBackgroundImage(self.ptr, cv.wrap_tensor(backgroundImage)))
     end
-end
+end 
 
 -- BackgroundSubtractorMOG2
 
@@ -567,6 +621,7 @@ do
 
             self.ptr = ffi.gc(C.KalmanFilter_ctor(dynamParams, measureParams, controlParams, type), C.KalmanFilter_dtor)
         end
+
         self.statePre = nil
         self.statePost = nil
         self.transitionMatrix = nil
@@ -616,6 +671,193 @@ do
         local measurement = cv.argcheck(t, argRules)
 
         return cv.unwrap_tensors(C.KalmanFilter_predict(self.ptr, cv.wrap_tensor(measurement)))
+    end
+end
+
+-- DenseOpticalFlow
+do
+    DenseOpticalFlow = torch.class('cv.DenseOpticalFlow', 'cv.Algorithm', cv)
+
+    function DenseOpticalFlow:calc(t)
+        local argRules = {
+            {"I0", required = true},
+            {"I1", required = true},
+            {"flow", default = nil}
+        }
+        local I0, I1, flow = cv.argcheck(t, argRules)
+
+        return cv.unwrap_tensors(
+            C.DenseOpticalFlow_calc(ptr, cv.wrap_tensor(I0), cv.wrap_tensor(I1), cv.wrap_tensor(flow)))
+    end
+
+    function DenseOpticalFlow:collectGarbage()
+        return C.DenseOpticalFlow_collectGarbage(ptr)
+    end
+end
+
+-- DualTVL1OpticalFlow
+
+do
+    DualTVL1OpticalFlow = torch.class('cv.DualTVL1OpticalFlow', 'cv.DenseOpticalFlow', cv)
+
+    function DualTVL1OpticalFlow:__init(t)
+        self.ptr = ffi.gc(C.DualTVL1OpticalFlow_ctor(), Classes.Algorithm_dtor)
+    end
+
+    function DualTVL1OpticalFlow:setTau(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+
+        C.DualTVL1OpticalFlow_setTau(self.ptr, val)
+    end
+
+    function DualTVL1OpticalFlow:getTau()
+        return C.DualTVL1OpticalFlow_getTau(self.ptr)
+    end
+
+    function DualTVL1OpticalFlow:setLambda(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+
+        C.DualTVL1OpticalFlow_setLambda(self.ptr, val)
+    end
+
+    function DualTVL1OpticalFlow:getLambda()
+        return C.DualTVL1OpticalFlow_getLambda(self.ptr)
+    end
+
+    function DualTVL1OpticalFlow:setTheta(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+
+        C.DualTVL1OpticalFlow_setTheta(self.ptr, val)
+    end
+
+    function DualTVL1OpticalFlow:getTheta()
+        return C.DualTVL1OpticalFlow_getTheta(self.ptr)
+    end
+
+    function DualTVL1OpticalFlow:setGamma(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+
+        C.DualTVL1OpticalFlow_setGamma(self.ptr, val)
+    end
+
+    function DualTVL1OpticalFlow:getGamma()
+        return C.DualTVL1OpticalFlow_getGamma(self.ptr)
+    end
+
+    function DualTVL1OpticalFlow:setEpsilon(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+
+        C.DualTVL1OpticalFlow_setEpsilon(self.ptr, val)
+    end
+
+    function DualTVL1OpticalFlow:getEpsilon()
+        return C.DualTVL1OpticalFlow_getEpsilon(self.ptr)
+    end
+
+    function DualTVL1OpticalFlow:setScaleStep(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+
+        C.DualTVL1OpticalFlow_setScaleStep(self.ptr, val)
+    end
+
+    function DualTVL1OpticalFlow:getScaleStep()
+        return C.DualTVL1OpticalFlow_getScaleStep(self.ptr)
+    end
+
+    function DualTVL1OpticalFlow:setScalesNumber(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+
+        C.DualTVL1OpticalFlow_setScalesNumber(self.ptr, val)
+    end
+
+    function DualTVL1OpticalFlow:getScalesNumber()
+        return C.DualTVL1OpticalFlow_getScalesNumber(self.ptr)
+    end
+
+    function DualTVL1OpticalFlow:setWarpingsNumber(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+
+        C.DualTVL1OpticalFlow_setWarpingsNumber(self.ptr, val)
+    end
+
+    function DualTVL1OpticalFlow:getWarpingsNumber()
+        return C.DualTVL1OpticalFlow_getWarpingsNumber(self.ptr)
+    end
+
+    function DualTVL1OpticalFlow:setInnerIterations(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+
+        C.DualTVL1OpticalFlow_setInnerIterations(self.ptr, val)
+    end
+
+    function DualTVL1OpticalFlow:getInnerIterations()
+        return C.DualTVL1OpticalFlow_getInnerIterations(self.ptr)
+    end
+
+    function DualTVL1OpticalFlow:setOuterIterations(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+
+        C.DualTVL1OpticalFlow_setOuterIterations(self.ptr, val)
+    end
+
+    function DualTVL1OpticalFlow:getOuterIterations()
+        return C.DualTVL1OpticalFlow_getOuterIterations(self.ptr)
+    end
+
+    function DualTVL1OpticalFlow:setMedianFiltering(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+
+        C.DualTVL1OpticalFlow_setMedianFiltering(self.ptr, val)
+    end
+
+    function DualTVL1OpticalFlow:getMedianFiltering()
+        return C.DualTVL1OpticalFlow_getMedianFiltering(self.ptr)
+    end
+
+    function DualTVL1OpticalFlow:setUseInitialFlow(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+
+        C.DualTVL1OpticalFlow_setUseInitialFlow(self.ptr, val)
+    end
+
+    function DualTVL1OpticalFlow:getUseInitialFlow()
+        return C.DualTVL1OpticalFlow_getUseInitialFlow(self.ptr)
     end
 end
 

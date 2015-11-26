@@ -97,7 +97,7 @@ extern "C" struct TensorWrapper BackgroundSubtractor_getBackgroundImage(struct B
 
 extern "C" struct BackgroundSubtractorMOG2Ptr BackgroundSubtractorMOG2_ctor(int history, double varThreshold, bool detectShadows)
 {
-        return rescueObjectFromPtr(cv::createBackgroundSubtractorMOG2(history, varThreshold, detectShadows));
+    return rescueObjectFromPtr(cv::createBackgroundSubtractorMOG2(history, varThreshold, detectShadows));
 
 }
 
@@ -321,4 +321,148 @@ extern "C" struct TensorWrapper KalmanFilter_correct(struct KalmanFilterPtr ptr,
 {
     cv::Mat res = ptr->correct(measurement.toMat());
     return TensorWrapper(res);
+}
+
+extern "C" struct TensorWrapper DenseOpticalFlow_calc(struct DenseOpticalFlowPtr ptr, struct TensorWrapper I0,
+                        struct TensorWrapper I1, struct TensorWrapper flow)
+{
+    if (flow.isNull()) {
+        cv::Mat retval;
+        ptr->calc(I0.toMat(), I1.toMat(), retval);
+        return TensorWrapper(retval);
+    }
+    ptr->calc(I0.toMat(), I1.toMat(), flow.toMat());
+    return flow;
+}
+
+extern "C" void DenseOpticalFlow_collectGarbage(struct DenseOpticalFlowPtr ptr)
+{
+    ptr->collectGarbage();
+}
+
+// DualTVL1OpticalFlow
+
+extern "C" struct DualTVL1OpticalFlowPtr DualTVL1OpticalFlow_ctor()
+{
+    return rescueObjectFromPtr(cv::createOptFlow_DualTVL1());
+}
+
+extern "C" void DualTVL1OpticalFlow_setTau(struct DualTVL1OpticalFlowPtr ptr, double val)
+{
+    ptr->setTau(val);
+}
+
+extern "C" double DualTVL1OpticalFlow_getTau(struct DualTVL1OpticalFlowPtr ptr)
+{
+    return ptr->getTau();
+}
+
+extern "C" void DualTVL1OpticalFlow_setLambda(struct DualTVL1OpticalFlowPtr ptr, double val)
+{
+    ptr->setLambda(val);
+}
+
+extern "C" double DualTVL1OpticalFlow_getLambda(struct DualTVL1OpticalFlowPtr ptr)
+{
+    return ptr->getLambda();
+}
+
+extern "C" void DualTVL1OpticalFlow_setTheta(struct DualTVL1OpticalFlowPtr ptr, double val)
+{
+    ptr->setTheta(val);
+}
+
+extern "C" double DualTVL1OpticalFlow_getTheta(struct DualTVL1OpticalFlowPtr ptr)
+{
+    return ptr->getTheta();
+}
+
+extern "C" void DualTVL1OpticalFlow_setGamma(struct DualTVL1OpticalFlowPtr ptr, double val)
+{
+    ptr->setGamma(val);
+}
+
+extern "C" double DualTVL1OpticalFlow_getGamma(struct DualTVL1OpticalFlowPtr ptr)
+{
+    return ptr->getGamma();
+}
+
+extern "C" void DualTVL1OpticalFlow_setEpsilon(struct DualTVL1OpticalFlowPtr ptr, double val)
+{
+    ptr->setEpsilon(val);
+}
+
+extern "C" double DualTVL1OpticalFlow_getEpsilon(struct DualTVL1OpticalFlowPtr ptr)
+{
+    return ptr->getEpsilon();
+}
+
+extern "C" void DualTVL1OpticalFlow_setScaleStep(struct DualTVL1OpticalFlowPtr ptr, double val)
+{
+    ptr->setScaleStep(val);
+}
+
+extern "C" double DualTVL1OpticalFlow_getScaleStep(struct DualTVL1OpticalFlowPtr ptr)
+{
+    return ptr->getScaleStep();
+}
+
+extern "C" void DualTVL1OpticalFlow_setScalesNumber(struct DualTVL1OpticalFlowPtr ptr, int val)
+{
+    ptr->setScalesNumber(val);
+}
+
+extern "C" int DualTVL1OpticalFlow_getScalesNumber(struct DualTVL1OpticalFlowPtr ptr)
+{
+    return ptr->getScalesNumber();
+}
+
+extern "C" void DualTVL1OpticalFlow_setWarpingsNumber(struct DualTVL1OpticalFlowPtr ptr, int val)
+{
+    ptr->setWarpingsNumber(val);
+}
+
+extern "C" int DualTVL1OpticalFlow_getWarpingsNumber(struct DualTVL1OpticalFlowPtr ptr)
+{
+    return ptr->getWarpingsNumber();
+}
+
+extern "C" void DualTVL1OpticalFlow_setInnerIterations(struct DualTVL1OpticalFlowPtr ptr, int val)
+{
+    ptr->setInnerIterations(val);
+}
+
+extern "C" int DualTVL1OpticalFlow_getInnerIterations(struct DualTVL1OpticalFlowPtr ptr)
+{
+    return ptr->getInnerIterations();
+}
+
+extern "C" void DualTVL1OpticalFlow_setOuterIterations(struct DualTVL1OpticalFlowPtr ptr, int val)
+{
+    ptr->setOuterIterations(val);
+}
+
+extern "C" int DualTVL1OpticalFlow_getOuterIterations(struct DualTVL1OpticalFlowPtr ptr)
+{
+    return ptr->getOuterIterations();
+}
+
+extern "C" void DualTVL1OpticalFlow_setMedianFiltering(struct DualTVL1OpticalFlowPtr ptr, int val)
+{
+    ptr->setMedianFiltering(val);
+}
+
+extern "C" int DualTVL1OpticalFlow_getMedianFiltering(struct DualTVL1OpticalFlowPtr ptr)
+{
+    return ptr->getMedianFiltering();
+}
+
+extern "C" void DualTVL1OpticalFlow_setUseInitialFlow(struct DualTVL1OpticalFlowPtr ptr, bool val)
+{
+    ptr->setUseInitialFlow(val);
+}
+
+extern "C" bool DualTVL1OpticalFlow_getUseInitialFlow(struct DualTVL1OpticalFlowPtr ptr)
+{
+    return ptr->getUseInitialFlow();
 }
