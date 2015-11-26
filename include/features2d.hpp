@@ -15,8 +15,14 @@ struct KeyPointArray {
     struct KeyPointWrapper *data;
     int size;
 
+    KeyPointArray() {}
     KeyPointArray(const std::vector<cv::KeyPoint> & v);
     operator std::vector<cv::KeyPoint>();
+};
+
+struct TensorPlusKeyPointArray {
+    struct TensorWrapper tensor;
+    struct KeyPointArray keypoints;
 };
 
 struct KeyPointMat {
@@ -69,11 +75,11 @@ extern "C" struct Feature2DPtr Feature2D_ctor();
 extern "C" struct KeyPointArray Feature2D_detect(
         struct Feature2DPtr ptr, struct TensorWrapper image, struct TensorWrapper mask);
 
-extern "C" struct KeyPointArray Feature2D_compute(struct Feature2DPtr ptr, struct TensorWrapper image,
+extern "C" struct TensorPlusKeyPointArray Feature2D_compute(struct Feature2DPtr ptr, struct TensorWrapper image,
                         struct KeyPointArray keypoints, struct TensorWrapper descriptors);
 
-extern "C" struct KeyPointArray Feature2D_detectAndCompute(struct Feature2DPtr ptr, struct TensorWrapper image,
-                        struct TensorWrapper mask, struct KeyPointArray keypoints,
+extern "C" struct TensorPlusKeyPointArray Feature2D_detectAndCompute(struct Feature2DPtr ptr, struct TensorWrapper image,
+                        struct TensorWrapper mask,
                         struct TensorWrapper descriptors, bool useProvidedKeypoints);
 
 extern "C" int Feature2D_descriptorSize(struct Feature2DPtr ptr);

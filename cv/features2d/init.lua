@@ -22,6 +22,11 @@ struct KeyPointArray {
     int size;
 };
 
+struct TensorPlusKeyPointArray {
+    struct TensorWrapper tensor;
+    struct KeyPointArray keypoints;
+};
+
 struct KeyPointMat {
     struct KeyPointWrapper **data;
     int size1, size2;
@@ -44,17 +49,15 @@ struct KeyPointArray KeyPointsFilter_removeDuplicated(struct KeyPointArray keypo
 
 struct KeyPointArray KeyPointsFilter_retainBest(struct KeyPointArray keypoints, int npoints);
 
-struct PtrWrapper Feature2D_ctor();
-
 struct KeyPointArray Feature2D_detect(struct PtrWrapper ptr, struct TensorWrapper image,
                         struct TensorWrapper mask);
 
-struct KeyPointArray Feature2D_compute(struct PtrWrapper ptr, struct TensorWrapper image,
+struct TensorPlusKeyPointArray Feature2D_compute(struct PtrWrapper ptr, struct TensorWrapper image,
                         struct KeyPointArray keypoints, struct TensorWrapper descriptors);
 
 struct KeyPointArray Feature2D_detectAndCompute(struct PtrWrapper ptr, struct TensorWrapper image,
-                        struct TensorWrapper mask, struct KeyPointArray keypoints,
-                        struct TensorWrapper descriptors, bool useProvidedKeypoints);
+                        struct TensorWrapper mask, struct TensorWrapper descriptors, 
+                        bool useProvidedKeypoints);
 
 int Feature2D_descriptorSize(struct PtrWrapper ptr);
 
@@ -261,25 +264,27 @@ do
         local argRules = {
             {"image", required = true},
             {"keypoints", required = true},
-            {"descriptors", required = true}
+            {"descriptors", default = nil}
         }
         local image, keypoints, descriptors = cv.argcheck(t, argRules)
 
-        return C.Feature2D_compute(self.ptr, cv.wrap_tensor(image), keypoints, cv.wrap_tensor(descriptors))
+        local result = C.Feature2D_compute(
+            self.ptr, cv.wrap_tensor(image), keypoints, cv.wrap_tensor(descriptors))
+        return result.keypoints, cv.unwrap_tensors(result.tensor)
     end
 
     function Feature2D:detectAndCompute(t)
         local argRules = {
             {"image", required = true},
-            {"mask", required = true},
-            {"keypoints", required = true},
-            {"descriptors", required = true},
+            {"mask", default = nil},
+            {"descriptors", default = nil},
             {"useProvidedKeypoints", default = false}
         }
-        local image, mask, keypoints, descriptors, useProvidedKeypoints = cv.argcheck(t, argRules)
+        local image, mask, descriptors, useProvidedKeypoints = cv.argcheck(t, argRules)
 
-        return C.Feature2D_detectAndCompute(self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(mask),
-                    keypoints, cv.wrap_tensors(descriptors), useProvidedKeypoints)
+        local result = C.Feature2D_detectAndCompute(self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(mask),
+                    cv.wrap_tensors(descriptors), useProvidedKeypoints)
+        return result.keypoints, cv.unwrap_tensors(result.tensor)
     end
 
     function Feature2D:descriptorSize()
