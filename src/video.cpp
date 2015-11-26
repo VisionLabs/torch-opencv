@@ -514,3 +514,110 @@ extern "C" double BackgroundSubtractorMOG_getNoiseSigma(struct BackgroundSubtrac
 {
     return ptr->getNoiseSigma();
 }
+
+// BackgroundSubtractorGMG
+
+extern "C" struct BackgroundSubtractorGMGPtr BackgroundSubtractorGMG_ctor(int initializationFrames, double decisionThreshold)
+{
+    return rescueObjectFromPtr(createBackgroundSubtractorGMG(initializationFrames, decisionThreshold));
+}
+
+extern "C" void BackgroundSubtractorGMG_setMaxFeatures(struct BackgroundSubtractorGMGPtr ptr, int maxFeatures)
+{
+    ptr->setMaxFeatures(maxFeatures);
+}
+
+extern "C" int BackgroundSubtractorGMG_getMaxFeatures(struct BackgroundSubtractorGMGPtr ptr)
+{
+    return ptr->getMaxFeatures();
+}
+
+extern "C" void BackgroundSubtractorGMG_setNumFrames(struct BackgroundSubtractorGMGPtr ptr, int numFrames)
+{
+    ptr->setNumFrames(numFrames);
+}
+
+extern "C" int BackgroundSubtractorGMG_getNumFrames(struct BackgroundSubtractorGMGPtr ptr)
+{
+    return ptr->getNumFrames();
+}
+
+extern "C" void BackgroundSubtractorGMG_setQuantizationLevels(struct BackgroundSubtractorGMGPtr ptr, int quantizationLevels)
+{
+    ptr->setQuantizationLevels(quantizationLevels);
+}
+
+extern "C" int BackgroundSubtractorGMG_getQuantizationLevels(struct BackgroundSubtractorGMGPtr ptr)
+{
+    return ptr->getQuantizationLevels();
+}
+
+extern "C" void BackgroundSubtractorGMG_setSmoothingRadius(struct BackgroundSubtractorGMGPtr ptr, int smoothingRadius)
+{
+    ptr->setSmoothingRadius(smoothingRadius);
+}
+
+extern "C" int BackgroundSubtractorGMG_getSmoothingRadius(struct BackgroundSubtractorGMGPtr ptr)
+{
+    return ptr->getSmoothingRadius();
+}
+
+extern "C" void BackgroundSubtractorGMG_setDefaultLearningRate(struct BackgroundSubtractorGMGPtr ptr, double defaultLearningRate)
+{
+    ptr->setDefaultLearningRate(defaultLearningRate);
+}
+
+extern "C" double BackgroundSubtractorGMG_getDefaultLearningRate(struct BackgroundSubtractorGMGPtr ptr)
+{
+    return ptr->getDefaultLearningRate();
+}
+
+extern "C" void BackgroundSubtractorGMG_setBackgroundPrior(struct BackgroundSubtractorGMGPtr ptr, double backgroundPrior)
+{
+    ptr->setBackgroundPrior(backgroundPrior);
+}
+
+extern "C" double BackgroundSubtractorGMG_getBackgroundPrior(struct BackgroundSubtractorGMGPtr ptr)
+{
+    return ptr->getBackgroundPrior();
+}
+
+extern "C" void BackgroundSubtractorGMG_setDecisionThreshold(struct BackgroundSubtractorGMGPtr ptr, double decisionThreshold)
+{
+    ptr->setDecisionThreshold(decisionThreshold);
+}
+
+extern "C" double BackgroundSubtractorGMG_getDecisionThreshold(struct BackgroundSubtractorGMGPtr ptr)
+{
+    return ptr->getDecisionThreshold();
+}
+
+extern "C" void BackgroundSubtractorGMG_setMinVal(struct BackgroundSubtractorGMGPtr ptr, double minVal)
+{
+    ptr->setMinVal(minVal);
+}
+
+extern "C" double BackgroundSubtractorGMG_getMinVal(struct BackgroundSubtractorGMGPtr ptr)
+{
+    return ptr->getMinVal();
+}
+
+extern "C" void BackgroundSubtractorGMG_setMaxVal(struct BackgroundSubtractorGMGPtr ptr, double maxVal)
+{
+    ptr->setMaxVal(maxVal);
+}
+
+extern "C" double BackgroundSubtractorGMG_getMaxVal(struct BackgroundSubtractorGMGPtr ptr)
+{
+    return ptr->getMaxVal();
+}
+
+extern "C" void BackgroundSubtractorGMG_setUpdateBackgroundModel(struct BackgroundSubtractorGMGPtr ptr, bool updateBackgroundModel)
+{
+    ptr->setUpdateBackgroundModel(updateBackgroundModel);
+}
+
+extern "C" bool BackgroundSubtractorGMG_getUpdateBackgroundModel(struct BackgroundSubtractorGMGPtr ptr)
+{
+    return ptr->getUpdateBackgroundModel();
+}

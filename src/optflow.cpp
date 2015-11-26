@@ -51,12 +51,12 @@ struct TensorWrapper calcOpticalFlowSparseToDense(
 {
     if (flow.isNull()) {
         cv::Mat retval;
-        calcOpticalFlowSparseToDense(
+        optflow::calcOpticalFlowSparseToDense(
                 from.toMat(), to.toMat(), retval, grid_step, k,
                 sigma, use_post_proc, fgs_lambda, fgs_sigma);
         return TensorWrapper(retval);
     } else {
-        calcOpticalFlowSparseToDense(
+        optflow::calcOpticalFlowSparseToDense(
                 from.toMat(), to.toMat(), flow.toMat(), grid_step, k,
                 sigma, use_post_proc, fgs_lambda, fgs_sigma);
         return flow;
@@ -100,7 +100,7 @@ double calcGlobalOrientation(
         struct TensorWrapper orientation, struct TensorWrapper mask,
         struct TensorWrapper mhi, double timestamp, double duration)
 {
-    return motempl::calcGlobalOrientation(
+    motempl::calcGlobalOrientation(
             orientation.toMat(), mask.toMat(), mhi.toMat(), timestamp, duration);
 }
 
@@ -145,8 +145,8 @@ struct DenseOpticalFlowPtr createOptFlow_Farneback_optflow()
     return rescueObjectFromPtr(optflow::createOptFlow_Farneback());
 }
 
-/*extern "C"
+extern "C"
 struct DenseOpticalFlowPtr createOptFlow_SparseToDense_optflow()
 {
     return rescueObjectFromPtr(optflow::createOptFlow_SparseToDense());
-}*/
+}

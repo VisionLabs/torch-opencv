@@ -262,3 +262,54 @@ extern "C" double BackgroundSubtractorMOG_getBackgroundRatio(struct BackgroundSu
 extern "C" void BackgroundSubtractorMOG_setNoiseSigma(struct BackgroundSubtractorMOGPtr ptr, double noiseSigma);
 
 extern "C" double BackgroundSubtractorMOG_getNoiseSigma(struct BackgroundSubtractorMOGPtr ptr);
+
+// BackgroundSubtractorGMG
+
+struct BackgroundSubtractorGMGPtr {
+    void *ptr;
+    inline BackgroundSubtractorGMG * operator->() { return static_cast<BackgroundSubtractorGMG *>(ptr); }
+    inline BackgroundSubtractorGMGPtr(BackgroundSubtractorGMG *ptr) { this->ptr = ptr; }
+    inline BackgroundSubtractorGMG & operator*() { return *static_cast<BackgroundSubtractorGMG *>(this->ptr); }
+};
+
+extern "C" struct BackgroundSubtractorGMGPtr BackgroundSubtractorGMG_ctor(int initializationFrames, double decisionThreshold);
+
+extern "C" void BackgroundSubtractorGMG_setMaxFeatures(struct BackgroundSubtractorGMGPtr ptr, int maxFeatures);
+
+extern "C" int BackgroundSubtractorGMG_getMaxFeatures(struct BackgroundSubtractorGMGPtr ptr);
+
+extern "C" void BackgroundSubtractorGMG_setNumFrames(struct BackgroundSubtractorGMGPtr ptr, int numFrames);
+
+extern "C" int BackgroundSubtractorGMG_getNumFrames(struct BackgroundSubtractorGMGPtr ptr);
+
+extern "C" void BackgroundSubtractorGMG_setQuantizationLevels(struct BackgroundSubtractorGMGPtr ptr, int quantizationLevels);
+
+extern "C" int BackgroundSubtractorGMG_getQuantizationLevels(struct BackgroundSubtractorGMGPtr ptr);
+
+extern "C" void BackgroundSubtractorGMG_setSmoothingRadius(struct BackgroundSubtractorGMGPtr ptr, int smoothingRadius);
+
+extern "C" int BackgroundSubtractorGMG_getSmoothingRadius(struct BackgroundSubtractorGMGPtr ptr);
+
+extern "C" void BackgroundSubtractorGMG_setDefaultLearningRate(struct BackgroundSubtractorGMGPtr ptr, double defaultLearningRate);
+
+extern "C" double BackgroundSubtractorGMG_getDefaultLearningRate(struct BackgroundSubtractorGMGPtr ptr);
+
+extern "C" void BackgroundSubtractorGMG_setBackgroundPrior(struct BackgroundSubtractorGMGPtr ptr, double backgroundPrior);
+
+extern "C" double BackgroundSubtractorGMG_getBackgroundPrior(struct BackgroundSubtractorGMGPtr ptr);
+
+extern "C" void BackgroundSubtractorGMG_setDecisionThreshold(struct BackgroundSubtractorGMGPtr ptr, double decisionThreshold);
+
+extern "C" double BackgroundSubtractorGMG_getDecisionThreshold(struct BackgroundSubtractorGMGPtr ptr);
+
+extern "C" void BackgroundSubtractorGMG_setMinVal(struct BackgroundSubtractorGMGPtr ptr, double minVal);
+
+extern "C" double BackgroundSubtractorGMG_getMinVal(struct BackgroundSubtractorGMGPtr ptr);
+
+extern "C" void BackgroundSubtractorGMG_setMaxVal(struct BackgroundSubtractorGMGPtr ptr, double maxVal);
+
+extern "C" double BackgroundSubtractorGMG_getMaxVal(struct BackgroundSubtractorGMGPtr ptr);
+
+extern "C" void BackgroundSubtractorGMG_setUpdateBackgroundModel(struct BackgroundSubtractorGMGPtr ptr, bool updateBackgroundModel);
+
+extern "C" bool BackgroundSubtractorGMG_getUpdateBackgroundModel(struct BackgroundSubtractorGMGPtr ptr);
