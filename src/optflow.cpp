@@ -100,7 +100,7 @@ double calcGlobalOrientation(
         struct TensorWrapper orientation, struct TensorWrapper mask,
         struct TensorWrapper mhi, double timestamp, double duration)
 {
-    motempl::calcGlobalOrientation(
+    return motempl::calcGlobalOrientation(
             orientation.toMat(), mask.toMat(), mhi.toMat(), timestamp, duration);
 }
 
