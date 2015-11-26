@@ -164,6 +164,7 @@ struct FloatArrayOfArrays {
 };
 
 int getIntMax();
+float getFloatMax();
 
 struct PointArrayOfArrays {
     struct PointWrapper **pointers;
@@ -179,6 +180,7 @@ local C = ffi.load(cv.libPath('Common'))
 require 'cv.constants'
 
 cv.INT_MAX = C.getIntMax()
+cv.FLT_MAT = C.getFloatMax()
 cv.NULLPTR = ffi.new('void *', nil)
 
 --- ***************** Argument checking & unpacking *****************
@@ -514,5 +516,9 @@ function cv.arrayToLua(array, outputType, output)
     return retval
 end
 
+-- make an array that has come from C++ garbage-collected
+function cv.gcarray(array)
+    array.data = ffi.gc(array.data, C.free)
+end
 
 return cv

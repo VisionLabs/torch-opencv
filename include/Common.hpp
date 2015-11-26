@@ -9,6 +9,7 @@ extern "C" {
 #include <array>
 
 extern "C" int getIntMax() { return INT_MAX; }
+extern "C" float getFloatMax() { return FLT_MAX; }
 
 /***************** Tensor <=> Mat conversion *****************/
 

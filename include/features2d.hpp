@@ -66,17 +66,11 @@ struct Feature2DPtr {
 
 extern "C" struct Feature2DPtr Feature2D_ctor();
 
-extern "C" struct KeyPointArray Feature2D_detect(struct Feature2DPtr ptr, struct TensorWrapper image,
-                        struct KeyPointArray keypoints, struct TensorWrapper mask);
-
-extern "C" struct KeyPointMat Feature2D_detect2(struct Feature2DPtr ptr, struct TensorArray images,
-                        struct KeyPointMat keypoints, struct TensorArray masks);
+extern "C" struct KeyPointArray Feature2D_detect(
+        struct Feature2DPtr ptr, struct TensorWrapper image, struct TensorWrapper mask);
 
 extern "C" struct KeyPointArray Feature2D_compute(struct Feature2DPtr ptr, struct TensorWrapper image,
                         struct KeyPointArray keypoints, struct TensorWrapper descriptors);
-
-extern "C" struct KeyPointMat Feature2D_compute2(struct Feature2DPtr ptr, struct TensorArray images,
-                        struct KeyPointMat keypoints, struct TensorArray descriptors);
 
 extern "C" struct KeyPointArray Feature2D_detectAndCompute(struct Feature2DPtr ptr, struct TensorWrapper image,
                         struct TensorWrapper mask, struct KeyPointArray keypoints,

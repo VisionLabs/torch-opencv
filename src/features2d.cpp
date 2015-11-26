@@ -11,7 +11,6 @@ KeyPointWrapper::KeyPointWrapper(const cv::KeyPoint & other) {
 
 KeyPointArray::KeyPointArray(const std::vector<cv::KeyPoint> & v)
 {
-    // TODO: IMPORTANT! Prevent memory leak here
     this->size = v.size();
     this->data = static_cast<KeyPointWrapper *>(
             malloc(sizeof(KeyPointWrapper) * this->size));
@@ -100,20 +99,12 @@ extern "C" struct Feature2DPtr Feature2D_ctor()
     return new cv::Feature2D();
 }
 
-extern "C" struct KeyPointArray Feature2D_detect(struct Feature2DPtr ptr, struct TensorWrapper image,
-                        struct KeyPointArray keypoints, struct TensorWrapper mask)
+extern "C" struct KeyPointArray Feature2D_detect(
+        struct Feature2DPtr ptr, struct TensorWrapper image, struct TensorWrapper mask)
 {
-    std::vector<cv::KeyPoint> keypointsVector(keypoints);
+    std::vector<cv::KeyPoint> keypointsVector;
     ptr->detect(image.toMat(), keypointsVector, TO_MAT_OR_NOARRAY(mask));
     return KeyPointArray(keypointsVector);
-}
-
-extern "C" struct KeyPointMat Feature2D_detect2(struct Feature2DPtr ptr, struct TensorArray images,
-                        struct KeyPointMat keypoints, struct TensorArray masks)
-{
-    std::vector<std::vector<cv::KeyPoint> > keypointsMat(keypoints);
-    ptr->detect(images.toMatList(), keypointsMat, TO_MAT_LIST_OR_NOARRAY(masks));
-    return KeyPointMat(keypointsMat);
 }
 
 extern "C" struct KeyPointArray Feature2D_compute(struct Feature2DPtr ptr, struct TensorWrapper image,
@@ -122,14 +113,6 @@ extern "C" struct KeyPointArray Feature2D_compute(struct Feature2DPtr ptr, struc
     std::vector<cv::KeyPoint> keypointsVector(keypoints);
     ptr->compute(image.toMat(), keypointsVector, descriptors.toMat());
     return KeyPointArray(keypointsVector);
-}
-
-extern "C" struct KeyPointMat Feature2D_compute2(struct Feature2DPtr ptr, struct TensorArray images,
-                        struct KeyPointMat keypoints, struct TensorArray descriptors)
-{
-    std::vector<std::vector<cv::KeyPoint> > keypointsMat(keypoints);
-    ptr->compute(images.toMatList(), keypointsMat, descriptors.toMatList());
-    return KeyPointMat(keypointsMat);
 }
 
 extern "C" struct KeyPointArray Feature2D_detectAndCompute(struct Feature2DPtr ptr, struct TensorWrapper image,

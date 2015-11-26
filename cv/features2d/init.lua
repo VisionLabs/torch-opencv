@@ -46,17 +46,11 @@ struct KeyPointArray KeyPointsFilter_retainBest(struct KeyPointArray keypoints, 
 
 struct PtrWrapper Feature2D_ctor();
 
-struct KeyPointArray Feature2D_detect(struct PtrWrapper ptr, struct TensorWrapper image, struct KeyPointArray keypoints,
+struct KeyPointArray Feature2D_detect(struct PtrWrapper ptr, struct TensorWrapper image,
                         struct TensorWrapper mask);
-
-struct KeyPointMat Feature2D_detect2(struct PtrWrapper ptr, struct TensorArray images,
-                        struct KeyPointMat keypoints, struct TensorArray masks);
 
 struct KeyPointArray Feature2D_compute(struct PtrWrapper ptr, struct TensorWrapper image,
                         struct KeyPointArray keypoints, struct TensorWrapper descriptors);
-
-struct KeyPointMat Feature2D_compute2(struct PtrWrapper ptr, struct TensorArray images,
-                        struct KeyPointMat keypoints, struct TensorArray descriptors);
 
 struct KeyPointArray Feature2D_detectAndCompute(struct PtrWrapper ptr, struct TensorWrapper image,
                         struct TensorWrapper mask, struct KeyPointArray keypoints,
@@ -195,18 +189,20 @@ do
         }
         local keypoints, imageSize, borderSize = cv.argcheck(t, argRules)
         
-        return C.KeyPointsFilter_runByImageBorder(keypoints, imageSize, borderSize);
+        return cv.gcarray(
+            C.KeyPointsFilter_runByImageBorder(keypoints, imageSize, borderSize))
     end
 
     function KeyPointsFilter:runByKeypointSize(t)
         local argRules = {
             {"keypoints", required = true},
             {"minSize", required = true},
-            {"maxSize", default = FLT_MAX}
+            {"maxSize", default = cv.FLT_MAX}
         }
         local keypoints, minSize, maxSize = cv.argcheck(t, argRules)
 
-        return C.KeyPointsFilter_runByKeypointSize(keypoints, imageSize, borderSize);
+        return cv.gcarray(
+            C.KeyPointsFilter_runByKeypointSize(keypoints, imageSize, borderSize))
     end
 
     function KeyPointsFilter:runByPixelsMask(t)
@@ -216,7 +212,8 @@ do
         }
         local keypoints, mask = cv.argcheck(t, argRules)
 
-        return C.KeyPointsFilter_runByPixelsMask(keypoints, cv.wrap_tensor(mask))
+        return cv.gcarray(
+            C.KeyPointsFilter_runByPixelsMask(keypoints, cv.wrap_tensor(mask)))
     end
 
     function KeyPointsFilter:removeDuplicated(t)
@@ -225,7 +222,8 @@ do
         }
         local keypoints = cv.argcheck(t, argRules)
 
-        return C.KeyPointsFilter_removeDuplicated(keypoints)
+        return cv.gcarray(
+            C.KeyPointsFilter_removeDuplicated(keypoints))
     end
 
     function KeyPointsFilter:retainBest(t)
@@ -235,7 +233,8 @@ do
         }
         local keypoints, npoints = cv.argcheck(t, argRules)
 
-        return C.KeyPointsFilter_retainBest(keypoints, npoints)
+        return cv.gcarray(
+            C.KeyPointsFilter_retainBest(keypoints, npoints))
     end
 end
 
@@ -251,23 +250,11 @@ do
     function Feature2D:detect(t)
         local argRules = {
             {"image", required = true},
-            {"keypoints", required = true},
             {"mask", default = nil}
         }
-        local image, keypoints, mask = cv.argcheck(t, argRules)
+        local image, mask = cv.argcheck(t, argRules)
 
-        return C.Feature2D_detect(self.ptr, cv.wrap_tensor(image), keypoints, cv.wrap_tensor(mask))
-    end
-
-    function Feature2D:detect2(t)
-        local argRules = {
-            {"images", required = true},
-            {"keypoints", required = true},
-            {"masks", default = nil}
-        }
-        local images, keypoints, masks = cv.argcheck(t, argRules)
-
-        return C.Feature2D_detect2(self.ptr, cv.wrap_tensors(images), keypoints, cv.wrap_tensors(masks))
+        return C.Feature2D_detect(self.ptr, cv.wrap_tensor(image), cv.wrap_tensor(mask))
     end
 
     function Feature2D:compute(t)
@@ -279,17 +266,6 @@ do
         local image, keypoints, descriptors = cv.argcheck(t, argRules)
 
         return C.Feature2D_compute(self.ptr, cv.wrap_tensor(image), keypoints, cv.wrap_tensor(descriptors))
-    end
-
-    function Feature2D:compute2(t)
-        local argRules = {
-            {"images", required = true},
-            {"keypoints", required = true},
-            {"descriptors", required = true}
-        }
-        local images, keypoints, descriptors = cv.argcheck(t, argRules)
-
-        return C.Feature2D_compute(self.ptr, cv.wrap_tensors(images), keypoints, cv.wrap_tensors(descriptors))
     end
 
     function Feature2D:detectAndCompute(t)
@@ -329,7 +305,16 @@ do
     local BRISK = torch.class('cv.BRISK', 'cv.Feature2D', cv)
 
     function BRISK:__init(t)
-        if t.radiusList or type(t[1]) ~= "number" then
+        if not (t.radiusList or t[1]) or type(t[1]) == "number" then
+            local argRules = {
+                {"thresh", default = 30},
+                {"octaves", default = 3},
+                {"patternScale", default = 1.0}
+            }
+            local thresh, octaves, patternScale = cv.argcheck(t, argRules)
+
+            self.ptr =  ffi.gc(C.BRISK_ctor(thresh, octaves, patternScale), Classes.Algorithm_dtor)
+        else
             local argRules = {
                 {"radiusList", required = true},
                 {"numberList", required = true},
@@ -353,19 +338,8 @@ do
 
             self.ptr =  ffi.gc(C.BRISK_ctor2(cv.wrap_tensor(radiusList), cv.wrap_tensor(numberList),
                                     dMax, dMin, cv.wrap_tensor(indexChange)), Classes.Algorithm_dtor)
-        else
-            local argRules = {
-                {"thresh", default = 30},
-                {"octaves", default = 3},
-                {"patternScale", default = 1.0}
-            }
-            local thresh, octaves, patternScale = cv.argcheck(t, argRules)
-
-            self.ptr =  ffi.gc(C.BRISK_ctor(thresh, octaves, patternScale), Classes.Algorithm_dtor)
         end
     end
-
-
 end
 
 -- ORB
