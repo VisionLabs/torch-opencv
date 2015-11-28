@@ -1023,13 +1023,13 @@ end
 function cv.resize(t)
     local argRules = {
         {"src", required = true},
-        {"dst", default = nil},
         {"dsize", default = {0, 0}, operator = cv.Size},
+        {"dst", default = nil},
         {"fx", default = 0},
         {"fy", default = 0},
         {"interpolation", default = cv.INTER_LINEAR}
     }
-    local src, dst, dsize, fx, fy, interpolation = cv.argcheck(t, argRules)
+    local src, dsize, dst, fx, fy, interpolation = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.resize(
