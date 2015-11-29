@@ -3,10 +3,10 @@
 #include <opencv2/video.hpp>
 #include <opencv2/bgsegm.hpp>
 
-extern "C" struct RotatedRectWrapper CamShift(struct TensorWrapper probImage, struct RectWrapper window,
+extern "C" struct RotatedRectPlusRect CamShift(struct TensorWrapper probImage, struct RectWrapper window,
                         struct TermCriteriaWrapper criteria);
 
-extern "C" int meanShift(struct TensorWrapper probImage, struct RectWrapper window,
+extern "C" struct RectPlusInt meanShift(struct TensorWrapper probImage, struct RectWrapper window,
                         struct TermCriteriaWrapper criteria);
 
 extern "C" struct TensorArray buildOpticalFlowPyramid(struct TensorWrapper img, struct TensorArray pyramid,

@@ -82,6 +82,11 @@ struct MomentsWrapper {
     double nu20, nu11, nu02, nu30, nu21, nu12, nu03;
 };
 
+struct RotatedRectPlusRect {
+    struct RotatedRectWrapper rotrect;
+    struct RectWrapper rect;
+};
+
 struct TensorPlusDouble {
     struct TensorWrapper tensor;
     double val;

@@ -1,16 +1,22 @@
 #include <video.hpp>
 
-extern "C" struct RotatedRectWrapper CamShift(struct TensorWrapper probImage, struct RectWrapper window, struct TermCriteriaWrapper criteria)
+extern "C" struct RotatedRectPlusRect CamShift(struct TensorWrapper probImage, struct RectWrapper window, struct TermCriteriaWrapper criteria)
 {
-    cv::Rect rect = window;
-    return cv::CamShift(probImage.toMat(), rect, criteria);
+    struct RotatedRectPlusRect retval;
+    cv::Rect windowRect = window;
+    retval.rotrect = cv::CamShift(probImage.toMat(), windowRect, criteria);
+    new (&retval.rect) RectWrapper(windowRect);
+    return retval;
 }
 
-extern "C" int meanShift(struct TensorWrapper probImage, struct RectWrapper window,
+extern "C" struct RectPlusInt meanShift(struct TensorWrapper probImage, struct RectWrapper window,
                         struct TermCriteriaWrapper criteria)
 {
+    RectPlusInt retval;
     cv::Rect rect = window;
-    return cv::meanShift(probImage.toMat(), rect, criteria);
+    retval.val = cv::meanShift(probImage.toMat(), rect, criteria);
+    new (&retval.rect) RectWrapper(rect);
+    return retval;
 }
 
 extern "C" struct TensorArray buildOpticalFlowPyramid(struct TensorWrapper img, struct TensorArray pyramid,

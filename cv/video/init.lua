@@ -90,10 +90,10 @@ bool BackgroundSubtractorKNN_getDetectShadows(struct PtrWrapper ptr);
 
 void BackgroundSubtractorKNN_setDetectShadows(struct PtrWrapper ptr, bool detectShadows);
 
-struct RotatedRectWrapper CamShift(struct TensorWrapper probImage, struct RectWrapper window,
+struct RotatedRectPlusRect CamShift(struct TensorWrapper probImage, struct RectWrapper window,
                         struct TermCriteriaWrapper criteria);
 
-int meanShift(struct TensorWrapper probImage, struct RectWrapper window,
+struct RectPlusInt meanShift(struct TensorWrapper probImage, struct RectWrapper window,
                         struct TermCriteriaWrapper criteria);
 
 struct TensorArray buildOpticalFlowPyramid(struct TensorWrapper img, struct TensorArray pyramid,
@@ -252,7 +252,7 @@ local Classes = ffi.load(cv.libPath('Classes'))
 do
     local BackgroundSubtractor = torch.class('cv.BackgroundSubtractor', 'cv.Algorithm', cv)
 
-    function BackgroundSubtractor:apply()
+    function BackgroundSubtractor:apply(t)
         local argRules = {
             {"image", required = true},
             {"fgmast", default = nil},
@@ -560,12 +560,13 @@ end
 function cv.CamShift(t)
     local argRules = {
         {"probImage", required = true},
-        {"window", required = true},
+        {"window", required = true, operator = cv.Rect},
         {"criteria", required = true, operator = cv.TermCriteria}
     }
     local probImage, window, criteria = cv.argcheck(t, argRules)
 
-    return C.CamShift(cv.wrap_tensor(probImage), window, criteria)
+    local result = C.CamShift(cv.wrap_tensor(probImage), window, criteria)
+    return result.rotrect, result.rect
 end
 
 function cv.meanShift(t)
@@ -576,7 +577,8 @@ function cv.meanShift(t)
     }
     local probImage, window, criteria = cv.argcheck(t, argRules)
 
-    return C.meanShift(cv.wrap_tensor(probImage), window, criteria)
+    local result = C.meanShift(cv.wrap_tensor(probImage), window, criteria)
+    return result.val, result. rect
 end
 
 function cv.buildOpticalFlowPyramid(t)

@@ -145,8 +145,9 @@ struct RotatedRectWrapper {
     struct Size2fWrapper size;
     float angle;
 
-    inline operator cv::RotatedRect() { return cv::RotatedRect(center, size, angle); }
+    RotatedRectWrapper() {}
     RotatedRectWrapper(const cv::RotatedRect & other);
+    inline operator cv::RotatedRect() { return cv::RotatedRect(center, size, angle); }
 };
 
 struct MomentsWrapper {
@@ -158,6 +159,11 @@ struct MomentsWrapper {
     inline operator cv::Moments() {
         return cv::Moments(m00, m10, m01, m20, m11, m02, m30, m21, m12, m03);
     }
+};
+
+struct RotatedRectPlusRect {
+    struct RotatedRectWrapper rotrect;
+    struct RectWrapper rect;
 };
 
 /***************** Helper wrappers for [OpenCV class + some primitive] *****************/
