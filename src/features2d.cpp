@@ -410,14 +410,213 @@ bool MSER_getPass2Only(struct MSERPtr ptr)
     return ptr->getPass2Only();
 }
 
+extern "C"
+struct KeyPointArray FAST(
+        struct TensorWrapper image, int threshold, bool nonmaxSuppression)
+{
+    std::vector<cv::KeyPoint> retval;
+    cv::FAST(image.toMat(), retval, threshold, nonmaxSuppression);
+    return KeyPointArray(retval);
+}
 
+extern "C"
+struct KeyPointArray FAST_type(
+        struct TensorWrapper image, int threshold, bool nonmaxSuppression, int type)
+{
+    std::vector<cv::KeyPoint> retval;
+    cv::FAST(image.toMat(), retval, threshold, nonmaxSuppression, type);
+    return KeyPointArray(retval);
+}
 
 extern "C"
 struct KeyPointArray AGAST(struct TensorWrapper image, int threshold, bool nonmaxSuppression)
 {
-    std::vector<cv::KeyPoint> result;
-    cv::AGAST(image.toMat(), result, threshold, nonmaxSuppression);
-    return KeyPointArray(result);
+    std::vector<cv::KeyPoint> retval;
+    cv::AGAST(image.toMat(), retval, threshold, nonmaxSuppression);
+    return KeyPointArray(retval);
+}
+
+extern "C"
+struct KeyPointArray AGAST_type(struct TensorWrapper image, int threshold, bool nonmaxSuppression, int type)
+{
+    std::vector<cv::KeyPoint> retval;
+    cv::AGAST(image.toMat(), retval, threshold, nonmaxSuppression, type);
+    return KeyPointArray(retval);
+}
+
+// FastFeatureDetector
+
+extern "C"
+struct FastFeatureDetectorPtr FastFeatureDetector_ctor(
+        int threshold, bool nonmaxSuppression, int type)
+{
+    return rescueObjectFromPtr(
+            cv::FastFeatureDetector::create(threshold, nonmaxSuppression, type));
+}
+
+extern "C"
+void FastFeatureDetector_setThreshold(struct FastFeatureDetectorPtr ptr, int val)
+{
+    ptr->setThreshold(val);
+}
+
+extern "C"
+int FastFeatureDetector_getThreshold(struct FastFeatureDetectorPtr ptr)
+{
+    return ptr->getThreshold();
+}
+
+extern "C"
+void FastFeatureDetector_setNonmaxSuppression(struct FastFeatureDetectorPtr ptr, bool val)
+{
+    ptr->setNonmaxSuppression(val);
+}
+
+extern "C"
+bool FastFeatureDetector_getNonmaxSuppression(struct FastFeatureDetectorPtr ptr)
+{
+    return ptr->getNonmaxSuppression();
+}
+
+extern "C"
+void FastFeatureDetector_setType(struct FastFeatureDetectorPtr ptr, int val)
+{
+    ptr->setType(val);
+}
+
+extern "C"
+int FastFeatureDetector_getType(struct FastFeatureDetectorPtr ptr)
+{
+    return ptr->getType();
+}
+
+// AgastFeatureDetector
+
+extern "C"
+struct AgastFeatureDetectorPtr AgastFeatureDetector_ctor(
+        int threshold, bool nonmaxSuppression, int type)
+{
+    return rescueObjectFromPtr(
+            cv::AgastFeatureDetector::create(threshold, nonmaxSuppression, type));
+}
+
+extern "C"
+void AgastFeatureDetector_setThreshold(struct AgastFeatureDetectorPtr ptr, int val)
+{
+    ptr->setThreshold(val);
+}
+
+extern "C"
+int AgastFeatureDetector_getThreshold(struct AgastFeatureDetectorPtr ptr)
+{
+    return ptr->getThreshold();
+}
+
+extern "C"
+void AgastFeatureDetector_setNonmaxSuppression(struct AgastFeatureDetectorPtr ptr, bool val)
+{
+    ptr->setNonmaxSuppression(val);
+}
+
+extern "C"
+bool AgastFeatureDetector_getNonmaxSuppression(struct AgastFeatureDetectorPtr ptr)
+{
+    return ptr->getNonmaxSuppression();
+}
+
+extern "C"
+void AgastFeatureDetector_setType(struct AgastFeatureDetectorPtr ptr, int val)
+{
+    ptr->setType(val);
+}
+
+extern "C"
+int AgastFeatureDetector_getType(struct AgastFeatureDetectorPtr ptr)
+{
+    return ptr->getType();
+}
+
+// GFTTDetector
+
+extern "C"
+struct GFTTDetectorPtr GFTTDetector_ctor(
+        int maxCorners, double qualityLevel, double minDistance,
+        int blockSize, bool useHarrisDetector, double k)
+{
+    return rescueObjectFromPtr(cv::GFTTDetector::create(
+            maxCorners, qualityLevel, minDistance, blockSize, useHarrisDetector, k));
+}
+
+extern "C"
+void GFTTDetector_setMaxFeatures(struct GFTTDetectorPtr ptr, int val)
+{
+    ptr->setMaxFeatures(val);
+}
+
+extern "C"
+int GFTTDetector_getMaxFeatures(struct GFTTDetectorPtr ptr)
+{
+    return ptr->getMaxFeatures();
+}
+
+extern "C"
+void GFTTDetector_setQualityLevel(struct GFTTDetectorPtr ptr, double val)
+{
+    ptr->setQualityLevel(val);
+}
+
+extern "C"
+double GFTTDetector_getQualityLevel(struct GFTTDetectorPtr ptr)
+{
+    return ptr->getQualityLevel();
+}
+
+extern "C"
+void GFTTDetector_setMinDistance(struct GFTTDetectorPtr ptr, double val)
+{
+    ptr->setMinDistance(val);
+}
+
+extern "C"
+double GFTTDetector_getMinDistance(struct GFTTDetectorPtr ptr)
+{
+    return ptr->getMinDistance();
+}
+
+extern "C"
+void GFTTDetector_setBlockSize(struct GFTTDetectorPtr ptr, int val)
+{
+    ptr->setBlockSize(val);
+}
+
+extern "C"
+int GFTTDetector_getBlockSize(struct GFTTDetectorPtr ptr)
+{
+    return ptr->getBlockSize();
+}
+
+extern "C"
+void GFTTDetector_setHarrisDetector(struct GFTTDetectorPtr ptr, bool val)
+{
+    ptr->setHarrisDetector(val);
+}
+
+extern "C"
+bool GFTTDetector_getHarrisDetector(struct GFTTDetectorPtr ptr)
+{
+    return ptr->getHarrisDetector();
+}
+
+extern "C"
+void GFTTDetector_setK(struct GFTTDetectorPtr ptr, double val)
+{
+    ptr->setK(val);
+}
+
+extern "C"
+double GFTTDetector_getK(struct GFTTDetectorPtr ptr)
+{
+    return ptr->getK();
 }
 
 // BOWTrainer

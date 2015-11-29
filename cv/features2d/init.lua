@@ -581,10 +581,21 @@ do
 end
 
 
+function cv.FAST(t)
+    local argRules = {
+        {"image", required = true},
+        {"threshold", required = true},
+        {"nonmaxSuppression", default = true},
+        {"_type", default = nil}
+    }
+    local image, threshold, nonmaxSuppression, _type = cv.argcheck(t, argRules)
 
-
-
-
+    if _type then
+        return C.FAST_type(cv.wrap_tensor(image), threshold, nonmaxSuppression, type)
+    else
+        return C.FAST(cv.wrap_tensor(image), threshold, nonmaxSuppression)
+    end
+end
 
 function cv.AGAST(t)
     local argRules = {
@@ -597,8 +608,121 @@ function cv.AGAST(t)
     return C.AGAST(cv.wrap_tensor(image), threshold, nonmaxSuppression)
 end
 
+-- FastFeatureDetector
 
+do
+    local FastFeatureDetector = torch.class('cv.FastFeatureDetector', 'cv.Feature2D', cv)
 
+    function FastFeatureDetector:__init(t)
+        local argRules = {
+            {"threshold", default = 10},
+            {"nonmaxSuppression", default = true},
+            {"_type", default = cv.FAST_FEATURE_DETECTOR_TYPE_9_16}
+        }
+        local threshold, nonmaxSuppression, _type = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(
+            C.FastFeatureDetector_ctor(threshold, nonmaxSuppression, _type),
+            C.Algorithm_dtor)
+    end
+
+    function FastFeatureDetector:setThreshold(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.FastFeatureDetector_setThreshold(self.ptr, val)
+    end
+
+    function FastFeatureDetector:getThreshold()
+        return C.FastFeatureDetector_getThreshold(self.ptr)
+    end
+
+    function FastFeatureDetector:setNonmaxSuppression(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.FastFeatureDetector_setNonmaxSuppression(self.ptr, val)
+    end
+
+    function FastFeatureDetector:getNonmaxSuppression()
+        return C.FastFeatureDetector_getNonmaxSuppression(self.ptr)
+    end
+
+    function FastFeatureDetector:setType(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.FastFeatureDetector_setType(self.ptr, val)
+    end
+
+    function FastFeatureDetector:getType()
+        return C.FastFeatureDetector_getType(self.ptr)
+    end
+end
+
+-- AgastFeatureDetector
+
+do
+    local AgastFeatureDetector = torch.class('cv.AgastFeatureDetector', 'cv.Feature2D', cv)
+
+    function AgastFeatureDetector:__init(t)
+        local argRules = {
+            {"threshold", default = 10},
+            {"nonmaxSuppression", default = true},
+            {"_type", default = cv.AGAST_FEATURE_DETECTOR_OAST_9_16}
+        }
+        local threshold, nonmaxSuppression, _type = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(
+            C.AgastFeatureDetector_ctor(threshold, nonmaxSuppression, _type),
+            C.Algorithm_dtor)
+    end
+
+    function AgastFeatureDetector:setThreshold(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.AgastFeatureDetector_setThreshold(self.ptr, val)
+    end
+
+    function AgastFeatureDetector:getThreshold()
+        return C.AgastFeatureDetector_getThreshold(self.ptr)
+    end
+
+    function AgastFeatureDetector:setNonmaxSuppression(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.AgastFeatureDetector_setNonmaxSuppression(self.ptr, val)
+    end
+
+    function AgastFeatureDetector:getNonmaxSuppression()
+        return C.AgastFeatureDetector_getNonmaxSuppression(self.ptr)
+    end
+
+    function AgastFeatureDetector:setType(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.AgastFeatureDetector_setType(self.ptr, val)
+    end
+
+    function AgastFeatureDetector:getType()
+        return C.AgastFeatureDetector_getType(self.ptr)
+    end
+end
 
 -- BOWTrainer
 
@@ -639,6 +763,103 @@ do
             return cv.unwrap_tensors(C.BOWTrainer_cluster(self.ptr))
         end
     end
+end
+
+-- GFTTDetector
+
+function GFTTDetector:__init(t)
+    local argRules = {
+        {"maxCorners", default = 1000},
+        {"qualityLevel", default = 0.01},
+        {"minDistance", default = 1},
+        {"blockSize", default = 3},
+        {"useHarrisDetector", default = false},
+        {"k", default = 0.04}
+    }
+    local maxCorners, qualityLevel, minDistance, blockSize, useHarrisDetector, k = 
+        cv.argcheck(t, argRules)
+    self.ptr = ffi.gc(
+        C.GFTTDetector_ctor(maxCorners, qualityLevel, minDistance, blockSize, useHarrisDetector, k),
+        Classes.Algorithm_dtor)
+end
+
+function GFTTDetector:setMaxFeatures(t)
+    local argRules = {
+        {"val", required = true}
+    }
+    local val = cv.argcheck(t, argRules)
+    
+    C.GFTTDetector_setMaxFeatures(self.ptr, val)
+end
+
+function GFTTDetector:getMaxFeatures()
+    return C.GFTTDetector_getMaxFeatures(self.ptr)
+end
+
+function GFTTDetector:setQualityLevel(t)
+
+    local argRules = {
+        {"val", required = true}
+    }
+    local val = cv.argcheck(t, argRules)
+    
+    C.GFTTDetector_setQualityLevel(self.ptr, val)
+end
+
+function GFTTDetector:getQualityLevel()
+    return C.GFTTDetector_getQualityLevel(self.ptr)
+end
+
+function GFTTDetector:setMinDistance(t)
+    local argRules = {
+        {"val", required = true}
+    }
+    local val = cv.argcheck(t, argRules)
+    
+    C.GFTTDetector_setMinDistance(self.ptr, val)
+end
+
+function GFTTDetector:getMinDistance()
+    return C.GFTTDetector_getMinDistance(self.ptr)
+end
+
+function GFTTDetector:setBlockSize(t)
+    local argRules = {
+        {"val", required = true}
+    }
+    local val = cv.argcheck(t, argRules)
+    
+    C.GFTTDetector_setBlockSize(self.ptr, val)
+end
+
+function GFTTDetector:getBlockSize()
+    return C.GFTTDetector_getBlockSize(self.ptr)
+end
+
+function GFTTDetector:setHarrisDetector(t)
+    local argRules = {
+        {"val", required = true}
+    }
+    local val = cv.argcheck(t, argRules)
+    
+    C.GFTTDetector_setHarrisDetector(self.ptr, val)
+end
+
+function GFTTDetector:getHarrisDetector()
+    return C.GFTTDetector_getHarrisDetector(self.ptr)
+end
+
+function GFTTDetector:setK(t)
+    local argRules = {
+        {"val", required = true}
+    }
+    local val = cv.argcheck(t, argRules)
+    
+    C.GFTTDetector_setK(self.ptr, val)
+end
+
+function GFTTDetector:getK()
+    return C.GFTTDetector_getK(self.ptr)
 end
 
 -- BOWKMeansTrainer

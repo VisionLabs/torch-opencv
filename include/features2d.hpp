@@ -34,7 +34,6 @@ struct KeyPointMat {
 };
 
 // KeyPointsFilter
-
 struct KeyPointsFilterPtr {
     void *ptr;
 
@@ -43,22 +42,29 @@ struct KeyPointsFilterPtr {
     inline cv::KeyPointsFilter & operator*() { return *static_cast<cv::KeyPointsFilter *>(this->ptr); }
 };
 
-extern "C" struct KeyPointsFilterPtr KeyPointsFilter_ctor();
+extern "C"
+struct KeyPointsFilterPtr KeyPointsFilter_ctor();
 
-extern "C" void KeyPointsFilter_dtor(struct KeyPointsFilterPtr ptr);
+extern "C"
+void KeyPointsFilter_dtor(struct KeyPointsFilterPtr ptr);
 
-extern "C" struct KeyPointArray KeyPointsFilter_runByImageBorder(struct KeyPointArray keypoints,
+extern "C"
+struct KeyPointArray KeyPointsFilter_runByImageBorder(struct KeyPointArray keypoints,
                         struct SizeWrapper imageSize, int borderSize);
 
-extern "C" struct KeyPointArray KeyPointsFilter_runByKeypointSize(struct KeyPointArray keypoints,
+extern "C"
+struct KeyPointArray KeyPointsFilter_runByKeypointSize(struct KeyPointArray keypoints,
                         float minSize, float maxSize);
 
-extern "C" struct KeyPointArray KeyPointsFilter_runByPixelsMask(struct KeyPointArray keypoints,
+extern "C"
+struct KeyPointArray KeyPointsFilter_runByPixelsMask(struct KeyPointArray keypoints,
                         struct TensorWrapper mask);
 
-extern "C" struct KeyPointArray KeyPointsFilter_removeDuplicated(struct KeyPointArray keypoints);
+extern "C"
+struct KeyPointArray KeyPointsFilter_removeDuplicated(struct KeyPointArray keypoints);
 
-extern "C" struct KeyPointArray KeyPointsFilter_retainBest(struct KeyPointArray keypoints, int npoints);
+extern "C"
+struct KeyPointArray KeyPointsFilter_retainBest(struct KeyPointArray keypoints, int npoints);
 
 // Feature2D
 
@@ -70,25 +76,33 @@ struct Feature2DPtr {
     inline cv::Feature2D & operator*() { return *static_cast<cv::Feature2D *>(this->ptr); }
 };
 
-extern "C" struct Feature2DPtr Feature2D_ctor();
+extern "C"
+struct Feature2DPtr Feature2D_ctor();
 
-extern "C" struct KeyPointArray Feature2D_detect(
+extern "C"
+struct KeyPointArray Feature2D_detect(
         struct Feature2DPtr ptr, struct TensorWrapper image, struct TensorWrapper mask);
 
-extern "C" struct TensorPlusKeyPointArray Feature2D_compute(struct Feature2DPtr ptr, struct TensorWrapper image,
+extern "C"
+struct TensorPlusKeyPointArray Feature2D_compute(struct Feature2DPtr ptr, struct TensorWrapper image,
                         struct KeyPointArray keypoints, struct TensorWrapper descriptors);
 
-extern "C" struct TensorPlusKeyPointArray Feature2D_detectAndCompute(struct Feature2DPtr ptr, struct TensorWrapper image,
+extern "C"
+struct TensorPlusKeyPointArray Feature2D_detectAndCompute(struct Feature2DPtr ptr, struct TensorWrapper image,
                         struct TensorWrapper mask,
                         struct TensorWrapper descriptors, bool useProvidedKeypoints);
 
-extern "C" int Feature2D_descriptorSize(struct Feature2DPtr ptr);
+extern "C"
+int Feature2D_descriptorSize(struct Feature2DPtr ptr);
 
-extern "C" int Feature2D_descriptorType(struct Feature2DPtr ptr);
+extern "C"
+int Feature2D_descriptorType(struct Feature2DPtr ptr);
 
-extern "C" int Feature2D_defaultNorm(struct Feature2DPtr ptr);
+extern "C"
+int Feature2D_defaultNorm(struct Feature2DPtr ptr);
 
-extern "C" bool Feature2D_empty(struct Feature2DPtr ptr);
+extern "C"
+bool Feature2D_empty(struct Feature2DPtr ptr);
 
 // BRISK
 
@@ -99,9 +113,11 @@ struct BRISKPtr {
     inline cv::BRISK & operator*() { return *static_cast<cv::BRISK *>(this->ptr); }
 };
 
-extern "C" struct BRISKPtr BRISK_ctor(int thresh, int octaves, float patternScale);
+extern "C"
+struct BRISKPtr BRISK_ctor(int thresh, int octaves, float patternScale);
 
-extern "C" struct BRISKPtr BRISK_ctor2(struct TensorWrapper radiusList, struct TensorWrapper numberList,
+extern "C"
+struct BRISKPtr BRISK_ctor2(struct TensorWrapper radiusList, struct TensorWrapper numberList,
                         float dMax, float dMin, struct TensorWrapper indexChange);
 
 // ORB
@@ -113,44 +129,63 @@ struct ORBPtr {
     inline cv::ORB & operator*() { return *static_cast<cv::ORB *>(this->ptr); }
 };
 
-extern "C" struct ORBPtr ORB_ctor(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel,
+extern "C"
+struct ORBPtr ORB_ctor(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel,
                         int WTA_K, int scoreType, int patchSize, int fastThreshold);
 
-extern "C" void ORB_setMaxFeatures(struct ORBPtr ptr, int maxFeatures);
+extern "C"
+void ORB_setMaxFeatures(struct ORBPtr ptr, int maxFeatures);
 
-extern "C" int ORB_getMaxFeatures(struct ORBPtr ptr);
+extern "C"
+int ORB_getMaxFeatures(struct ORBPtr ptr);
 
-extern "C" void ORB_setScaleFactor(struct ORBPtr ptr, int scaleFactor);
+extern "C"
+void ORB_setScaleFactor(struct ORBPtr ptr, int scaleFactor);
 
-extern "C" double ORB_getScaleFactor(struct ORBPtr ptr);
+extern "C"
+double ORB_getScaleFactor(struct ORBPtr ptr);
 
-extern "C" void ORB_setNLevels(struct ORBPtr ptr, int nlevels);
+extern "C"
+void ORB_setNLevels(struct ORBPtr ptr, int nlevels);
 
-extern "C" int ORB_getNLevels(struct ORBPtr ptr);
+extern "C"
+int ORB_getNLevels(struct ORBPtr ptr);
 
-extern "C" void ORB_setEdgeThreshold(struct ORBPtr ptr, int edgeThreshold);
+extern "C"
+void ORB_setEdgeThreshold(struct ORBPtr ptr, int edgeThreshold);
 
-extern "C" int ORB_getEdgeThreshold(struct ORBPtr ptr);
+extern "C"
+int ORB_getEdgeThreshold(struct ORBPtr ptr);
 
-extern "C" void ORB_setFirstLevel(struct ORBPtr ptr, int firstLevel);
+extern "C"
+void ORB_setFirstLevel(struct ORBPtr ptr, int firstLevel);
 
-extern "C" int ORB_getFirstLevel(struct ORBPtr ptr);
+extern "C"
+int ORB_getFirstLevel(struct ORBPtr ptr);
 
-extern "C" void ORB_setWTA_K(struct ORBPtr ptr, int wta_k);
+extern "C"
+void ORB_setWTA_K(struct ORBPtr ptr, int wta_k);
 
-extern "C" int ORB_getWTA_K(struct ORBPtr ptr);
+extern "C"
+int ORB_getWTA_K(struct ORBPtr ptr);
 
-extern "C" void ORB_setScoreType(struct ORBPtr ptr, int scoreType);
+extern "C"
+void ORB_setScoreType(struct ORBPtr ptr, int scoreType);
 
-extern "C" int ORB_getScoreType(struct ORBPtr ptr);
+extern "C"
+int ORB_getScoreType(struct ORBPtr ptr);
 
-extern "C" void ORB_setPatchSize(struct ORBPtr ptr, int patchSize);
+extern "C"
+void ORB_setPatchSize(struct ORBPtr ptr, int patchSize);
 
-extern "C" int ORB_getPatchSize(struct ORBPtr ptr);
+extern "C"
+int ORB_getPatchSize(struct ORBPtr ptr);
 
-extern "C" void ORB_setFastThreshold(struct ORBPtr ptr, int fastThreshold);
+extern "C"
+void ORB_setFastThreshold(struct ORBPtr ptr, int fastThreshold);
 
-extern "C" int ORB_getFastThreshold(struct ORBPtr ptr);
+extern "C"
+int ORB_getFastThreshold(struct ORBPtr ptr);
 
 // MSER
 
@@ -161,27 +196,95 @@ struct MSERPtr {
     inline cv::MSER & operator*() { return *static_cast<cv::MSER *>(this->ptr); }
 };
 
-extern "C" struct MSERPtr MSER_ctor(int _delta, int _min_area, int _max_area, double _max_variation, double _min_diversity,
+extern "C"
+struct MSERPtr MSER_ctor(int _delta, int _min_area, int _max_area, double _max_variation, double _min_diversity,
                         int _max_evolution, double _area_threshold, double _min_margin, int _edge_blur_size);
 
-extern "C" void MSER_setDelta(struct MSERPtr ptr, int delta);
+extern "C"
+void MSER_setDelta(struct MSERPtr ptr, int delta);
 
-extern "C" int MSER_getDelta(struct MSERPtr ptr);
+extern "C"
+int MSER_getDelta(struct MSERPtr ptr);
 
-extern "C" void MSER_setMinArea(struct MSERPtr ptr, int minArea);
+extern "C"
+void MSER_setMinArea(struct MSERPtr ptr, int minArea);
 
-extern "C" int MSER_getMinArea(struct MSERPtr ptr);
+extern "C"
+int MSER_getMinArea(struct MSERPtr ptr);
 
-extern "C" void MSER_setMaxArea(struct MSERPtr ptr, int MaxArea);
+extern "C"
+void MSER_setMaxArea(struct MSERPtr ptr, int MaxArea);
 
-extern "C" int MSER_getMaxArea(struct MSERPtr ptr);
+extern "C"
+int MSER_getMaxArea(struct MSERPtr ptr);
 
+extern "C"
+struct KeyPointArray FAST(
+        struct TensorWrapper image, int threshold, bool nonmaxSuppression);
 
+extern "C"
+struct KeyPointArray FAST_type(
+        struct TensorWrapper image, int threshold, bool nonmaxSuppression, int type);
 
+extern "C"
+struct KeyPointArray AGAST(struct TensorWrapper image, int threshold, bool nonmaxSuppression);
 
+extern "C"
+struct KeyPointArray AGAST_type(struct TensorWrapper image, int threshold, bool nonmaxSuppression, int type);
 
+// FastFeatureDetector
 
-extern "C" struct KeyPointArray AGAST(struct TensorWrapper image, int threshold, bool nonmaxSuppression);
+struct FastFeatureDetectorPtr {
+    void *ptr;
+    inline cv::FastFeatureDetector * operator->() { return static_cast<cv::FastFeatureDetector *>(ptr); }
+    inline FastFeatureDetectorPtr(cv::FastFeatureDetector *ptr) { this->ptr = ptr; }
+    inline cv::FastFeatureDetector & operator*() { return *static_cast<cv::FastFeatureDetector *>(this->ptr); }
+};
+
+// AgastFeatureDetector
+
+struct AgastFeatureDetectorPtr {
+    void *ptr;
+    inline cv::AgastFeatureDetector * operator->() { return static_cast<cv::AgastFeatureDetector *>(ptr); }
+    inline AgastFeatureDetectorPtr(cv::AgastFeatureDetector *ptr) { this->ptr = ptr; }
+    inline cv::AgastFeatureDetector & operator*() { return *static_cast<cv::AgastFeatureDetector *>(this->ptr); }
+};
+
+// GFTTDetector
+
+struct GFTTDetectorPtr {
+    void *ptr;
+    inline cv::GFTTDetector * operator->() { return static_cast<cv::GFTTDetector *>(ptr); }
+    inline GFTTDetectorPtr(cv::GFTTDetector *ptr) { this->ptr = ptr; }
+    inline cv::GFTTDetector & operator*() { return *static_cast<cv::GFTTDetector *>(this->ptr); }
+};
+
+// SimpleBlobDetector
+
+struct SimpleBlobDetectorPtr {
+    void *ptr;
+    inline cv::SimpleBlobDetector * operator->() { return static_cast<cv::SimpleBlobDetector *>(ptr); }
+    inline SimpleBlobDetectorPtr(cv::SimpleBlobDetector *ptr) { this->ptr = ptr; }
+    inline cv::SimpleBlobDetector & operator*() { return *static_cast<cv::SimpleBlobDetector *>(this->ptr); }
+};
+
+// KAZE
+
+struct KAZEPtr {
+    void *ptr;
+    inline cv::KAZE * operator->() { return static_cast<cv::KAZE *>(ptr); }
+    inline KAZEPtr(cv::KAZE *ptr) { this->ptr = ptr; }
+    inline cv::KAZE & operator*() { return *static_cast<cv::KAZE *>(this->ptr); }
+};
+
+// AKAZE
+
+struct AKAZEPtr {
+    void *ptr;
+    inline cv::AKAZE * operator->() { return static_cast<cv::AKAZE *>(ptr); }
+    inline AKAZEPtr(cv::AKAZE *ptr) { this->ptr = ptr; }
+    inline cv::AKAZE & operator*() { return *static_cast<cv::AKAZE *>(this->ptr); }
+};
 
 // DescriptorMatcher
 
