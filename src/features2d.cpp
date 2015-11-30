@@ -621,60 +621,193 @@ double GFTTDetector_getK(struct GFTTDetectorPtr ptr)
 
 // SimpleBlobDetector
 
-// TODO maybe avoid copying and pass only a pointer to original struct? (less safe)
-struct SimpleBlobDetector_Params SimpleBlobDetector_Params_default()
+cv::SimpleBlobDetector::Params SimpleBlobDetector_Params_default()
 {
-    cv::SimpleBlobDetector::Params defaultParams;
-    SimpleBlobDetector_Params retval;
-
-    retval.thresholdStep = defaultParams.thresholdStep;
-    retval.minThreshold = defaultParams.minThreshold;
-    retval.maxThreshold = defaultParams.maxThreshold;
-    retval.minRepeatability = defaultParams.minRepeatability;
-    retval.minDistBetweenBlobs = defaultParams.minDistBetweenBlobs;
-    retval.filterByColor = defaultParams.filterByColor;
-    retval.blobColor = defaultParams.blobColor;
-    retval.filterByArea = defaultParams.filterByArea;
-    retval.minArea = defaultParams.minArea;
-    retval.maxArea = defaultParams.maxArea;
-    retval.filterByCircularity = defaultParams.filterByCircularity;
-    retval.minCircularity = defaultParams.minCircularity;
-    retval.maxCircularity = defaultParams.maxCircularity;
-    retval.filterByInertia = defaultParams.filterByInertia;
-    retval.minInertiaRatio = defaultParams.minInertiaRatio;
-    retval.maxInertiaRatio = defaultParams.maxInertiaRatio;
-    retval.filterByConvexity = defaultParams.filterByConvexity;
-    retval.minConvexity = defaultParams.minConvexity;
-    retval.maxConvexity = defaultParams.maxConvexity;
-
-    return retval;
+    return cv::SimpleBlobDetector::Params();
 }
 
-struct SimpleBlobDetectorPtr SimpleBlobDetector_ctor(struct SimpleBlobDetector_Params params)
+struct SimpleBlobDetectorPtr SimpleBlobDetector_ctor(cv::SimpleBlobDetector::Params params)
 {
-    struct cv::SimpleBlobDetector::Params params_CV;
+    return rescueObjectFromPtr(cv::SimpleBlobDetector::create(params));
+}
 
-    params_CV.thresholdStep = params.thresholdStep;
-    params_CV.minThreshold = params.minThreshold;
-    params_CV.maxThreshold = params.maxThreshold;
-    params_CV.minRepeatability = params.minRepeatability;
-    params_CV.minDistBetweenBlobs = params.minDistBetweenBlobs;
-    params_CV.filterByColor = params.filterByColor;
-    params_CV.blobColor = params.blobColor;
-    params_CV.filterByArea = params.filterByArea;
-    params_CV.minArea = params.minArea;
-    params_CV.maxArea = params.maxArea;
-    params_CV.filterByCircularity = params.filterByCircularity;
-    params_CV.minCircularity = params.minCircularity;
-    params_CV.maxCircularity = params.maxCircularity;
-    params_CV.filterByInertia = params.filterByInertia;
-    params_CV.minInertiaRatio = params.minInertiaRatio;
-    params_CV.maxInertiaRatio = params.maxInertiaRatio;
-    params_CV.filterByConvexity = params.filterByConvexity;
-    params_CV.minConvexity = params.minConvexity;
-    params_CV.maxConvexity = params.maxConvexity;
+// KAZE
 
-    return rescueObjectFromPtr(cv::SimpleBlobDetector::create(params_CV));
+extern "C"
+struct KAZEPtr KAZE_ctor(
+        bool extended, bool upright, float threshold,
+        int nOctaves, int nOctaveLayers, int diffusivity)
+{
+    return rescueObjectFromPtr(cv::KAZE::create(
+            extended, upright, threshold, nOctaves, nOctaveLayers, diffusivity));
+}
+
+extern "C"
+void KAZE_setExtended(struct KAZEPtr ptr, bool val)
+{
+    ptr->setExtended(val);
+}
+
+extern "C"
+bool KAZE_getExtended(struct KAZEPtr ptr)
+{
+    return ptr->getExtended();
+}
+
+extern "C"
+void KAZE_setUpright(struct KAZEPtr ptr, bool val)
+{
+    ptr->setUpright(val);
+}
+
+extern "C"
+bool KAZE_getUpright(struct KAZEPtr ptr)
+{
+    return ptr->getUpright();
+}
+
+extern "C"
+void KAZE_setThreshold(struct KAZEPtr ptr, double val)
+{
+    ptr->setThreshold(val);
+}
+
+extern "C"
+double KAZE_getThreshold(struct KAZEPtr ptr)
+{
+    return ptr->getThreshold();
+}
+
+extern "C"
+void KAZE_setNOctaves(struct KAZEPtr ptr, int val)
+{
+    ptr->setNOctaves(val);
+}
+
+extern "C"
+int KAZE_getNOctaves(struct KAZEPtr ptr)
+{
+    return ptr->getNOctaves();
+}
+
+extern "C"
+void KAZE_setNOctaveLayers(struct KAZEPtr ptr, int val)
+{
+    ptr->setNOctaveLayers(val);
+}
+
+extern "C"
+int KAZE_getNOctaveLayers(struct KAZEPtr ptr)
+{
+    return ptr->getNOctaveLayers();
+}
+
+extern "C"
+void KAZE_setDiffusivity(struct KAZEPtr ptr, int val)
+{
+    ptr->setDiffusivity(val);
+}
+
+extern "C"
+int KAZE_getDiffusivity(struct KAZEPtr ptr)
+{
+    return ptr->getDiffusivity();
+}
+
+// AKAZE
+
+extern "C"
+struct AKAZEPtr AKAZE_ctor(
+        int descriptor_type, int descriptor_size, int descriptor_channels,
+        float threshold, int nOctaves, int nOctaveLayers, int diffusivity)
+{
+    return rescueObjectFromPtr(cv::AKAZE::create(
+            descriptor_type, descriptor_size, descriptor_channels, threshold,
+            nOctaves, nOctaveLayers, diffusivity));
+}
+
+extern "C"
+void AKAZE_setDescriptorType(struct AKAZEPtr ptr, int val)
+{
+    ptr->setDescriptorType(val);
+}
+
+extern "C"
+int AKAZE_getDescriptorType(struct AKAZEPtr ptr)
+{
+    return ptr->getDescriptorType();
+}
+
+extern "C"
+void AKAZE_setDescriptorSize(struct AKAZEPtr ptr, int val)
+{
+    ptr->setDescriptorSize(val);
+}
+
+extern "C"
+int AKAZE_getDescriptorSize(struct AKAZEPtr ptr)
+{
+    return ptr->getDescriptorSize();
+}
+
+extern "C"
+void AKAZE_setDescriptorChannels(struct AKAZEPtr ptr, int val)
+{
+    ptr->setDescriptorChannels(val);
+}
+
+extern "C"
+int AKAZE_getDescriptorChannels(struct AKAZEPtr ptr)
+{
+    return ptr->getDescriptorChannels();
+}
+
+extern "C"
+void AKAZE_setThreshold(struct AKAZEPtr ptr, double val)
+{
+    ptr->setThreshold(val);
+}
+
+extern "C"
+double AKAZE_getThreshold(struct AKAZEPtr ptr)
+{
+    return ptr->getThreshold();
+}
+
+extern "C"
+void AKAZE_setNOctaves(struct AKAZEPtr ptr, int val)
+{
+    ptr->setNOctaves(val);
+}
+
+extern "C"
+int AKAZE_getNOctaves(struct AKAZEPtr ptr)
+{
+    return ptr->getNOctaves();
+}
+
+extern "C"
+void AKAZE_setNOctaveLayers(struct AKAZEPtr ptr, int val)
+{
+    ptr->setNOctaveLayers(val);
+}
+
+extern "C"
+int AKAZE_getNOctaveLayers(struct AKAZEPtr ptr)
+{
+    return ptr->getNOctaveLayers();
+}
+
+extern "C"
+void AKAZE_setDiffusivity(struct AKAZEPtr ptr, int val)
+{
+    ptr->setDiffusivity(val);
+}
+
+extern "C"
+int AKAZE_getDiffusivity(struct AKAZEPtr ptr)
+{
+    return ptr->getDiffusivity();
 }
 
 // BOWTrainer

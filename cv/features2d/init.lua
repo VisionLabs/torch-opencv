@@ -724,47 +724,6 @@ do
     end
 end
 
--- BOWTrainer
-
-do
-    local BOWTrainer = torch.class('cv.BOWTrainer', cv)
-
-    function BOWTrainer:add(t)
-        local argRules = {
-            {"descriptors", required = true}
-        }
-        local descriptors = cv.argcheck(t, argRules)
-
-        C.BOWTrainer_add(self.ptr, cv.wrap_tensor(descriptors))
-    end
-
-    function BOWTrainer:getDescriptors(t)
-        return cv.unwrap_tensors(C.BOWTrainer_getDescriptors(self.ptr))
-    end
-
-    function BOWTrainer:descriptorsCount(t)
-        return C.BOWTrainer_descriptorsCount(self.ptr)
-    end
-
-    function BOWTrainer:clear(t)
-        C.BOWTrainer_clear(self.ptr)
-    end
-
-    function BOWTrainer:cluster(t)
-        if t[1] or t.descriptors then
-            local argRules = {
-                {"descriptors", required = true}
-            }
-            local descriptors = cv.argcheck(t, argRules)
-
-            return cv.unwrap_tensors(C.BOWTrainer_cluster_descriptors(
-                self.ptr, cv.wrap_tensor(descriptors)))
-        else
-            return cv.unwrap_tensors(C.BOWTrainer_cluster(self.ptr))
-        end
-    end
-end
-
 -- GFTTDetector
 
 do
@@ -892,6 +851,264 @@ do
 
         params = params or cv.SimpleBlobDetector_Params{}
         self.ptr = C.SimpleBlobDetector_ctor(params)
+    end
+end
+
+-- KAZE
+
+do
+    local KAZE = torch.class('cv.KAZE', 'cv.Feature2D', cv)
+
+    function KAZE:__init(t)
+        local argRules = {
+            {"extended", default = false},
+            {"upright", default = false},
+            {"threshold", default = 0.001},
+            {"nOctaves", default = 4},
+            {"nOctaveLayers", default = 4},
+            {"diffusivity", default = cv.KAZE_DIFF_PM_G2}
+        }
+        local extended, upright, threshold, nOctaves, nOctaveLayers, diffusivity = 
+            cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(
+            C.KAZE_ctor(extended, upright, threshold, nOctaves, nOctaveLayers, diffusivity),
+            C.Algorithm_dtor)
+    end
+
+    function KAZE:setExtended(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.KAZE_setExtended(self.ptr, val)
+    end
+
+    function KAZE:getExtended()
+        return C.KAZE_getExtended(self.ptr)
+    end
+
+    function KAZE:setUpright(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.KAZE_setUpright(self.ptr, val)
+    end
+
+    function KAZE:getUpright()
+        return C.KAZE_getUpright(self.ptr)
+    end
+
+    function KAZE:setThreshold(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.KAZE_setThreshold(self.ptr, val)
+    end
+
+    function KAZE:getThreshold()
+        return C.KAZE_getThreshold(self.ptr)
+    end
+
+    function KAZE:setNOctaves(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.KAZE_setNOctaves(self.ptr, val)
+    end
+
+    function KAZE:getNOctaves()
+        return C.KAZE_getNOctaves(self.ptr)
+    end
+
+    function KAZE:setNOctaveLayers(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.KAZE_setNOctaveLayers(self.ptr, val)
+    end
+
+    function KAZE:getNOctaveLayers()
+        return C.KAZE_getNOctaveLayers(self.ptr)
+    end
+
+    function KAZE:setDiffusivity(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.KAZE_setDiffusivity(self.ptr, val)
+    end
+
+    function KAZE:getDiffusivity()
+        return C.KAZE_getDiffusivity(self.ptr)
+    end
+end
+
+-- AKAZE
+
+do
+    local AKAZE = torch.class('cv.AKAZE', 'cv.Feature2D', cv)
+
+    function AKAZE:__init(t)
+        local argRules = {
+            {"descriptor_type", default = cv.AKAZE_DESCRIPTOR_MLDB},
+            {"descriptor_size", default = 0},
+            {"descriptor_channels", default = 3},
+            {"threshold", default = 0.001},
+            {"nOctaves", default = 4},
+            {"nOctaveLayers", default = 4},
+            {"diffusivity", default = cv.KAZE_DIFF_PM_G2}
+        }
+        local descriptor_type, descriptor_size, descriptor_channels, 
+            threshold, nOctaves, nOctaveLayers, diffusivity = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(
+            C.AKAZE_ctor(descriptor_type, descriptor_size, descriptor_channels, 
+                threshold, nOctaves, nOctaveLayers, diffusivity),
+            C.Algorithm_dtor)
+    end
+
+    function AKAZE:setDescriptorType(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.AKAZE_setDescriptorType(self.ptr, val)
+    end
+
+    function AKAZE:getDescriptorType()
+        return C.AKAZE_getDescriptorType(self.ptr)
+    end
+
+    function AKAZE:setDescriptorSize(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.AKAZE_setDescriptorSize(self.ptr, val)
+    end
+
+    function AKAZE:getDescriptorSize()
+        return C.AKAZE_getDescriptorSize(self.ptr)
+    end
+
+    function AKAZE:setDescriptorChannels(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.AKAZE_setDescriptorChannels(self.ptr, val)
+    end
+
+    function AKAZE:getDescriptorChannels()
+        return C.AKAZE_getDescriptorChannels(self.ptr)
+    end
+
+    function AKAZE:setThreshold(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.AKAZE_setThreshold(self.ptr, val)
+    end
+
+    function AKAZE:getThreshold()
+        return C.AKAZE_getThreshold(self.ptr)
+    end
+
+    function AKAZE:setNOctaves(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.AKAZE_setNOctaves(self.ptr, val)
+    end
+
+    function AKAZE:getNOctaves()
+        return C.AKAZE_getNOctaves(self.ptr)
+    end
+
+    function AKAZE:setNOctaveLayers(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.AKAZE_setNOctaveLayers(self.ptr, val)
+    end
+
+    function AKAZE:getNOctaveLayers()
+        return C.AKAZE_getNOctaveLayers(self.ptr)
+    end
+
+    function AKAZE:setDiffusivity(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.AKAZE_setDiffusivity(self.ptr, val)
+    end
+
+    function AKAZE:getDiffusivity()
+        return C.AKAZE_getDiffusivity(self.ptr)
+    end
+end
+
+-- BOWTrainer
+
+do
+    local BOWTrainer = torch.class('cv.BOWTrainer', cv)
+
+    function BOWTrainer:add(t)
+        local argRules = {
+            {"descriptors", required = true}
+        }
+        local descriptors = cv.argcheck(t, argRules)
+
+        C.BOWTrainer_add(self.ptr, cv.wrap_tensor(descriptors))
+    end
+
+    function BOWTrainer:getDescriptors(t)
+        return cv.unwrap_tensors(C.BOWTrainer_getDescriptors(self.ptr))
+    end
+
+    function BOWTrainer:descriptorsCount(t)
+        return C.BOWTrainer_descriptorsCount(self.ptr)
+    end
+
+    function BOWTrainer:clear(t)
+        C.BOWTrainer_clear(self.ptr)
+    end
+
+    function BOWTrainer:cluster(t)
+        if t[1] or t.descriptors then
+            local argRules = {
+                {"descriptors", required = true}
+            }
+            local descriptors = cv.argcheck(t, argRules)
+
+            return cv.unwrap_tensors(C.BOWTrainer_cluster_descriptors(
+                self.ptr, cv.wrap_tensor(descriptors)))
+        else
+            return cv.unwrap_tensors(C.BOWTrainer_cluster(self.ptr))
+        end
     end
 end
 

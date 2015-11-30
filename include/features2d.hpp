@@ -291,7 +291,7 @@ struct SimpleBlobDetectorPtr {
     inline cv::SimpleBlobDetector & operator*() { return *static_cast<cv::SimpleBlobDetector *>(this->ptr); }
 };
 
-struct SimpleBlobDetector_Params SimpleBlobDetector_Params_default();
+cv::SimpleBlobDetector::Params SimpleBlobDetector_Params_default();
 
 struct SimpleBlobDetectorPtr SimpleBlobDetector_ctor(struct SimpleBlobDetector_Params params);
 
