@@ -261,12 +261,39 @@ struct GFTTDetectorPtr {
 
 // SimpleBlobDetector
 
+struct SimpleBlobDetector_Params {
+    float thresholdStep;
+    float minThreshold;
+    float maxThreshold;
+    size_t minRepeatability;
+    float minDistBetweenBlobs;
+
+    bool filterByColor;
+    unsigned char blobColor;
+
+    bool filterByArea;
+    float minArea, maxArea;
+
+    bool filterByCircularity;
+    float minCircularity, maxCircularity;
+
+    bool filterByInertia;
+    float minInertiaRatio, maxInertiaRatio;
+
+    bool filterByConvexity;
+    float minConvexity, maxConvexity;
+};
+
 struct SimpleBlobDetectorPtr {
     void *ptr;
     inline cv::SimpleBlobDetector * operator->() { return static_cast<cv::SimpleBlobDetector *>(ptr); }
     inline SimpleBlobDetectorPtr(cv::SimpleBlobDetector *ptr) { this->ptr = ptr; }
     inline cv::SimpleBlobDetector & operator*() { return *static_cast<cv::SimpleBlobDetector *>(this->ptr); }
 };
+
+struct SimpleBlobDetector_Params SimpleBlobDetector_Params_default();
+
+struct SimpleBlobDetectorPtr SimpleBlobDetector_ctor(struct SimpleBlobDetector_Params params);
 
 // KAZE
 

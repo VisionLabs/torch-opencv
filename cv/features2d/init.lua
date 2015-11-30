@@ -767,100 +767,135 @@ end
 
 -- GFTTDetector
 
-function GFTTDetector:__init(t)
+do
+    local GFTTDetector = torch.class('cv.GFTTDetector', 'cv.Feature2D', cv)
+
+    function GFTTDetector:__init(t)
+        local argRules = {
+            {"maxCorners", default = 1000},
+            {"qualityLevel", default = 0.01},
+            {"minDistance", default = 1},
+            {"blockSize", default = 3},
+            {"useHarrisDetector", default = false},
+            {"k", default = 0.04}
+        }
+        local maxCorners, qualityLevel, minDistance, blockSize, useHarrisDetector, k = 
+            cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(
+            C.GFTTDetector_ctor(maxCorners, qualityLevel, minDistance, blockSize, useHarrisDetector, k),
+            Classes.Algorithm_dtor)
+    end
+
+    function GFTTDetector:setMaxFeatures(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.GFTTDetector_setMaxFeatures(self.ptr, val)
+    end
+
+    function GFTTDetector:getMaxFeatures()
+        return C.GFTTDetector_getMaxFeatures(self.ptr)
+    end
+
+    function GFTTDetector:setQualityLevel(t)
+
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.GFTTDetector_setQualityLevel(self.ptr, val)
+    end
+
+    function GFTTDetector:getQualityLevel()
+        return C.GFTTDetector_getQualityLevel(self.ptr)
+    end
+
+    function GFTTDetector:setMinDistance(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.GFTTDetector_setMinDistance(self.ptr, val)
+    end
+
+    function GFTTDetector:getMinDistance()
+        return C.GFTTDetector_getMinDistance(self.ptr)
+    end
+
+    function GFTTDetector:setBlockSize(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.GFTTDetector_setBlockSize(self.ptr, val)
+    end
+
+    function GFTTDetector:getBlockSize()
+        return C.GFTTDetector_getBlockSize(self.ptr)
+    end
+
+    function GFTTDetector:setHarrisDetector(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.GFTTDetector_setHarrisDetector(self.ptr, val)
+    end
+
+    function GFTTDetector:getHarrisDetector()
+        return C.GFTTDetector_getHarrisDetector(self.ptr)
+    end
+
+    function GFTTDetector:setK(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        local val = cv.argcheck(t, argRules)
+        
+        C.GFTTDetector_setK(self.ptr, val)
+    end
+
+    function GFTTDetector:getK()
+        return C.GFTTDetector_getK(self.ptr)
+    end
+end
+
+-- SimpleBlobDetector
+
+function cv.SimpleBlobDetector_Params(t)
     local argRules = {
-        {"maxCorners", default = 1000},
-        {"qualityLevel", default = 0.01},
-        {"minDistance", default = 1},
-        {"blockSize", default = 3},
-        {"useHarrisDetector", default = false},
-        {"k", default = 0.04}
+        {"params", default = {}}
     }
-    local maxCorners, qualityLevel, minDistance, blockSize, useHarrisDetector, k = 
-        cv.argcheck(t, argRules)
-    self.ptr = ffi.gc(
-        C.GFTTDetector_ctor(maxCorners, qualityLevel, minDistance, blockSize, useHarrisDetector, k),
-        Classes.Algorithm_dtor)
+    local params = cv.argcheck(t, argRules)
+
+    local result = C.SimpleBlobDetector_Params_default()
+    for k, v in pairs(params) do
+        result[k] = v
+    end
 end
 
-function GFTTDetector:setMaxFeatures(t)
-    local argRules = {
-        {"val", required = true}
-    }
-    local val = cv.argcheck(t, argRules)
-    
-    C.GFTTDetector_setMaxFeatures(self.ptr, val)
+
+do
+    local SimpleBlobDetector = torch.class('cv.SimpleBlobDetector', 'cv.Feature2D', cv)
+
+    function SimpleBlobDetector:__init(t)
+        local argRules = {
+            {"params", default = nil}
+        }
+        local params = cv.argcheck(t, argRules)
+
+        params = params or cv.SimpleBlobDetector_Params{}
+        self.ptr = C.SimpleBlobDetector_ctor(params)
+    end
 end
 
-function GFTTDetector:getMaxFeatures()
-    return C.GFTTDetector_getMaxFeatures(self.ptr)
-end
-
-function GFTTDetector:setQualityLevel(t)
-
-    local argRules = {
-        {"val", required = true}
-    }
-    local val = cv.argcheck(t, argRules)
-    
-    C.GFTTDetector_setQualityLevel(self.ptr, val)
-end
-
-function GFTTDetector:getQualityLevel()
-    return C.GFTTDetector_getQualityLevel(self.ptr)
-end
-
-function GFTTDetector:setMinDistance(t)
-    local argRules = {
-        {"val", required = true}
-    }
-    local val = cv.argcheck(t, argRules)
-    
-    C.GFTTDetector_setMinDistance(self.ptr, val)
-end
-
-function GFTTDetector:getMinDistance()
-    return C.GFTTDetector_getMinDistance(self.ptr)
-end
-
-function GFTTDetector:setBlockSize(t)
-    local argRules = {
-        {"val", required = true}
-    }
-    local val = cv.argcheck(t, argRules)
-    
-    C.GFTTDetector_setBlockSize(self.ptr, val)
-end
-
-function GFTTDetector:getBlockSize()
-    return C.GFTTDetector_getBlockSize(self.ptr)
-end
-
-function GFTTDetector:setHarrisDetector(t)
-    local argRules = {
-        {"val", required = true}
-    }
-    local val = cv.argcheck(t, argRules)
-    
-    C.GFTTDetector_setHarrisDetector(self.ptr, val)
-end
-
-function GFTTDetector:getHarrisDetector()
-    return C.GFTTDetector_getHarrisDetector(self.ptr)
-end
-
-function GFTTDetector:setK(t)
-    local argRules = {
-        {"val", required = true}
-    }
-    local val = cv.argcheck(t, argRules)
-    
-    C.GFTTDetector_setK(self.ptr, val)
-end
-
-function GFTTDetector:getK()
-    return C.GFTTDetector_getK(self.ptr)
-end
+-- 
 
 -- BOWKMeansTrainer
 

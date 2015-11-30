@@ -619,6 +619,64 @@ double GFTTDetector_getK(struct GFTTDetectorPtr ptr)
     return ptr->getK();
 }
 
+// SimpleBlobDetector
+
+// TODO maybe avoid copying and pass only a pointer to original struct? (less safe)
+struct SimpleBlobDetector_Params SimpleBlobDetector_Params_default()
+{
+    cv::SimpleBlobDetector::Params defaultParams;
+    SimpleBlobDetector_Params retval;
+
+    retval.thresholdStep = defaultParams.thresholdStep;
+    retval.minThreshold = defaultParams.minThreshold;
+    retval.maxThreshold = defaultParams.maxThreshold;
+    retval.minRepeatability = defaultParams.minRepeatability;
+    retval.minDistBetweenBlobs = defaultParams.minDistBetweenBlobs;
+    retval.filterByColor = defaultParams.filterByColor;
+    retval.blobColor = defaultParams.blobColor;
+    retval.filterByArea = defaultParams.filterByArea;
+    retval.minArea = defaultParams.minArea;
+    retval.maxArea = defaultParams.maxArea;
+    retval.filterByCircularity = defaultParams.filterByCircularity;
+    retval.minCircularity = defaultParams.minCircularity;
+    retval.maxCircularity = defaultParams.maxCircularity;
+    retval.filterByInertia = defaultParams.filterByInertia;
+    retval.minInertiaRatio = defaultParams.minInertiaRatio;
+    retval.maxInertiaRatio = defaultParams.maxInertiaRatio;
+    retval.filterByConvexity = defaultParams.filterByConvexity;
+    retval.minConvexity = defaultParams.minConvexity;
+    retval.maxConvexity = defaultParams.maxConvexity;
+
+    return retval;
+}
+
+struct SimpleBlobDetectorPtr SimpleBlobDetector_ctor(struct SimpleBlobDetector_Params params)
+{
+    struct cv::SimpleBlobDetector::Params params_CV;
+
+    params_CV.thresholdStep = params.thresholdStep;
+    params_CV.minThreshold = params.minThreshold;
+    params_CV.maxThreshold = params.maxThreshold;
+    params_CV.minRepeatability = params.minRepeatability;
+    params_CV.minDistBetweenBlobs = params.minDistBetweenBlobs;
+    params_CV.filterByColor = params.filterByColor;
+    params_CV.blobColor = params.blobColor;
+    params_CV.filterByArea = params.filterByArea;
+    params_CV.minArea = params.minArea;
+    params_CV.maxArea = params.maxArea;
+    params_CV.filterByCircularity = params.filterByCircularity;
+    params_CV.minCircularity = params.minCircularity;
+    params_CV.maxCircularity = params.maxCircularity;
+    params_CV.filterByInertia = params.filterByInertia;
+    params_CV.minInertiaRatio = params.minInertiaRatio;
+    params_CV.maxInertiaRatio = params.maxInertiaRatio;
+    params_CV.filterByConvexity = params.filterByConvexity;
+    params_CV.minConvexity = params.minConvexity;
+    params_CV.maxConvexity = params.maxConvexity;
+
+    return rescueObjectFromPtr(cv::SimpleBlobDetector::create(params_CV));
+}
+
 // BOWTrainer
 
 extern "C"
