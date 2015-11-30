@@ -82,6 +82,18 @@ struct MomentsWrapper {
     double nu20, nu11, nu02, nu30, nu21, nu12, nu03;
 };
 
+struct DMatchWrapper {
+    int queryIdx;
+    int trainIdx;
+    int imgIdx;
+    float distance;
+};
+
+struct DMatchArray {
+    int size;
+    struct DMatchWrapper *data;
+};
+
 struct TensorPlusDouble {
     struct TensorWrapper tensor;
     double val;

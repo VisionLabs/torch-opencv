@@ -163,6 +163,29 @@ struct MomentsWrapper {
     }
 };
 
+struct DMatchWrapper {
+    int queryIdx;
+    int trainIdx;
+    int imgIdx;
+    float distance;
+};
+
+struct DMatchArray {
+    int size;
+    struct DMatchWrapper *data;
+
+    DMatchArray() {}
+    DMatchArray(std::vector<cv::DMatch> & other);
+};
+
+struct DMatchArrayOfArrays {
+    int size;
+    struct DMatchArray *data;
+
+    DMatchArrayOfArrays() {}
+    DMatchArrayOfArrays(std::vector<std::vector<cv::DMatch>> & other);
+};
+
 /***************** Helper wrappers for [OpenCV class + some primitive] *****************/
 
 struct TensorPlusDouble {

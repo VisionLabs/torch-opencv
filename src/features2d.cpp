@@ -810,6 +810,84 @@ int AKAZE_getDiffusivity(struct AKAZEPtr ptr)
     return ptr->getDiffusivity();
 }
 
+// DescriptorMatcher
+
+struct DescriptorMatcherPtr DescriptorMatcher_ctor(const char *descriptorMatcherType)
+{
+    return rescueObjectFromPtr(cv::DescriptorMatcher::create(descriptorMatcherType));
+}
+
+void add(struct DescriptorMatcherPtr ptr, struct TensorArray descriptors)
+{
+    ptr->add(descriptors.toMatList());
+}
+
+struct TensorArray getTrainDescriptors(struct DescriptorMatcherPtr ptr)
+{
+    std::vector<cv::Mat> retval = ptr->getTrainDescriptors();
+    return TensorArray(retval);
+}
+
+void clear(struct DescriptorMatcherPtr ptr)
+{
+    ptr->clear();
+}
+
+bool empty(struct DescriptorMatcherPtr ptr)
+{
+    ptr->empty();
+}
+
+bool isMaskSupported(struct DescriptorMatcherPtr ptr)
+{
+    return ptr->isMaskSupported();
+}
+
+void train(struct DescriptorMatcherPtr ptr)
+{
+    ptr->train();
+}
+
+struct DMatchArray match(struct DescriptorMatcherPtr ptr,
+        struct TensorWrapper queryDescriptors, struct TensorWrapper mask)
+{
+    std::vector<cv::DMatch> retval;
+    ptr->match(
+            queryDescriptors.toMat(), retval, TO_MAT_OR_NOARRAY(mask));
+    return retval;
+}
+
+struct DMatchArray match_trainDescriptors(struct DescriptorMatcherPtr ptr,
+        struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
+        struct TensorWrapper mask)
+{
+    std::vector<cv::DMatch> retval;
+    ptr->match(
+            queryDescriptors.toMat(), trainDescriptors.toMat(), retval, TO_MAT_OR_NOARRAY(mask));
+    return retval;
+}
+
+struct DMatchArrayOfArrays knnMatch(struct DescriptorMatcherPtr ptr,
+        struct TensorWrapper queryDescriptors, int k,
+        struct TensorWrapper mask, bool compactResult)
+{
+    std::vector<std::vector<cv::DMatch>> retval;
+    ptr->knnMatch(
+            queryDescriptors.toMat(), retval, k,
+            TO_MAT_OR_NOARRAY(mask), compactResult);
+    return DMatchArrayOfArrays(retval);
+}
+
+struct DMatchArrayOfArrays knnMatch_trainDescriptors(struct DescriptorMatcherPtr ptr,
+        struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
+        int k, struct TensorWrapper mask, bool compactResult) {
+    std::vector<std::vector<cv::DMatch>> retval;
+    ptr->knnMatch(
+            queryDescriptors.toMat(), trainDescriptors.toMat(),
+            retval, k, TO_MAT_OR_NOARRAY(mask), compactResult);
+    return DMatchArrayOfArrays(retval);
+}
+
 // BOWTrainer
 
 extern "C"

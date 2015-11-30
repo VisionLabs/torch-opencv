@@ -1071,6 +1071,90 @@ do
     end
 end
 
+-- DescriptorMatcher
+
+do
+    local DescriptorMatcher = torch.class('cv.DescriptorMatcher', 'cv.Algorithm', cv)
+
+    function DescriptorMatcher:__init(t)
+        local argRules = {
+            {"descriptorMatcherType", required = true}
+        }
+        local descriptorMatcherType = cv.argcheck(t, argRules)
+
+        self.ptr = C.DescriptorMatcher_ctor(descriptorMatcherType)
+    end
+
+    function DescriptorMatcher:add(t)
+        local argRules = {
+            {"descriptors", required = true}
+        }
+        local descriptors = cv.argcheck(t, argRules)
+
+        C.DescriptorMatcher_add(self.ptr, cv.wrap_tensors(descriptors))
+    end
+
+    function DescriptorMatcher:getTrainDescriptors()
+        return unwrap_tensors(C.DescriptorMatcher_getTrainDescriptors(self.ptr), true)
+    end
+
+    function DescriptorMatcher:clear()
+        C.DescriptorMatcher_clear(self.ptr)
+    end
+
+    function DescriptorMatcher:empty()
+        return C.DescriptorMatcher_empty(self.ptr)
+    end
+
+    function DescriptorMatcher:isMaskSupported()
+        return C.DescriptorMatcher_isMaskSupported(self.ptr)
+    end
+
+    function DescriptorMatcher:train()
+        C.DescriptorMatcher_train(self.ptr)
+    end
+
+    function DescriptorMatcher:match(t)
+        local argRules = {
+            {"queryDescriptors", required = true},
+            {"trainDescriptors", default = nil},
+            {"mask", default = nil},
+        }
+        local queryDescriptors, trainDescriptors, mask = cv.argcheck(t, argRules)
+
+        if trainDescriptors then
+            return cv.gcarray(C.DescriptorMatcher_match_trainDescriptors(
+                cv.wrap_tensor(queryDescriptors), cv.wrap_tensors(trainDescriptors), 
+                cv.wrap_tensors(mask)))
+        else
+            return cv.gcarray(C.DescriptorMatcher_match(
+                cv.wrap_tensor(queryDescriptors),
+                cv.wrap_tensors(mask)))
+        end
+    end
+
+    function DescriptorMatcher:knnMatch(t)
+        local argRules = {
+            {"queryDescriptors", required = true},
+            {"trainDescriptors", default = nil},
+            {"k", required = true},
+            {"mask", default = nil},
+            {"compactResult", default = false}
+        }
+        local queryDescriptors, trainDescriptors, k, mask, compactResult = cv.argcheck(t, argRules)
+
+        if trainDescriptors then
+            return cv.gcarray(C.DescriptorknnMatcher_knnMatch_trainDescriptors(
+                cv.wrap_tensor(queryDescriptors), cv.wrap_tensors(trainDescriptors), 
+                k, cv.wrap_tensors(mask), compactResult))
+        else
+            return cv.gcarray(C.DescriptorknnMatcher_knnMatch(
+                cv.wrap_tensor(queryDescriptors),
+                k, cv.wrap_tensors(mask), compactResult))
+        end
+    end
+end
+
 -- BOWTrainer
 
 do
