@@ -1198,6 +1198,20 @@ do
     end
 end
 
+function cv.drawKeypoints(t)
+    local argRules = {
+        {"image", required = true},
+        {"keypoints", required = true},
+        {"outImage", default = nil},
+        {"color", default = {-1, -1, -1, -1}, operator = cv.Scalar},
+        {"flags", default = cv.DRAW_MATCHES_FLAGS_DEFAULT}
+    }
+    local image, keypoints, outImage, color, flags = cv.argcheck(t, argRules)
+
+    return cv.unwrap_tensors(C.drawKeypoints(
+        cv.wrap_tensor(image), keypoints, cv.wrap_tensor(outImage), color, flags))
+end
+
 -- BOWTrainer
 
 do
@@ -1238,8 +1252,6 @@ do
         end
     end
 end
-
--- 
 
 -- BOWKMeansTrainer
 

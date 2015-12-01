@@ -911,6 +911,20 @@ struct FlannBasedMatcherPtr FlannBasedMatcher(
     return new cv::FlannBasedMatcher(indexParamsPtr, searchParamsPtr);
 }
 
+struct TensorWrapper drawKeypoints(
+        struct TensorWrapper image, struct KeyPointArray keypoints, struct TensorWrapper outImage,
+        struct ScalarWrapper color, int flags)
+{
+    if (outImage.isNull()) {
+        cv::Mat result;
+        cv::drawKeypoints(image.toMat(), keypoints, result, color, flags);
+        return TensorWrapper(result);
+    } else {
+        cv::drawKeypoints(image.toMat(), keypoints, outImage.toMat(), color, flags);
+        return outImage;
+    }
+}
+
 // BOWTrainer
 
 extern "C"
