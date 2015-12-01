@@ -94,6 +94,11 @@ struct DMatchArray {
     struct DMatchWrapper *data;
 };
 
+struct DMatchArrayOfArrays {
+    int size;
+    struct DMatchArray *data;
+};
+
 struct TensorPlusDouble {
     struct TensorWrapper tensor;
     double val;
@@ -531,6 +536,7 @@ end
 -- make an array that has come from C++ garbage-collected
 function cv.gcarray(array)
     array.data = ffi.gc(array.data, C.free)
+    return array
 end
 
 return cv

@@ -888,6 +888,29 @@ struct DMatchArrayOfArrays knnMatch_trainDescriptors(struct DescriptorMatcherPtr
     return DMatchArrayOfArrays(retval);
 }
 
+// BFMatcher
+
+struct BFMatcherPtr BFMatcher_ctor(int normType, bool crossCheck)
+{
+    return new cv::BFMatcher(normType, crossCheck);
+}
+
+// FlannBasedMatcher
+
+struct FlannBasedMatcherPtr FlannBasedMatcher(
+        struct IndexParamsPtr indexParams, struct SearchParamsPtr searchParams)
+{
+    cv::Ptr<flann::IndexParams> indexParamsPtr(
+            static_cast<flann::IndexParams *>(indexParams.ptr));
+    cv::Ptr<flann::SearchParams> searchParamsPtr(
+            static_cast<flann::SearchParams *>(searchParams.ptr));
+
+    rescueObjectFromPtr(indexParamsPtr);
+    rescueObjectFromPtr(searchParamsPtr);
+
+    return new cv::FlannBasedMatcher(indexParamsPtr, searchParamsPtr);
+}
+
 // BOWTrainer
 
 extern "C"

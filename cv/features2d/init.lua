@@ -1143,15 +1143,58 @@ do
         }
         local queryDescriptors, trainDescriptors, k, mask, compactResult = cv.argcheck(t, argRules)
 
+        local result
+
         if trainDescriptors then
-            return cv.gcarray(C.DescriptorknnMatcher_knnMatch_trainDescriptors(
+            result = C.DescriptorknnMatcher_knnMatch_trainDescriptors(
                 cv.wrap_tensor(queryDescriptors), cv.wrap_tensors(trainDescriptors), 
-                k, cv.wrap_tensors(mask), compactResult))
+                k, cv.wrap_tensors(mask), compactResult)
         else
-            return cv.gcarray(C.DescriptorknnMatcher_knnMatch(
+            result = C.DescriptorknnMatcher_knnMatch(
                 cv.wrap_tensor(queryDescriptors),
-                k, cv.wrap_tensors(mask), compactResult))
+                k, cv.wrap_tensors(mask), compactResult)
         end
+
+        local retval = {}
+        for i in 0, result.size - 1 do
+            retval[i + 1] = cv.gcarray(result[i])
+        end
+
+        return retval
+    end
+end
+
+-- BFMatcher
+
+do
+    local BFMatcher = torch.class('cv.BFMatcher', 'cv.DescriptorMatcher', cv)
+
+    function BFMatcher:__init(t)
+        local argRules = {
+            {"normType", default = cv.NORM_L2},
+            {"crossCheck", default = false}
+        }
+        local normType, crossCheck = cv.argcheck(t, argRules)
+
+        self.ptr = C.BFMatcher_ctor(normType, crossCheck)
+    end
+end
+
+-- FlannBasedMatcher
+
+do
+    local FlannBasedMatcher = torch.class('cv.FlannBasedMatcher', 'cv.DescriptorMatcher', cv)
+
+    function FlannBasedMatcher:__init(t)
+        local flann = require 'cv.flann'
+
+        local argRules = {
+            {"indexParams", default = flann.KDTreeIndexParams{}},
+            {"searchParams", default = flann.SearchParams{}}
+        }
+        local normType, crossCheck = cv.argcheck(t, argRules)
+
+        self.ptr = C.FlannBasedMatcher_ctor(indexParams.ptr, searchParams.ptr)
     end
 end
 

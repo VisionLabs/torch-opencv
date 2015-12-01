@@ -1,5 +1,6 @@
 #include <Common.hpp>
 #include <Classes.hpp>
+#include <flann.hpp>
 #include <opencv2/features2d.hpp>
 
 struct KeyPointWrapper {
@@ -320,6 +321,24 @@ struct DescriptorMatcherPtr {
     inline cv::DescriptorMatcher * operator->() { return static_cast<cv::DescriptorMatcher *>(ptr); }
     inline DescriptorMatcherPtr(cv::DescriptorMatcher *ptr) { this->ptr = ptr; }
     inline cv::DescriptorMatcher & operator*() { return *static_cast<cv::DescriptorMatcher *>(this->ptr); }
+};
+
+// BFMatcher
+
+struct BFMatcherPtr {
+    void *ptr;
+    inline cv::BFMatcher * operator->() { return static_cast<cv::BFMatcher *>(ptr); }
+    inline BFMatcherPtr(cv::BFMatcher *ptr) { this->ptr = ptr; }
+    inline cv::BFMatcher & operator*() { return *static_cast<cv::BFMatcher *>(this->ptr); }
+};
+
+// FlannBasedMatcher
+
+struct FlannBasedMatcherPtr {
+    void *ptr;
+    inline cv::FlannBasedMatcher * operator->() { return static_cast<cv::FlannBasedMatcher *>(ptr); }
+    inline FlannBasedMatcherPtr(cv::FlannBasedMatcher *ptr) { this->ptr = ptr; }
+    inline cv::FlannBasedMatcher & operator*() { return *static_cast<cv::FlannBasedMatcher *>(this->ptr); }
 };
 
 // BOWTrainer
