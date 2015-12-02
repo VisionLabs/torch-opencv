@@ -286,3 +286,9 @@ struct PointArrayOfArrays {
     int dims;
     int *sizes;
 };
+
+struct TensorPlusTensorPlusTensor {
+    struct TensorWrapper tensor;
+    struct TensorWrapper status;
+    struct TensorWrapper err;
+};

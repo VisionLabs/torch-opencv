@@ -19,22 +19,19 @@ extern "C" struct RectPlusInt meanShift(struct TensorWrapper probImage, struct R
     return retval;
 }
 
-extern "C" struct TensorArray buildOpticalFlowPyramid(struct TensorWrapper img, struct TensorArray pyramid,
+extern "C" struct TensorArrayPlusInt buildOpticalFlowPyramid(struct TensorWrapper img, struct TensorArray pyramid,
                         struct SizeWrapper winSize, int maxLevel, bool withDerivatives, int pyrBorder,
                         int derivBorder, bool tryReuseInputImage)
 {
-    if (pyramid.isNull()) {
-        std::vector<cv::Mat> retval;
-        cv::buildOpticalFlowPyramid(img.toMat(), retval, winSize, maxLevel,
+    std::vector<cv::Mat> output(pyramid);
+    TensorArrayPlusInt retval;
+    retval.val = cv::buildOpticalFlowPyramid(img.toMat(), output, winSize, maxLevel,
                     withDerivatives, pyrBorder, derivBorder, tryReuseInputImage);
-        return TensorArray(retval);
-    }
-    cv::buildOpticalFlowPyramid(img.toMat(), pyramid.toMatList(), winSize, maxLevel,
-                    withDerivatives, pyrBorder, derivBorder, tryReuseInputImage);
-    return pyramid;
+    retval.tensors = TensorArray(output);
+    return retval;
 }
 
-extern "C" struct TensorWrapper calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
+extern "C" struct TensorPlusTensorPlusTensor calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
                         struct TensorWrapper nextImg, struct TensorWrapper prevPts,
                         struct TensorWrapper nextPts, struct TensorWrapper status,
                         struct TensorWrapper err, struct SizeWrapper winSize, int maxLevel,
@@ -51,7 +48,12 @@ extern "C" struct TensorWrapper calcOpticalFlowPyrLK(struct TensorWrapper prevIm
                     statusMat, errMat, winSize, maxLevel,
                     criteria.orDefault(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01)),
                     flags, minEigThreshold);
-    return nextPts;
+    
+    struct TensorPlusTensorPlusTensor retval;
+    retval.tensor = nextPts;
+    retval.status = TensorWrapper(statusMat);
+    retval.err = TensorWrapper(errMat);
+    return retval;
 }
 
 extern "C" struct TensorWrapper calcOpticalFlowFarneback(struct TensorWrapper prev, struct TensorWrapper next,
@@ -97,6 +99,11 @@ extern "C" struct TensorWrapper BackgroundSubtractor_apply(struct BackgroundSubt
 extern "C" struct TensorWrapper BackgroundSubtractor_getBackgroundImage(struct BackgroundSubtractorPtr ptr,
                                     struct TensorWrapper backgroundImage)
 {
+    if (backgroundImage.isNull()) {
+        cv::Mat retval;
+        ptr->getBackgroundImage(retval);
+        return TensorWrapper(retval);
+    }
     ptr->getBackgroundImage(backgroundImage.toMat());
     return backgroundImage;
 }

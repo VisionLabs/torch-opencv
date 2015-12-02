@@ -51,12 +51,12 @@ struct TensorWrapper calcOpticalFlowSparseToDense(
 {
     if (flow.isNull()) {
         cv::Mat retval;
-        optflow::calcOpticalFlowSparseToDense(
+        calcOpticalFlowSparseToDense(
                 from.toMat(), to.toMat(), retval, grid_step, k,
                 sigma, use_post_proc, fgs_lambda, fgs_sigma);
         return TensorWrapper(retval);
     } else {
-        optflow::calcOpticalFlowSparseToDense(
+        calcOpticalFlowSparseToDense(
                 from.toMat(), to.toMat(), flow.toMat(), grid_step, k,
                 sigma, use_post_proc, fgs_lambda, fgs_sigma);
         return flow;

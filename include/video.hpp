@@ -9,11 +9,11 @@ extern "C" struct RotatedRectPlusRect CamShift(struct TensorWrapper probImage, s
 extern "C" struct RectPlusInt meanShift(struct TensorWrapper probImage, struct RectWrapper window,
                         struct TermCriteriaWrapper criteria);
 
-extern "C" struct TensorArray buildOpticalFlowPyramid(struct TensorWrapper img, struct TensorArray pyramid,
+extern "C" struct TensorArrayPlusInt buildOpticalFlowPyramid(struct TensorWrapper img, struct TensorArray pyramid,
                         struct SizeWrapper winSize, int maxLevel, bool withDerivatives, int pyrBorder,
                         int derivBorder, bool tryReuseInputImage);
 
-extern "C" struct TensorWrapper calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
+extern "C" struct TensorPlusTensorPlusTensor calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
                         struct TensorWrapper nextImg, struct TensorWrapper prevPts,
                         struct TensorWrapper nextPts, struct TensorWrapper status,
                         struct TensorWrapper err, struct SizeWrapper winSize, int maxLevel,

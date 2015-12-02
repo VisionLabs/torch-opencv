@@ -96,11 +96,11 @@ struct RotatedRectPlusRect CamShift(struct TensorWrapper probImage, struct RectW
 struct RectPlusInt meanShift(struct TensorWrapper probImage, struct RectWrapper window,
                         struct TermCriteriaWrapper criteria);
 
-struct TensorArray buildOpticalFlowPyramid(struct TensorWrapper img, struct TensorArray pyramid,
+struct TensorArrayPlusInt buildOpticalFlowPyramid(struct TensorWrapper img, struct TensorArray pyramid,
                         struct SizeWrapper winSize, int maxLevel, bool withDerivatives, int pyrBorder,
                         int derivBorder, bool tryReuseInputImage);
 
-struct TensorWrapper calcOpticalFlowPyrLK(struct TensorWrapper prevImg, struct TensorWrapper nextImg,
+struct TensorPlusTensorPlusTensor calcOpticalFlowPyrLK(struct TensorWrapper prevImg, struct TensorWrapper nextImg,
                         struct TensorWrapper prevPts, struct TensorWrapper nextPts, struct TensorWrapper status,
                         struct TensorWrapper err, struct SizeWrapper winSize, int maxLevel,
                         struct TermCriteriaWrapper criteria, int flags, double minEigThreshold);
@@ -267,7 +267,7 @@ do
 
     function BackgroundSubtractor:getBackgroundImage(t)
         local argRules = {
-            {"backgroundImage", required = true}
+            {"backgroundImage", default = nil}
         }
         local backgroundImage = cv.argcheck(t, argRules)
 
@@ -578,7 +578,7 @@ function cv.meanShift(t)
     local probImage, window, criteria = cv.argcheck(t, argRules)
 
     local result = C.meanShift(cv.wrap_tensor(probImage), window, criteria)
-    return result.val, result. rect
+    return result.val, result.rect
 end
 
 function cv.buildOpticalFlowPyramid(t)
@@ -594,8 +594,9 @@ function cv.buildOpticalFlowPyramid(t)
     }
     local img, pyramid, winSize, maxLevel, withDerivatives, pyrBorder, derivBorder, tryReuseInputImage = cv.argcheck(t, argRules)
 
-    return cv.unwrap_tensors(C.buildOpticalFlowPyramid(cv.wrap_tensor(img), cv.wrap_tensors(pyramid), winSize, maxLevel,
-        withDerivatives, pyrBorder, derivBorder, tryReuseInputImage))
+    local result = C.buildOpticalFlowPyramid(cv.wrap_tensor(img), cv.wrap_tensors(pyramid), winSize, maxLevel,
+        withDerivatives, pyrBorder, derivBorder, tryReuseInputImage)
+    return resuil.val, cv.unwrap_tensors(result.tensors)
 end
 
 function cv.calcOpticalFlowPyrLK(t)
@@ -608,15 +609,16 @@ function cv.calcOpticalFlowPyrLK(t)
         {"err", default = nil},
         {"winSize", default = {21, 21}, operator = cv.Size},
         {"maxLevel", default = 3},
-        {"criteria", default = nil, operator = cv.TermCriteria},
+        {"criteria", default = 0, operator = cv.TermCriteria},
         {"flags", default = 0},
         {"minEigThreshold", default = 1e-4}
     }
     local prevImg, nextImg, prevPts, nextPts, status, err, winSize, maxLevel, criteria, flags, minEigThreshold = cv.argcheck(t, argRules)
 
-    return cv.unwrap_tensors(C.calcOpticalFlowPyrLK(cv.wrap_tensor(prevImg), cv.wrap_tensor(nextImg),
+    local result = C.calcOpticalFlowPyrLK(cv.wrap_tensor(prevImg), cv.wrap_tensor(nextImg),
             cv.wrap_tensor(prevPts), cv.wrap_tensor(nextPts), cv.wrap_tensor(status),
-            cv.wrap_tensor(err), winSize, maxLevel, criteria, flags, minEigThreshold))
+            cv.wrap_tensor(err), winSize, maxLevel, criteria, flags, minEigThreshold)
+    return cv.unwrap_tensors(result.tensor), cv.unwrap_tensors(result.status), cv.unwrap_tensors(result.err)
 end
 
 function cv.calcOpticalFlowFarneback(t)
