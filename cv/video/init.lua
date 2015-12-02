@@ -111,7 +111,7 @@ struct TensorWrapper calcOpticalFlowFarneback(struct TensorWrapper prev, struct 
 
 struct TensorWrapper estimateRigidTransform(struct TensorWrapper src, struct TensorWrapper dst, bool fullAffine);
 
-double findTransformECC(struct TensorWrapper templateImage, struct TensorWrapper inputImage,
+struct TensorPlusDouble findTransformECC(struct TensorWrapper templateImage, struct TensorWrapper inputImage,
                         struct TensorWrapper warpMatrix, int motionType, struct TermCriteriaWrapper criteria,
                         struct TensorWrapper inputMask);
 
@@ -596,7 +596,7 @@ function cv.buildOpticalFlowPyramid(t)
 
     local result = C.buildOpticalFlowPyramid(cv.wrap_tensor(img), cv.wrap_tensors(pyramid), winSize, maxLevel,
         withDerivatives, pyrBorder, derivBorder, tryReuseInputImage)
-    return resuil.val, cv.unwrap_tensors(result.tensors)
+    return result.val, cv.unwrap_tensors(result.tensors)
 end
 
 function cv.calcOpticalFlowPyrLK(t)
@@ -651,19 +651,20 @@ function cv.estimateRigidTransform(t)
     return cv.unwrap_tensors(C.estimateRigidTransform(cv.wrap_tensor(src), cv.wrap_tensor(dst), fullAffine))
 end
 
-function findTransformECC(t)
+function cv.findTransformECC(t)
     local argRules = {
         {"templateImage", required = true},
         {"inputImage", required = true},
         {"warpMatrix", required = true},
         {"motionType", default = cv.MOTION_AFFINE},
-        {"criteria", default = nil, operator = cv.TermCriteria},
+        {"criteria", default = 0, operator = cv.TermCriteria},
         {"inputMask", default = nil}
     }
     local templateImage, inputImage, warpMatrix, motionType, criteria, inputMask = cv.argcheck(t, argRules)
 
-    return C.findTransformECC(cv.wrap_tensor(templateImage), cv.wrap_tensor(inputImage),
+    local result = C.findTransformECC(cv.wrap_tensor(templateImage), cv.wrap_tensor(inputImage),
                 cv.wrap_tensor(warpMatrix), motionType, criteria, cv.wrap_tensor(inputMask))
+    return result.val, result.tensor
 end
 
 -- KalmanFilter
@@ -995,6 +996,8 @@ do
         return C.BackgroundSubtractorMOG_getNoiseSigma(self.ptr)
     end
 end
+
+-- BackgroundSubtractorGMG
 
 do
     BackgroundSubtractorGMG = torch.class('cv.BackgroundSubtractorGMG', 'cv.BackgroundSubtractor', cv)

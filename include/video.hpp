@@ -25,7 +25,7 @@ extern "C" struct TensorWrapper calcOpticalFlowFarneback(struct TensorWrapper pr
 
 extern "C" struct TensorWrapper estimateRigidTransform(struct TensorWrapper src, struct TensorWrapper dst, bool fullAffine);
 
-extern "C" double findTransformECC(struct TensorWrapper templateImage, struct TensorWrapper inputImage,
+extern "C" struct TensorPlusDouble findTransformECC(struct TensorWrapper templateImage, struct TensorWrapper inputImage,
                         struct TensorWrapper warpMatrix, int motionType, struct TermCriteriaWrapper criteria,
                         struct TensorWrapper inputMask);
 

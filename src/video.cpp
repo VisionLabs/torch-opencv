@@ -72,13 +72,16 @@ extern "C" struct TensorWrapper estimateRigidTransform(struct TensorWrapper src,
     return TensorWrapper(retval);
 }
 
-extern "C" double findTransformECC(struct TensorWrapper templateImage, struct TensorWrapper inputImage,
+extern "C" struct TensorPlusDouble findTransformECC(struct TensorWrapper templateImage, struct TensorWrapper inputImage,
                         struct TensorWrapper warpMatrix, int motionType, struct TermCriteriaWrapper criteria,
                         struct TensorWrapper inputMask)
 {
-    return cv::findTransformECC(templateImage.toMat(), inputImage.toMat(), warpMatrix.toMat(),
+    struct TensorPlusDouble retval;
+    retval.val = cv::findTransformECC(templateImage.toMat(), inputImage.toMat(), warpMatrix.toMat(),
                     motionType, criteria.orDefault(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 50, 0.001)),
                     TO_MAT_OR_NOARRAY(inputMask));
+    retval.tensor = TensorWrapper(warpMatrix);
+    return retval;
 }
 
 // BackgroundSubtractor
