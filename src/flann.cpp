@@ -108,10 +108,8 @@ struct TensorArray Index_knnSearch(
         struct TensorWrapper dists, struct SearchParamsPtr params)
 {
     std::vector<cv::Mat> retval(2);
-    retval[0] = indices.isNull() ? cv::Mat(10, 10, CV_32S) : indices.toMat();
-    retval[1] = dists.isNull()   ? cv::Mat(10, 10, CV_32F) : dists.toMat();
-
-
+    if (!indices.isNull()) retval[0] = indices;
+    if (!dists.isNull())   retval[1] = dists;
     
     ptr->knnSearch(query.toMat(), retval[0], retval[1], knn, params);
     
