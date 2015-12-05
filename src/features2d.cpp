@@ -621,11 +621,13 @@ double GFTTDetector_getK(struct GFTTDetectorPtr ptr)
 
 // SimpleBlobDetector
 
+extern "C"
 cv::SimpleBlobDetector::Params SimpleBlobDetector_Params_default()
 {
     return cv::SimpleBlobDetector::Params();
 }
 
+extern "C"
 struct SimpleBlobDetectorPtr SimpleBlobDetector_ctor(cv::SimpleBlobDetector::Params params)
 {
     return rescueObjectFromPtr(cv::SimpleBlobDetector::create(params));
@@ -812,42 +814,50 @@ int AKAZE_getDiffusivity(struct AKAZEPtr ptr)
 
 // DescriptorMatcher
 
+extern "C"
 struct DescriptorMatcherPtr DescriptorMatcher_ctor(const char *descriptorMatcherType)
 {
     return rescueObjectFromPtr(cv::DescriptorMatcher::create(descriptorMatcherType));
 }
 
+extern "C"
 void add(struct DescriptorMatcherPtr ptr, struct TensorArray descriptors)
 {
     ptr->add(descriptors.toMatList());
 }
 
+extern "C"
 struct TensorArray getTrainDescriptors(struct DescriptorMatcherPtr ptr)
 {
     std::vector<cv::Mat> retval = ptr->getTrainDescriptors();
     return TensorArray(retval);
 }
 
+extern "C"
 void clear(struct DescriptorMatcherPtr ptr)
 {
     ptr->clear();
 }
 
+extern "C"
 bool empty(struct DescriptorMatcherPtr ptr)
 {
     ptr->empty();
 }
 
+extern "C"
 bool isMaskSupported(struct DescriptorMatcherPtr ptr)
 {
     return ptr->isMaskSupported();
 }
 
+extern "C"
 void train(struct DescriptorMatcherPtr ptr)
 {
     ptr->train();
 }
 
+extern "C"
 struct DMatchArray match(struct DescriptorMatcherPtr ptr,
         struct TensorWrapper queryDescriptors, struct TensorWrapper mask)
 {
@@ -857,6 +867,7 @@ struct DMatchArray match(struct DescriptorMatcherPtr ptr,
     return retval;
 }
 
+extern "C"
 struct DMatchArray match_trainDescriptors(struct DescriptorMatcherPtr ptr,
         struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
         struct TensorWrapper mask)
@@ -867,6 +878,7 @@ struct DMatchArray match_trainDescriptors(struct DescriptorMatcherPtr ptr,
     return retval;
 }
 
+extern "C"
 struct DMatchArrayOfArrays knnMatch(struct DescriptorMatcherPtr ptr,
         struct TensorWrapper queryDescriptors, int k,
         struct TensorWrapper mask, bool compactResult)
@@ -878,6 +890,7 @@ struct DMatchArrayOfArrays knnMatch(struct DescriptorMatcherPtr ptr,
     return DMatchArrayOfArrays(retval);
 }
 
+extern "C"
 struct DMatchArrayOfArrays knnMatch_trainDescriptors(struct DescriptorMatcherPtr ptr,
         struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
         int k, struct TensorWrapper mask, bool compactResult) {
@@ -890,6 +903,7 @@ struct DMatchArrayOfArrays knnMatch_trainDescriptors(struct DescriptorMatcherPtr
 
 // BFMatcher
 
+extern "C"
 struct BFMatcherPtr BFMatcher_ctor(int normType, bool crossCheck)
 {
     return new cv::BFMatcher(normType, crossCheck);
@@ -897,6 +911,7 @@ struct BFMatcherPtr BFMatcher_ctor(int normType, bool crossCheck)
 
 // FlannBasedMatcher
 
+extern "C"
 struct FlannBasedMatcherPtr FlannBasedMatcher(
         struct IndexParamsPtr indexParams, struct SearchParamsPtr searchParams)
 {
@@ -911,6 +926,7 @@ struct FlannBasedMatcherPtr FlannBasedMatcher(
     return new cv::FlannBasedMatcher(indexParamsPtr, searchParamsPtr);
 }
 
+extern "C"
 struct TensorWrapper drawKeypoints(
         struct TensorWrapper image, struct KeyPointArray keypoints, struct TensorWrapper outImage,
         struct ScalarWrapper color, int flags)
@@ -922,6 +938,38 @@ struct TensorWrapper drawKeypoints(
     } else {
         cv::drawKeypoints(image.toMat(), keypoints, outImage.toMat(), color, flags);
         return outImage;
+    }
+}
+
+extern "C"
+struct TensorWrapper drawMatches(
+        struct TensorWrapper img1, struct KeyPointArray keypoints1,
+        struct TensorWrapper img2, struct KeyPointArray keypoints2,
+        struct DMatchArray matches1to2, struct TensorWrapper outImg,
+        struct ScalarWrapper matchColor, struct ScalarWrapper singlePointColor,
+        struct TensorWrapper matchesMask, int flags)
+{
+    // TODO: enhance this. Built-in Mat->std::vector conversion fails
+    cv::Mat matchesMaskMat = matchesMask;
+    std::vector<char> matchesMaskVec(matchesMaskMat.rows * matchesMaskMat.cols);
+    if (!matchesMaskMat.empty()) {
+        std::copy(
+                matchesMaskMat.begin<char>(),
+                matchesMaskMat.end<char>(),
+                matchesMaskVec.begin());
+    }
+
+    if (outImg.isNull()) {
+        cv::Mat result;
+        cv::drawMatches(
+                img1.toMat(), keypoints1, img2.toMat(), keypoints2, matches1to2, result,
+                matchColor, singlePointColor, matchesMaskVec, flags);
+        return TensorWrapper(result);
+    } else {
+        cv::drawMatches(
+                img1.toMat(), keypoints1, img2.toMat(), keypoints2, matches1to2, outImg.toMat(),
+                matchColor, singlePointColor, matchesMaskVec, flags);
+        return outImg;
     }
 }
 

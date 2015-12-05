@@ -1212,6 +1212,30 @@ function cv.drawKeypoints(t)
         cv.wrap_tensor(image), keypoints, cv.wrap_tensor(outImage), color, flags))
 end
 
+-- TODO: test when matchesMask is nil
+function cv.drawMatches(t)
+    local argRules = {
+        {"img1", required = true},
+        {"keypoints1", required = true},
+        {"img2", required = true},
+        {"keypoints2", required = true},
+        {"matches1to2", required = true},
+        {"outImg", default = nil},
+        {"matchColor", default = {-1, -1, -1, -1}, operator = cv.Scalar},
+        {"singlePointColor", default = {-1, -1, -1, -1}, operator = cv.Scalar},
+        {"matchesMask", default = nil},
+        {"flags", default = cv.DRAW_MATCHES_FLAGS_DEFAULT}
+    }
+    local img1, keypoints1, img2, keypoints2, matches1to2, outImg, matchColor, 
+        singlePointColor, matchesMask, flags = cv.argcheck(t, argRules)
+
+    assert(matchesMask == nil or cv.tensorType(matchesMask) == cv.CV_8S)
+
+    return cv.unwrap_tensors(C.drawMatches(
+        cv.wrap_tensor(img1), keypoints1, cv.wrap_tensor(img2), keypoints2, matches1to2, 
+        cv.wrap_tensor(outImg), matchColor, singlePointColor, matchesMask, flags))
+end
+
 -- BOWTrainer
 
 do

@@ -292,9 +292,11 @@ struct SimpleBlobDetectorPtr {
     inline cv::SimpleBlobDetector & operator*() { return *static_cast<cv::SimpleBlobDetector *>(this->ptr); }
 };
 
+extern "C"
 cv::SimpleBlobDetector::Params SimpleBlobDetector_Params_default();
 
-struct SimpleBlobDetectorPtr SimpleBlobDetector_ctor(struct SimpleBlobDetector_Params params);
+extern "C"
+struct SimpleBlobDetectorPtr SimpleBlobDetector_ctor(cv::SimpleBlobDetector::Params params);
 
 // KAZE
 

@@ -176,6 +176,7 @@ struct DMatchArray {
 
     DMatchArray() {}
     DMatchArray(std::vector<cv::DMatch> & other);
+    operator std::vector<cv::DMatch>();
 };
 
 struct DMatchArrayOfArrays {

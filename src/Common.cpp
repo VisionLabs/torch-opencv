@@ -167,6 +167,12 @@ DMatchArray::DMatchArray(std::vector<cv::DMatch> & other) {
     memcpy(this->data, other.data(), memSize);
 }
 
+DMatchArray::operator std::vector<cv::DMatch>() {
+    std::vector<cv::DMatch> retval(this->size);
+    memcpy(retval.data(), this->data, this->size * sizeof(DMatchWrapper));
+    return retval;
+}
+
 DMatchArrayOfArrays::DMatchArrayOfArrays(std::vector<std::vector<cv::DMatch>> & other) {
     this->size = other.size();
     this->data = static_cast<DMatchArray *>(malloc(this->size * sizeof(DMatchArray)));
