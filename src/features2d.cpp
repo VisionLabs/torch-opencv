@@ -973,6 +973,41 @@ struct TensorWrapper drawMatches(
     }
 }
 
+extern "C"
+struct TensorWrapper drawMatchesKnn(
+        struct TensorWrapper img1, struct KeyPointArray keypoints1,
+        struct TensorWrapper img2, struct KeyPointArray keypoints2,
+        struct DMatchArrayOfArrays matches1to2, struct TensorWrapper outImg,
+        struct ScalarWrapper matchColor, struct ScalarWrapper singlePointColor,
+        struct TensorArray matchesMask, int flags)
+{
+    std::vector<std::vector<char>> matchesMaskVec(matchesMask.size);
+    for (int i = 0; i < matchesMask.size; ++i) {
+        cv::Mat matchesMaskMat = matchesMask.tensors[i];
+        matchesMaskVec[i].resize(matchesMaskMat.rows * matchesMaskMat.cols);
+
+        if (!matchesMaskMat.empty()) {
+            std::copy(
+                    matchesMaskMat.begin<char>(),
+                    matchesMaskMat.end<char>(),
+                    matchesMaskVec[i].begin());
+        }
+    }
+
+    if (outImg.isNull()) {
+        cv::Mat result;
+        cv::drawMatches(
+                img1.toMat(), keypoints1, img2.toMat(), keypoints2, matches1to2, result,
+                matchColor, singlePointColor, matchesMaskVec, flags);
+        return TensorWrapper(result);
+    } else {
+        cv::drawMatches(
+                img1.toMat(), keypoints1, img2.toMat(), keypoints2, matches1to2, outImg.toMat(),
+                matchColor, singlePointColor, matchesMaskVec, flags);
+        return outImg;
+    }
+}
+
 // BOWTrainer
 
 extern "C"

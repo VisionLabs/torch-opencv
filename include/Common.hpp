@@ -185,6 +185,7 @@ struct DMatchArrayOfArrays {
 
     DMatchArrayOfArrays() {}
     DMatchArrayOfArrays(std::vector<std::vector<cv::DMatch>> & other);
+    operator std::vector<std::vector<cv::DMatch>>();
 };
 
 /***************** Helper wrappers for [OpenCV class + some primitive] *****************/

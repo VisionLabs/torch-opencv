@@ -1146,13 +1146,13 @@ do
         local result
 
         if trainDescriptors then
-            result = C.DescriptorknnMatcher_knnMatch_trainDescriptors(
+            result = cv.gcarray(C.DescriptorknnMatcher_knnMatch_trainDescriptors(
                 cv.wrap_tensor(queryDescriptors), cv.wrap_tensors(trainDescriptors), 
-                k, cv.wrap_tensors(mask), compactResult)
+                k, cv.wrap_tensors(mask), compactResult))
         else
-            result = C.DescriptorknnMatcher_knnMatch(
+            result = cv.gcarray(C.DescriptorknnMatcher_knnMatch(
                 cv.wrap_tensor(queryDescriptors),
-                k, cv.wrap_tensors(mask), compactResult)
+                k, cv.wrap_tensors(mask), compactResult))
         end
 
         local retval = {}
@@ -1230,9 +1230,43 @@ function cv.drawMatches(t)
         singlePointColor, matchesMask, flags = cv.argcheck(t, argRules)
 
     assert(matchesMask == nil or cv.tensorType(matchesMask) == cv.CV_8S)
+    assert(ffi.typeof(matches1to2) == ffi.typeof(ffi.new('struct DMatchArray')))
 
     return cv.unwrap_tensors(C.drawMatches(
         cv.wrap_tensor(img1), keypoints1, cv.wrap_tensor(img2), keypoints2, matches1to2, 
+        cv.wrap_tensor(outImg), matchColor, singlePointColor, matchesMask, flags))
+end
+
+function cv.drawMatchesKnn(t)
+    local argRules = {
+        {"img1", required = true},
+        {"keypoints1", required = true},
+        {"img2", required = true},
+        {"keypoints2", required = true},
+        {"matches1to2", required = true},
+        {"outImg", default = nil},
+        {"matchColor", default = {-1, -1, -1, -1}, operator = cv.Scalar},
+        {"singlePointColor", default = {-1, -1, -1, -1}, operator = cv.Scalar},
+        {"matchesMask", default = nil},
+        {"flags", default = cv.DRAW_MATCHES_FLAGS_DEFAULT}
+    }
+    local img1, keypoints1, img2, keypoints2, matches1to2, outImg, matchColor, 
+        singlePointColor, matchesMask, flags = cv.argcheck(t, argRules)
+
+    assert(matchesMask == nil or cv.tensorType(matchesMask) == cv.CV_8S)
+    assert(type(matches1to2) == 'table')
+
+    local matches1to2_CArray = ffi.new('struct DMatchArrayOfArrays')
+    matches1to2_CArray.size = #matches1to2
+    matches1to2_CArray.data = ffi.gc(
+        C.malloc(#matches1to2 * ffi.sizeof('struct DMatchArray')),
+        C.free)
+    for i in 1, #matches1to2 do
+        matches1to2_CArray.data[i-1] = matches1to2[i]
+    end
+
+    return cv.unwrap_tensors(C.drawMatchesKnn(
+        cv.wrap_tensor(img1), keypoints1, cv.wrap_tensor(img2), keypoints2, matches1to2_CArray, 
         cv.wrap_tensor(outImg), matchColor, singlePointColor, matchesMask, flags))
 end
 

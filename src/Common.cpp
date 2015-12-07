@@ -181,6 +181,14 @@ DMatchArrayOfArrays::DMatchArrayOfArrays(std::vector<std::vector<cv::DMatch>> & 
     }
 }
 
+DMatchArrayOfArrays::operator std::vector<std::vector<cv::DMatch>>() {
+    std::vector<std::vector<cv::DMatch>> retval(this->size);
+    for (int i = 0; i < this->size; ++i) {
+        retval[i] = this->data[i];
+    }
+    return retval;
+}
+
 /***************** Helper wrappers for [OpenCV class + some primitive] *****************/
 
 RectWrapper & RectWrapper::operator=(cv::Rect & other) {
