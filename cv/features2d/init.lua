@@ -4,7 +4,16 @@ local ffi = require 'ffi'
 
 local C = ffi.load(cv.libPath('features2d'))
 
---- ***************** Classes *****************
+function cv.tableToDMatchArrayOfArrays(tbl)
+    local result = ffi.new('struct DMatchArrayOfArrays')
+    result.size = #tbl
+    result.data = ffi.gc(
+        C.malloc(#tbl * ffi.sizeof('struct DMatchArray')),
+        C.free)
+    for i in 1, #tbl do
+        result.data[i-1] = tbl[i]
+    end
+end
 
 require 'cv.Classes'
 
@@ -27,37 +36,41 @@ struct TensorPlusKeyPointArray {
     struct KeyPointArray keypoints;
 };
 
-struct KeyPointMat {
-    struct KeyPointWrapper **data;
-    int size1, size2;
+struct evaluateFeatureDetectorRetval {
+    struct KeyPointArray keypoints1, keypoints2;
+    float repeatability;
+    int correspCount;
 };
 
+// KeyPointsFilter
 struct PtrWrapper KeyPointsFilter_ctor();
 
 void KeyPointsFilter_dtor(struct PtrWrapper ptr);
 
 struct KeyPointArray KeyPointsFilter_runByImageBorder(struct KeyPointArray keypoints,
-                        struct SizeWrapper imageSize, int borderSize);
+                                                      struct SizeWrapper imageSize, int borderSize);
 
-struct KeyPointArray KeyPointsFilter_runByKeypointSize(struct KeyPointArray keypoints, float minSize,
-                        float maxSize);
+struct KeyPointArray KeyPointsFilter_runByKeypointSize(struct KeyPointArray keypoints,
+                                                       float minSize, float maxSize);
 
 struct KeyPointArray KeyPointsFilter_runByPixelsMask(struct KeyPointArray keypoints,
-                        struct TensorWrapper mask);
+                                                     struct TensorWrapper mask);
 
 struct KeyPointArray KeyPointsFilter_removeDuplicated(struct KeyPointArray keypoints);
 
 struct KeyPointArray KeyPointsFilter_retainBest(struct KeyPointArray keypoints, int npoints);
 
-struct KeyPointArray Feature2D_detect(struct PtrWrapper ptr, struct TensorWrapper image,
-                        struct TensorWrapper mask);
+// Feature2D
+
+struct KeyPointArray Feature2D_detect(
+        struct PtrWrapper ptr, struct TensorWrapper image, struct TensorWrapper mask);
 
 struct TensorPlusKeyPointArray Feature2D_compute(struct PtrWrapper ptr, struct TensorWrapper image,
                         struct KeyPointArray keypoints, struct TensorWrapper descriptors);
 
-struct KeyPointArray Feature2D_detectAndCompute(struct PtrWrapper ptr, struct TensorWrapper image,
-                        struct TensorWrapper mask, struct TensorWrapper descriptors, 
-                        bool useProvidedKeypoints);
+struct TensorPlusKeyPointArray Feature2D_detectAndCompute(struct PtrWrapper ptr, struct TensorWrapper image,
+                        struct TensorWrapper mask,
+                        struct TensorWrapper descriptors, bool useProvidedKeypoints);
 
 int Feature2D_descriptorSize(struct PtrWrapper ptr);
 
@@ -67,13 +80,17 @@ int Feature2D_defaultNorm(struct PtrWrapper ptr);
 
 bool Feature2D_empty(struct PtrWrapper ptr);
 
+// BRISK
+
 struct PtrWrapper BRISK_ctor(int thresh, int octaves, float patternScale);
 
 struct PtrWrapper BRISK_ctor2(struct TensorWrapper radiusList, struct TensorWrapper numberList,
-                        float dMax, float dMin, struct TensorWrapper indexChange);
+                            float dMax, float dMin, struct TensorWrapper indexChange);
+
+// ORB
 
 struct PtrWrapper ORB_ctor(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel,
-                        int WTA_K, int scoreType, int patchSize, int fastThreshold);
+                       int WTA_K, int scoreType, int patchSize, int fastThreshold);
 
 void ORB_setMaxFeatures(struct PtrWrapper ptr, int maxFeatures);
 
@@ -111,11 +128,13 @@ void ORB_setFastThreshold(struct PtrWrapper ptr, int fastThreshold);
 
 int ORB_getFastThreshold(struct PtrWrapper ptr);
 
+// MSER
+
 struct PtrWrapper MSER_ctor(int _delta, int _min_area, int _max_area, double _max_variation, double _min_diversity,
-                        int _max_evolution, double _area_threshold, double _min_margin, int _edge_blur_size);
+                         int _max_evolution, double _area_threshold, double _min_margin, int _edge_blur_size);
 
 struct TensorArray MSER_detectRegions(struct PtrWrapper ptr,
-        struct TensorWrapper image, struct TensorWrapper bboxes);
+                                      struct TensorWrapper image, struct TensorWrapper bboxes);
 
 void MSER_setDelta(struct PtrWrapper ptr, int delta);
 
@@ -129,12 +148,255 @@ void MSER_setMaxArea(struct PtrWrapper ptr, int MaxArea);
 
 int MSER_getMaxArea(struct PtrWrapper ptr);
 
+void MSER_setPass2Only(struct PtrWrapper ptr, bool Pass2Only);
 
+bool MSER_getPass2Only(struct PtrWrapper ptr);
 
+// functions
 
-struct KeyPointArray AGAST(
+struct KeyPointArray FAST(
         struct TensorWrapper image, int threshold, bool nonmaxSuppression);
 
+struct KeyPointArray FAST_type(
+        struct TensorWrapper image, int threshold, bool nonmaxSuppression, int type);
+
+struct KeyPointArray AGAST(struct TensorWrapper image, int threshold, bool nonmaxSuppression);
+
+struct KeyPointArray AGAST_type(struct TensorWrapper image, int threshold, bool nonmaxSuppression, int type);
+
+// FastFeatureDetector
+
+struct PtrWrapper FastFeatureDetector_ctor(
+        int threshold, bool nonmaxSuppression, int type);
+
+void FastFeatureDetector_setThreshold(struct PtrWrapper ptr, int val);
+
+int FastFeatureDetector_getThreshold(struct PtrWrapper ptr);
+
+void FastFeatureDetector_setNonmaxSuppression(struct PtrWrapper ptr, bool val);
+
+bool FastFeatureDetector_getNonmaxSuppression(struct PtrWrapper ptr);
+
+void FastFeatureDetector_setType(struct PtrWrapper ptr, int val);
+
+int FastFeatureDetector_getType(struct PtrWrapper ptr);
+
+// AgastFeatureDetector
+
+struct PtrWrapper AgastFeatureDetector_ctor(
+        int threshold, bool nonmaxSuppression, int type);
+
+void AgastFeatureDetector_setThreshold(struct PtrWrapper ptr, int val);
+
+int AgastFeatureDetector_getThreshold(struct PtrWrapper ptr);
+
+void AgastFeatureDetector_setNonmaxSuppression(struct PtrWrapper ptr, bool val);
+
+bool AgastFeatureDetector_getNonmaxSuppression(struct PtrWrapper ptr);
+
+void AgastFeatureDetector_setType(struct PtrWrapper ptr, int val);
+
+int AgastFeatureDetector_getType(struct PtrWrapper ptr);
+
+// GFTTDetector
+
+struct PtrWrapper GFTTDetector_ctor(
+        int maxCorners, double qualityLevel, double minDistance,
+        int blockSize, bool useHarrisDetector, double k);
+
+void GFTTDetector_setMaxFeatures(struct PtrWrapper ptr, int val);
+
+int GFTTDetector_getMaxFeatures(struct PtrWrapper ptr);
+
+void GFTTDetector_setQualityLevel(struct PtrWrapper ptr, double val);
+
+double GFTTDetector_getQualityLevel(struct PtrWrapper ptr);
+
+void GFTTDetector_setMinDistance(struct PtrWrapper ptr, double val);
+
+double GFTTDetector_getMinDistance(struct PtrWrapper ptr);
+
+void GFTTDetector_setBlockSize(struct PtrWrapper ptr, int val);
+
+int GFTTDetector_getBlockSize(struct PtrWrapper ptr);
+
+void GFTTDetector_setHarrisDetector(struct PtrWrapper ptr, bool val);
+
+bool GFTTDetector_getHarrisDetector(struct PtrWrapper ptr);
+
+void GFTTDetector_setK(struct PtrWrapper ptr, double val);
+
+double GFTTDetector_getK(struct PtrWrapper ptr);
+
+// SimpleBlobDetector
+
+struct SimpleBlobDetector_Params {
+    float thresholdStep;
+    float minThreshold;
+    float maxThreshold;
+    size_t minRepeatability;
+    float minDistBetweenBlobs;
+
+    bool filterByColor;
+    unsigned char blobColor;
+
+    bool filterByArea;
+    float minArea, maxArea;
+
+    bool filterByCircularity;
+    float minCircularity, maxCircularity;
+
+    bool filterByInertia;
+    float minInertiaRatio, maxInertiaRatio;
+
+    bool filterByConvexity;
+    float minConvexity, maxConvexity;
+};
+
+struct SimpleBlobDetector_Params SimpleBlobDetector_Params_default();
+
+struct PtrWrapper SimpleBlobDetector_ctor(struct SimpleBlobDetector_Params params);
+
+struct SimpleBlobDetector_Params SimpleBlobDetector_Params_default();
+
+struct PtrWrapper SimpleBlobDetector_ctor(struct SimpleBlobDetector_Params params);
+
+// KAZE
+
+struct PtrWrapper KAZE_ctor(
+        bool extended, bool upright, float threshold,
+        int nOctaves, int nOctaveLayers, int diffusivity);
+
+void KAZE_setExtended(struct PtrWrapper ptr, bool val);
+
+bool KAZE_getExtended(struct PtrWrapper ptr);
+
+void KAZE_setUpright(struct PtrWrapper ptr, bool val);
+
+bool KAZE_getUpright(struct PtrWrapper ptr);
+
+void KAZE_setThreshold(struct PtrWrapper ptr, double val);
+
+double KAZE_getThreshold(struct PtrWrapper ptr);
+
+void KAZE_setNOctaves(struct PtrWrapper ptr, int val);
+
+int KAZE_getNOctaves(struct PtrWrapper ptr);
+
+void KAZE_setNOctaveLayers(struct PtrWrapper ptr, int val);
+
+int KAZE_getNOctaveLayers(struct PtrWrapper ptr);
+
+void KAZE_setDiffusivity(struct PtrWrapper ptr, int val);
+
+int KAZE_getDiffusivity(struct PtrWrapper ptr);
+
+// AKAZE
+
+struct PtrWrapper AKAZE_ctor(
+        int descriptor_type, int descriptor_size, int descriptor_channels,
+        float threshold, int nOctaves, int nOctaveLayers, int diffusivity);
+
+void AKAZE_setDescriptorType(struct PtrWrapper ptr, int val);
+
+int AKAZE_getDescriptorType(struct PtrWrapper ptr);
+
+void AKAZE_setDescriptorSize(struct PtrWrapper ptr, int val);
+
+int AKAZE_getDescriptorSize(struct PtrWrapper ptr);
+
+void AKAZE_setDescriptorChannels(struct PtrWrapper ptr, int val);
+
+int AKAZE_getDescriptorChannels(struct PtrWrapper ptr);
+
+void AKAZE_setThreshold(struct PtrWrapper ptr, double val);
+
+double AKAZE_getThreshold(struct PtrWrapper ptr);
+
+void AKAZE_setNOctaves(struct PtrWrapper ptr, int val);
+
+int AKAZE_getNOctaves(struct PtrWrapper ptr);
+
+void AKAZE_setNOctaveLayers(struct PtrWrapper ptr, int val);
+
+int AKAZE_getNOctaveLayers(struct PtrWrapper ptr);
+
+void AKAZE_setDiffusivity(struct PtrWrapper ptr, int val);
+
+int AKAZE_getDiffusivity(struct PtrWrapper ptr);
+
+// DescriptorMatcher
+
+struct PtrWrapper DescriptorMatcher_ctor(const char *descriptorMatcherType);
+
+void DescriptorMatcher_add(struct PtrWrapper ptr, struct TensorArray descriptors);
+
+struct TensorArray DescriptorMatcher_getTrainDescriptors(struct PtrWrapper ptr);
+
+void DescriptorMatcher_clear(struct PtrWrapper ptr);
+
+bool DescriptorMatcher_empty(struct PtrWrapper ptr);
+
+bool DescriptorMatcher_isMaskSupported(struct PtrWrapper ptr);
+
+void DescriptorMatcher_train(struct PtrWrapper ptr);
+
+struct DMatchArray DescriptorMatcher_match(struct PtrWrapper ptr,
+                                           struct TensorWrapper queryDescriptors, struct TensorWrapper mask);
+
+struct DMatchArray DescriptorMatcher_match_trainDescriptors(struct PtrWrapper ptr,
+                                                            struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
+                                                            struct TensorWrapper mask);
+
+struct DMatchArrayOfArrays DescriptorMatcher_knnMatch(struct PtrWrapper ptr,
+                                                      struct TensorWrapper queryDescriptors, int k,
+                                                      struct TensorWrapper mask, bool compactResult);
+
+struct DMatchArrayOfArrays DescriptorMatcher_knnMatch_trainDescriptors(struct PtrWrapper ptr,
+                                                                       struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
+                                                                       int k, struct TensorWrapper mask, bool compactResult);
+
+// BFMatcher
+
+struct PtrWrapper BFMatcher_ctor(int normType, bool crossCheck);
+
+// FlannBasedMatcher
+
+struct PtrWrapper FlannBasedMatcher_ctor(
+        struct PtrWrapper indexParams, struct PtrWrapper searchParams);
+
+// functions
+
+struct TensorWrapper drawKeypoints(
+        struct TensorWrapper image, struct KeyPointArray keypoints, struct TensorWrapper outImage,
+        struct ScalarWrapper color, int flags);
+
+struct TensorWrapper drawMatches(
+        struct TensorWrapper img1, struct KeyPointArray keypoints1,
+        struct TensorWrapper img2, struct KeyPointArray keypoints2,
+        struct DMatchArray matches1to2, struct TensorWrapper outImg,
+        struct ScalarWrapper matchColor, struct ScalarWrapper singlePointColor,
+        struct TensorWrapper matchesMask, int flags);
+
+struct TensorWrapper drawMatchesKnn(
+        struct TensorWrapper img1, struct KeyPointArray keypoints1,
+        struct TensorWrapper img2, struct KeyPointArray keypoints2,
+        struct DMatchArrayOfArrays matches1to2, struct TensorWrapper outImg,
+        struct ScalarWrapper matchColor, struct ScalarWrapper singlePointColor,
+        struct TensorArray matchesMask, int flags);
+
+struct evaluateFeatureDetectorRetval evaluateFeatureDetector(
+        struct TensorWrapper img1, struct TensorWrapper img2, struct TensorWrapper H1to2,
+        struct PtrWrapper fdetector);
+
+struct TensorWrapper computeRecallPrecisionCurve(
+        struct DMatchArrayOfArrays matches1to2, struct TensorArray correctMatches1to2Mask);
+
+float getRecall(struct TensorWrapper recallPrecisionCurve, float l_precision);
+
+int getNearestPoint(struct TensorWrapper recallPrecisionCurve, float l_precision);
+
+// BOWTrainer
 
 void BOWTrainer_dtor(struct PtrWrapper ptr);
 
@@ -150,9 +412,13 @@ struct TensorWrapper BOWTrainer_cluster(struct PtrWrapper ptr);
 
 struct TensorWrapper BOWTrainer_cluster_descriptors(struct PtrWrapper ptr, struct TensorWrapper descriptors);
 
+// BOWKMeansTrainer
+
 struct PtrWrapper BOWKMeansTrainer_ctor(
         int clusterCount, struct TermCriteriaWrapper termcrit,
         int attempts, int flags);
+
+// BOWImgDescriptorExtractor
 
 struct PtrWrapper BOWImgDescriptorExtractor_ctor(
         struct PtrWrapper dextractor, struct PtrWrapper dmatcher);
@@ -162,16 +428,15 @@ void BOWImgDescriptorExtractor_dtor(struct PtrWrapper ptr);
 void BOWImgDescriptorExtractor_setVocabulary(
         struct PtrWrapper ptr, struct TensorWrapper vocabulary);
 
-struct TensorWrapper getVocabulary(struct PtrWrapper ptr);
+struct TensorWrapper BOWImgDescriptorExtractor_getVocabulary(struct PtrWrapper ptr);
 
-struct TensorWrapper compute(
+struct TensorWrapper BOWImgDescriptorExtractor_compute(
         struct PtrWrapper ptr, struct TensorWrapper image,
         struct KeyPointArray keypoints, struct TensorWrapper imgDescriptor);
 
-int descriptorSize(struct PtrWrapper ptr);
+int BOWImgDescriptorExtractor_descriptorSize(struct PtrWrapper ptr);
 
-int descriptorType(struct PtrWrapper ptr);
-
+int BOWImgDescriptorExtractor_descriptorType(struct PtrWrapper ptr);
 ]]
 
 function cv.KeyPoint(...)
@@ -1229,7 +1494,9 @@ function cv.drawMatches(t)
     local img1, keypoints1, img2, keypoints2, matches1to2, outImg, matchColor, 
         singlePointColor, matchesMask, flags = cv.argcheck(t, argRules)
 
-    assert(matchesMask == nil or cv.tensorType(matchesMask) == cv.CV_8S)
+    assert(
+        matchesMask == nil or 
+        torch.isTensor(matchesMask) and cv.tensorType(matchesMask) == cv.CV_8S)
     assert(ffi.typeof(matches1to2) == ffi.typeof(ffi.new('struct DMatchArray')))
 
     return cv.unwrap_tensors(C.drawMatches(
@@ -1253,21 +1520,70 @@ function cv.drawMatchesKnn(t)
     local img1, keypoints1, img2, keypoints2, matches1to2, outImg, matchColor, 
         singlePointColor, matchesMask, flags = cv.argcheck(t, argRules)
 
-    assert(matchesMask == nil or cv.tensorType(matchesMask) == cv.CV_8S)
+    assert(
+        matchesMask == nil or 
+        torch.isTensor(matchesMask) and cv.tensorType(matchesMask) == cv.CV_8S)
     assert(type(matches1to2) == 'table')
 
-    local matches1to2_CArray = ffi.new('struct DMatchArrayOfArrays')
-    matches1to2_CArray.size = #matches1to2
-    matches1to2_CArray.data = ffi.gc(
-        C.malloc(#matches1to2 * ffi.sizeof('struct DMatchArray')),
-        C.free)
-    for i in 1, #matches1to2 do
-        matches1to2_CArray.data[i-1] = matches1to2[i]
-    end
+    local matches1to2_CArray = cv.tableToDMatchArrayOfArrays(matches1to2)
 
     return cv.unwrap_tensors(C.drawMatchesKnn(
         cv.wrap_tensor(img1), keypoints1, cv.wrap_tensor(img2), keypoints2, matches1to2_CArray, 
         cv.wrap_tensor(outImg), matchColor, singlePointColor, matchesMask, flags))
+end
+
+function cv.evaluateFeatureDetector(t)
+    local argRules = {
+        {"img1", required = true},
+        {"img2", required = true},
+        {"H1to2", required = true},
+        {"fdetector", required = true}
+    }
+    local img1, img2, H1to2, fdetector = cv.argcheck(t, argRules)
+
+    local result = C.evaluateFeatureDetector(
+        cv.wrap_tensor(img1), cv.wrap_tensor(img2), cv.wrap_tensor(H1to2), fdetector.ptr)
+    return result.keypoints1, result.keypoints2, result.repeatability, result.correspCount
+end
+
+function cv.computeRecallPrecisionCurve(t)
+    local argRules = {
+        {"matches1to2", required = true},
+        {"correctMatches1to2Mask", required = true}
+    }
+    local matches1to2, correctMatches1to2Mask = cv.argcheck(t, argRules)
+
+    assert(type(correctMatches1to2Mask) == 'table')
+    for i in 1, #correctMatches1to2Mask do
+        assert(
+            torch.isTensor(correctMatches1to2Mask[i]) and 
+            cv.tensorType(correctMatches1to2Mask[i]) == cv.CV_8U)
+    end
+
+    local matches1to2_CArray = cv.tableToDMatchArrayOfArrays(matches1to2)
+
+    return cv.unwrap_tensors(C.computeRecallPrecisionCurve(
+        matches1to2_CArray, cv.wrap_tensors(correctMatches1to2Mask)))
+end
+
+function cv.getRecall(t)
+    local argRules = {
+        {"recallPrecisionCurve", required = true},
+        {"l_precision", required = true}
+    }
+    local recallPrecisionCurve, l_precision = cv.argcheck(t, argRules)
+
+    return C.getRecall(cv.wrap_tensor(recallPrecisionCurve), l_precision)
+end
+
+function cv.getNearestPoint(t)
+    local argRules = {
+        {"recallPrecisionCurve", required = true},
+        {"l_precision", required = true}
+    }
+    local recallPrecisionCurve, l_precision = cv.argcheck(t, argRules)
+
+    return C.getNearestPoint(cv.wrap_tensor(recallPrecisionCurve), l_precision)
 end
 
 -- BOWTrainer
@@ -1384,6 +1700,5 @@ do
         return C.BOWImgDescriptorExtractor_descriptorType(self.ptr)
     end
 end
-
 
 return cv

@@ -26,12 +26,10 @@ struct TensorPlusKeyPointArray {
     struct KeyPointArray keypoints;
 };
 
-struct KeyPointMat {
-    struct KeyPointWrapper **data;
-    int size1, size2;
-
-    KeyPointMat(const std::vector<std::vector<cv::KeyPoint> > & v);
-    operator std::vector<std::vector<cv::KeyPoint> >();
+struct evaluateFeatureDetectorRetval {
+    struct KeyPointArray keypoints1, keypoints2;
+    float repeatability;
+    int correspCount;
 };
 
 // KeyPointsFilter
@@ -51,15 +49,15 @@ void KeyPointsFilter_dtor(struct KeyPointsFilterPtr ptr);
 
 extern "C"
 struct KeyPointArray KeyPointsFilter_runByImageBorder(struct KeyPointArray keypoints,
-                        struct SizeWrapper imageSize, int borderSize);
+                                                      struct SizeWrapper imageSize, int borderSize);
 
 extern "C"
 struct KeyPointArray KeyPointsFilter_runByKeypointSize(struct KeyPointArray keypoints,
-                        float minSize, float maxSize);
+                                                       float minSize, float maxSize);
 
 extern "C"
 struct KeyPointArray KeyPointsFilter_runByPixelsMask(struct KeyPointArray keypoints,
-                        struct TensorWrapper mask);
+                                                     struct TensorWrapper mask);
 
 extern "C"
 struct KeyPointArray KeyPointsFilter_removeDuplicated(struct KeyPointArray keypoints);
@@ -76,9 +74,6 @@ struct Feature2DPtr {
     inline Feature2DPtr(cv::Feature2D *ptr) { this->ptr = ptr; }
     inline cv::Feature2D & operator*() { return *static_cast<cv::Feature2D *>(this->ptr); }
 };
-
-extern "C"
-struct Feature2DPtr Feature2D_ctor();
 
 extern "C"
 struct KeyPointArray Feature2D_detect(
@@ -119,7 +114,7 @@ struct BRISKPtr BRISK_ctor(int thresh, int octaves, float patternScale);
 
 extern "C"
 struct BRISKPtr BRISK_ctor2(struct TensorWrapper radiusList, struct TensorWrapper numberList,
-                        float dMax, float dMin, struct TensorWrapper indexChange);
+                            float dMax, float dMin, struct TensorWrapper indexChange);
 
 // ORB
 
@@ -132,7 +127,7 @@ struct ORBPtr {
 
 extern "C"
 struct ORBPtr ORB_ctor(int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel,
-                        int WTA_K, int scoreType, int patchSize, int fastThreshold);
+                       int WTA_K, int scoreType, int patchSize, int fastThreshold);
 
 extern "C"
 void ORB_setMaxFeatures(struct ORBPtr ptr, int maxFeatures);
@@ -199,7 +194,11 @@ struct MSERPtr {
 
 extern "C"
 struct MSERPtr MSER_ctor(int _delta, int _min_area, int _max_area, double _max_variation, double _min_diversity,
-                        int _max_evolution, double _area_threshold, double _min_margin, int _edge_blur_size);
+                         int _max_evolution, double _area_threshold, double _min_margin, int _edge_blur_size);
+
+extern "C"
+struct TensorArray MSER_detectRegions(struct MSERPtr ptr,
+                                      struct TensorWrapper image, struct TensorWrapper bboxes);
 
 extern "C"
 void MSER_setDelta(struct MSERPtr ptr, int delta);
@@ -218,6 +217,14 @@ void MSER_setMaxArea(struct MSERPtr ptr, int MaxArea);
 
 extern "C"
 int MSER_getMaxArea(struct MSERPtr ptr);
+
+extern "C"
+void MSER_setPass2Only(struct MSERPtr ptr, bool Pass2Only);
+
+extern "C"
+bool MSER_getPass2Only(struct MSERPtr ptr);
+
+// functions
 
 extern "C"
 struct KeyPointArray FAST(
@@ -242,6 +249,28 @@ struct FastFeatureDetectorPtr {
     inline cv::FastFeatureDetector & operator*() { return *static_cast<cv::FastFeatureDetector *>(this->ptr); }
 };
 
+extern "C"
+struct FastFeatureDetectorPtr FastFeatureDetector_ctor(
+        int threshold, bool nonmaxSuppression, int type);
+
+extern "C"
+void FastFeatureDetector_setThreshold(struct FastFeatureDetectorPtr ptr, int val);
+
+extern "C"
+int FastFeatureDetector_getThreshold(struct FastFeatureDetectorPtr ptr);
+
+extern "C"
+void FastFeatureDetector_setNonmaxSuppression(struct FastFeatureDetectorPtr ptr, bool val);
+
+extern "C"
+bool FastFeatureDetector_getNonmaxSuppression(struct FastFeatureDetectorPtr ptr);
+
+extern "C"
+void FastFeatureDetector_setType(struct FastFeatureDetectorPtr ptr, int val);
+
+extern "C"
+int FastFeatureDetector_getType(struct FastFeatureDetectorPtr ptr);
+
 // AgastFeatureDetector
 
 struct AgastFeatureDetectorPtr {
@@ -250,6 +279,28 @@ struct AgastFeatureDetectorPtr {
     inline AgastFeatureDetectorPtr(cv::AgastFeatureDetector *ptr) { this->ptr = ptr; }
     inline cv::AgastFeatureDetector & operator*() { return *static_cast<cv::AgastFeatureDetector *>(this->ptr); }
 };
+
+extern "C"
+struct AgastFeatureDetectorPtr AgastFeatureDetector_ctor(
+        int threshold, bool nonmaxSuppression, int type);
+
+extern "C"
+void AgastFeatureDetector_setThreshold(struct AgastFeatureDetectorPtr ptr, int val);
+
+extern "C"
+int AgastFeatureDetector_getThreshold(struct AgastFeatureDetectorPtr ptr);
+
+extern "C"
+void AgastFeatureDetector_setNonmaxSuppression(struct AgastFeatureDetectorPtr ptr, bool val);
+
+extern "C"
+bool AgastFeatureDetector_getNonmaxSuppression(struct AgastFeatureDetectorPtr ptr);
+
+extern "C"
+void AgastFeatureDetector_setType(struct AgastFeatureDetectorPtr ptr, int val);
+
+extern "C"
+int AgastFeatureDetector_getType(struct AgastFeatureDetectorPtr ptr);
 
 // GFTTDetector
 
@@ -260,30 +311,48 @@ struct GFTTDetectorPtr {
     inline cv::GFTTDetector & operator*() { return *static_cast<cv::GFTTDetector *>(this->ptr); }
 };
 
+extern "C"
+struct GFTTDetectorPtr GFTTDetector_ctor(
+        int maxCorners, double qualityLevel, double minDistance,
+        int blockSize, bool useHarrisDetector, double k);
+
+extern "C"
+void GFTTDetector_setMaxFeatures(struct GFTTDetectorPtr ptr, int val);
+
+extern "C"
+int GFTTDetector_getMaxFeatures(struct GFTTDetectorPtr ptr);
+
+extern "C"
+void GFTTDetector_setQualityLevel(struct GFTTDetectorPtr ptr, double val);
+
+extern "C"
+double GFTTDetector_getQualityLevel(struct GFTTDetectorPtr ptr);
+
+extern "C"
+void GFTTDetector_setMinDistance(struct GFTTDetectorPtr ptr, double val);
+
+extern "C"
+double GFTTDetector_getMinDistance(struct GFTTDetectorPtr ptr);
+
+extern "C"
+void GFTTDetector_setBlockSize(struct GFTTDetectorPtr ptr, int val);
+
+extern "C"
+int GFTTDetector_getBlockSize(struct GFTTDetectorPtr ptr);
+
+extern "C"
+void GFTTDetector_setHarrisDetector(struct GFTTDetectorPtr ptr, bool val);
+
+extern "C"
+bool GFTTDetector_getHarrisDetector(struct GFTTDetectorPtr ptr);
+
+extern "C"
+void GFTTDetector_setK(struct GFTTDetectorPtr ptr, double val);
+
+extern "C"
+double GFTTDetector_getK(struct GFTTDetectorPtr ptr);
+
 // SimpleBlobDetector
-
-struct SimpleBlobDetector_Params {
-    float thresholdStep;
-    float minThreshold;
-    float maxThreshold;
-    size_t minRepeatability;
-    float minDistBetweenBlobs;
-
-    bool filterByColor;
-    unsigned char blobColor;
-
-    bool filterByArea;
-    float minArea, maxArea;
-
-    bool filterByCircularity;
-    float minCircularity, maxCircularity;
-
-    bool filterByInertia;
-    float minInertiaRatio, maxInertiaRatio;
-
-    bool filterByConvexity;
-    float minConvexity, maxConvexity;
-};
 
 struct SimpleBlobDetectorPtr {
     void *ptr;
@@ -291,6 +360,12 @@ struct SimpleBlobDetectorPtr {
     inline SimpleBlobDetectorPtr(cv::SimpleBlobDetector *ptr) { this->ptr = ptr; }
     inline cv::SimpleBlobDetector & operator*() { return *static_cast<cv::SimpleBlobDetector *>(this->ptr); }
 };
+
+extern "C"
+cv::SimpleBlobDetector::Params SimpleBlobDetector_Params_default();
+
+extern "C"
+struct SimpleBlobDetectorPtr SimpleBlobDetector_ctor(cv::SimpleBlobDetector::Params params);
 
 extern "C"
 cv::SimpleBlobDetector::Params SimpleBlobDetector_Params_default();
@@ -307,6 +382,47 @@ struct KAZEPtr {
     inline cv::KAZE & operator*() { return *static_cast<cv::KAZE *>(this->ptr); }
 };
 
+extern "C"
+struct KAZEPtr KAZE_ctor(
+        bool extended, bool upright, float threshold,
+        int nOctaves, int nOctaveLayers, int diffusivity);
+
+extern "C"
+void KAZE_setExtended(struct KAZEPtr ptr, bool val);
+
+extern "C"
+bool KAZE_getExtended(struct KAZEPtr ptr);
+
+extern "C"
+void KAZE_setUpright(struct KAZEPtr ptr, bool val);
+
+extern "C"
+bool KAZE_getUpright(struct KAZEPtr ptr);
+
+extern "C"
+void KAZE_setThreshold(struct KAZEPtr ptr, double val);
+
+extern "C"
+double KAZE_getThreshold(struct KAZEPtr ptr);
+
+extern "C"
+void KAZE_setNOctaves(struct KAZEPtr ptr, int val);
+
+extern "C"
+int KAZE_getNOctaves(struct KAZEPtr ptr);
+
+extern "C"
+void KAZE_setNOctaveLayers(struct KAZEPtr ptr, int val);
+
+extern "C"
+int KAZE_getNOctaveLayers(struct KAZEPtr ptr);
+
+extern "C"
+void KAZE_setDiffusivity(struct KAZEPtr ptr, int val);
+
+extern "C"
+int KAZE_getDiffusivity(struct KAZEPtr ptr);
+
 // AKAZE
 
 struct AKAZEPtr {
@@ -315,6 +431,53 @@ struct AKAZEPtr {
     inline AKAZEPtr(cv::AKAZE *ptr) { this->ptr = ptr; }
     inline cv::AKAZE & operator*() { return *static_cast<cv::AKAZE *>(this->ptr); }
 };
+
+extern "C"
+struct AKAZEPtr AKAZE_ctor(
+        int descriptor_type, int descriptor_size, int descriptor_channels,
+        float threshold, int nOctaves, int nOctaveLayers, int diffusivity);
+
+extern "C"
+void AKAZE_setDescriptorType(struct AKAZEPtr ptr, int val);
+
+extern "C"
+int AKAZE_getDescriptorType(struct AKAZEPtr ptr);
+
+extern "C"
+void AKAZE_setDescriptorSize(struct AKAZEPtr ptr, int val);
+
+extern "C"
+int AKAZE_getDescriptorSize(struct AKAZEPtr ptr);
+
+extern "C"
+void AKAZE_setDescriptorChannels(struct AKAZEPtr ptr, int val);
+
+extern "C"
+int AKAZE_getDescriptorChannels(struct AKAZEPtr ptr);
+
+extern "C"
+void AKAZE_setThreshold(struct AKAZEPtr ptr, double val);
+
+extern "C"
+double AKAZE_getThreshold(struct AKAZEPtr ptr);
+
+extern "C"
+void AKAZE_setNOctaves(struct AKAZEPtr ptr, int val);
+
+extern "C"
+int AKAZE_getNOctaves(struct AKAZEPtr ptr);
+
+extern "C"
+void AKAZE_setNOctaveLayers(struct AKAZEPtr ptr, int val);
+
+extern "C"
+int AKAZE_getNOctaveLayers(struct AKAZEPtr ptr);
+
+extern "C"
+void AKAZE_setDiffusivity(struct AKAZEPtr ptr, int val);
+
+extern "C"
+int AKAZE_getDiffusivity(struct AKAZEPtr ptr);
 
 // DescriptorMatcher
 
@@ -325,6 +488,46 @@ struct DescriptorMatcherPtr {
     inline cv::DescriptorMatcher & operator*() { return *static_cast<cv::DescriptorMatcher *>(this->ptr); }
 };
 
+extern "C"
+struct DescriptorMatcherPtr DescriptorMatcher_ctor(const char *descriptorMatcherType);
+
+extern "C"
+void DescriptorMatcher_add(struct DescriptorMatcherPtr ptr, struct TensorArray descriptors);
+
+extern "C"
+struct TensorArray DescriptorMatcher_getTrainDescriptors(struct DescriptorMatcherPtr ptr);
+
+extern "C"
+void DescriptorMatcher_clear(struct DescriptorMatcherPtr ptr);
+
+extern "C"
+bool DescriptorMatcher_empty(struct DescriptorMatcherPtr ptr);
+
+extern "C"
+bool DescriptorMatcher_isMaskSupported(struct DescriptorMatcherPtr ptr);
+
+extern "C"
+void DescriptorMatcher_train(struct DescriptorMatcherPtr ptr);
+
+extern "C"
+struct DMatchArray DescriptorMatcher_match(struct DescriptorMatcherPtr ptr,
+                                           struct TensorWrapper queryDescriptors, struct TensorWrapper mask);
+
+extern "C"
+struct DMatchArray DescriptorMatcher_match_trainDescriptors(struct DescriptorMatcherPtr ptr,
+                                                            struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
+                                                            struct TensorWrapper mask);
+
+extern "C"
+struct DMatchArrayOfArrays DescriptorMatcher_knnMatch(struct DescriptorMatcherPtr ptr,
+                                                      struct TensorWrapper queryDescriptors, int k,
+                                                      struct TensorWrapper mask, bool compactResult);
+
+extern "C"
+struct DMatchArrayOfArrays DescriptorMatcher_knnMatch_trainDescriptors(struct DescriptorMatcherPtr ptr,
+                                                                       struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
+                                                                       int k, struct TensorWrapper mask, bool compactResult);
+
 // BFMatcher
 
 struct BFMatcherPtr {
@@ -333,6 +536,9 @@ struct BFMatcherPtr {
     inline BFMatcherPtr(cv::BFMatcher *ptr) { this->ptr = ptr; }
     inline cv::BFMatcher & operator*() { return *static_cast<cv::BFMatcher *>(this->ptr); }
 };
+
+extern "C"
+struct BFMatcherPtr BFMatcher_ctor(int normType, bool crossCheck);
 
 // FlannBasedMatcher
 
@@ -343,6 +549,48 @@ struct FlannBasedMatcherPtr {
     inline cv::FlannBasedMatcher & operator*() { return *static_cast<cv::FlannBasedMatcher *>(this->ptr); }
 };
 
+extern "C"
+struct FlannBasedMatcherPtr FlannBasedMatcher_ctor(
+        struct IndexParamsPtr indexParams, struct SearchParamsPtr searchParams);
+
+// functions
+
+extern "C"
+struct TensorWrapper drawKeypoints(
+        struct TensorWrapper image, struct KeyPointArray keypoints, struct TensorWrapper outImage,
+        struct ScalarWrapper color, int flags);
+
+extern "C"
+struct TensorWrapper drawMatches(
+        struct TensorWrapper img1, struct KeyPointArray keypoints1,
+        struct TensorWrapper img2, struct KeyPointArray keypoints2,
+        struct DMatchArray matches1to2, struct TensorWrapper outImg,
+        struct ScalarWrapper matchColor, struct ScalarWrapper singlePointColor,
+        struct TensorWrapper matchesMask, int flags);
+
+extern "C"
+struct TensorWrapper drawMatchesKnn(
+        struct TensorWrapper img1, struct KeyPointArray keypoints1,
+        struct TensorWrapper img2, struct KeyPointArray keypoints2,
+        struct DMatchArrayOfArrays matches1to2, struct TensorWrapper outImg,
+        struct ScalarWrapper matchColor, struct ScalarWrapper singlePointColor,
+        struct TensorArray matchesMask, int flags);
+
+extern "C"
+struct evaluateFeatureDetectorRetval evaluateFeatureDetector(
+        struct TensorWrapper img1, struct TensorWrapper img2, struct TensorWrapper H1to2,
+        struct Feature2DPtr fdetector);
+
+extern "C"
+struct TensorWrapper computeRecallPrecisionCurve(
+        struct DMatchArrayOfArrays matches1to2, struct TensorArray correctMatches1to2Mask);
+
+extern "C"
+float getRecall(struct TensorWrapper recallPrecisionCurve, float l_precision);
+
+extern "C"
+int getNearestPoint(struct TensorWrapper recallPrecisionCurve, float l_precision);
+
 // BOWTrainer
 
 struct BOWTrainerPtr {
@@ -351,26 +599,6 @@ struct BOWTrainerPtr {
     inline BOWTrainerPtr(cv::BOWTrainer *ptr) { this->ptr = ptr; }
     inline cv::BOWTrainer & operator*() { return *static_cast<cv::BOWTrainer *>(this->ptr); }
 };
-
-// BOWKMeansTrainer
-
-struct BOWKMeansTrainerPtr {
-    void *ptr;
-    inline cv::BOWKMeansTrainer * operator->() { return static_cast<cv::BOWKMeansTrainer *>(ptr); }
-    inline BOWKMeansTrainerPtr(cv::BOWKMeansTrainer *ptr) { this->ptr = ptr; }
-    inline cv::BOWKMeansTrainer & operator*() { return *static_cast<cv::BOWKMeansTrainer *>(this->ptr); }
-};
-
-// BOWImgDescriptorExtractor
-
-struct BOWImgDescriptorExtractorPtr {
-    void *ptr;
-    inline cv::BOWImgDescriptorExtractor * operator->() { return static_cast<cv::BOWImgDescriptorExtractor *>(ptr); }
-    inline BOWImgDescriptorExtractorPtr(cv::BOWImgDescriptorExtractor *ptr) { this->ptr = ptr; }
-    inline cv::BOWImgDescriptorExtractor & operator*() { return *static_cast<cv::BOWImgDescriptorExtractor *>(this->ptr); }
-};
-
-// BOWTrainer
 
 extern "C"
 void BOWTrainer_dtor(struct BOWTrainerPtr ptr);
@@ -393,10 +621,28 @@ struct TensorWrapper BOWTrainer_cluster(struct BOWTrainerPtr ptr);
 extern "C"
 struct TensorWrapper BOWTrainer_cluster_descriptors(struct BOWTrainerPtr ptr, struct TensorWrapper descriptors);
 
+// BOWKMeansTrainer
+
+struct BOWKMeansTrainerPtr {
+    void *ptr;
+    inline cv::BOWKMeansTrainer * operator->() { return static_cast<cv::BOWKMeansTrainer *>(ptr); }
+    inline BOWKMeansTrainerPtr(cv::BOWKMeansTrainer *ptr) { this->ptr = ptr; }
+    inline cv::BOWKMeansTrainer & operator*() { return *static_cast<cv::BOWKMeansTrainer *>(this->ptr); }
+};
+
 extern "C"
 struct BOWKMeansTrainerPtr BOWKMeansTrainer_ctor(
         int clusterCount, struct TermCriteriaWrapper termcrit,
         int attempts, int flags);
+
+// BOWImgDescriptorExtractor
+
+struct BOWImgDescriptorExtractorPtr {
+    void *ptr;
+    inline cv::BOWImgDescriptorExtractor * operator->() { return static_cast<cv::BOWImgDescriptorExtractor *>(ptr); }
+    inline BOWImgDescriptorExtractorPtr(cv::BOWImgDescriptorExtractor *ptr) { this->ptr = ptr; }
+    inline cv::BOWImgDescriptorExtractor & operator*() { return *static_cast<cv::BOWImgDescriptorExtractor *>(this->ptr); }
+};
 
 extern "C"
 struct BOWImgDescriptorExtractorPtr BOWImgDescriptorExtractor_ctor(
@@ -410,15 +656,15 @@ void BOWImgDescriptorExtractor_setVocabulary(
         struct BOWImgDescriptorExtractorPtr ptr, struct TensorWrapper vocabulary);
 
 extern "C"
-struct TensorWrapper getVocabulary(struct BOWImgDescriptorExtractorPtr ptr);
+struct TensorWrapper BOWImgDescriptorExtractor_getVocabulary(struct BOWImgDescriptorExtractorPtr ptr);
 
 extern "C"
-struct TensorWrapper compute(
+struct TensorWrapper BOWImgDescriptorExtractor_compute(
         struct BOWImgDescriptorExtractorPtr ptr, struct TensorWrapper image,
         struct KeyPointArray keypoints, struct TensorWrapper imgDescriptor);
 
 extern "C"
-int descriptorSize(struct BOWImgDescriptorExtractorPtr ptr);
+int BOWImgDescriptorExtractor_descriptorSize(struct BOWImgDescriptorExtractorPtr ptr);
 
 extern "C"
-int descriptorType(struct BOWImgDescriptorExtractorPtr ptr);
+int BOWImgDescriptorExtractor_descriptorType(struct BOWImgDescriptorExtractorPtr ptr);

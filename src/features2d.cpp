@@ -28,20 +28,6 @@ KeyPointArray::operator std::vector<cv::KeyPoint>()
     return retval;
 }
 
-KeyPointMat::KeyPointMat(const std::vector<std::vector<cv::KeyPoint> > & v)
-{
-    // TODO: this function
-    this->size1 = v.size();
-    this->size2 = v[0].size();
-}
-
-KeyPointMat::operator std::vector<std::vector<cv::KeyPoint> >()
-{
-    // TODO: this function
-    std::vector<std::vector<cv::KeyPoint> > retval;
-    return retval;
-}
-
 // KeyPointsFilter
 
 extern "C"
@@ -821,44 +807,44 @@ struct DescriptorMatcherPtr DescriptorMatcher_ctor(const char *descriptorMatcher
 }
 
 extern "C"
-void add(struct DescriptorMatcherPtr ptr, struct TensorArray descriptors)
+void DescriptorMatcher_add(struct DescriptorMatcherPtr ptr, struct TensorArray descriptors)
 {
     ptr->add(descriptors.toMatList());
 }
 
 extern "C"
-struct TensorArray getTrainDescriptors(struct DescriptorMatcherPtr ptr)
+struct TensorArray DescriptorMatcher_getTrainDescriptors(struct DescriptorMatcherPtr ptr)
 {
     std::vector<cv::Mat> retval = ptr->getTrainDescriptors();
     return TensorArray(retval);
 }
 
 extern "C"
-void clear(struct DescriptorMatcherPtr ptr)
+void DescriptorMatcher_clear(struct DescriptorMatcherPtr ptr)
 {
     ptr->clear();
 }
 
 extern "C"
-bool empty(struct DescriptorMatcherPtr ptr)
+bool DescriptorMatcher_empty(struct DescriptorMatcherPtr ptr)
 {
     ptr->empty();
 }
 
 extern "C"
-bool isMaskSupported(struct DescriptorMatcherPtr ptr)
+bool DescriptorMatcher_isMaskSupported(struct DescriptorMatcherPtr ptr)
 {
     return ptr->isMaskSupported();
 }
 
 extern "C"
-void train(struct DescriptorMatcherPtr ptr)
+void DescriptorMatcher_train(struct DescriptorMatcherPtr ptr)
 {
     ptr->train();
 }
 
 extern "C"
-struct DMatchArray match(struct DescriptorMatcherPtr ptr,
+struct DMatchArray DescriptorMatcher_match(struct DescriptorMatcherPtr ptr,
         struct TensorWrapper queryDescriptors, struct TensorWrapper mask)
 {
     std::vector<cv::DMatch> retval;
@@ -868,7 +854,7 @@ struct DMatchArray match(struct DescriptorMatcherPtr ptr,
 }
 
 extern "C"
-struct DMatchArray match_trainDescriptors(struct DescriptorMatcherPtr ptr,
+struct DMatchArray DescriptorMatcher_match_trainDescriptors(struct DescriptorMatcherPtr ptr,
         struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
         struct TensorWrapper mask)
 {
@@ -879,7 +865,7 @@ struct DMatchArray match_trainDescriptors(struct DescriptorMatcherPtr ptr,
 }
 
 extern "C"
-struct DMatchArrayOfArrays knnMatch(struct DescriptorMatcherPtr ptr,
+struct DMatchArrayOfArrays DescriptorMatcher_knnMatch(struct DescriptorMatcherPtr ptr,
         struct TensorWrapper queryDescriptors, int k,
         struct TensorWrapper mask, bool compactResult)
 {
@@ -891,7 +877,8 @@ struct DMatchArrayOfArrays knnMatch(struct DescriptorMatcherPtr ptr,
 }
 
 extern "C"
-struct DMatchArrayOfArrays knnMatch_trainDescriptors(struct DescriptorMatcherPtr ptr,
+struct DMatchArrayOfArrays DescriptorMatcher_knnMatch_trainDescriptors(
+        struct DescriptorMatcherPtr ptr,
         struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
         int k, struct TensorWrapper mask, bool compactResult) {
     std::vector<std::vector<cv::DMatch>> retval;
@@ -912,7 +899,7 @@ struct BFMatcherPtr BFMatcher_ctor(int normType, bool crossCheck)
 // FlannBasedMatcher
 
 extern "C"
-struct FlannBasedMatcherPtr FlannBasedMatcher(
+struct FlannBasedMatcherPtr FlannBasedMatcher_ctor(
         struct IndexParamsPtr indexParams, struct SearchParamsPtr searchParams)
 {
     cv::Ptr<flann::IndexParams> indexParamsPtr(
@@ -1006,6 +993,62 @@ struct TensorWrapper drawMatchesKnn(
                 matchColor, singlePointColor, matchesMaskVec, flags);
         return outImg;
     }
+}
+
+extern "C"
+struct evaluateFeatureDetectorRetval evaluateFeatureDetector(
+        struct TensorWrapper img1, struct TensorWrapper img2, struct TensorWrapper H1to2,
+        struct Feature2DPtr fdetector)
+{
+    cv::Ptr<cv::FeatureDetector> fdetectorPtr(static_cast<cv::Feature2D *>(fdetector.ptr));
+    rescueObjectFromPtr(fdetectorPtr);
+    
+    evaluateFeatureDetectorRetval retval;
+    std::vector<cv::KeyPoint> keypoints1, keypoints2;
+    cv::evaluateFeatureDetector(
+            img1.toMat(), img2.toMat(), H1to2.toMat(), &keypoints1, &keypoints2,
+            retval.repeatability, retval.correspCount, fdetectorPtr);
+    
+    new (&retval.keypoints1) KeyPointArray(keypoints1);
+    new (&retval.keypoints2) KeyPointArray(keypoints2);
+    
+    return retval;
+}
+
+extern "C"
+struct TensorWrapper computeRecallPrecisionCurve(
+        struct DMatchArrayOfArrays matches1to2, struct TensorArray correctMatches1to2Mask)
+{
+    std::vector<std::vector<unsigned char>> correctMatches1to2MaskVec(correctMatches1to2Mask.size);
+    for (int i = 0; i < correctMatches1to2Mask.size; ++i) {
+        cv::Mat tempMat = correctMatches1to2Mask.tensors[i];
+        correctMatches1to2MaskVec[i].resize(tempMat.rows * tempMat.cols);
+
+        if (!tempMat.empty()) {
+            std::copy(
+                    tempMat.begin<char>(),
+                    tempMat.end<char>(),
+                    correctMatches1to2MaskVec[i].begin());
+        }
+    }
+
+    std::vector<cv::Point2f> result;
+    cv::computeRecallPrecisionCurve(matches1to2, correctMatches1to2MaskVec, result);
+    return TensorWrapper(cv::Mat(result));
+}
+
+extern "C"
+float getRecall(struct TensorWrapper recallPrecisionCurve, float l_precision)
+{
+    std::vector<cv::Point2f> recallPrecisionCurveVec = recallPrecisionCurve.toMat();
+    return cv::getRecall(recallPrecisionCurveVec, l_precision);
+}
+
+extern "C"
+int getNearestPoint(struct TensorWrapper recallPrecisionCurve, float l_precision)
+{
+    std::vector<cv::Point2f> recallPrecisionCurveVec = recallPrecisionCurve.toMat();
+    return cv::getNearestPoint(recallPrecisionCurveVec, l_precision);
 }
 
 // BOWTrainer
