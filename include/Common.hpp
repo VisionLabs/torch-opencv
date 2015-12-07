@@ -9,10 +9,13 @@ extern "C" {
 #include <array>
 
 extern "C" int getIntMax() { return INT_MAX; }
+extern "C" float getFloatMax() { return FLT_MAX; }
 
 /***************** Tensor <=> Mat conversion *****************/
 
 #define TO_MAT_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toMat())
+
+#define TO_MAT_LIST_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toMatList())
 
 struct TensorWrapper {
     void *tensorPtr;
@@ -30,7 +33,7 @@ struct TensorWrapper {
 
 struct TensorArray {
     struct TensorWrapper *tensors;
-    short size;
+    int size;
 
     TensorArray();
     TensorArray(std::vector<cv::Mat> & matList);
@@ -166,6 +169,31 @@ struct RotatedRectPlusRect {
     struct RectWrapper rect;
 };
 
+struct DMatchWrapper {
+    int queryIdx;
+    int trainIdx;
+    int imgIdx;
+    float distance;
+};
+
+struct DMatchArray {
+    int size;
+    struct DMatchWrapper *data;
+
+    DMatchArray() {}
+    DMatchArray(std::vector<cv::DMatch> & other);
+    operator std::vector<cv::DMatch>();
+};
+
+struct DMatchArrayOfArrays {
+    int size;
+    struct DMatchArray *data;
+
+    DMatchArrayOfArrays() {}
+    DMatchArrayOfArrays(std::vector<std::vector<cv::DMatch>> & other);
+    operator std::vector<std::vector<cv::DMatch>>();
+};
+
 /***************** Helper wrappers for [OpenCV class + some primitive] *****************/
 
 struct TensorPlusDouble {
@@ -239,7 +267,7 @@ struct IntArray {
 
 struct FloatArray {
     float *data;
-    int size;
+    int size; 
     inline std::vector<float>& toFloatList(std::vector<float>& res) {
         for (int i = 0; i < size; ++i)
             res.push_back(data[i]);

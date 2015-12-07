@@ -21,7 +21,7 @@ struct TensorWrapper {
 
 struct TensorArray {
     struct TensorWrapper *tensors;
-    short size;
+    int size;
 };
 
 void *malloc(size_t size);
@@ -85,6 +85,23 @@ struct MomentsWrapper {
 struct RotatedRectPlusRect {
     struct RotatedRectWrapper rotrect;
     struct RectWrapper rect;
+};
+
+struct DMatchWrapper {
+    int queryIdx;
+    int trainIdx;
+    int imgIdx;
+    float distance;
+};
+
+struct DMatchArray {
+    int size;
+    struct DMatchWrapper *data;
+};
+
+struct DMatchArrayOfArrays {
+    int size;
+    struct DMatchArray *data;
 };
 
 struct TensorPlusDouble {
@@ -169,6 +186,7 @@ struct FloatArrayOfArrays {
 };
 
 int getIntMax();
+float getFloatMax();
 
 struct PointArrayOfArrays {
     struct PointWrapper **pointers;
@@ -190,6 +208,7 @@ local C = ffi.load(cv.libPath('Common'))
 require 'cv.constants'
 
 cv.INT_MAX = C.getIntMax()
+cv.FLT_MAT = C.getFloatMax()
 cv.NULLPTR = ffi.new('void *', nil)
 
 --- ***************** Argument checking & unpacking *****************
@@ -201,8 +220,6 @@ function cv.argcheck(t, rules)
         if userInputArg == nil then
             userInputArg = t[i]
         end
-        
-        --print(argument[1], type(t[argument[1]]), type(t[i]))
 
         if userInputArg == nil then
             if argument.required then
@@ -525,5 +542,10 @@ function cv.arrayToLua(array, outputType, output)
     return retval
 end
 
+-- make an array that has come from C++ garbage-collected
+function cv.gcarray(array)
+    array.data = ffi.gc(array.data, C.free)
+    return array
+end
 
 return cv

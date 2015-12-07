@@ -160,6 +160,35 @@ MomentsWrapper::MomentsWrapper(const cv::Moments & other) {
     nu21 = other.nu21; nu12 = other.nu12; nu03 = other.nu03;
 }
 
+DMatchArray::DMatchArray(std::vector<cv::DMatch> & other) {
+    this->size = other.size();
+    size_t memSize = this->size * sizeof(DMatchWrapper);
+    this->data = static_cast<DMatchWrapper *>(malloc(memSize));
+    memcpy(this->data, other.data(), memSize);
+}
+
+DMatchArray::operator std::vector<cv::DMatch>() {
+    std::vector<cv::DMatch> retval(this->size);
+    memcpy(retval.data(), this->data, this->size * sizeof(DMatchWrapper));
+    return retval;
+}
+
+DMatchArrayOfArrays::DMatchArrayOfArrays(std::vector<std::vector<cv::DMatch>> & other) {
+    this->size = other.size();
+    this->data = static_cast<DMatchArray *>(malloc(this->size * sizeof(DMatchArray)));
+    for (int i = 0; i < this->size; ++i) {
+        new (this->data + i) DMatchArray(other[i]);
+    }
+}
+
+DMatchArrayOfArrays::operator std::vector<std::vector<cv::DMatch>>() {
+    std::vector<std::vector<cv::DMatch>> retval(this->size);
+    for (int i = 0; i < this->size; ++i) {
+        retval[i] = this->data[i];
+    }
+    return retval;
+}
+
 /***************** Helper wrappers for [OpenCV class + some primitive] *****************/
 
 RectWrapper & RectWrapper::operator=(cv::Rect & other) {
