@@ -1,4 +1,4 @@
-PROJECT(opencv.torch)
+PROJECT(Torch_OpenCV)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8 FATAL_ERROR)
 
 SET(BUILD_TESTS OFF)
@@ -6,7 +6,16 @@ SET(BUILD_TESTS OFF)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
+SET(OPENCV_MODULES_TO_WRAP imgcodecs highgui features2d flann imgproc ml optflow photo superres video videoio)
+
+# Unfortunately, OpenCVConfig.cmake doesn't make use of FIND_PACKAGE's "OPTIONAL_COMPONENTS"
+# So let's invoke FIND_PACKAGE twice:
+
+# Once (error-throwing) to check if OpenCV is present
 FIND_PACKAGE(OpenCV REQUIRED)
+# Once more (silently) to look for the installed modules
+FIND_PACKAGE(OpenCV OPTIONAL_COMPONENTS ${OPENCV_MODULES_TO_WRAP})
+
 FIND_PACKAGE(Torch REQUIRED)
 INCLUDE_DIRECTORIES(${Torch_INSTALL_INCLUDE} ${OpenCV_INCLUDE_DIRS})
 
@@ -16,15 +25,19 @@ INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/include")
 ADD_LIBRARY(Common SHARED "${SOURCE_DIR}/Common.cpp")
 TARGET_LINK_LIBRARIES(Common TH ${OpenCV_LIBS})
 
-SET(SHARED_LIBS imgcodecs highgui features2d flann imgproc ml optflow photo superres video videoio Classes)
+ADD_LIBRARY(Classes SHARED "${SOURCE_DIR}/Classes.cpp")
+TARGET_LINK_LIBRARIES(Classes Common)
 
-FOREACH(LIB ${SHARED_LIBS})
-    ADD_LIBRARY(${LIB} SHARED "${SOURCE_DIR}/${LIB}.cpp")
-    TARGET_LINK_LIBRARIES(${LIB} Common)
+FOREACH(MODULE ${OPENCV_MODULES_TO_WRAP})
+    STRING(TOUPPER ${MODULE} MODULE_UPPERCASE)
+    IF (OPENCV_${MODULE_UPPERCASE}_FOUND)
+        ADD_LIBRARY(${MODULE} SHARED "${SOURCE_DIR}/${MODULE}.cpp")
+        TARGET_LINK_LIBRARIES(${MODULE} Common)
+    ENDIF()
 ENDFOREACH()
 
-if (BUILD_TESTS)
-    file(GLOB Tests_SRC "${SOURCE_DIR}/tests/*.cpp")
+IF (BUILD_TESTS)
+    FILE(GLOB Tests_SRC "${SOURCE_DIR}/tests/*.cpp")
     ADD_LIBRARY(Tests SHARED ${Tests_SRC})
     TARGET_LINK_LIBRARIES(Tests Common)
 endif()
