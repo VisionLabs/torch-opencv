@@ -13,7 +13,7 @@ extern "C" struct TensorArrayPlusInt buildOpticalFlowPyramid(struct TensorWrappe
                         struct SizeWrapper winSize, int maxLevel, bool withDerivatives, int pyrBorder,
                         int derivBorder, bool tryReuseInputImage);
 
-extern "C" struct TensorPlusTensorPlusTensor calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
+extern "C" struct TensorArray calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
                         struct TensorWrapper nextImg, struct TensorWrapper prevPts,
                         struct TensorWrapper nextPts, struct TensorWrapper status,
                         struct TensorWrapper err, struct SizeWrapper winSize, int maxLevel,

@@ -100,7 +100,7 @@ struct TensorArrayPlusInt buildOpticalFlowPyramid(struct TensorWrapper img, stru
                         struct SizeWrapper winSize, int maxLevel, bool withDerivatives, int pyrBorder,
                         int derivBorder, bool tryReuseInputImage);
 
-struct TensorPlusTensorPlusTensor calcOpticalFlowPyrLK(struct TensorWrapper prevImg, struct TensorWrapper nextImg,
+struct TensorArray calcOpticalFlowPyrLK(struct TensorWrapper prevImg, struct TensorWrapper nextImg,
                         struct TensorWrapper prevPts, struct TensorWrapper nextPts, struct TensorWrapper status,
                         struct TensorWrapper err, struct SizeWrapper winSize, int maxLevel,
                         struct TermCriteriaWrapper criteria, int flags, double minEigThreshold);
@@ -604,7 +604,7 @@ function cv.calcOpticalFlowPyrLK(t)
         {"prevImg", required = true},
         {"nextImg", required = true},
         {"prevPts", required = true},
-        {"nextPts", required = true},
+        {"nextPts", default = nil},
         {"status", default = nil},
         {"err", default = nil},
         {"winSize", default = {21, 21}, operator = cv.Size},
@@ -615,10 +615,10 @@ function cv.calcOpticalFlowPyrLK(t)
     }
     local prevImg, nextImg, prevPts, nextPts, status, err, winSize, maxLevel, criteria, flags, minEigThreshold = cv.argcheck(t, argRules)
 
-    local result = C.calcOpticalFlowPyrLK(cv.wrap_tensor(prevImg), cv.wrap_tensor(nextImg),
+    local nextPts, status, err = cv.unwrap_tensors(C.calcOpticalFlowPyrLK(cv.wrap_tensor(prevImg), cv.wrap_tensor(nextImg),
             cv.wrap_tensor(prevPts), cv.wrap_tensor(nextPts), cv.wrap_tensor(status),
-            cv.wrap_tensor(err), winSize, maxLevel, criteria, flags, minEigThreshold)
-    return cv.unwrap_tensors(result.tensor), cv.unwrap_tensors(result.status), cv.unwrap_tensors(result.err)
+            cv.wrap_tensor(err), winSize, maxLevel, criteria, flags, minEigThreshold))
+    return nextPts, status, err
 end
 
 function cv.calcOpticalFlowFarneback(t)

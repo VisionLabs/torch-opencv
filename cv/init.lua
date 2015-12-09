@@ -195,12 +195,6 @@ struct PointArrayOfArrays {
     int *sizes;
 };
 
-struct TensorPlusTensorPlusTensor {
-    struct TensorWrapper tensor;
-    struct TensorWrapper status;
-    struct TensorWrapper err;
-};
-
 ]]
 
 local C = ffi.load(cv.libPath('Common'))

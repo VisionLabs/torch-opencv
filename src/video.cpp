@@ -31,29 +31,23 @@ extern "C" struct TensorArrayPlusInt buildOpticalFlowPyramid(struct TensorWrappe
     return retval;
 }
 
-extern "C" struct TensorPlusTensorPlusTensor calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
+extern "C" struct TensorArray calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
                         struct TensorWrapper nextImg, struct TensorWrapper prevPts,
                         struct TensorWrapper nextPts, struct TensorWrapper status,
                         struct TensorWrapper err, struct SizeWrapper winSize, int maxLevel,
                         struct TermCriteriaWrapper criteria, int flags, double minEigThreshold)
 {
-    cv::Mat statusMat;
-    if (!status.isNull())
-        statusMat = status.toMat();
-    cv::Mat errMat;
-    if (!err.isNull())
-        errMat = err.toMat();
+    std::vector<cv::Mat> retval(3);
+    if (!nextPts.isNull()) retval[0] = nextPts;
+    if (!status.isNull()) retval[1] = status;
+    if (!err.isNull()) retval[2] = err;
 
-    cv::calcOpticalFlowPyrLK(prevImg.toMat(), nextImg.toMat(), prevPts.toMat(), nextPts.toMat(),
-                    statusMat, errMat, winSize, maxLevel,
+    cv::calcOpticalFlowPyrLK(prevImg.toMat(), nextImg.toMat(), prevPts.toMat(), retval[0], retval[1],
+                    retval[2], winSize, maxLevel,
                     criteria.orDefault(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01)),
                     flags, minEigThreshold);
     
-    struct TensorPlusTensorPlusTensor retval;
-    retval.tensor = nextPts;
-    retval.status = TensorWrapper(statusMat);
-    retval.err = TensorWrapper(errMat);
-    return retval;
+    return TensorArray(retval);
 }
 
 extern "C" struct TensorWrapper calcOpticalFlowFarneback(struct TensorWrapper prev, struct TensorWrapper next,
