@@ -6,7 +6,7 @@ SET(BUILD_TESTS OFF)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-SET(OPENCV_MODULES_TO_WRAP imgcodecs highgui features2d flann imgproc ml optflow photo superres video videoio)
+SET(OPENCV_MODULES_TO_WRAP imgcodecs highgui features2d flann imgproc ml optflow photo superres videoio)
 
 # Unfortunately, OpenCVConfig.cmake doesn't make use of FIND_PACKAGE's "OPTIONAL_COMPONENTS"
 # So let's invoke FIND_PACKAGE twice:
