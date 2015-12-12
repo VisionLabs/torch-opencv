@@ -1,5 +1,4 @@
 #pragma once
-#include <opencv2/core.hpp>
 #include <Common.hpp>
 
 // This is cv::Ptr with all fields made public
