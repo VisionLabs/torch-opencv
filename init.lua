@@ -242,12 +242,13 @@ end
 --- ***************** Tensor <=> Mat conversion *****************
 
 local tensor_CV_code_by_letter = {
-    [66] = cv.CV_8U , -- Byte
-    [70] = cv.CV_32F, -- Float
-    [68] = cv.CV_64F, -- Double
-    [73] = cv.CV_32S, -- Int
-    [83] = cv.CV_16S, -- Short
-    [67] = cv.CV_8S , -- Char
+    [ 66] = cv.CV_8U , -- B : Byte
+    [ 70] = cv.CV_32F, -- F : Float
+    [ 68] = cv.CV_64F, -- D : Double
+    [ 73] = cv.CV_32S, -- I : Int
+    [ 83] = cv.CV_16S, -- S : Short
+    [104] = cv.CV_8S , -- h : Char
+    [117] = 666      , -- u : CUDA
 }
 
 local tensor_type_by_CV_code = {
@@ -256,7 +257,8 @@ local tensor_type_by_CV_code = {
     [cv.CV_64F] = "Double",
     [cv.CV_32S] = "Int",
     [cv.CV_16S] = "Short",
-    [cv.CV_8S ] = "Char"
+    [cv.CV_8S ] = "Char",
+    [666      ] = "CUDA (Float)"
 }
 
 cv.EMPTY_WRAPPER = ffi.new("struct TensorWrapper", nil)
@@ -268,6 +270,8 @@ function cv.tensorType(tensor)
 
     if letter == 76 then
         error("Sorry, LongTensors aren't supported. Consider using IntTensor")
+    elseif letter == 67 then
+        letter = tensor:type():byte(8)
     end
 
     return tensor_CV_code_by_letter[letter]
