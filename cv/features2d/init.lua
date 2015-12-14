@@ -10,7 +10,7 @@ function cv.tableToDMatchArrayOfArrays(tbl)
     result.data = ffi.gc(
         C.malloc(#tbl * ffi.sizeof('struct DMatchArray')),
         C.free)
-    for i in 1, #tbl do
+    for i = 1, #tbl do
         result.data[i-1] = tbl[i]
     end
 end
@@ -1421,7 +1421,7 @@ do
         end
 
         local retval = {}
-        for i in 0, result.size - 1 do
+        for i = 0, result.size - 1 do
             retval[i + 1] = cv.gcarray(result[i])
         end
 
@@ -1554,7 +1554,7 @@ function cv.computeRecallPrecisionCurve(t)
     local matches1to2, correctMatches1to2Mask = cv.argcheck(t, argRules)
 
     assert(type(correctMatches1to2Mask) == 'table')
-    for i in 1, #correctMatches1to2Mask do
+    for i = 1, #correctMatches1to2Mask do
         assert(
             torch.isTensor(correctMatches1to2Mask[i]) and 
             cv.tensorType(correctMatches1to2Mask[i]) == cv.CV_8U)
