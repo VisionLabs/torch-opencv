@@ -7,12 +7,14 @@ local cv = require 'cv'
 cv.cuda = require 'cv.cudaarithm'
 require 'cutorch'
 
-local a = (torch.rand(5, 5) * 10):int():float():cuda()
-local b = (torch.rand(5, 5) * 10):int():float():cuda()
-local c = torch.FloatTensor(5, 5)
+local n = 5
 
-for i = 1, 5 do
-	for j = 1, 5 do
+local a = (torch.rand(n, n) * 10):int():float():cuda()
+local b = (torch.rand(n, n) * 10):int():float():cuda()
+local c = torch.FloatTensor(n, n)
+
+for i = 1, n do
+	for j = 1, n do
 		c[i][j] = math.min(a[i][j], b[i][j])
 	end
 end

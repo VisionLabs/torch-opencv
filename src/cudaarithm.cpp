@@ -12,7 +12,11 @@ struct TensorWrapper min(
 
         cv::Mat temp;
         result.download(temp);
-        std::cout << temp << std::endl;
+        //std::cout << temp << std::endl;
+        //cout << "temp step,rows: " << temp.step << " " << temp.rows << endl;
+        //cout << "result step,rows: " << result.step << " " << result.rows << endl;
+
+
 
         return TensorWrapper(result, state);
     } else {

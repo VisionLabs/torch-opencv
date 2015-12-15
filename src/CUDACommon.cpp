@@ -1,6 +1,9 @@
 #include <CUDACommon.hpp>
 #include <array>
 
+using namespace std;
+#define pr(v) cout << #v << " = " << v << "\n";
+
 cuda::GpuMat TensorWrapper::toGpuMat() {
 
     if (this->tensorPtr == nullptr) {
@@ -8,6 +11,16 @@ cuda::GpuMat TensorWrapper::toGpuMat() {
     }
 
     THCudaTensor *tensorPtr = static_cast<THCudaTensor *>(this->tensorPtr);
+
+    pr(tensorPtr->nDimension);
+    pr(tensorPtr->refcount)
+    pr(tensorPtr->size[0])
+    pr(tensorPtr->size[1])
+    pr(tensorPtr->storageOffset)
+    pr(tensorPtr->stride[0])
+    pr(tensorPtr->stride[1])
+    pr(tensorPtr->storage->size)
+    pr(tensorPtr->storage->refcount)
 
     int numChannels = 1;
     if (tensorPtr->nDimension == 3) {
@@ -40,8 +53,10 @@ TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state) {
     outputPtr->storage = THCudaStorage_newWithData(
             state,
             reinterpret_cast<float *>(mat.data),
-            mat.step * mat.rows
+            mat.step * mat.rows * mat.channels() / cv::getElemSize(mat.depth())
     );
+
+    std::cout << "block size " << mat.step * mat.rows * mat.channels() / cv::getElemSize(mat.depth())  << std::endl;
 
     int sizeMultiplier;
     if (mat.channels() == 1) {
@@ -56,20 +71,37 @@ TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state) {
     outputPtr->stride = static_cast<long *>(THAlloc(sizeof(long) * outputPtr->nDimension));
 
     if (mat.channels() > 1) {
-        outputPtr->size[outputPtr->nDimension - 1] = mat.channels();
-        outputPtr->stride[outputPtr->nDimension - 1] = 1; //cv::getElemSize(returnValue.typeCode);
+        outputPtr->size[2] = mat.channels();
+        outputPtr->stride[2] = 1; //cv::getElemSize(returnValue.typeCode);
     }
 
     outputPtr->size[0] = mat.rows;
-    outputPtr->stride[0] = mat.step / sizeMultiplier;
-
     outputPtr->size[1] = mat.cols;
-    outputPtr->stride[1] = mat.step / sizeMultiplier;
+
+    outputPtr->stride[0] = mat.step / sizeMultiplier;
+    outputPtr->stride[1] = 1;
+
+    outputPtr->storageOffset = 0;
+    
+    std::cout << "size " << outputPtr->size[0] << " " << outputPtr->size[1] << std::endl;
+    std::cout << "stride " << outputPtr->stride[0] << " " << outputPtr->stride[1] << std::endl;
+
 
     // Make OpenCV treat underlying data as user-allocated
     mat.refcount = nullptr;
 
     outputPtr->refcount = 0;
+
+    pr(mat.isContinuous())
+    pr(outputPtr->nDimension);
+    pr(outputPtr->refcount)
+    pr(outputPtr->size[0])
+    pr(outputPtr->size[1])
+    pr(outputPtr->storageOffset)
+    pr(outputPtr->stride[0])
+    pr(outputPtr->stride[1])
+    pr(outputPtr->storage->size)
+    pr(outputPtr->storage->refcount)
 
     this->tensorPtr = outputPtr;
 }
