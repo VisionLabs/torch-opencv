@@ -31,6 +31,7 @@ void *malloc(size_t size);
 void free(void *ptr);
 
 void transfer_tensor(void *destination, void *source);
+void transfer_tensor_CUDA(void *state, void *destination, void *source);
 
 struct SizeWrapper {
     int width, height;
@@ -207,6 +208,7 @@ struct TensorPlusTensorPlusTensor {
 ]]
 
 local C = ffi.load(cv.libPath('Common'))
+local _, CUDACommon_C = pcall(ffi.load, cv.libPath('CUDACommon'))
 
 require 'cv.constants'
 
@@ -242,23 +244,23 @@ end
 --- ***************** Tensor <=> Mat conversion *****************
 
 local tensor_CV_code_by_letter = {
-    [ 66] = cv.CV_8U , -- B : Byte
-    [ 70] = cv.CV_32F, -- F : Float
-    [ 68] = cv.CV_64F, -- D : Double
-    [ 73] = cv.CV_32S, -- I : Int
-    [ 83] = cv.CV_16S, -- S : Short
-    [104] = cv.CV_8S , -- h : Char
-    [117] = 666      , -- u : CUDA
+    [ 66] = cv.CV_8U  , -- B : Byte
+    [ 70] = cv.CV_32F , -- F : Float
+    [ 68] = cv.CV_64F , -- D : Double
+    [ 73] = cv.CV_32S , -- I : Int
+    [ 83] = cv.CV_16S , -- S : Short
+    [104] = cv.CV_8S  , -- h : Char
+    [117] = cv.CV_CUDA, -- u : Cuda
 }
 
 local tensor_type_by_CV_code = {
-    [cv.CV_8U ] = "Byte",
-    [cv.CV_32F] = "Float",
-    [cv.CV_64F] = "Double",
-    [cv.CV_32S] = "Int",
-    [cv.CV_16S] = "Short",
-    [cv.CV_8S ] = "Char",
-    [666      ] = "CUDA (Float)"
+    [cv.CV_8U  ] = "Byte",
+    [cv.CV_32F ] = "Float",
+    [cv.CV_64F ] = "Double",
+    [cv.CV_32S ] = "Int",
+    [cv.CV_16S ] = "Short",
+    [cv.CV_8S  ] = "Char",
+    [cv.CV_CUDA] = "Cuda"
 }
 
 cv.EMPTY_WRAPPER = ffi.new("struct TensorWrapper", nil)
@@ -266,23 +268,21 @@ cv.EMPTY_MULTI_WRAPPER = ffi.new("struct TensorArray", nil)
 
 function cv.tensorType(tensor)
     -- get the first letter of Tensor type
-    local letter = tensor:type():byte(7)
+    local typeString = tensor:type()
+    local letter1, letter2 = typeString:byte(7), typeString:byte(8)
 
-    if letter == 76 then
+    if letter1 == 76 then
         error("Sorry, LongTensors aren't supported. Consider using IntTensor")
-    elseif letter == 67 then
-        letter = tensor:type():byte(8)
+    elseif letter1 == 67 then
+        letter1 = letter2
     end
 
-    return tensor_CV_code_by_letter[letter]
+    return tensor_CV_code_by_letter[letter1]
 end
 
 local
 function empty_tensor_of_type(code)
-    if code == cv.CV_16U then
-        error("Sorry, cv::Mats of type CV_16U aren't supported.")
-    end
-
+    assert(code ~= cv.CV_16U, "Sorry, cv::Mats of type CV_16U aren't supported.")
     return torch[tensor_type_by_CV_code[code] .. "Tensor"]()
 end
 
@@ -329,8 +329,15 @@ function cv.unwrap_tensors(wrapper, toTable)
         if wrapper.tensorPtr == nil then
             return
         end
+        
         retval = empty_tensor_of_type(wrapper.typeCode)
-        C.transfer_tensor(retval:cdata(), wrapper.tensorPtr)
+        
+        if wrapper.typeCode == cv.CV_CUDA then
+            C.transfer_tensor(retval:cdata(), wrapper.tensorPtr)
+        else
+            CUDACommon_C.transfer_tensor_CUDA(cutorch._state, retval:cdata(), wrapper.tensorPtr)
+        end
+
         return retval
     else
         -- handle multiple tensors

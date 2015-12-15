@@ -19,6 +19,7 @@ extern "C" float getFloatMax() { return FLT_MAX; }
 #define TO_MAT_LIST_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toMatList())
 
 class cv::cuda::GpuMat;
+struct THCState;
 
 struct TensorWrapper {
     void *tensorPtr;
@@ -27,6 +28,8 @@ struct TensorWrapper {
     TensorWrapper();
     TensorWrapper(cv::Mat & mat);
     TensorWrapper(cv::Mat && mat);
+    TensorWrapper(cv::cuda::GpuMat & mat, THCState *state);
+    TensorWrapper(cv::cuda::GpuMat && mat, THCState *state);
 
     operator cv::Mat();
     // synonym for operator cv::Mat()

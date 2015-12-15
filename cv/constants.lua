@@ -596,6 +596,7 @@ cv.CV_8UC1 = 0
 cv.CV_8UC2 = 8
 cv.CV_8UC3 = 16
 cv.CV_8UC4 = 24
+cv.CV_CUDA = 666
 cv.DCT_INVERSE = 1
 cv.DCT_ROWS = 4
 cv.DECOMP_CHOLESKY = 3
