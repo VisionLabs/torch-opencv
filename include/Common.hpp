@@ -1,9 +1,10 @@
 #pragma once
-#include <opencv2/core.hpp>
 
 extern "C" {
 #include <TH/TH.h>
 }
+
+#include <opencv2/core.hpp>
 
 #include <iostream>
 #include <array>
