@@ -1,7 +1,6 @@
 #include <Common.hpp>
 #include <Classes.hpp>
 #include <opencv2/video.hpp>
-#include <opencv2/bgsegm.hpp>
 
 extern "C" struct RotatedRectPlusRect CamShift(struct TensorWrapper probImage,
                         struct RectWrapper window, struct TermCriteriaWrapper criteria);
@@ -242,85 +241,3 @@ extern "C" int DualTVL1OpticalFlow_getMedianFiltering(struct DualTVL1OpticalFlow
 extern "C" void DualTVL1OpticalFlow_setUseInitialFlow(struct DualTVL1OpticalFlowPtr ptr, bool val);
 
 extern "C" bool DualTVL1OpticalFlow_getUseInitialFlow(struct DualTVL1OpticalFlowPtr ptr);
-
-// BackgroundSubtractorMOG
-
-using namespace cv::bgsegm;
-
-struct BackgroundSubtractorMOGPtr {
-    void *ptr;
-    inline BackgroundSubtractorMOG * operator->() { return static_cast<BackgroundSubtractorMOG *>(ptr); }
-    inline BackgroundSubtractorMOGPtr(BackgroundSubtractorMOG *ptr) { this->ptr = ptr; }
-    inline BackgroundSubtractorMOG & operator*() { return *static_cast<BackgroundSubtractorMOG *>(this->ptr); }
-};
-
-extern "C" struct BackgroundSubtractorMOGPtr BackgroundSubtractorMOG_ctor(int history, int nmixtures,
-                        double backgroundRatio, double noiseSigma);
-
-extern "C" void BackgroundSubtractorMOG_setHistory(struct BackgroundSubtractorMOGPtr ptr, int val);
-
-extern "C" int BackgroundSubtractorMOG_getHistory(struct BackgroundSubtractorMOGPtr ptr);
-
-extern "C" void BackgroundSubtractorMOG_setNMixtures(struct BackgroundSubtractorMOGPtr ptr, int val);
-
-extern "C" int BackgroundSubtractorMOG_getNMixtures(struct BackgroundSubtractorMOGPtr ptr);
-
-extern "C" void BackgroundSubtractorMOG_setBackgroundRatio(struct BackgroundSubtractorMOGPtr ptr, double backgroundRatio);
-
-extern "C" double BackgroundSubtractorMOG_getBackgroundRatio(struct BackgroundSubtractorMOGPtr ptr);
-
-extern "C" void BackgroundSubtractorMOG_setNoiseSigma(struct BackgroundSubtractorMOGPtr ptr, double noiseSigma);
-
-extern "C" double BackgroundSubtractorMOG_getNoiseSigma(struct BackgroundSubtractorMOGPtr ptr);
-
-// BackgroundSubtractorGMG
-
-struct BackgroundSubtractorGMGPtr {
-    void *ptr;
-    inline BackgroundSubtractorGMG * operator->() { return static_cast<BackgroundSubtractorGMG *>(ptr); }
-    inline BackgroundSubtractorGMGPtr(BackgroundSubtractorGMG *ptr) { this->ptr = ptr; }
-    inline BackgroundSubtractorGMG & operator*() { return *static_cast<BackgroundSubtractorGMG *>(this->ptr); }
-};
-
-extern "C" struct BackgroundSubtractorGMGPtr BackgroundSubtractorGMG_ctor(int initializationFrames,
-                        double decisionThreshold);
-
-extern "C" void BackgroundSubtractorGMG_setMaxFeatures(struct BackgroundSubtractorGMGPtr ptr, int maxFeatures);
-
-extern "C" int BackgroundSubtractorGMG_getMaxFeatures(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setNumFrames(struct BackgroundSubtractorGMGPtr ptr, int numFrames);
-
-extern "C" int BackgroundSubtractorGMG_getNumFrames(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setQuantizationLevels(struct BackgroundSubtractorGMGPtr ptr, int quantizationLevels);
-
-extern "C" int BackgroundSubtractorGMG_getQuantizationLevels(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setSmoothingRadius(struct BackgroundSubtractorGMGPtr ptr, int smoothingRadius);
-
-extern "C" int BackgroundSubtractorGMG_getSmoothingRadius(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setDefaultLearningRate(struct BackgroundSubtractorGMGPtr ptr, double defaultLearningRate);
-
-extern "C" double BackgroundSubtractorGMG_getDefaultLearningRate(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setBackgroundPrior(struct BackgroundSubtractorGMGPtr ptr, double backgroundPrior);
-
-extern "C" double BackgroundSubtractorGMG_getBackgroundPrior(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setDecisionThreshold(struct BackgroundSubtractorGMGPtr ptr, double decisionThreshold);
-
-extern "C" double BackgroundSubtractorGMG_getDecisionThreshold(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setMinVal(struct BackgroundSubtractorGMGPtr ptr, double minVal);
-
-extern "C" double BackgroundSubtractorGMG_getMinVal(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setMaxVal(struct BackgroundSubtractorGMGPtr ptr, double maxVal);
-
-extern "C" double BackgroundSubtractorGMG_getMaxVal(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setUpdateBackgroundModel(struct BackgroundSubtractorGMGPtr ptr, bool updateBackgroundModel);
-
-extern "C" bool BackgroundSubtractorGMG_getUpdateBackgroundModel(struct BackgroundSubtractorGMGPtr ptr);
