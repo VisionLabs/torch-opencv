@@ -29,7 +29,7 @@ extern "C" struct TensorArrayPlusInt buildOpticalFlowPyramid(struct TensorWrappe
     TensorArrayPlusInt retval;
     retval.val = cv::buildOpticalFlowPyramid(img.toMat(), output, winSize, maxLevel,
                     withDerivatives, pyrBorder, derivBorder, tryReuseInputImage);
-    retval.tensors = TensorArray(output);
+    new (&retval.tensors) TensorArray(output);
     return retval;
 }
 
@@ -80,7 +80,7 @@ extern "C" struct TensorPlusDouble findTransformECC(struct TensorWrapper templat
                     motionType,
                     criteria.orDefault(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 50, 0.001)),
                     TO_MAT_OR_NOARRAY(inputMask));
-    retval.tensor = TensorWrapper(warpMatrix);
+    new (&retval.tensor) TensorWrapper(warpMatrix);
     return retval;
 }
 
