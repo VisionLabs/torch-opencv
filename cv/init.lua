@@ -233,7 +233,7 @@ function cv.argcheck(t, rules)
         function identity(...) return ... end
         retval[i] = (argument.operator or identity)(userInputArg)
     end
-    return unpack(retval, 1, table.maxn(retval))
+    return unpack(retval, 1, #rules)
 end
 
 --- ***************** Tensor <=> Mat conversion *****************
