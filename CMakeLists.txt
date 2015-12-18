@@ -16,8 +16,18 @@ FIND_PACKAGE(OpenCV REQUIRED)
 # Once more (silently) to look for the installed modules
 FIND_PACKAGE(OpenCV OPTIONAL_COMPONENTS ${OPENCV_MODULES_TO_WRAP})
 
+IF(LUAROCKS_PREFIX)
+    MESSAGE(STATUS "Installing Torch through Luarocks")
+    STRING(REGEX REPLACE "(.*)lib/luarocks/rocks.*" "\\1" CMAKE_INSTALL_PREFIX  "${LUAROCKS_PREFIX}")
+    MESSAGE(STATUS "Prefix inferred from Luarocks: ${CMAKE_INSTALL_PREFIX}")
+ENDIF()
+
 FIND_PACKAGE(Torch REQUIRED)
 INCLUDE_DIRECTORIES(${Torch_INSTALL_INCLUDE} ${OpenCV_INCLUDE_DIRS})
+
+FILE(GLOB luasrc *.lua)
+SET(luasrc ${luasrc})
+ADD_TORCH_PACKAGE(torch-opencv "" "${luasrc}" "torch-opencv")
 
 SET(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -41,3 +51,6 @@ IF (BUILD_TESTS)
     ADD_LIBRARY(Tests SHARED ${Tests_SRC})
     TARGET_LINK_LIBRARIES(Tests Common)
 endif()
+
+
+
