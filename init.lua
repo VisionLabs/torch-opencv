@@ -3,13 +3,14 @@ local cv = require 'cv._env'
 
 local ffi = require 'ffi'
 
+local packageRoot = paths.thisfile('')
 function cv.libPath(libName)
     if     ffi.os == 'Windows' then
-        return 'lib/' .. libName .. '.dll'
+        return packageRoot .. '/lib/' .. libName .. '.dll'
     elseif ffi.os == 'OSX' then
-        return 'lib/lib' .. libName .. '.dylib'
+        return packageRoot .. '/lib/lib' .. libName .. '.dylib'
     else
-        return 'lib/lib' .. libName .. '.so'
+        return packageRoot .. '/lib/lib' .. libName .. '.so'
     end
 end
 
