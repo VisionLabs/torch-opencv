@@ -233,7 +233,7 @@ function cv.argcheck(t, rules)
         function identity(...) return ... end
         retval[i] = (argument.operator or identity)(userInputArg)
     end
-    return unpack(retval, 1, #rules)
+    return table.unpack(retval, 1, #rules)
 end
 
 --- ***************** Tensor <=> Mat conversion *****************
@@ -343,7 +343,7 @@ function cv.unwrap_tensors(wrapper, toTable)
         if toTable then
             return retval
         else
-            return unpack(retval)
+            return table.unpack(retval)
         end
     end
 end
