@@ -16,18 +16,14 @@ FIND_PACKAGE(OpenCV REQUIRED)
 # Once more (silently) to look for the installed modules
 FIND_PACKAGE(OpenCV OPTIONAL_COMPONENTS ${OPENCV_MODULES_TO_WRAP})
 
-IF(LUAROCKS_PREFIX)
-    MESSAGE(STATUS "Installing Torch through Luarocks")
-    STRING(REGEX REPLACE "(.*)lib/luarocks/rocks.*" "\\1" CMAKE_INSTALL_PREFIX  "${LUAROCKS_PREFIX}")
-    MESSAGE(STATUS "Prefix inferred from Luarocks: ${CMAKE_INSTALL_PREFIX}")
-ENDIF()
-
 FIND_PACKAGE(Torch REQUIRED)
 INCLUDE_DIRECTORIES(${Torch_INSTALL_INCLUDE} ${OpenCV_INCLUDE_DIRS})
 
-FILE(GLOB luasrc *.lua)
+FILE(GLOB luasrc *.lua cv/*.lua)
 SET(luasrc ${luasrc})
-ADD_TORCH_PACKAGE(torch-opencv "" "${luasrc}" "torch-opencv")
+FILE(GLOB sharedlib lib/*)
+SET(luasrc ${luasrc})
+ADD_TORCH_PACKAGE(cv "" "${luasrc}" "cv")
 
 SET(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -39,12 +35,15 @@ ADD_LIBRARY(Classes SHARED "${SOURCE_DIR}/Classes.cpp")
 TARGET_LINK_LIBRARIES(Classes Common)
 
 FOREACH(MODULE ${OPENCV_MODULES_TO_WRAP})
+    ADD_SUBDIRECTORY(cv/${MODULE})
     STRING(TOUPPER ${MODULE} MODULE_UPPERCASE)
     IF (OPENCV_${MODULE_UPPERCASE}_FOUND)
         ADD_LIBRARY(${MODULE} SHARED "${SOURCE_DIR}/${MODULE}.cpp")
         TARGET_LINK_LIBRARIES(${MODULE} Common)
     ENDIF()
 ENDFOREACH()
+
+INSTALL(DIRECTORY "lib" DESTINATION "${Torch_INSTALL_LUA_PATH_SUBDIR}/cv")
 
 IF (BUILD_TESTS)
     FILE(GLOB Tests_SRC "${SOURCE_DIR}/tests/*.cpp")

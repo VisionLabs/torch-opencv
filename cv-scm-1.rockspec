@@ -1,4 +1,4 @@
-package = "torch-opencv"
+package = "cv"
 version = "scm-1"
 
 source = {
