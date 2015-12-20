@@ -3,6 +3,8 @@ local cv = require 'cv._env'
 
 local ffi = require 'ffi'
 
+require 'torch'
+require 'paths'
 local packageRoot = paths.thisfile('')
 function cv.libPath(libName)
     if     ffi.os == 'Windows' then
