@@ -12,9 +12,9 @@ SET(OPENCV_MODULES_TO_WRAP imgcodecs highgui features2d flann imgproc ml optflow
 # So let's invoke FIND_PACKAGE twice:
 
 # Once (error-throwing) to check if OpenCV is present
-FIND_PACKAGE(OpenCV REQUIRED)
+FIND_PACKAGE(OpenCV 3 REQUIRED)
 # Once more (silently) to look for the installed modules
-FIND_PACKAGE(OpenCV OPTIONAL_COMPONENTS ${OPENCV_MODULES_TO_WRAP})
+FIND_PACKAGE(OpenCV 3 OPTIONAL_COMPONENTS ${OPENCV_MODULES_TO_WRAP})
 
 IF(LUAROCKS_PREFIX)
     MESSAGE(STATUS "Installing Torch through Luarocks")
