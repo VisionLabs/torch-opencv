@@ -10,7 +10,7 @@ end
 
 local image = cv.imread{arg[1] or 'demo/lena.jpg'}
 
-if image:nDimension() == 0 then
+if not image or image:nDimension() == 0 then
 	print("Problem loading image\n")
 	os.exit(0)
 end
@@ -25,7 +25,7 @@ cv.putText{
 	thickness=2,
 }
 
-cv.imshow{winname="Original image with text", image=image}
+cv.imshow{"Original image with text", image}
 cv.waitKey{0}
 
 -- output to another Tensor of same size & type...
@@ -36,8 +36,9 @@ cv.GaussianBlur{src=image, dst=image_A, ksize={7, 7}, sigmaX=3.5, sigmaY=3.5}
 local image_B = cv.GaussianBlur{src=image, ksize={7, 7}, sigmaX=3.5, sigmaY=3.5}
 
 -- or filter in-place.
--- we can also specify ksize as a string-number table:
-cv.GaussianBlur{src=image, dst=image, ksize={width=7, height=7}, sigmaX=3.5, sigmaY=3.5}
+-- we can also specify ksize as a string-number table,
+-- and it's not necessary to use named agruments:
+cv.GaussianBlur{image, image, {width=7, height=7}, 3.5, 3.5}
 
 -- results are equal
 assert((image:eq(image_B) - 1):sum() == 0)
