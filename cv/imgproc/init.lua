@@ -427,7 +427,7 @@ function cv.getGaussianKernel(t)
         {"ktype", default = cv.CV_64F}
     }
     local ksize, sigma, ktype = cv.argcheck(t, argRules)
-    return cv.unwrap_tensor(C.getGaussianKernel(ksize, sigma, ktype))
+    return cv.unwrap_tensors(C.getGaussianKernel(ksize, sigma, ktype))
 end
 
 
