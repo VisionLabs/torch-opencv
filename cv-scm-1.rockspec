@@ -11,7 +11,8 @@ description = {
    detailed = [[
    	    OpenCV bindings for LuaJIT+Torch
    ]],
-   homepage = "https://github.com/VisionLabs/torch-opencv"
+   homepage = "https://github.com/VisionLabs/torch-opencv",
+   license = "MIT"
 }
 
 dependencies = {
