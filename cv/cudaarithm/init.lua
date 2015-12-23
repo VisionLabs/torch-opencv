@@ -94,4 +94,19 @@ function cv.cuda.min(t)
         C.min(cutorch._state, cv.wrap_tensor(src1), cv.wrap_tensor(src2), cv.wrap_tensor(dst)))
 end
 
+function cv.cuda.cartToPolar(t)
+    local argRules = {
+        {"x", required = true},
+        {"y", required = true},
+        {"magnitude", default = nil},
+        {"angle", default = nil},
+        {"angleInDegrees", default = false},
+    }
+    local x, y, magnitude, angle, angleInDegrees = cv.argcheck(t, argRules)
+
+    return cv.unwrap_tensors(C.cartToPolar(cutorch._state, 
+        cv.wrap_tensor(x), cv.wrap_tensor(y), cv.wrap_tensor(magnitude), 
+        cv.wrap_tensor(angle), angleInDegrees))
+end
+
 return cv
