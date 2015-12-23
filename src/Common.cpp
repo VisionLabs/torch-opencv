@@ -1,5 +1,4 @@
 #include <Common.hpp>
-#include <THC/THCTensor.h>
 
 /***************** Tensor <=> Mat conversion *****************/
 
