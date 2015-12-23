@@ -1,8 +1,4 @@
 #include <CUDACommon.hpp>
-#include <array>
-
-using namespace std;
-#define pr(v) cout << #v << " = " << v << "\n";
 
 cuda::GpuMat TensorWrapper::toGpuMat() {
 
@@ -11,17 +7,6 @@ cuda::GpuMat TensorWrapper::toGpuMat() {
     }
 
     THCudaTensor *tensorPtr = static_cast<THCudaTensor *>(this->tensorPtr);
-
-    cout << endl << "toGpuMat:" << endl;
-    pr(tensorPtr->nDimension);
-    pr(tensorPtr->refcount)
-    pr(tensorPtr->size[0])
-    pr(tensorPtr->size[1])
-    pr(tensorPtr->storageOffset)
-    pr(tensorPtr->stride[0])
-    pr(tensorPtr->stride[1])
-    pr(tensorPtr->storage->size)
-    pr(tensorPtr->storage->refcount)
 
     int numChannels = 1;
     if (tensorPtr->nDimension == 3) {
@@ -56,8 +41,6 @@ TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state) {
             mat.step * mat.rows * mat.channels() / cv::getElemSize(mat.depth())
     );
 
-    std::cout << "block size " << mat.step * mat.rows * mat.channels() / cv::getElemSize(mat.depth())  << std::endl;
-
     int sizeMultiplier;
     if (mat.channels() == 1) {
         outputPtr->nDimension = 2;
@@ -82,26 +65,11 @@ TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state) {
     outputPtr->stride[1] = 1;
 
     outputPtr->storageOffset = 0;
-    
-    std::cout << "size " << outputPtr->size[0] << " " << outputPtr->size[1] << std::endl;
-    std::cout << "stride " << outputPtr->stride[0] << " " << outputPtr->stride[1] << std::endl;
 
     // Make OpenCV treat underlying data as user-allocated
     mat.refcount = nullptr;
 
     outputPtr->refcount = 0;
-
-    cout << endl << "TensorWrapper ctor:" << endl;
-    pr(mat.isContinuous())
-    pr(outputPtr->nDimension);
-    pr(outputPtr->refcount)
-    pr(outputPtr->size[0])
-    pr(outputPtr->size[1])
-    pr(outputPtr->storageOffset)
-    pr(outputPtr->stride[0])
-    pr(outputPtr->stride[1])
-    pr(outputPtr->storage->size)
-    pr(outputPtr->storage->refcount)
 
     this->tensorPtr = outputPtr;
 }
