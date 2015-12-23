@@ -7,6 +7,16 @@ local cv = require 'cv'
 cv.cuda = require 'cv.cudaarithm'
 require 'cutorch'
 
+local t = (torch.rand(4, 4) * 10):int():float():cuda()
+print(t)
+local r = cv.cuda.min{t, t}
+print(r:getDevice())
+print(r:size())
+print(r:isContiguous())
+print(r)
+
+os.exit(0)
+
 local n = 5
 
 local a = (torch.rand(n, n) * 10):int():float():cuda()

@@ -12,6 +12,7 @@ cuda::GpuMat TensorWrapper::toGpuMat() {
 
     THCudaTensor *tensorPtr = static_cast<THCudaTensor *>(this->tensorPtr);
 
+    cout << endl << "toGpuMat:" << endl;
     pr(tensorPtr->nDimension);
     pr(tensorPtr->refcount)
     pr(tensorPtr->size[0])
@@ -43,9 +44,8 @@ TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state) {
         return;
     }
 
-    this->typeCode = static_cast<char>(mat.depth());
-
-    assert(this->typeCode == CV_32F);
+    assert(mat.depth() == CV_32F);
+    this->typeCode = 66;
 
     THCudaTensor *outputPtr = new THCudaTensor;
 
@@ -86,12 +86,12 @@ TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state) {
     std::cout << "size " << outputPtr->size[0] << " " << outputPtr->size[1] << std::endl;
     std::cout << "stride " << outputPtr->stride[0] << " " << outputPtr->stride[1] << std::endl;
 
-
     // Make OpenCV treat underlying data as user-allocated
     mat.refcount = nullptr;
 
     outputPtr->refcount = 0;
 
+    cout << endl << "TensorWrapper ctor:" << endl;
     pr(mat.isContinuous())
     pr(outputPtr->nDimension);
     pr(outputPtr->refcount)
