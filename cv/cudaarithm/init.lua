@@ -1,5 +1,7 @@
 local cv = require 'cv._env'
-local cuda = require 'cv._env_cuda'
+
+-- TODO: remove this after gathering all CUDA packages in a single submodule
+cv.cuda = cv.cuda or {}
 
 local ffi = require 'ffi'
 
@@ -10,7 +12,7 @@ struct TensorWrapper min(
 
 local C = ffi.load(cv.libPath('cudaarithm'))
 
-function cuda.min(t)
+function cv.cuda.min(t)
     local argRules = {
         {"src1", required = true},
         {"src2", required = true},
@@ -22,4 +24,4 @@ function cuda.min(t)
         C.min(cutorch._state, cv.wrap_tensor(src1), cv.wrap_tensor(src2), cv.wrap_tensor(dst)))
 end
 
-return cuda
+return cv

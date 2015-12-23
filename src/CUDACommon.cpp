@@ -96,3 +96,13 @@ void transfer_tensor_CUDA(THCState *state, THCudaTensor *dst, THCudaTensor *src)
     dst->nDimension = src->nDimension;
     ++dst->refcount;
 }
+
+TensorArray::TensorArray(std::vector<cuda::GpuMat> & matList, THCState *state):
+        tensors(static_cast<TensorWrapper *>(malloc(matList.size() * sizeof(TensorWrapper)))),
+        size(matList.size())
+{
+    for (size_t i = 0; i < matList.size(); ++i) {
+        // invoke the constructor, memory is already allocated
+        new (tensors + i) TensorWrapper(matList[i], state);
+    }
+}

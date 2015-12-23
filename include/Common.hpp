@@ -6,6 +6,11 @@ extern "C" {
 
 #include <opencv2/core.hpp>
 
+#ifdef WITH_CUDA
+#include <THC/THC.h>
+#include <opencv2/core/cuda.hpp>
+#endif
+
 #include <iostream>
 #include <array>
 
@@ -17,9 +22,6 @@ extern "C" float getFloatMax() { return FLT_MAX; }
 #define TO_MAT_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toMat())
 
 #define TO_MAT_LIST_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toMatList())
-
-class cv::cuda::GpuMat;
-struct THCState;
 
 struct TensorWrapper {
     void *tensorPtr;
@@ -35,7 +37,9 @@ struct TensorWrapper {
     // synonym for operator cv::Mat()
     inline cv::Mat toMat() { return *this; }
 
+    #ifdef WITH_CUDA
     cv::cuda::GpuMat toGpuMat();
+    #endif
 
     inline bool isNull() { return tensorPtr == nullptr; }
 };
@@ -47,6 +51,10 @@ struct TensorArray {
     TensorArray();
     TensorArray(std::vector<cv::Mat> & matList);
     explicit TensorArray(short size);
+
+    #ifdef WITH_CUDA
+    TensorArray(std::vector<cv::cuda::GpuMat> & matList, THCState *state);
+    #endif
 
     operator std::vector<cv::Mat>();
     // synonym for operator std::vector<cv::Mat>()
