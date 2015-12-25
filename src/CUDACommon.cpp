@@ -8,6 +8,9 @@ cuda::GpuMat TensorWrapper::toGpuMat() {
 
     THCudaTensor *tensorPtr = static_cast<THCudaTensor *>(this->tensorPtr);
 
+    assert(this->typeCode == CV_CUDA);
+    assert(tensorPtr->nDimension <= 3);
+
     int numChannels = 1;
     if (tensorPtr->nDimension == 3) {
         numChannels = tensorPtr->size[2];
@@ -16,7 +19,7 @@ cuda::GpuMat TensorWrapper::toGpuMat() {
     return cuda::GpuMat(
             tensorPtr->size[0],
             tensorPtr->size[1],
-            CV_32FC1,
+            CV_32FC(numChannels),
             tensorPtr->storage->data,
             tensorPtr->stride[0] * sizeof(float)
     );

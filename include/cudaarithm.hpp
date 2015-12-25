@@ -27,7 +27,7 @@ struct TensorWrapper max(
         struct THCState *state, struct TensorWrapper src1, struct TensorWrapper src2, struct TensorWrapper dst);
 
 extern "C"
-struct TensorWrapper threshold(
+struct TensorPlusDouble threshold(
         struct THCState *state, struct TensorWrapper src,
         struct TensorWrapper dst, double thresh, double maxval, int type);
 
@@ -105,7 +105,8 @@ struct TensorWrapper dft(
         struct TensorWrapper dst, struct SizeWrapper dft_size, int flags);
 
 extern "C"
-struct ConvolutionPtr Convolution_ctor(struct SizeWrapper user_block_size);
+struct ConvolutionPtr Convolution_ctor(
+        struct THCState *state, struct SizeWrapper user_block_size);
 
 extern "C"
 struct TensorWrapper Convolution_convolve(

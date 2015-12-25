@@ -1,6 +1,6 @@
 local cv = require 'cv'
-require 'cv.cudaarithm'
 require 'cutorch'
+require 'cv.cudaarithm'
 
 local x = torch.CudaTensor(5, 5) * 0 + 0.7
 local y = torch.CudaTensor(5, 5) * 0 - 0.5

@@ -1,7 +1,7 @@
 -- Calculates an elementwise minimum of two random matrices on GPU
 local cv = require "cv"
-require "cv.cudaarithm"
 require "cutorch"
+require "cv.cudaarithm"
 
 local n = 5
 

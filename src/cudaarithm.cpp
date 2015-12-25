@@ -1,4 +1,5 @@
 #include <cudaarithm.hpp>
+#include <opencv2/highgui.hpp>
 
 extern "C"
 struct TensorWrapper min(
@@ -29,18 +30,21 @@ struct TensorWrapper max(
 }
 
 extern "C"
-struct TensorWrapper threshold(
+struct TensorPlusDouble threshold(
         struct THCState *state, struct TensorWrapper src, 
         struct TensorWrapper dst, double thresh, double maxval, int type)
 {
+    TensorPlusDouble retval;
+
     if (dst.isNull()) {
         cuda::GpuMat result;
-        cuda::threshold(src.toGpuMat(), result, thresh, maxval, type);
-        return TensorWrapper(result, state);
+        retval.val = cuda::threshold(src.toGpuMat(), result, thresh, maxval, type);
+        new (&retval.tensor) TensorWrapper(result, state);
     } else {
-        cuda::threshold(src.toGpuMat(), dst.toGpuMat(), thresh, maxval, type);
-        return dst;
+        retval.val = cuda::threshold(src.toGpuMat(), dst.toGpuMat(), thresh, maxval, type);
+        retval.tensor = dst;
     }
+    return retval;
 }
 
 extern "C"
@@ -119,7 +123,7 @@ struct TensorArray cartToPolar(
         struct THCState *state, struct TensorWrapper x, struct TensorWrapper y,
         struct TensorWrapper magnitude, struct TensorWrapper angle, bool angleInDegrees)
 {
-    std::vector<cuda::GpuMat> result;
+    std::vector<cuda::GpuMat> result(2);
     if (!magnitude.isNull()) result[0] = magnitude.toGpuMat();
     if (!angle.isNull())     result[1] = angle.toGpuMat();
 
@@ -268,7 +272,8 @@ struct TensorWrapper dft(
 }
 
 extern "C"
-struct ConvolutionPtr Convolution_ctor(struct SizeWrapper user_block_size)
+struct ConvolutionPtr Convolution_ctor(
+        struct THCState *state, struct SizeWrapper user_block_size)
 {
     return rescueObjectFromPtr(cuda::createConvolution(user_block_size));
 }
