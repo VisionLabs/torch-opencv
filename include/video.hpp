@@ -1,32 +1,35 @@
 #include <Common.hpp>
 #include <Classes.hpp>
 #include <opencv2/video.hpp>
-#include <opencv2/bgsegm.hpp>
 
-extern "C" struct RotatedRectPlusRect CamShift(struct TensorWrapper probImage, struct RectWrapper window,
-                        struct TermCriteriaWrapper criteria);
+extern "C" struct RotatedRectPlusRect CamShift(struct TensorWrapper probImage,
+                        struct RectWrapper window, struct TermCriteriaWrapper criteria);
 
 extern "C" struct RectPlusInt meanShift(struct TensorWrapper probImage, struct RectWrapper window,
                         struct TermCriteriaWrapper criteria);
 
-extern "C" struct TensorArrayPlusInt buildOpticalFlowPyramid(struct TensorWrapper img, struct TensorArray pyramid,
-                        struct SizeWrapper winSize, int maxLevel, bool withDerivatives, int pyrBorder,
-                        int derivBorder, bool tryReuseInputImage);
+extern "C" struct TensorArrayPlusInt buildOpticalFlowPyramid(struct TensorWrapper img,
+                        struct TensorArray pyramid, struct SizeWrapper winSize, int maxLevel,
+                        bool withDerivatives, int pyrBorder, int derivBorder,
+                        bool tryReuseInputImage);
 
-extern "C" struct TensorPlusTensorPlusTensor calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
+extern "C" struct TensorArray calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
                         struct TensorWrapper nextImg, struct TensorWrapper prevPts,
                         struct TensorWrapper nextPts, struct TensorWrapper status,
                         struct TensorWrapper err, struct SizeWrapper winSize, int maxLevel,
                         struct TermCriteriaWrapper criteria, int flags, double minEigThreshold);
 
-extern "C" struct TensorWrapper calcOpticalFlowFarneback(struct TensorWrapper prev, struct TensorWrapper next,
-                        struct TensorWrapper flow, double pyr_scale, int levels, int winsize,
-                        int iterations, int poly_n, double poly_sigma, int flags);
+extern "C" struct TensorWrapper calcOpticalFlowFarneback(struct TensorWrapper prev,
+                        struct TensorWrapper next, struct TensorWrapper flow, double pyr_scale,
+                        int levels, int winsize, int iterations, int poly_n, double poly_sigma,
+                        int flags);
 
-extern "C" struct TensorWrapper estimateRigidTransform(struct TensorWrapper src, struct TensorWrapper dst, bool fullAffine);
+extern "C" struct TensorWrapper estimateRigidTransform(struct TensorWrapper src,
+                        struct TensorWrapper dst, bool fullAffine);
 
-extern "C" struct TensorPlusDouble findTransformECC(struct TensorWrapper templateImage, struct TensorWrapper inputImage,
-                        struct TensorWrapper warpMatrix, int motionType, struct TermCriteriaWrapper criteria,
+extern "C" struct TensorPlusDouble findTransformECC(struct TensorWrapper templateImage,
+                        struct TensorWrapper inputImage, struct TensorWrapper warpMatrix,
+                        int motionType, struct TermCriteriaWrapper criteria,
                         struct TensorWrapper inputMask);
 
 // BackgroundSubtractor
@@ -37,8 +40,8 @@ struct BackgroundSubtractorPtr {
     inline BackgroundSubtractorPtr(cv::BackgroundSubtractor *ptr) { this->ptr = ptr; }
 };
 
-extern "C" struct TensorWrapper BackgroundSubtractor_apply(struct BackgroundSubtractorPtr ptr, struct TensorWrapper image,
-                        struct TensorWrapper fgmast, double learningRate);
+extern "C" struct TensorWrapper BackgroundSubtractor_apply(struct BackgroundSubtractorPtr ptr,
+                        struct TensorWrapper image, struct TensorWrapper fgmast, double learningRate);
 
 extern "C" struct TensorWrapper BackgroundSubtractor_getBackgroundImage(struct BackgroundSubtractorPtr ptr,
                         struct TensorWrapper backgroundImage);
@@ -51,7 +54,8 @@ struct BackgroundSubtractorMOG2Ptr {
     inline BackgroundSubtractorMOG2Ptr(cv::BackgroundSubtractorMOG2 *ptr) { this->ptr = ptr; }
 };
 
-extern "C" struct BackgroundSubtractorMOG2Ptr BackgroundSubtractorMOG2_ctor(int history, double varThreshold, bool detectShadows);
+extern "C" struct BackgroundSubtractorMOG2Ptr BackgroundSubtractorMOG2_ctor(int history,
+                        double varThreshold, bool detectShadows);
 
 extern "C" int BackgroundSubtractorMOG2_getHistory(struct BackgroundSubtractorMOG2Ptr ptr);
 
@@ -109,7 +113,8 @@ struct BackgroundSubtractorKNNPtr {
     inline BackgroundSubtractorKNNPtr(cv::BackgroundSubtractorKNN *ptr) { this->ptr = ptr; }
 };
 
-extern "C" struct BackgroundSubtractorKNNPtr BackgroundSubtractorKNN_ctor(int history, double dist2Threshold, bool detectShadows);
+extern "C" struct BackgroundSubtractorKNNPtr BackgroundSubtractorKNN_ctor(int history,
+                        double dist2Threshold, bool detectShadows);
 
 extern "C" int BackgroundSubtractorKNN_getHistory(struct BackgroundSubtractorKNNPtr ptr);
 
@@ -148,17 +153,23 @@ struct KalmanFilterPtr {
     inline cv::KalmanFilter & operator*() { return *static_cast<cv::KalmanFilter *>(this->ptr); }
 };
 
+extern "C" struct TensorArray KalmanFilter_getFields(struct KalmanFilterPtr ptr);
+
 extern "C" struct KalmanFilterPtr KalmanFilter_ctor_default();
 
-extern "C" struct KalmanFilterPtr KalmanFilter_ctor(int dynamParams, int measureParams, int controlParams, int type);
+extern "C" struct KalmanFilterPtr KalmanFilter_ctor(int dynamParams, int measureParams,
+                        int controlParams, int type);
 
 extern "C" void KalmanFilter_dtor(struct KalmanFilterPtr ptr);
 
-extern "C" void KalmanFilter_init(struct KalmanFilterPtr ptr, int dynamParams, int measureParams, int controlParams, int type);
+extern "C" void KalmanFilter_init(struct KalmanFilterPtr ptr, int dynamParams, int measureParams,
+                        int controlParams, int type);
 
-extern "C" struct TensorWrapper KalmanFilter_predict(struct KalmanFilterPtr ptr, struct TensorWrapper control);
+extern "C" struct TensorWrapper KalmanFilter_predict(struct KalmanFilterPtr ptr,
+                        struct TensorWrapper control);
 
-extern "C" struct TensorWrapper KalmanFilter_correct(struct KalmanFilterPtr ptr, struct TensorWrapper measurement);
+extern "C" struct TensorWrapper KalmanFilter_correct(struct KalmanFilterPtr ptr,
+                        struct TensorWrapper measurement);
 
 // DenseOpticalFlow
 
@@ -169,8 +180,8 @@ struct DenseOpticalFlowPtr {
     inline cv::DenseOpticalFlow & operator*() { return *static_cast<cv::DenseOpticalFlow *>(this->ptr); }
 };
 
-extern "C" struct TensorWrapper DenseOpticalFlow_calc(struct DenseOpticalFlowPtr ptr, struct TensorWrapper I0,
-                        struct TensorWrapper I1, struct TensorWrapper flow);
+extern "C" struct TensorWrapper DenseOpticalFlow_calc(struct DenseOpticalFlowPtr ptr,
+                        struct TensorWrapper I0, struct TensorWrapper I1, struct TensorWrapper flow);
 
 extern "C" void DenseOpticalFlow_collectGarbage(struct DenseOpticalFlowPtr ptr);
 
@@ -232,84 +243,3 @@ extern "C" int DualTVL1OpticalFlow_getMedianFiltering(struct DualTVL1OpticalFlow
 extern "C" void DualTVL1OpticalFlow_setUseInitialFlow(struct DualTVL1OpticalFlowPtr ptr, bool val);
 
 extern "C" bool DualTVL1OpticalFlow_getUseInitialFlow(struct DualTVL1OpticalFlowPtr ptr);
-
-// BackgroundSubtractorMOG
-
-using namespace cv::bgsegm;
-
-struct BackgroundSubtractorMOGPtr {
-    void *ptr;
-    inline BackgroundSubtractorMOG * operator->() { return static_cast<BackgroundSubtractorMOG *>(ptr); }
-    inline BackgroundSubtractorMOGPtr(BackgroundSubtractorMOG *ptr) { this->ptr = ptr; }
-    inline BackgroundSubtractorMOG & operator*() { return *static_cast<BackgroundSubtractorMOG *>(this->ptr); }
-};
-
-extern "C" struct BackgroundSubtractorMOGPtr BackgroundSubtractorMOG_ctor(int history, int nmixtures,
-                        double backgroundRatio, double noiseSigma);
-
-extern "C" void BackgroundSubtractorMOG_setHistory(struct BackgroundSubtractorMOGPtr ptr, int val);
-
-extern "C" int BackgroundSubtractorMOG_getHistory(struct BackgroundSubtractorMOGPtr ptr);
-
-extern "C" void BackgroundSubtractorMOG_setNMixtures(struct BackgroundSubtractorMOGPtr ptr, int val);
-
-extern "C" int BackgroundSubtractorMOG_getNMixtures(struct BackgroundSubtractorMOGPtr ptr);
-
-extern "C" void BackgroundSubtractorMOG_setBackgroundRatio(struct BackgroundSubtractorMOGPtr ptr, double backgroundRatio);
-
-extern "C" double BackgroundSubtractorMOG_getBackgroundRatio(struct BackgroundSubtractorMOGPtr ptr);
-
-extern "C" void BackgroundSubtractorMOG_setNoiseSigma(struct BackgroundSubtractorMOGPtr ptr, double noiseSigma);
-
-extern "C" double BackgroundSubtractorMOG_getNoiseSigma(struct BackgroundSubtractorMOGPtr ptr);
-
-// BackgroundSubtractorGMG
-
-struct BackgroundSubtractorGMGPtr {
-    void *ptr;
-    inline BackgroundSubtractorGMG * operator->() { return static_cast<BackgroundSubtractorGMG *>(ptr); }
-    inline BackgroundSubtractorGMGPtr(BackgroundSubtractorGMG *ptr) { this->ptr = ptr; }
-    inline BackgroundSubtractorGMG & operator*() { return *static_cast<BackgroundSubtractorGMG *>(this->ptr); }
-};
-
-extern "C" struct BackgroundSubtractorGMGPtr BackgroundSubtractorGMG_ctor(int initializationFrames, double decisionThreshold);
-
-extern "C" void BackgroundSubtractorGMG_setMaxFeatures(struct BackgroundSubtractorGMGPtr ptr, int maxFeatures);
-
-extern "C" int BackgroundSubtractorGMG_getMaxFeatures(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setNumFrames(struct BackgroundSubtractorGMGPtr ptr, int numFrames);
-
-extern "C" int BackgroundSubtractorGMG_getNumFrames(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setQuantizationLevels(struct BackgroundSubtractorGMGPtr ptr, int quantizationLevels);
-
-extern "C" int BackgroundSubtractorGMG_getQuantizationLevels(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setSmoothingRadius(struct BackgroundSubtractorGMGPtr ptr, int smoothingRadius);
-
-extern "C" int BackgroundSubtractorGMG_getSmoothingRadius(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setDefaultLearningRate(struct BackgroundSubtractorGMGPtr ptr, double defaultLearningRate);
-
-extern "C" double BackgroundSubtractorGMG_getDefaultLearningRate(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setBackgroundPrior(struct BackgroundSubtractorGMGPtr ptr, double backgroundPrior);
-
-extern "C" double BackgroundSubtractorGMG_getBackgroundPrior(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setDecisionThreshold(struct BackgroundSubtractorGMGPtr ptr, double decisionThreshold);
-
-extern "C" double BackgroundSubtractorGMG_getDecisionThreshold(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setMinVal(struct BackgroundSubtractorGMGPtr ptr, double minVal);
-
-extern "C" double BackgroundSubtractorGMG_getMinVal(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setMaxVal(struct BackgroundSubtractorGMGPtr ptr, double maxVal);
-
-extern "C" double BackgroundSubtractorGMG_getMaxVal(struct BackgroundSubtractorGMGPtr ptr);
-
-extern "C" void BackgroundSubtractorGMG_setUpdateBackgroundModel(struct BackgroundSubtractorGMGPtr ptr, bool updateBackgroundModel);
-
-extern "C" bool BackgroundSubtractorGMG_getUpdateBackgroundModel(struct BackgroundSubtractorGMGPtr ptr);

@@ -1,6 +1,7 @@
 #include <video.hpp>
 
-extern "C" struct RotatedRectPlusRect CamShift(struct TensorWrapper probImage, struct RectWrapper window, struct TermCriteriaWrapper criteria)
+extern "C" struct RotatedRectPlusRect CamShift(struct TensorWrapper probImage,
+                        struct RectWrapper window, struct TermCriteriaWrapper criteria)
 {
     struct RotatedRectPlusRect retval;
     cv::Rect windowRect = window;
@@ -19,75 +20,74 @@ extern "C" struct RectPlusInt meanShift(struct TensorWrapper probImage, struct R
     return retval;
 }
 
-extern "C" struct TensorArrayPlusInt buildOpticalFlowPyramid(struct TensorWrapper img, struct TensorArray pyramid,
-                        struct SizeWrapper winSize, int maxLevel, bool withDerivatives, int pyrBorder,
-                        int derivBorder, bool tryReuseInputImage)
+extern "C" struct TensorArrayPlusInt buildOpticalFlowPyramid(struct TensorWrapper img,
+                        struct TensorArray pyramid, struct SizeWrapper winSize, int maxLevel,
+                        bool withDerivatives, int pyrBorder, int derivBorder,
+                        bool tryReuseInputImage)
 {
     std::vector<cv::Mat> output(pyramid);
     TensorArrayPlusInt retval;
     retval.val = cv::buildOpticalFlowPyramid(img.toMat(), output, winSize, maxLevel,
                     withDerivatives, pyrBorder, derivBorder, tryReuseInputImage);
-    retval.tensors = TensorArray(output);
+    new (&retval.tensors) TensorArray(output);
     return retval;
 }
 
-extern "C" struct TensorPlusTensorPlusTensor calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
+extern "C" struct TensorArray calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
                         struct TensorWrapper nextImg, struct TensorWrapper prevPts,
                         struct TensorWrapper nextPts, struct TensorWrapper status,
                         struct TensorWrapper err, struct SizeWrapper winSize, int maxLevel,
                         struct TermCriteriaWrapper criteria, int flags, double minEigThreshold)
 {
-    cv::Mat statusMat;
-    if (!status.isNull())
-        statusMat = status.toMat();
-    cv::Mat errMat;
-    if (!err.isNull())
-        errMat = err.toMat();
+    std::vector<cv::Mat> retval(3);
+    if (!nextPts.isNull()) retval[0] = nextPts;
+    if (!status.isNull()) retval[1] = status;
+    if (!err.isNull()) retval[2] = err;
 
-    cv::calcOpticalFlowPyrLK(prevImg.toMat(), nextImg.toMat(), prevPts.toMat(), nextPts.toMat(),
-                    statusMat, errMat, winSize, maxLevel,
-                    criteria.orDefault(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01)),
-                    flags, minEigThreshold);
+    cv::calcOpticalFlowPyrLK(prevImg.toMat(), nextImg.toMat(), prevPts.toMat(), retval[0], retval[1],
+                retval[2], winSize, maxLevel,
+                criteria.orDefault(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01)),
+                flags, minEigThreshold);
     
-    struct TensorPlusTensorPlusTensor retval;
-    retval.tensor = nextPts;
-    retval.status = TensorWrapper(statusMat);
-    retval.err = TensorWrapper(errMat);
-    return retval;
+    return TensorArray(retval);
 }
 
-extern "C" struct TensorWrapper calcOpticalFlowFarneback(struct TensorWrapper prev, struct TensorWrapper next,
-                        struct TensorWrapper flow, double pyr_scale, int levels, int winsize,
-                        int iterations, int poly_n, double poly_sigma, int flags)
+extern "C" struct TensorWrapper calcOpticalFlowFarneback(struct TensorWrapper prev,
+                        struct TensorWrapper next, struct TensorWrapper flow, double pyr_scale,
+                        int levels, int winsize, int iterations, int poly_n, double poly_sigma,
+                        int flags)
 {
     cv::calcOpticalFlowFarneback(prev.toMat(), next.toMat(), flow.toMat(), pyr_scale,
                     levels, winsize, iterations, poly_n, poly_sigma, flags);
     return flow;
 }
 
-extern "C" struct TensorWrapper estimateRigidTransform(struct TensorWrapper src, struct TensorWrapper dst, bool fullAffine)
+extern "C" struct TensorWrapper estimateRigidTransform(struct TensorWrapper src,
+                        struct TensorWrapper dst, bool fullAffine)
 {
     cv::Mat retval;
     retval = cv::estimateRigidTransform(src.toMat(), dst.toMat(), fullAffine);
     return TensorWrapper(retval);
 }
 
-extern "C" struct TensorPlusDouble findTransformECC(struct TensorWrapper templateImage, struct TensorWrapper inputImage,
-                        struct TensorWrapper warpMatrix, int motionType, struct TermCriteriaWrapper criteria,
+extern "C" struct TensorPlusDouble findTransformECC(struct TensorWrapper templateImage,
+                        struct TensorWrapper inputImage, struct TensorWrapper warpMatrix,
+                        int motionType, struct TermCriteriaWrapper criteria,
                         struct TensorWrapper inputMask)
 {
     struct TensorPlusDouble retval;
     retval.val = cv::findTransformECC(templateImage.toMat(), inputImage.toMat(), warpMatrix.toMat(),
-                    motionType, criteria.orDefault(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 50, 0.001)),
+                    motionType,
+                    criteria.orDefault(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 50, 0.001)),
                     TO_MAT_OR_NOARRAY(inputMask));
-    retval.tensor = TensorWrapper(warpMatrix);
+    new (&retval.tensor) TensorWrapper(warpMatrix);
     return retval;
 }
 
 // BackgroundSubtractor
 
-extern "C" struct TensorWrapper BackgroundSubtractor_apply(struct BackgroundSubtractorPtr ptr, struct TensorWrapper image,
-                struct TensorWrapper fgmast, double learningRate)
+extern "C" struct TensorWrapper BackgroundSubtractor_apply(struct BackgroundSubtractorPtr ptr,
+                        struct TensorWrapper image, struct TensorWrapper fgmast, double learningRate)
 {
     if (fgmast.isNull()) {
         cv::Mat retval;
@@ -100,7 +100,7 @@ extern "C" struct TensorWrapper BackgroundSubtractor_apply(struct BackgroundSubt
 }
 
 extern "C" struct TensorWrapper BackgroundSubtractor_getBackgroundImage(struct BackgroundSubtractorPtr ptr,
-                                    struct TensorWrapper backgroundImage)
+                        struct TensorWrapper backgroundImage)
 {
     if (backgroundImage.isNull()) {
         cv::Mat retval;
@@ -111,10 +111,10 @@ extern "C" struct TensorWrapper BackgroundSubtractor_getBackgroundImage(struct B
     return backgroundImage;
 }
 
-extern "C" struct BackgroundSubtractorMOG2Ptr BackgroundSubtractorMOG2_ctor(int history, double varThreshold, bool detectShadows)
+extern "C" struct BackgroundSubtractorMOG2Ptr BackgroundSubtractorMOG2_ctor(int history,
+                        double varThreshold, bool detectShadows)
 {
     return rescueObjectFromPtr(cv::createBackgroundSubtractorMOG2(history, varThreshold, detectShadows));
-
 }
 
 extern "C" int BackgroundSubtractorMOG2_getHistory(struct BackgroundSubtractorMOG2Ptr ptr)
@@ -126,6 +126,7 @@ extern "C" void BackgroundSubtractorMOG2_setHistory(struct BackgroundSubtractorM
 {
     ptr->setHistory(history);
 }
+
 extern "C" int BackgroundSubtractorMOG2_getNMixtures(struct BackgroundSubtractorMOG2Ptr ptr)
 {
     return ptr->getNMixtures();
@@ -135,6 +136,7 @@ extern "C" void BackgroundSubtractorMOG2_setNMixtures(struct BackgroundSubtracto
 {
     ptr->setNMixtures(nmixtures);
 }
+
 extern "C" int BackgroundSubtractorMOG2_getShadowValue(struct BackgroundSubtractorMOG2Ptr ptr)
 {
     return ptr->getShadowValue();
@@ -154,6 +156,7 @@ extern "C" void BackgroundSubtractorMOG2_setBackgroundRatio(struct BackgroundSub
 {
     ptr->setBackgroundRatio(ratio);
 }
+
 extern "C" double BackgroundSubtractorMOG2_getVarThreshold(struct BackgroundSubtractorMOG2Ptr ptr)
 {
     return ptr->getVarThreshold();
@@ -163,6 +166,7 @@ extern "C" void BackgroundSubtractorMOG2_setVarThreshold(struct BackgroundSubtra
 {
     ptr->setVarThreshold(varThreshold);
 }
+
 extern "C" double BackgroundSubtractorMOG2_getVarThresholdGen(struct BackgroundSubtractorMOG2Ptr ptr)
 {
     return ptr->getVarThresholdGen();
@@ -172,6 +176,7 @@ extern "C" void BackgroundSubtractorMOG2_setVarThresholdGen(struct BackgroundSub
 {
     ptr->setVarThresholdGen(varThresholdGen);
 }
+
 extern "C" double BackgroundSubtractorMOG2_getVarInit(struct BackgroundSubtractorMOG2Ptr ptr)
 {
     return ptr->getVarInit();
@@ -181,6 +186,7 @@ extern "C" void BackgroundSubtractorMOG2_setVarInit(struct BackgroundSubtractorM
 {
     ptr->setVarInit(varInit);
 }
+
 extern "C" double BackgroundSubtractorMOG2_getVarMin(struct BackgroundSubtractorMOG2Ptr ptr)
 {
     return ptr->getVarMin();
@@ -190,6 +196,7 @@ extern "C" void BackgroundSubtractorMOG2_setVarMin(struct BackgroundSubtractorMO
 {
     ptr->setVarMin(varMin);
 }
+
 extern "C" double BackgroundSubtractorMOG2_getVarMax(struct BackgroundSubtractorMOG2Ptr ptr)
 {
     return ptr->getVarMax();
@@ -219,6 +226,7 @@ extern "C" void BackgroundSubtractorMOG2_setComplexityReductionThreshold(struct 
 {
     ptr->setComplexityReductionThreshold(ct);
 }
+
 extern "C" double BackgroundSubtractorMOG2_getShadowThreshold(struct BackgroundSubtractorMOG2Ptr ptr)
 {
     return ptr->getShadowThreshold();
@@ -231,7 +239,8 @@ extern "C" void BackgroundSubtractorMOG2_setShadowThreshold(struct BackgroundSub
 
 // BackgroundSubtractorKNN
 
-extern "C" struct BackgroundSubtractorKNNPtr BackgroundSubtractorKNN_ctor(int history, double dist2Threshold, bool detectShadows)
+extern "C" struct BackgroundSubtractorKNNPtr BackgroundSubtractorKNN_ctor(int history,
+                        double dist2Threshold, bool detectShadows)
 {
     return rescueObjectFromPtr(cv::createBackgroundSubtractorKNN(history, dist2Threshold, detectShadows));
 }
@@ -245,6 +254,7 @@ extern "C" void BackgroundSubtractorKNN_setHistory(struct BackgroundSubtractorKN
 {
     ptr->setHistory(history);
 }
+
 extern "C" int BackgroundSubtractorKNN_getNSamples(struct BackgroundSubtractorKNNPtr ptr)
 {
     return ptr->getNSamples();
@@ -254,6 +264,7 @@ extern "C" void BackgroundSubtractorKNN_setNSamples(struct BackgroundSubtractorK
 {
     ptr->setNSamples(nSamples);
 }
+
 extern "C" int BackgroundSubtractorKNN_getkNNSamples(struct BackgroundSubtractorKNNPtr ptr)
 {
     return ptr->getkNNSamples();
@@ -263,6 +274,7 @@ extern "C" void BackgroundSubtractorKNN_setkNNSamples(struct BackgroundSubtracto
 {
     ptr->setkNNSamples(kNNSamples);
 }
+
 extern "C" int BackgroundSubtractorKNN_getShadowValue(struct BackgroundSubtractorKNNPtr ptr)
 {
     return ptr->getShadowValue();
@@ -282,6 +294,7 @@ extern "C" void BackgroundSubtractorKNN_setDist2Threshold(struct BackgroundSubtr
 {
     ptr->setDist2Threshold(dist2Threshold);
 }
+
 extern "C" double BackgroundSubtractorKNN_getShadowThreshold(struct BackgroundSubtractorKNNPtr ptr)
 {
     return ptr->getShadowThreshold();
@@ -304,12 +317,30 @@ extern "C" void BackgroundSubtractorKNN_setDetectShadows(struct BackgroundSubtra
 
 // KalmanFilter
 
+extern "C"
+struct TensorArray KalmanFilter_getFields(struct KalmanFilterPtr ptr)
+{
+    std::vector<cv::Mat> retval(10);
+    retval[0] = ptr->statePre;
+    retval[1] = ptr->statePost;
+    retval[2] = ptr->transitionMatrix;
+    retval[3] = ptr->controlMatrix;
+    retval[4] = ptr->measurementMatrix;
+    retval[5] = ptr->processNoiseCov;
+    retval[6] = ptr->measurementNoiseCov;
+    retval[7] = ptr->errorCovPre;
+    retval[8] = ptr->gain;
+    retval[9] = ptr->errorCovPost;
+    return TensorArray(retval);
+}
+
 extern "C" struct KalmanFilterPtr KalmanFilter_ctor_default()
 {
     return new cv::KalmanFilter();
 }
 
-extern "C" struct KalmanFilterPtr KalmanFilter_ctor(int dynamParams, int measureParams, int controlParams, int type)
+extern "C" struct KalmanFilterPtr KalmanFilter_ctor(int dynamParams, int measureParams,
+                        int controlParams, int type)
 {
     return new cv::KalmanFilter(dynamParams, measureParams, controlParams, type);
 }
@@ -319,28 +350,31 @@ extern "C" void KalmanFilter_dtor(struct KalmanFilterPtr ptr)
     delete static_cast<cv::KalmanFilter *>(ptr.ptr);
 }
 
-extern "C" void KalmanFilter_init(struct KalmanFilterPtr ptr, int dynamParams, int measureParams, int controlParams, int type)
+extern "C" void KalmanFilter_init(struct KalmanFilterPtr ptr, int dynamParams, int measureParams,
+                        int controlParams, int type)
 {
     ptr->init(dynamParams, measureParams, controlParams, type);
 }
 
-extern "C" struct TensorWrapper KalmanFilter_predict(struct KalmanFilterPtr ptr, struct TensorWrapper control)
+extern "C" struct TensorWrapper KalmanFilter_predict(struct KalmanFilterPtr ptr,
+                        struct TensorWrapper control)
 {
-    cv::Mat retval = cv::Mat();
+    cv::Mat retval;
     if (!control.isNull())
         retval = control.toMat();
     cv::Mat res = ptr->predict(retval);
     return TensorWrapper(res);
 }
 
-extern "C" struct TensorWrapper KalmanFilter_correct(struct KalmanFilterPtr ptr, struct TensorWrapper measurement)
+extern "C" struct TensorWrapper KalmanFilter_correct(struct KalmanFilterPtr ptr,
+                        struct TensorWrapper measurement)
 {
     cv::Mat res = ptr->correct(measurement.toMat());
     return TensorWrapper(res);
 }
 
-extern "C" struct TensorWrapper DenseOpticalFlow_calc(struct DenseOpticalFlowPtr ptr, struct TensorWrapper I0,
-                        struct TensorWrapper I1, struct TensorWrapper flow)
+extern "C" struct TensorWrapper DenseOpticalFlow_calc(struct DenseOpticalFlowPtr ptr,
+                        struct TensorWrapper I0, struct TensorWrapper I1, struct TensorWrapper flow)
 {
     if (flow.isNull()) {
         cv::Mat retval;
@@ -481,159 +515,4 @@ extern "C" void DualTVL1OpticalFlow_setUseInitialFlow(struct DualTVL1OpticalFlow
 extern "C" bool DualTVL1OpticalFlow_getUseInitialFlow(struct DualTVL1OpticalFlowPtr ptr)
 {
     return ptr->getUseInitialFlow();
-}
-
-// BackgroundSubtractorMOG
-
-extern "C" struct BackgroundSubtractorMOGPtr BackgroundSubtractorMOG_ctor(int history, int nmixtures,
-                        double backgroundRatio, double noiseSigma)
-{
-    return rescueObjectFromPtr(createBackgroundSubtractorMOG(history, nmixtures, backgroundRatio, noiseSigma));
-}
-
-extern "C" void BackgroundSubtractorMOG_setHistory(struct BackgroundSubtractorMOGPtr ptr, int val)
-{
-    ptr->setHistory(val);
-}
-
-extern "C" int BackgroundSubtractorMOG_getHistory(struct BackgroundSubtractorMOGPtr ptr)
-{
-    return ptr->getHistory();
-}
-
-extern "C" void BackgroundSubtractorMOG_setNMixtures(struct BackgroundSubtractorMOGPtr ptr, int val)
-{
-    ptr->setNMixtures(val);
-}
-
-extern "C" int BackgroundSubtractorMOG_getNMixtures(struct BackgroundSubtractorMOGPtr ptr)
-{
-    return ptr->getNMixtures();
-}
-
-extern "C" void BackgroundSubtractorMOG_setBackgroundRatio(struct BackgroundSubtractorMOGPtr ptr, double backgroundRatio)
-{
-    ptr->setBackgroundRatio(backgroundRatio);
-}
-
-extern "C" double BackgroundSubtractorMOG_getBackgroundRatio(struct BackgroundSubtractorMOGPtr ptr)
-{
-    return ptr->getBackgroundRatio();
-}
-
-extern "C" void BackgroundSubtractorMOG_setNoiseSigma(struct BackgroundSubtractorMOGPtr ptr, double noiseSigma)
-{
-    ptr->setNoiseSigma(noiseSigma);
-}
-
-extern "C" double BackgroundSubtractorMOG_getNoiseSigma(struct BackgroundSubtractorMOGPtr ptr)
-{
-    return ptr->getNoiseSigma();
-}
-
-// BackgroundSubtractorGMG
-
-extern "C" struct BackgroundSubtractorGMGPtr BackgroundSubtractorGMG_ctor(int initializationFrames, double decisionThreshold)
-{
-    return rescueObjectFromPtr(createBackgroundSubtractorGMG(initializationFrames, decisionThreshold));
-}
-
-extern "C" void BackgroundSubtractorGMG_setMaxFeatures(struct BackgroundSubtractorGMGPtr ptr, int maxFeatures)
-{
-    ptr->setMaxFeatures(maxFeatures);
-}
-
-extern "C" int BackgroundSubtractorGMG_getMaxFeatures(struct BackgroundSubtractorGMGPtr ptr)
-{
-    return ptr->getMaxFeatures();
-}
-
-extern "C" void BackgroundSubtractorGMG_setNumFrames(struct BackgroundSubtractorGMGPtr ptr, int numFrames)
-{
-    ptr->setNumFrames(numFrames);
-}
-
-extern "C" int BackgroundSubtractorGMG_getNumFrames(struct BackgroundSubtractorGMGPtr ptr)
-{
-    return ptr->getNumFrames();
-}
-
-extern "C" void BackgroundSubtractorGMG_setQuantizationLevels(struct BackgroundSubtractorGMGPtr ptr, int quantizationLevels)
-{
-    ptr->setQuantizationLevels(quantizationLevels);
-}
-
-extern "C" int BackgroundSubtractorGMG_getQuantizationLevels(struct BackgroundSubtractorGMGPtr ptr)
-{
-    return ptr->getQuantizationLevels();
-}
-
-extern "C" void BackgroundSubtractorGMG_setSmoothingRadius(struct BackgroundSubtractorGMGPtr ptr, int smoothingRadius)
-{
-    ptr->setSmoothingRadius(smoothingRadius);
-}
-
-extern "C" int BackgroundSubtractorGMG_getSmoothingRadius(struct BackgroundSubtractorGMGPtr ptr)
-{
-    return ptr->getSmoothingRadius();
-}
-
-extern "C" void BackgroundSubtractorGMG_setDefaultLearningRate(struct BackgroundSubtractorGMGPtr ptr, double defaultLearningRate)
-{
-    ptr->setDefaultLearningRate(defaultLearningRate);
-}
-
-extern "C" double BackgroundSubtractorGMG_getDefaultLearningRate(struct BackgroundSubtractorGMGPtr ptr)
-{
-    return ptr->getDefaultLearningRate();
-}
-
-extern "C" void BackgroundSubtractorGMG_setBackgroundPrior(struct BackgroundSubtractorGMGPtr ptr, double backgroundPrior)
-{
-    ptr->setBackgroundPrior(backgroundPrior);
-}
-
-extern "C" double BackgroundSubtractorGMG_getBackgroundPrior(struct BackgroundSubtractorGMGPtr ptr)
-{
-    return ptr->getBackgroundPrior();
-}
-
-extern "C" void BackgroundSubtractorGMG_setDecisionThreshold(struct BackgroundSubtractorGMGPtr ptr, double decisionThreshold)
-{
-    ptr->setDecisionThreshold(decisionThreshold);
-}
-
-extern "C" double BackgroundSubtractorGMG_getDecisionThreshold(struct BackgroundSubtractorGMGPtr ptr)
-{
-    return ptr->getDecisionThreshold();
-}
-
-extern "C" void BackgroundSubtractorGMG_setMinVal(struct BackgroundSubtractorGMGPtr ptr, double minVal)
-{
-    ptr->setMinVal(minVal);
-}
-
-extern "C" double BackgroundSubtractorGMG_getMinVal(struct BackgroundSubtractorGMGPtr ptr)
-{
-    return ptr->getMinVal();
-}
-
-extern "C" void BackgroundSubtractorGMG_setMaxVal(struct BackgroundSubtractorGMGPtr ptr, double maxVal)
-{
-    ptr->setMaxVal(maxVal);
-}
-
-extern "C" double BackgroundSubtractorGMG_getMaxVal(struct BackgroundSubtractorGMGPtr ptr)
-{
-    return ptr->getMaxVal();
-}
-
-extern "C" void BackgroundSubtractorGMG_setUpdateBackgroundModel(struct BackgroundSubtractorGMGPtr ptr, bool updateBackgroundModel)
-{
-    ptr->setUpdateBackgroundModel(updateBackgroundModel);
-}
-
-extern "C" bool BackgroundSubtractorGMG_getUpdateBackgroundModel(struct BackgroundSubtractorGMGPtr ptr)
-{
-    return ptr->getUpdateBackgroundModel();
 }

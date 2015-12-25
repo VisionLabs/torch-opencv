@@ -100,7 +100,7 @@ struct TensorArrayPlusInt buildOpticalFlowPyramid(struct TensorWrapper img, stru
                         struct SizeWrapper winSize, int maxLevel, bool withDerivatives, int pyrBorder,
                         int derivBorder, bool tryReuseInputImage);
 
-struct TensorPlusTensorPlusTensor calcOpticalFlowPyrLK(struct TensorWrapper prevImg, struct TensorWrapper nextImg,
+struct TensorArray calcOpticalFlowPyrLK(struct TensorWrapper prevImg, struct TensorWrapper nextImg,
                         struct TensorWrapper prevPts, struct TensorWrapper nextPts, struct TensorWrapper status,
                         struct TensorWrapper err, struct SizeWrapper winSize, int maxLevel,
                         struct TermCriteriaWrapper criteria, int flags, double minEigThreshold);
@@ -114,6 +114,8 @@ struct TensorWrapper estimateRigidTransform(struct TensorWrapper src, struct Ten
 struct TensorPlusDouble findTransformECC(struct TensorWrapper templateImage, struct TensorWrapper inputImage,
                         struct TensorWrapper warpMatrix, int motionType, struct TermCriteriaWrapper criteria,
                         struct TensorWrapper inputMask);
+
+struct TensorArray KalmanFilter_getFields(struct PtrWrapper ptr);
 
 struct PtrWrapper KalmanFilter_ctor_default();
 
@@ -181,67 +183,6 @@ int DualTVL1OpticalFlow_getMedianFiltering(struct PtrWrapper ptr);
 void DualTVL1OpticalFlow_setUseInitialFlow(struct PtrWrapper ptr, bool val);
 
 bool DualTVL1OpticalFlow_getUseInitialFlow(struct PtrWrapper ptr);
-
-struct PtrWrapper BackgroundSubtractorMOG_ctor(int history, int nmixtures,
-                        double backgroundRatio, double noiseSigma);
-
-void BackgroundSubtractorMOG_setHistory(struct PtrWrapper ptr, int val);
-
-int BackgroundSubtractorMOG_getHistory(struct PtrWrapper ptr);
-
-void BackgroundSubtractorMOG_setNMixtures(struct PtrWrapper ptr, int val);
-
-int BackgroundSubtractorMOG_getNMixtures(struct PtrWrapper ptr);
-
-void BackgroundSubtractorMOG_setBackgroundRatio(struct PtrWrapper ptr, double backgroundRatio);
-
-double BackgroundSubtractorMOG_getBackgroundRatio(struct PtrWrapper ptr);
-
-void BackgroundSubtractorMOG_setNoiseSigma(struct PtrWrapper ptr, double noiseSigma);
-
-double BackgroundSubtractorMOG_getNoiseSigma(struct PtrWrapper ptr);
-
-struct PtrWrapper BackgroundSubtractorGMG_ctor(int initializationFrames, double decisionThreshold);
-
-void BackgroundSubtractorGMG_setMaxFeatures(struct PtrWrapper ptr, int maxFeatures);
-
-int BackgroundSubtractorGMG_getMaxFeatures(struct PtrWrapper ptr);
-
-void BackgroundSubtractorGMG_setNumFrames(struct PtrWrapper ptr, int numFrames);
-
-int BackgroundSubtractorGMG_getNumFrames(struct PtrWrapper ptr);
-
-void BackgroundSubtractorGMG_setQuantizationLevels(struct PtrWrapper ptr, int quantizationLevels);
-
-int BackgroundSubtractorGMG_getQuantizationLevels(struct PtrWrapper ptr);
-
-void BackgroundSubtractorGMG_setSmoothingRadius(struct PtrWrapper ptr, int smoothingRadius);
-
-int BackgroundSubtractorGMG_getSmoothingRadius(struct PtrWrapper ptr);
-
-void BackgroundSubtractorGMG_setDefaultLearningRate(struct PtrWrapper ptr, double defaultLearningRate);
-
-double BackgroundSubtractorGMG_getDefaultLearningRate(struct PtrWrapper ptr);
-
-void BackgroundSubtractorGMG_setBackgroundPrior(struct PtrWrapper ptr, double backgroundPrior);
-
-double BackgroundSubtractorGMG_getBackgroundPrior(struct PtrWrapper ptr);
-
-void BackgroundSubtractorGMG_setDecisionThreshold(struct PtrWrapper ptr, double decisionThreshold);
-
-double BackgroundSubtractorGMG_getDecisionThreshold(struct PtrWrapper ptr);
-
-void BackgroundSubtractorGMG_setMinVal(struct PtrWrapper ptr, double minVal);
-
-double BackgroundSubtractorGMG_getMinVal(struct PtrWrapper ptr);
-
-void BackgroundSubtractorGMG_setMaxVal(struct PtrWrapper ptr, double maxVal);
-
-double BackgroundSubtractorGMG_getMaxVal(struct PtrWrapper ptr);
-
-void BackgroundSubtractorGMG_setUpdateBackgroundModel(struct PtrWrapper ptr, bool updateBackgroundModel);
-
-bool BackgroundSubtractorGMG_getUpdateBackgroundModel(struct PtrWrapper ptr);
 ]]
 
 local C = ffi.load(cv.libPath('video'))
@@ -584,19 +525,19 @@ end
 function cv.buildOpticalFlowPyramid(t)
     local argRules = {
         {"img", required = true},
-        {"pyramid", default = nil},
         {"winSize", required = true, operator = cv.Size},
         {"maxLevel", required = true},
+        {"pyramid", default = nil},
         {"withDerivatives", default = true},
         {"pyrBorder", default = cv.BORDER_REFLECT_101},
         {"derivBorder", default = cv.BORDER_CONSTANT},
         {"tryReuseInputImage", default = true}
     }
-    local img, pyramid, winSize, maxLevel, withDerivatives, pyrBorder, derivBorder, tryReuseInputImage = cv.argcheck(t, argRules)
+    local img, winSize, maxLevel, pyramid, withDerivatives, pyrBorder, derivBorder, tryReuseInputImage = cv.argcheck(t, argRules)
 
     local result = C.buildOpticalFlowPyramid(cv.wrap_tensor(img), cv.wrap_tensors(pyramid), winSize, maxLevel,
         withDerivatives, pyrBorder, derivBorder, tryReuseInputImage)
-    return result.val, cv.unwrap_tensors(result.tensors)
+    return result.val, cv.unwrap_tensors(result.tensors, true)
 end
 
 function cv.calcOpticalFlowPyrLK(t)
@@ -604,7 +545,7 @@ function cv.calcOpticalFlowPyrLK(t)
         {"prevImg", required = true},
         {"nextImg", required = true},
         {"prevPts", required = true},
-        {"nextPts", required = true},
+        {"nextPts", default = nil},
         {"status", default = nil},
         {"err", default = nil},
         {"winSize", default = {21, 21}, operator = cv.Size},
@@ -615,10 +556,10 @@ function cv.calcOpticalFlowPyrLK(t)
     }
     local prevImg, nextImg, prevPts, nextPts, status, err, winSize, maxLevel, criteria, flags, minEigThreshold = cv.argcheck(t, argRules)
 
-    local result = C.calcOpticalFlowPyrLK(cv.wrap_tensor(prevImg), cv.wrap_tensor(nextImg),
+    local nextPts, status, err = cv.unwrap_tensors(C.calcOpticalFlowPyrLK(cv.wrap_tensor(prevImg), cv.wrap_tensor(nextImg),
             cv.wrap_tensor(prevPts), cv.wrap_tensor(nextPts), cv.wrap_tensor(status),
-            cv.wrap_tensor(err), winSize, maxLevel, criteria, flags, minEigThreshold)
-    return cv.unwrap_tensors(result.tensor), cv.unwrap_tensors(result.status), cv.unwrap_tensors(result.err)
+            cv.wrap_tensor(err), winSize, maxLevel, criteria, flags, minEigThreshold))
+    return nextPts, status, err
 end
 
 function cv.calcOpticalFlowFarneback(t)
@@ -672,6 +613,20 @@ end
 do
     local KalmanFilter = torch.class('cv.KalmanFilter', cv)
 
+    local
+    function updateFields(ptr)
+        self.statePre,
+        self.statePost,
+        self.transitionMatrix,
+        self.controlMatrix,
+        self.measurementMatrix,
+        self.processNoiseCov,
+        self.measurementNoiseCov,
+        self.errorCovPre,
+        self.gain,
+        self.errorCovPost = cv.unwrap_tensors(C.KalmanFilter_getFields(ptr))
+    end
+
     function KalmanFilter:__init(t)
         if table.getn(t) == 0 then
             self.ptr = ffi.gc(C.KalmanFilter_ctor_default(), C.KalmanFilter_dtor)
@@ -682,61 +637,33 @@ do
                 {"controlParams", default = 0},
                 {"type", default = cv.CV_32F}
             }
-            
-            local dynamParams, measureParams, controlParams, type = cv.argcheck(t, argRules)
+            local dynamParams, measureParams, controlParams, _type = cv.argcheck(t, argRules)
 
-            self.ptr = ffi.gc(C.KalmanFilter_ctor(dynamParams, measureParams, controlParams, type), C.KalmanFilter_dtor)
+            self.ptr = ffi.gc(C.KalmanFilter_ctor(dynamParams, measureParams, controlParams, _type), C.KalmanFilter_dtor)
+            updateFields(self.ptr)
         end
-
-        self.statePre = nil
-        self.statePost = nil
-        self.transitionMatrix = nil
-        self.controlMatrix = nil
-        self.measurementMatrix = nil
-        self.processNoiseCov = nil
-        self.measurementNoiseCov = nil
-        self.errorCovPre = nil
-        self.gain = nil
-        self.errorCovPost = nil
-        
-        self.temp1 = nil
-        self.temp2 = nil
-        self.temp3 = nil
-        self.temp4 = nil
-        self.temp5 = nil
-    end
-
-    function KalmanFilter:init(t)
-        local argRules = {
-            {"dynamParams", required = true},
-            {"measureParams", required = true},
-            {"controlParams", default = 0},
-            {"type", default = cv.CV_32F}
-        }
-            
-        local dynamParams, measureParams, controlParams, type = cv.argcheck(t, argRules)
-
-        C.KalmanFilter_init(self.ptr, dynamParams, measureParams, controlParams, type)
     end
 
     function KalmanFilter:predict(t)
         local argRules = {
             {"control", defauil = nil}
         }
-
         local control = cv.argcheck(t, argRules)
 
-        return cv.unwrap_tensors(C.KalmanFilter_predict(self.ptr, cv.wrap_tensor(control)))
+        local retval = cv.unwrap_tensors(C.KalmanFilter_predict(self.ptr, cv.wrap_tensor(control)))
+        updateFields(self.ptr)
+        return retval
     end
 
     function KalmanFilter:correct(t)
         local argRules = {
             {"measurement", required = true}
         }
-
         local measurement = cv.argcheck(t, argRules)
 
-        return cv.unwrap_tensors(C.KalmanFilter_predict(self.ptr, cv.wrap_tensor(measurement)))
+        local retval = cv.unwrap_tensors(C.KalmanFilter_predict(self.ptr, cv.wrap_tensor(measurement)))
+        updateFields(self.ptr)
+        return retval
     end
 end
 
@@ -924,222 +851,6 @@ do
 
     function DualTVL1OpticalFlow:getUseInitialFlow()
         return C.DualTVL1OpticalFlow_getUseInitialFlow(self.ptr)
-    end
-end
-
--- BackgroundSubtractorMOG
-
-do
-    BackgroundSubtractorMOG = torch.class('cv.BackgroundSubtractorMOG', 'cv.BackgroundSubtractor', cv)
-
-    function BackgroundSubtractorMOG:__init(t)
-        local argRules = {
-            {"history", default = 200},
-            {"nmixtures", default = 5},
-            {"backgroundRatio", default = 0.7},
-            {"noiseSigma", default = 0}
-        }
-        local history, nmixtures, backgroundRatio, noiseSigma = cv.argcheck(t, argRules)
-        
-        self.ptr = ffi.gc(C.BackgroundSubtractorMOG_ctor(history, nmixtures, backgroundRatio, noiseSigma), Classes.Algorithm_dtor)
-    end
-
-    function BackgroundSubtractorMOG:setHistory(t)
-        local argRules = {
-            {"nframes", required = true}
-        }
-        local val = cv.argcheck(t, argRules)
-
-        C.BackgroundSubtractorMOG_setHistory(self.ptr, val)
-    end
-
-    function BackgroundSubtractorMOG:getHistory()
-        return C.BackgroundSubtractorMOG_getHistory(self.ptr)
-    end
-
-    function BackgroundSubtractorMOG:setNMixtures(t)
-        local argRules = {
-            {"nmix", required = true}
-        }
-        local val = cv.argcheck(t, argRules)
-
-        C.BackgroundSubtractorMOG_setNMixtures(self.ptr, val)
-    end
-
-    function BackgroundSubtractorMOG:getNMixtures()
-        return C.BackgroundSubtractorMOG_getNMixtures(self.ptr)
-    end
-
-    function BackgroundSubtractorMOG:setBackgroundRatio(t)
-        local argRules = {
-            {"backgroundRatio", required = true}
-        }
-        local backgroundRatio = cv.argcheck(t, argRules)
-
-        C.BackgroundSubtractorMOG_setBackgroundRatio(self.ptr, backgroundRatio)
-    end
-
-    function BackgroundSubtractorMOG:getBackgroundRatio()
-        return C.BackgroundSubtractorMOG_getBackgroundRatio(self.ptr)
-    end
-
-    function BackgroundSubtractorMOG:setNoiseSigma(t)
-        local argRules = {
-            {"noiseSigma", required = true}
-        }
-        local noiseSigma = cv.argcheck(t, argRules)
-
-        C.BackgroundSubtractorMOG_setNoiseSigma(self.ptr, noiseSigma)
-    end
-
-    function BackgroundSubtractorMOG:getNoiseSigma()
-        return C.BackgroundSubtractorMOG_getNoiseSigma(self.ptr)
-    end
-end
-
--- BackgroundSubtractorGMG
-
-do
-    BackgroundSubtractorGMG = torch.class('cv.BackgroundSubtractorGMG', 'cv.BackgroundSubtractor', cv)
-
-    function BackgroundSubtractorGMG:__init(t)
-        local argRules = {
-            {"initializationFrames", default = 120},
-            {"decisionThreshold", default = 0.8}
-        }
-        local initializationFrames, decisionThreshold = cv.argcheck(t, argRules)
-        
-        self.ptr = ffi.gc(C.BackgroundSubtractorGMG_ctor(initializationFrames, decisionThreshold), Classes.Algorithm_dtor)
-    end
-
-    function BackgroundSubtractorGMG:setMaxFeatures(t)
-        local argRules = {
-            {"maxFeatures", required = true}
-        }
-        local maxFeatures = cv.argcheck(t, argRules)
-
-        C.BackgroundSubtractorGMG_setMaxFeatures(self.ptr, maxFeatures)
-    end
-
-    function BackgroundSubtractorGMG:getMaxFeatures()
-        return C.BackgroundSubtractorGMG_getMaxFeatures(self.ptr)
-    end
-
-    function BackgroundSubtractorGMG:setNumFrames(t)
-        local argRules = {
-            {"nframes", required = true}
-        }
-        local numFrames = cv.argcheck(t, argRules)
-
-        C.BackgroundSubtractorGMG_setNumFrames(self.ptr, numFrames)
-    end
-
-    function BackgroundSubtractorGMG:getNumFrames()
-        return C.BackgroundSubtractorGMG_getNumFrames(self.ptr)
-    end
-
-    function BackgroundSubtractorGMG:setQuantizationLevels(t)
-        local argRules = {
-            {"nlevels", required = true}
-        }
-        local quantizationLevels = cv.argcheck(t, argRules)
-
-        C.BackgroundSubtractorGMG_setQuantizationLevels(self.ptr, quantizationLevels)
-    end
-
-    function BackgroundSubtractorGMG:getQuantizationLevels()
-        return C.BackgroundSubtractorGMG_getQuantizationLevels(self.ptr)
-    end
-
-    function BackgroundSubtractorGMG:setSmoothingRadius(t)
-        local argRules = {
-            {"radius", required = true}
-        }
-        local smoothingRadius = cv.argcheck(t, argRules)
-
-        C.BackgroundSubtractorGMG_setSmoothingRadius(self.ptr, smoothingRadius)
-    end
-
-    function BackgroundSubtractorGMG:getSmoothingRadius()
-        return C.BackgroundSubtractorGMG_getSmoothingRadius(self.ptr)
-    end
-
-    function BackgroundSubtractorGMG:setDefaultLearningRate(t)
-        local argRules = {
-            {"lr", required = true}
-        }
-        local defaultLearningRate = cv.argcheck(t, argRules)
-
-        C.BackgroundSubtractorGMG_setDefaultLearningRate(self.ptr, defaultLearningRate)
-    end
-
-    function BackgroundSubtractorGMG:getDefaultLearningRate()
-        return C.BackgroundSubtractorGMG_getDefaultLearningRate(self.ptr)
-    end
-
-    function BackgroundSubtractorGMG:setBackgroundPrior(t)
-        local argRules = {
-            {"bgprior", required = true}
-        }
-        local backgroundPrior = cv.argcheck(t, argRules)
-
-        C.BackgroundSubtractorGMG_setBackgroundPrior(self.ptr, backgroundPrior)
-    end
-
-    function BackgroundSubtractorGMG:getBackgroundPrior()
-        return C.BackgroundSubtractorGMG_getBackgroundPrior(self.ptr)
-    end
-
-    function BackgroundSubtractorGMG:setDecisionThreshold(t)
-        local argRules = {
-            {"thresh", required = true}
-        }
-        local decisionThreshold = cv.argcheck(t, argRules)
-
-        C.BackgroundSubtractorGMG_setDecisionThreshold(self.ptr, decisionThreshold)
-    end
-
-    function BackgroundSubtractorGMG:getDecisionThreshold()
-        return C.BackgroundSubtractorGMG_getDecisionThreshold(self.ptr)
-    end
-
-    function BackgroundSubtractorGMG:setMinVal(t)
-        local argRules = {
-            {"val", required = true}
-        }
-        local minVal = cv.argcheck(t, argRules)
-
-        C.BackgroundSubtractorGMG_setMinVal(self.ptr, minVal)
-    end
-
-    function BackgroundSubtractorGMG:getMinVal()
-        return C.BackgroundSubtractorGMG_getMinVal(self.ptr)
-    end
-
-    function BackgroundSubtractorGMG:setMaxVal(t)
-        local argRules = {
-            {"val", required = true}
-        }
-        local maxVal = cv.argcheck(t, argRules)
-
-        C.BackgroundSubtractorGMG_setMaxVal(self.ptr, maxVal)
-    end
-
-    function BackgroundSubtractorGMG:getMaxVal()
-        return C.BackgroundSubtractorGMG_getMaxVal(self.ptr)
-    end
-
-    function BackgroundSubtractorGMG:setUpdateBackgroundModel(t)
-        local argRules = {
-            {"update", required = true}
-        }
-        local updateBackgroundModel = cv.argcheck(t, argRules)
-
-        C.BackgroundSubtractorGMG_setUpdateBackgroundModel(self.ptr, updateBackgroundModel)
-    end
-
-    function BackgroundSubtractorGMG:getUpdateBackgroundModel()
-        return C.BackgroundSubtractorGMG_getUpdateBackgroundModel(self.ptr)
     end
 end
 
