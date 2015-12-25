@@ -10,7 +10,11 @@ void test_tensor_to_mat(struct TensorWrapper tensor);
 struct TensorWrapper test_mat_to_tensor();
 ]]
 
-local C = ffi.load(cv.libPath('Tests'))
+local ok, C = pcall(ffi.load, cv.libPath('Tests'))
+if not ok then
+    print('torch-opencv is built with BUILD_TESTS = OFF. Aborting.')
+    os.exit(-1)
+end
 
 -- prints Tensor from OpenCV
 function test_tensor_to_mat(tensor)
@@ -39,9 +43,9 @@ test_tensor_to_mat(tensor_a)
 
 tensor_b = torch.DoubleTensor(3, 3)
 for i=1,3 do
-	for j=1,3 do
-		tensor_b[i][j] = j^i
-	end
+    for j=1,3 do
+        tensor_b[i][j] = j^i
+    end
 end
 
 test_tensor_to_mat(tensor_b)

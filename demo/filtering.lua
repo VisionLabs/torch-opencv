@@ -4,25 +4,25 @@ require 'cv.imgcodecs'
 require 'cv.highgui'
 
 if not arg[1] then
-	print('Usage: `th demo/filtering.lua path-to-image`')
+    print('Usage: `th demo/filtering.lua path-to-image`')
     print('Now using demo/lena.jpg')
 end
 
 local image = cv.imread{arg[1] or 'demo/lena.jpg'}
 
 if not image or image:nDimension() == 0 then
-	print("Problem loading image\n")
-	os.exit(0)
+    print("Problem loading image\n")
+    os.exit(0)
 end
 
 cv.putText{
-	img=image, 
-	text="Some text on top of the image", 
-	org={x=15, y=50},
-	fontFace=cv.FONT_HERSHEY_DUPLEX,
-	fontScale=0.95,
-	color={50, 200, 200},
-	thickness=2,
+    img=image, 
+    text="Some text on top of the image", 
+    org={x=15, y=50},
+    fontFace=cv.FONT_HERSHEY_DUPLEX,
+    fontScale=0.95,
+    color={50, 200, 200},
+    thickness=2,
 }
 
 cv.imshow{"Original image with text", image}
