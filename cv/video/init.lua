@@ -628,7 +628,7 @@ do
     end
 
     function KalmanFilter:__init(t)
-        if table.getn(t) == 0 then
+        if not t or #t == 0 and not t.dynamParams then
             self.ptr = ffi.gc(C.KalmanFilter_ctor_default(), C.KalmanFilter_dtor)
         else
             local argRules = {
