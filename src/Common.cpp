@@ -131,22 +131,19 @@ TensorArray::operator std::vector<cv::Mat>() {
 // Kill "destination" and assign "source" data to it.
 // "destination" is always supposed to be an empty Tensor
 extern "C"
-void transfer_tensor(void *destination, void *source) {
-    THByteTensor * s = static_cast<THByteTensor *>(source);
-    THByteTensor * d = static_cast<THByteTensor *>(destination);
+void transfer_tensor(THByteTensor *dst, THByteTensor *src) {
+    if (dst->storage)
+        THFree(dst->storage);
+    if (dst->size)
+        THFree(dst->size);
+    if (dst->stride)
+        THFree(dst->stride);
 
-    if (d->storage)
-        THFree(d->storage);
-    if (d->size)
-        THFree(d->size);
-    if (d->stride)
-        THFree(d->stride);
-
-    d->storage = s->storage;
-    d->size = s->size;
-    d->stride = s->stride;
-    d->nDimension = s->nDimension;
-    ++d->refcount;
+    dst->storage = src->storage;
+    dst->size = src->size;
+    dst->stride = src->stride;
+    dst->nDimension = src->nDimension;
+    ++dst->refcount;
 }
 
 /***************** Wrappers for small classes *****************/

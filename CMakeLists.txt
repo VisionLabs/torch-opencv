@@ -1,12 +1,15 @@
 PROJECT(Torch_OpenCV)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8 FATAL_ERROR)
 
-SET(BUILD_TESTS OFF)
+OPTION(BUILD_TESTS  "Build C tests"         OFF)
+OPTION(BUILD_CUDA   "Wrap CUDA packages"    ON)
 
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-SET(OPENCV_MODULES_TO_WRAP imgcodecs highgui features2d flann imgproc ml optflow photo superres videoio)
+SET(OPENCV_MODULES_TO_WRAP
+        imgcodecs highgui features2d flann imgproc ml optflow photo superres videoio
+        cudaarithm)
 
 # Unfortunately, OpenCVConfig.cmake doesn't make use of FIND_PACKAGE's "OPTIONAL_COMPONENTS"
 # So let's invoke FIND_PACKAGE twice:
@@ -21,12 +24,31 @@ IF(LUAROCKS_PREFIX)
     STRING(REGEX REPLACE "(.*)lib/luarocks/rocks.*" "\\1" CMAKE_INSTALL_PREFIX  "${LUAROCKS_PREFIX}")
     MESSAGE(STATUS "Prefix inferred from Luarocks: ${CMAKE_INSTALL_PREFIX}")
 ENDIF()
+
 FIND_PACKAGE(Torch REQUIRED)
 INCLUDE_DIRECTORIES(${Torch_INSTALL_INCLUDE} ${OpenCV_INCLUDE_DIRS})
 
 FILE(GLOB luasrc *.lua cv/*.lua)
 SET(luasrc ${luasrc})
 ADD_TORCH_PACKAGE(cv "" "${luasrc}" "cv")
+
+# Check if both OpenCV CUDA interface and cutorch are installed
+IF (BUILD_CUDA)
+    IF (NOT OPENCV_CUDAARITHM_FOUND)
+        MESSAGE(WARNING "BUILD_CUDA is ON, but OpenCV CUDA interface wasn't found. Won't build OpenCV-CUDA wrappers.")
+        SET(BUILD_CUDA OFF)
+    ELSEIF(NOT EXISTS "${Torch_INSTALL_INCLUDE}/THC/")
+        MESSAGE(WARNING "BUILD_CUDA is ON, but cutorch wasn't found. Won't build OpenCV-CUDA wrappers")
+        SET(BUILD_CUDA OFF)
+    ENDIF()
+ENDIF()
+
+IF (BUILD_CUDA)
+    FIND_PACKAGE(CUDA REQUIRED)
+
+    INCLUDE_DIRECTORIES(${CUDA_INCLUDE_DIRS})
+    ADD_DEFINITIONS(-DWITH_CUDA)
+ENDIF()
 
 SET(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -37,12 +59,25 @@ TARGET_LINK_LIBRARIES(Common TH ${OpenCV_LIBS})
 ADD_LIBRARY(Classes SHARED "${SOURCE_DIR}/Classes.cpp")
 TARGET_LINK_LIBRARIES(Classes Common)
 
+IF (BUILD_CUDA)
+    ADD_LIBRARY(CUDACommon SHARED "${SOURCE_DIR}/CUDACommon.cpp")
+    TARGET_LINK_LIBRARIES(CUDACommon Common)
+ENDIF()
+
 FOREACH(MODULE ${OPENCV_MODULES_TO_WRAP})
-    ADD_SUBDIRECTORY(cv/${MODULE})
     STRING(TOUPPER ${MODULE} MODULE_UPPERCASE)
     IF (OPENCV_${MODULE_UPPERCASE}_FOUND)
-        ADD_LIBRARY(${MODULE} SHARED "${SOURCE_DIR}/${MODULE}.cpp")
-        TARGET_LINK_LIBRARIES(${MODULE} Common)
+        IF (${MODULE_UPPERCASE} MATCHES "^CUDA")
+            IF (BUILD_CUDA)
+                ADD_SUBDIRECTORY(cv/${MODULE})
+                ADD_LIBRARY(${MODULE} SHARED "${SOURCE_DIR}/${MODULE}.cpp")
+                TARGET_LINK_LIBRARIES(${MODULE} CUDACommon)
+            ENDIF()
+        ELSE()
+            ADD_SUBDIRECTORY(cv/${MODULE})
+            ADD_LIBRARY(${MODULE} SHARED "${SOURCE_DIR}/${MODULE}.cpp")
+            TARGET_LINK_LIBRARIES(${MODULE} Common)
+        ENDIF()
     ENDIF()
 ENDFOREACH()
 
