@@ -317,6 +317,23 @@ extern "C" void BackgroundSubtractorKNN_setDetectShadows(struct BackgroundSubtra
 
 // KalmanFilter
 
+extern "C"
+struct TensorArray KalmanFilter_getFields(struct KalmanFilterPtr ptr)
+{
+    std::vector<cv::Mat> retval(10);
+    retval[0] = ptr->statePre;
+    retval[1] = ptr->statePost;
+    retval[2] = ptr->transitionMatrix;
+    retval[3] = ptr->controlMatrix;
+    retval[4] = ptr->measurementMatrix;
+    retval[5] = ptr->processNoiseCov;
+    retval[6] = ptr->measurementNoiseCov;
+    retval[7] = ptr->errorCovPre;
+    retval[8] = ptr->gain;
+    retval[9] = ptr->errorCovPost;
+    return TensorArray(retval);
+}
+
 extern "C" struct KalmanFilterPtr KalmanFilter_ctor_default()
 {
     return new cv::KalmanFilter();

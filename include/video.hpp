@@ -153,6 +153,8 @@ struct KalmanFilterPtr {
     inline cv::KalmanFilter & operator*() { return *static_cast<cv::KalmanFilter *>(this->ptr); }
 };
 
+extern "C" struct TensorArray KalmanFilter_getFields(struct KalmanFilterPtr ptr);
+
 extern "C" struct KalmanFilterPtr KalmanFilter_ctor_default();
 
 extern "C" struct KalmanFilterPtr KalmanFilter_ctor(int dynamParams, int measureParams,
