@@ -9,7 +9,7 @@ if not arg[1] then
     print('Now using demo/lena.jpg')
 end
 
-local image = cv.imread{arg[1] or 'demo/lena.jpg', cv.IMREAD_COLOR}
+local image = cv.imread{arg[1] or 'demo/lena.jpg', cv.IMREAD_GRAYSCALE}
 
 if not image or image:nDimension() == 0 then
     print("Problem loading image\n")

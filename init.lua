@@ -333,9 +333,9 @@ function cv.unwrap_tensors(wrapper, toTable)
         retval = empty_tensor_of_type(wrapper.typeCode)
         
         if wrapper.typeCode == cv.CV_CUDA then
-            C.transfer_tensor(retval:cdata(), wrapper.tensorPtr)
-        else
             CUDACommon_C.transfer_tensor_CUDA(cutorch._state, retval:cdata(), wrapper.tensorPtr)
+        else
+            C.transfer_tensor(retval:cdata(), wrapper.tensorPtr)
         end
 
         return retval
