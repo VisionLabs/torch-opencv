@@ -30,8 +30,10 @@ struct TensorWrapper {
     TensorWrapper();
     TensorWrapper(cv::Mat & mat);
     TensorWrapper(cv::Mat && mat);
+    #ifdef WITH_CUDA
     TensorWrapper(cv::cuda::GpuMat & mat, THCState *state);
     TensorWrapper(cv::cuda::GpuMat && mat, THCState *state);
+    #endif
 
     operator cv::Mat();
     // synonym for operator cv::Mat()
