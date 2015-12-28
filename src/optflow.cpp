@@ -45,25 +45,6 @@ struct TensorWrapper calcOpticalFlowSF_expanded(
 }
 
 extern "C"
-struct TensorWrapper calcOpticalFlowSparseToDense(
-        struct TensorWrapper from, struct TensorWrapper to, struct TensorWrapper flow,
-        int grid_step, int k, float sigma, bool use_post_proc, float fgs_lambda, float fgs_sigma)
-{
-    if (flow.isNull()) {
-        cv::Mat retval;
-        optflow::calcOpticalFlowSparseToDense(
-                from.toMat(), to.toMat(), retval, grid_step, k,
-                sigma, use_post_proc, fgs_lambda, fgs_sigma);
-        return TensorWrapper(retval);
-    } else {
-        optflow::calcOpticalFlowSparseToDense(
-                from.toMat(), to.toMat(), flow.toMat(), grid_step, k,
-                sigma, use_post_proc, fgs_lambda, fgs_sigma);
-        return flow;
-    }
-}
-
-extern "C"
 struct TensorWrapper readOpticalFlow(const char *path)
 {
     return TensorWrapper(optflow::readOpticalFlow(path));
@@ -145,8 +126,31 @@ struct DenseOpticalFlowPtr createOptFlow_Farneback_optflow()
     return rescueObjectFromPtr(optflow::createOptFlow_Farneback());
 }
 
+#if CV_MAJOR_VERSION >= 3 && CV_MINOR_VERSION >= 1
+
+extern "C"
+struct TensorWrapper calcOpticalFlowSparseToDense(
+        struct TensorWrapper from, struct TensorWrapper to, struct TensorWrapper flow,
+        int grid_step, int k, float sigma, bool use_post_proc, float fgs_lambda, float fgs_sigma)
+{
+    if (flow.isNull()) {
+        cv::Mat retval;
+        optflow::calcOpticalFlowSparseToDense(
+                from.toMat(), to.toMat(), retval, grid_step, k,
+                sigma, use_post_proc, fgs_lambda, fgs_sigma);
+        return TensorWrapper(retval);
+    } else {
+        optflow::calcOpticalFlowSparseToDense(
+                from.toMat(), to.toMat(), flow.toMat(), grid_step, k,
+                sigma, use_post_proc, fgs_lambda, fgs_sigma);
+        return flow;
+    }
+}
+
 extern "C"
 struct DenseOpticalFlowPtr createOptFlow_SparseToDense_optflow()
 {
     return rescueObjectFromPtr(optflow::createOptFlow_SparseToDense());
 }
+
+#endif
