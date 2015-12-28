@@ -21,11 +21,6 @@ struct TensorWrapper calcOpticalFlowSF_expanded(
         double upscale_sigma_color, double speed_up_thr);
 
 extern "C"
-struct TensorWrapper calcOpticalFlowSparseToDense(
-        struct TensorWrapper from, struct TensorWrapper to, struct TensorWrapper flow,
-        int grid_step, int k, float sigma, bool use_post_proc, float fgs_lambda, float fgs_sigma);
-
-extern "C"
 struct TensorWrapper readOpticalFlow(const char *path);
 
 extern "C"
@@ -60,5 +55,14 @@ struct DenseOpticalFlowPtr createOptFlow_SimpleFlow_optflow();
 extern "C"
 struct DenseOpticalFlowPtr createOptFlow_Farneback_optflow();
 
+#if CV_MAJOR_VERSION >= 3 && CV_MINOR_VERSION >= 1
+
+extern "C"
+struct TensorWrapper calcOpticalFlowSparseToDense(
+        struct TensorWrapper from, struct TensorWrapper to, struct TensorWrapper flow,
+        int grid_step, int k, float sigma, bool use_post_proc, float fgs_lambda, float fgs_sigma);
+
 extern "C"
 struct DenseOpticalFlowPtr createOptFlow_SparseToDense_optflow();
+
+#endif

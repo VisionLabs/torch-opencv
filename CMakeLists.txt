@@ -19,6 +19,10 @@ FIND_PACKAGE(OpenCV 3 REQUIRED)
 # Once more (silently) to look for the installed modules
 FIND_PACKAGE(OpenCV 3 OPTIONAL_COMPONENTS ${OPENCV_MODULES_TO_WRAP})
 
+MESSAGE(STATUS "OpenCV Include dirs: ${OpenCV_INCLUDE_DIRS}")
+MESSAGE(STATUS "OpenCV Library dirs: ${OpenCV_LIB_DIR}")
+MESSAGE(STATUS "OpenCV Libraries: ${OpenCV_LIBS}")
+
 IF(LUAROCKS_PREFIX)
     MESSAGE(STATUS "Installing Torch through Luarocks")
     STRING(REGEX REPLACE "(.*)lib/luarocks/rocks.*" "\\1" CMAKE_INSTALL_PREFIX  "${LUAROCKS_PREFIX}")
