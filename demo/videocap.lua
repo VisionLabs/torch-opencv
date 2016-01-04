@@ -14,10 +14,11 @@ end
 
 cv.namedWindow{"edges", cv.WINDOW_AUTOSIZE}
 local _, frame = cap:read{}
-local edges
+-- make a tensor of same type, but a 2-dimensional one
+local edges = frame.new(frame:size()[1], frame:size()[2])
 
 while true do
-    edges = cv.cvtColor{frame, cv.COLOR_BGR2GRAY}
+    cv.cvtColor{frame, edges, cv.COLOR_BGR2GRAY}
     
     cv.GaussianBlur{
         edges, 
