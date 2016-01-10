@@ -1388,13 +1388,13 @@ do
         local queryDescriptors, trainDescriptors, mask = cv.argcheck(t, argRules)
 
         if trainDescriptors then
-            return cv.gcarray(C.DescriptorMatcher_match_trainDescriptors(
-                cv.wrap_tensor(queryDescriptors), cv.wrap_tensors(trainDescriptors), 
-                cv.wrap_tensors(mask)))
+            return cv.gcarray(C.DescriptorMatcher_match_trainDescriptors(self.ptr,
+                cv.wrap_tensor(queryDescriptors), cv.wrap_tensor(trainDescriptors), 
+                cv.wrap_tensor(mask)))
         else
-            return cv.gcarray(C.DescriptorMatcher_match(
+            return cv.gcarray(C.DescriptorMatcher_match(self.ptr,
                 cv.wrap_tensor(queryDescriptors),
-                cv.wrap_tensors(mask)))
+                cv.wrap_tensor(mask)))
         end
     end
 
@@ -1411,11 +1411,11 @@ do
         local result
 
         if trainDescriptors then
-            result = cv.gcarray(C.DescriptorknnMatcher_knnMatch_trainDescriptors(
+            result = cv.gcarray(C.DescriptorknnMatcher_knnMatch_trainDescriptors(self.ptr,
                 cv.wrap_tensor(queryDescriptors), cv.wrap_tensors(trainDescriptors), 
                 k, cv.wrap_tensors(mask), compactResult))
         else
-            result = cv.gcarray(C.DescriptorknnMatcher_knnMatch(
+            result = cv.gcarray(C.DescriptorknnMatcher_knnMatch(self.ptr,
                 cv.wrap_tensor(queryDescriptors),
                 k, cv.wrap_tensors(mask), compactResult))
         end
