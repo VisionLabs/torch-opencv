@@ -1501,7 +1501,7 @@ function cv.drawMatches(t)
 
     return cv.unwrap_tensors(C.drawMatches(
         cv.wrap_tensor(img1), keypoints1, cv.wrap_tensor(img2), keypoints2, matches1to2, 
-        cv.wrap_tensor(outImg), matchColor, singlePointColor, matchesMask, flags))
+        cv.wrap_tensor(outImg), matchColor, singlePointColor, cv.wrap_tensor(matchesMask), flags))
 end
 
 function cv.drawMatchesKnn(t)
@@ -1529,7 +1529,7 @@ function cv.drawMatchesKnn(t)
 
     return cv.unwrap_tensors(C.drawMatchesKnn(
         cv.wrap_tensor(img1), keypoints1, cv.wrap_tensor(img2), keypoints2, matches1to2_CArray, 
-        cv.wrap_tensor(outImg), matchColor, singlePointColor, matchesMask, flags))
+        cv.wrap_tensor(outImg), matchColor, singlePointColor, cv.wrap_tensor(matchesMask), flags))
 end
 
 function cv.evaluateFeatureDetector(t)
