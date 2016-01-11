@@ -302,6 +302,10 @@ struct DoubleArray {
 struct PointArray {
     struct PointWrapper *data;
     int size;
+
+    PointArray() {}
+    PointArray(std::vector<cv::Point> & vec);
+    operator std::vector<cv::Point>();
 };
 
 struct RectArray {
@@ -323,6 +327,11 @@ struct TensorPlusRectArray {
 struct TensorArrayPlusRectArray {
     struct TensorArray tensors;
     struct RectArray rects;
+};
+
+struct TensorPlusPointArray {
+    struct TensorWrapper tensor;
+    struct PointArray points;
 };
 
 // Arrays of arrays

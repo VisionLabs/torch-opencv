@@ -225,6 +225,21 @@ PointWrapper::PointWrapper(const cv::Point & other) {
     this->y = other.y;
 }
 
+PointArray::PointArray(std::vector<cv::Point> & vec) {
+    this->data = static_cast<PointWrapper *>(malloc(vec.size() * sizeof(PointWrapper)));
+    this->size = vec.size();
+
+    for (int i = 0; i < vec.size(); ++i) {
+        this->data[i] = vec[i];
+    }
+}
+
+PointArray::operator std::vector<cv::Point>() {
+    std::vector<cv::Point> retval(this->size);
+    memcpy(retval.data(), this->data, this->size * sizeof(PointWrapper));
+    return retval;
+}
+
 Point2fWrapper::Point2fWrapper(const cv::Point2f & other) {
     this->x = other.x;
     this->y = other.y;
