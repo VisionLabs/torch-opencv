@@ -193,7 +193,7 @@ function optflow.segmentMotion(t)
 
     local result = C.segmentMotion(
         cv.wrap_tensor(mhi), cv.wrap_tensor(segmask), timestamp, segThresh)
-    return cv.unwrap_tensors(result.tensor), result.rects
+    return cv.unwrap_tensors(result.tensor), cv.gcarray(result.rects)
 end
 
 function optflow.createOptFlow_DeepFlow()

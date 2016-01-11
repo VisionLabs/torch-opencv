@@ -310,6 +310,7 @@ struct RectArray {
 
     RectArray() {}
     RectArray(std::vector<cv::Rect> & vec);
+    operator std::vector<cv::Rect>();
 };
 
 struct TensorPlusRectArray {
@@ -317,6 +318,11 @@ struct TensorPlusRectArray {
     struct RectArray rects;
 
     TensorPlusRectArray() {}
+};
+
+struct TensorArrayPlusRectArray {
+    struct TensorArray tensors;
+    struct RectArray rects;
 };
 
 // Arrays of arrays

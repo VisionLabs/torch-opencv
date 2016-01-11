@@ -243,3 +243,9 @@ RectArray::RectArray(std::vector<cv::Rect> & vec) {
         this->data[i] = vec[i];
     }
 }
+
+RectArray::operator std::vector<cv::Rect>() {
+    std::vector<cv::Rect> retval(this->size);
+    memcpy(retval.data(), this->data, this->size * sizeof(RectWrapper));
+    return retval;
+}
