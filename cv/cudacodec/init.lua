@@ -28,11 +28,35 @@ struct EncoderParams {
     int DisableSPSPPS;   //!< NVVE_DISABLE_SPS_PPS
 };
 
+struct FormatInfo {
+    int codec;
+    int chromaFormat;
+    int width;
+    int height;
+};
+
 struct EncoderParams EncoderParams_ctor_default();
 
 struct EncoderParams EncoderParams_ctor(const char *configFile);
 
 void EncoderParams_save(struct EncoderParams params, const char *configFile);
+
+struct PtrWrapper VideoWriter_ctor();
+
+void VideoWriter_dtor(struct PtrWrapper ptr);
+
+void VideoWriter_write(struct PtrWrapper ptr, struct TensorWrapper frame, bool lastFrame);
+
+struct EncoderParams VideoWriter_getEncoderParams(struct PtrWrapper ptr);
+
+struct PtrWrapper VideoReader_ctor(const char *filename);
+
+void VideoReader_dtor(struct PtrWrapper ptr);
+
+struct TensorWrapper VideoReader_nextFrame(
+        struct THCState *state, struct PtrWrapper ptr, struct TensorWrapper frame);
+
+struct FormatInfo VideoReader_format(struct PtrWrapper ptr);
 ]]
 
 local C = ffi.load(cv.libPath('cudacodec'))
@@ -139,6 +163,33 @@ do
         local retval = cv.cuda.EncoderParams{}
         retval.object = C.VideoWriter_getEncoderParams(self.ptr)
         return retval
+    end
+end
+
+do
+    local VideoReader = torch.class('cuda.VideoReader', cv.cuda)
+
+    function VideoReader:__init(t)
+        local argRules = {
+            {"filename", required = true}
+        }
+        local filename = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.VideoReader_ctor(filename), C.VideoReader_dtor)
+    end
+
+    function VideoReader:nextFrame(t)
+        local argRules = {
+            {"frame", default = nil}
+        }
+        local frame = cv.argcheck(t, argRules)
+
+        return cv.unwrap_tensors(C.VideoReader_nextFrame(cutorch._state, 
+            self.ptr, cv.wrap_tensor(frame)))
+    end
+
+    function VideoReader:format()
+        return C.VideoReader_format(self.ptr)
     end
 end
 

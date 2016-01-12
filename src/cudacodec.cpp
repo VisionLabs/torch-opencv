@@ -3,13 +3,19 @@
 extern "C"
 struct cudacodec::EncoderParams EncoderParams_ctor_default()
 {
-    std::cout << cudacodec::SF_UYVY << std::endl;
-    std::cout << cudacodec::SF_YUY2 << std::endl;
-    std::cout << cudacodec::SF_YV12 << std::endl;
-    std::cout << cudacodec::SF_NV12 << std::endl;
-    std::cout << cudacodec::SF_IYUV << std::endl;
-    std::cout << cudacodec::SF_IYUV << std::endl;
-    std::cout << cudacodec::SF_GRAY << std::endl;
+    std::cout << cudacodec::Codec::MPEG1 << std::endl;
+    std::cout << cudacodec::Codec::MPEG2 << std::endl;
+    std::cout << cudacodec::Codec::MPEG4 << std::endl;
+    std::cout << cudacodec::Codec::VC1 << std::endl;
+    std::cout << cudacodec::Codec::H264 << std::endl;
+    std::cout << cudacodec::Codec::JPEG << std::endl;
+    std::cout << cudacodec::Codec::H264_SVC << std::endl;
+    std::cout << cudacodec::Codec::H264_MVC << std::endl;
+    std::cout << cudacodec::Codec::Uncompressed_YUV420 << std::endl;
+    std::cout << cudacodec::Codec::Uncompressed_YV12 << std::endl;
+    std::cout << cudacodec::Codec::Uncompressed_NV12 << std::endl;
+    std::cout << cudacodec::Codec::Uncompressed_YUYV << std::endl;
+    std::cout << cudacodec::Codec::Uncompressed_UYVY << std::endl;
     return cudacodec::EncoderParams();
 }
 
@@ -31,7 +37,8 @@ struct VideoWriterPtr VideoWriter_ctor(
         double fps, struct cudacodec::EncoderParams params, int format)
 {
     return rescueObjectFromPtr(cudacodec::createVideoWriter(
-            filename, frameSize, fps, params, static_cast<cudacodec::SurfaceFormat>(format)));
+            cv::String(filename), frameSize, fps, params,
+            static_cast<cudacodec::SurfaceFormat>(format)));
 }
 
 extern "C"
@@ -50,4 +57,36 @@ extern "C"
 struct cudacodec::EncoderParams VideoWriter_getEncoderParams(struct VideoWriterPtr ptr)
 {
     return ptr->getEncoderParams();
+}
+
+extern "C"
+struct VideoReaderPtr VideoReader_ctor(const char *filename)
+{
+    return rescueObjectFromPtr(cudacodec::createVideoReader(cv::String(filename)));
+}
+
+extern "C"
+void VideoReader_dtor(struct VideoReaderPtr ptr)
+{
+    delete static_cast<cudacodec::VideoReader *>(ptr.ptr);
+}
+
+extern "C"
+struct TensorWrapper VideoReader_nextFrame(
+        struct THCState *state, struct VideoReaderPtr ptr, struct TensorWrapper frame)
+{
+    if (frame.isNull()) {
+        cuda::GpuMat retval;
+        ptr->nextFrame(retval);
+        return TensorWrapper(retval, state);
+    } else {
+        ptr->nextFrame(frame.toGpuMat());
+        return frame;
+    }
+}
+
+extern "C"
+struct cudacodec::FormatInfo VideoReader_format(struct VideoReaderPtr ptr)
+{
+    return ptr->format();
 }
