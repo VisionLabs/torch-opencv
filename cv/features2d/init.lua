@@ -452,7 +452,7 @@ do
         self.ptr = ffi.gc(C.KeyPointsFilter_ctor(), C.KeyPointsFilter_dtor)
     end
 
-    function KeyPointsFilter:runByImageBorder(t)
+    function KeyPointsFilter.runByImageBorder(t)
         local argRules = {
             {"keypoints", required = true},
             {"imageSize", required = true, operator = cv.Size},
@@ -464,7 +464,7 @@ do
             C.KeyPointsFilter_runByImageBorder(keypoints, imageSize, borderSize))
     end
 
-    function KeyPointsFilter:runByKeypointSize(t)
+    function KeyPointsFilter.runByKeypointSize(t)
         local argRules = {
             {"keypoints", required = true},
             {"minSize", required = true},
@@ -476,7 +476,7 @@ do
             C.KeyPointsFilter_runByKeypointSize(keypoints, imageSize, borderSize))
     end
 
-    function KeyPointsFilter:runByPixelsMask(t)
+    function KeyPointsFilter.runByPixelsMask(t)
         local argRules = {
             {"keypoints", required = true},
             {"mask", required = true}
@@ -487,7 +487,7 @@ do
             C.KeyPointsFilter_runByPixelsMask(keypoints, cv.wrap_tensor(mask)))
     end
 
-    function KeyPointsFilter:removeDuplicated(t)
+    function KeyPointsFilter.removeDuplicated(t)
         local argRules = {
             {"keypoints", required = true}
         }
@@ -497,7 +497,7 @@ do
             C.KeyPointsFilter_removeDuplicated(keypoints))
     end
 
-    function KeyPointsFilter:retainBest(t)
+    function KeyPointsFilter.retainBest(t)
         local argRules = {
             {"keypoints", required = true},
             {"npoints", required = true}
@@ -525,7 +525,7 @@ do
         }
         local image, mask = cv.argcheck(t, argRules)
 
-        return C.Feature2D_detect(self.ptr, cv.wrap_tensor(image), cv.wrap_tensor(mask))
+        return cv.gcarray(C.Feature2D_detect(self.ptr, cv.wrap_tensor(image), cv.wrap_tensor(mask)))
     end
 
     function Feature2D:compute(t)
@@ -538,7 +538,7 @@ do
 
         local result = C.Feature2D_compute(
             self.ptr, cv.wrap_tensor(image), keypoints, cv.wrap_tensor(descriptors))
-        return result.keypoints, cv.unwrap_tensors(result.tensor)
+        return cv.gcarray(result.keypoints), cv.unwrap_tensors(result.tensor)
     end
 
     function Feature2D:detectAndCompute(t)
@@ -552,7 +552,7 @@ do
 
         local result = C.Feature2D_detectAndCompute(self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(mask),
                     cv.wrap_tensors(descriptors), useProvidedKeypoints)
-        return result.keypoints, cv.unwrap_tensors(result.tensor)
+        return cv.gcarray(result.keypoints), cv.unwrap_tensors(result.tensor)
     end
 
     function Feature2D:descriptorSize()
@@ -856,9 +856,9 @@ function cv.FAST(t)
     local image, threshold, nonmaxSuppression, _type = cv.argcheck(t, argRules)
 
     if _type then
-        return C.FAST_type(cv.wrap_tensor(image), threshold, nonmaxSuppression, type)
+        return cv.gcarray(C.FAST_type(cv.wrap_tensor(image), threshold, nonmaxSuppression, type))
     else
-        return C.FAST(cv.wrap_tensor(image), threshold, nonmaxSuppression)
+        return cv.gcarray(C.FAST(cv.wrap_tensor(image), threshold, nonmaxSuppression))
     end
 end
 
@@ -870,7 +870,7 @@ function cv.AGAST(t)
     }
     local image, threshold, nonmaxSuppression = cv.argcheck(t, argRules)
 
-    return C.AGAST(cv.wrap_tensor(image), threshold, nonmaxSuppression)
+    return cv.gcarray(C.AGAST(cv.wrap_tensor(image), threshold, nonmaxSuppression))
 end
 
 -- FastFeatureDetector
