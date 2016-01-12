@@ -19,6 +19,8 @@ struct PtrWrapper CascadeClassifier_ctor_default();
 
 struct PtrWrapper CascadeClassifier_ctor(const char *filename);
 
+void CascadeClassifier_dtor(struct PtrWrapper ptr);
+
 bool CascadeClassifier_read(struct PtrWrapper ptr, struct PtrWrapper node);
 
 struct RectArray CascadeClassifier_detectMultiScale(struct PtrWrapper ptr,
@@ -130,7 +132,7 @@ do
 end
 
 do
-    local CascadeClassifier = torch.class('cv.CascadeClassifier', 'cv.BaseCascadeClassifier', cv)
+    local CascadeClassifier = torch.class('cv.CascadeClassifier', cv)
 
     function CascadeClassifier:__init(t)
         local argRules = {
@@ -139,9 +141,9 @@ do
         local filename = cv.argcheck(t, argRules)
 
         if filename then
-            self.ptr = ffi.gc(C.CascadeClassifier_ctor(filename), Classes.Algorithm_dtor)
+            self.ptr = ffi.gc(C.CascadeClassifier_ctor(filename), C.CascadeClassifier_dtor)
         else
-            self.ptr = ffi.gc(C.CascadeClassifier_ctor_default(), Classes.Algorithm_dtor)
+            self.ptr = ffi.gc(C.CascadeClassifier_ctor_default(), C.CascadeClassifier_dtor)
         end
     end
 
@@ -182,9 +184,9 @@ do
         }
         local image, scaleFactor, minNeighbors, flags, minSize, maxSize = cv.argcheck(t, argRules)
 
-        local result = C.CascadeClassifier_detectMultiScale(self.ptr, cv.wrap_tensor(image),
+        local result = C.CascadeClassifier_detectMultiScale2(self.ptr, cv.wrap_tensor(image),
             scaleFactor, minNeighbors, flags, minSize, maxSize)
-        return cv.gcarray(result.rects), result.tensor
+        return cv.gcarray(result.rects), cv.unwrap_tensors(result.tensor)
     end
 
     function CascadeClassifier:detectMultiScale3(t)
@@ -199,8 +201,8 @@ do
         }
         local image, scaleFactor, minNeighbors, flags, minSize, maxSize = cv.argcheck(t, argRules)
 
-        local result = C.CascadeClassifier_detectMultiScale(self.ptr, cv.wrap_tensor(image),
-            scaleFactor, minNeighbors, flags, minSize, maxSize)
+        local result = C.CascadeClassifier_detectMultiScale3(self.ptr, cv.wrap_tensor(image),
+            scaleFactor, minNeighbors, flags, minSize, maxSize, outputRejectLevels)
         return cv.gcarray(result.rects), cv.unwrap_tensors(result.tensors)
     end
 

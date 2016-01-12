@@ -51,6 +51,9 @@ extern "C"
 struct CascadeClassifierPtr CascadeClassifier_ctor(const char *filename);
 
 extern "C"
+void CascadeClassifier_dtor(struct CascadeClassifierPtr ptr);
+
+extern "C"
 bool CascadeClassifier_read(struct CascadeClassifierPtr ptr, struct FileNodePtr node);
 
 extern "C"

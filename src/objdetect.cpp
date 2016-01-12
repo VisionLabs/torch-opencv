@@ -62,6 +62,12 @@ struct CascadeClassifierPtr CascadeClassifier_ctor(const char *filename)
 }
 
 extern "C"
+void CascadeClassifier_dtor(struct CascadeClassifierPtr ptr)
+{
+    delete static_cast<cv::CascadeClassifier *>(ptr.ptr);
+}
+
+extern "C"
 bool CascadeClassifier_read(struct CascadeClassifierPtr ptr, struct FileNodePtr node)
 {
     return ptr->read(*node);
@@ -110,7 +116,7 @@ struct TensorArrayPlusRectArray CascadeClassifier_detectMultiScale3(
 
     ptr->detectMultiScale(
             image.toMat(), objects, rejectLevels, levelWeights,
-            scaleFactor, minNeighbors, flags, minSize, maxSize);
+            scaleFactor, minNeighbors, flags, minSize, maxSize, outputRejectLevels);
 
     new (&retval.rects) RectArray(objects);
     std::vector<cv::Mat> matArray(2);
