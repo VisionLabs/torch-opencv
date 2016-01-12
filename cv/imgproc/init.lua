@@ -135,9 +135,9 @@ struct TensorWrapper warpPerspective(
         int flags, int borderMode, struct ScalarWrapper borderValue);
 
 struct TensorWrapper remap(
-        struct TensorWrapper src, struct TensorWrapper dst,
-        struct TensorWrapper map1, struct TensorWrapper map2,
-        int interpolation, int borderMode, struct ScalarWrapper borderValue);
+        struct TensorWrapper src, struct TensorWrapper map1, struct TensorWrapper map2,
+        int interpolation, struct TensorWrapper dst, 
+        int borderMode, struct ScalarWrapper borderValue);
 
 struct TensorArray convertMaps(
         struct TensorWrapper map1, struct TensorWrapper map2,
@@ -969,7 +969,7 @@ function cv.erode(t)
         {"kernel", required = true},
         {"anchor", default = {-1, -1}, operator = cv.Point},
         {"borderType", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0/0} , operator = cv.Scalar}
+        {"borderValue", default = {0,0,0,0} , operator = cv.Scalar}
     }
     local src, dst, kernel, anchor, borderType, borderValue = cv.argcheck(t, argRules)
     local iterations = 1
@@ -988,7 +988,7 @@ function cv.dilate(t)
         {"kernel", required = true},
         {"anchor", default = {-1, -1}, operator = cv.Point},
         {"borderType", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0/0} , operator = cv.Scalar}
+        {"borderValue", default = {0,0,0,0} , operator = cv.Scalar}
     }
     local src, dst, kernel, anchor, borderType, borderValue = cv.argcheck(t, argRules)
     local iterations = 1
@@ -1008,7 +1008,7 @@ function cv.morphologyEx(t)
         {"kernel", required = true},
         {"anchor", default = {-1, -1}, operator = cv.Point},
         {"borderType", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0/0} , operator = cv.Scalar}
+        {"borderValue", default = {0,0,0,0} , operator = cv.Scalar}
     }
     local src, dst, op, kernel, anchor, borderType, borderValue = cv.argcheck(t, argRules)
     local iterations = 1
@@ -1045,7 +1045,7 @@ function cv.warpAffine(t)
         {"dsize", default = {0, 0}, operator = cv.Size},
         {"flags", default = cv.INTER_LINEAR},
         {"borderMode", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0/0} , operator = cv.Scalar}
+        {"borderValue", default = {0,0,0,0} , operator = cv.Scalar}
     }
     local src, dst, M, dsize, flags, borderMode, borderValue = cv.argcheck(t, argRules)
 
@@ -1064,7 +1064,7 @@ function cv.warpPerspective(t)
         {"dsize", default = {0, 0}, operator = cv.Size},
         {"flags", default = cv.INTER_LINEAR},
         {"borderMode", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0/0} , operator = cv.Scalar}
+        {"borderValue", default = {0,0,0,0} , operator = cv.Scalar}
     }
     local src, dst, M, dsize, flags, borderMode, borderValue = cv.argcheck(t, argRules)
 
@@ -1078,19 +1078,19 @@ end
 function cv.remap(t)
     local argRules = {
         {"src", required = true},
-        {"dst", default = nil},
         {"map1", required = true},
         {"map2", required = true},
         {"interpolation", required = true},
+        {"dst", default = nil},
         {"borderMode", default = cv.BORDER_CONSTANT},
         {"borderValue", default = {0, 0, 0, 0}, operator = cv.Scalar}
     }
-    local src, dst, map1, map2, interpolation, borderMode, borderValue = cv.argcheck(t, argRules)
+    local src, map1, map2, interpolation, dst, borderMode, borderValue = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.remap(
-            cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(map1), cv.wrap_tensor(map2),
-            interpolation, borderMode, borderValue))
+            cv.wrap_tensor(src), cv.wrap_tensor(map1), cv.wrap_tensor(map2),
+            interpolation, cv.wrap_tensor(dst), borderMode, borderValue))
 end
 
 

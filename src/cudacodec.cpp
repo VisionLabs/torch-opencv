@@ -3,19 +3,6 @@
 extern "C"
 struct cudacodec::EncoderParams EncoderParams_ctor_default()
 {
-    std::cout << cudacodec::Codec::MPEG1 << std::endl;
-    std::cout << cudacodec::Codec::MPEG2 << std::endl;
-    std::cout << cudacodec::Codec::MPEG4 << std::endl;
-    std::cout << cudacodec::Codec::VC1 << std::endl;
-    std::cout << cudacodec::Codec::H264 << std::endl;
-    std::cout << cudacodec::Codec::JPEG << std::endl;
-    std::cout << cudacodec::Codec::H264_SVC << std::endl;
-    std::cout << cudacodec::Codec::H264_MVC << std::endl;
-    std::cout << cudacodec::Codec::Uncompressed_YUV420 << std::endl;
-    std::cout << cudacodec::Codec::Uncompressed_YV12 << std::endl;
-    std::cout << cudacodec::Codec::Uncompressed_NV12 << std::endl;
-    std::cout << cudacodec::Codec::Uncompressed_YUYV << std::endl;
-    std::cout << cudacodec::Codec::Uncompressed_UYVY << std::endl;
     return cudacodec::EncoderParams();
 }
 

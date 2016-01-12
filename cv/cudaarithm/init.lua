@@ -1,4 +1,5 @@
 local cv = require 'cv._env'
+require 'cutorch'
 
 -- TODO: remove this after gathering all CUDA packages in a single submodule
 cv.cuda = cv.cuda or {}
@@ -362,4 +363,4 @@ do
     end
 end
 
-return cv
+return cv.cuda

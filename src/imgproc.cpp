@@ -576,9 +576,9 @@ struct TensorWrapper warpPerspective(
 
 extern "C"
 struct TensorWrapper remap(
-        struct TensorWrapper src, struct TensorWrapper dst,
-        struct TensorWrapper map1, struct TensorWrapper map2,
-        int interpolation, int borderMode, struct ScalarWrapper borderValue)
+        struct TensorWrapper src, struct TensorWrapper map1,
+        struct TensorWrapper map2, int interpolation, struct TensorWrapper dst,
+        int borderMode, struct ScalarWrapper borderValue)
 {
     if (dst.isNull()) {
         cv::Mat retval;
