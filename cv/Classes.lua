@@ -103,7 +103,7 @@ do
     local Algorithm = torch.class('cv.Algorithm', cv)
 
     function Algorithm:__init()
-        self.ptr = ffi.gc(C.Algorithm_ctor(), C.Algorithm_dtor)
+        self.ptr = ffi.gc(C.Algorithm_ctor(), Classes.Algorithm_dtor)
     end
 
     function Algorithm:clear()

@@ -1,0 +1,5 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8 FATAL_ERROR)
+CMAKE_POLICY(VERSION 2.8)
+SET(src)
+FILE(GLOB luasrc *.lua)
+ADD_TORCH_PACKAGE(cv/cudacodec "${src}" "${luasrc}")
