@@ -106,4 +106,40 @@ do
     end
 end
 
+do
+    local VideoWriter = torch.class('cuda.VideoWriter', cv.cuda)
+
+    function VideoWriter:__init(t)
+        local argRules = {
+            {"fileName", required = true},
+            {"frameSize", required = true, operator = cv.Size},
+            {"fps", required = true},
+            {"params", default = cv.cuda.EncoderParams{}},
+            {"format", default = cv.cuda.SF_BGR}
+        }
+        local fileName, frameSize, fps, params, format = cv.argcheck(t, argRules)
+
+        assert(torch.type(params) == 'cuda.EncoderParams')
+
+        self.ptr = ffi.gc(C.VideoWriter_ctor(
+            fileName, frameSize, fps, params, format), C.VideoWriter_dtor)
+    end
+
+    function VideoWriter:write(t)
+        local argRules = {
+            {"frame", required = true},
+            {"lastFrame", default = false}
+        }
+        local frame, lastFrame = cv.argcheck(t, argRules)
+
+        C.VideoWriter_write(self.ptr, cv.wrap_tensor(frame), lastFrame)
+    end
+
+    function VideoWriter:getEncoderParams()
+        local retval = cv.cuda.EncoderParams{}
+        retval.object = C.VideoWriter_getEncoderParams(self.ptr)
+        return retval
+    end
+end
+
 return cv

@@ -888,7 +888,7 @@ do
 
         self.ptr = ffi.gc(
             C.FastFeatureDetector_ctor(threshold, nonmaxSuppression, _type),
-            C.Algorithm_dtor)
+            Classes.Algorithm_dtor)
     end
 
     function FastFeatureDetector:setThreshold(t)
@@ -946,7 +946,7 @@ do
 
         self.ptr = ffi.gc(
             C.AgastFeatureDetector_ctor(threshold, nonmaxSuppression, _type),
-            C.Algorithm_dtor)
+            Classes.Algorithm_dtor)
     end
 
     function AgastFeatureDetector:setThreshold(t)
@@ -1138,7 +1138,7 @@ do
 
         self.ptr = ffi.gc(
             C.KAZE_ctor(extended, upright, threshold, nOctaves, nOctaveLayers, diffusivity),
-            C.Algorithm_dtor)
+            Classes.Algorithm_dtor)
     end
 
     function KAZE:setExtended(t)
@@ -1241,7 +1241,7 @@ do
         self.ptr = ffi.gc(
             C.AKAZE_ctor(descriptor_type, descriptor_size, descriptor_channels, 
                 threshold, nOctaves, nOctaveLayers, diffusivity),
-            C.Algorithm_dtor)
+            Classes.Algorithm_dtor)
     end
 
     function AKAZE:setDescriptorType(t)
