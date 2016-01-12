@@ -139,9 +139,9 @@ do
         local filename = cv.argcheck(t, argRules)
 
         if filename then
-            self.ptr = ffi.gc(CascadeClassifier_ctor(filename), Classes.Algorithm_dtor)
+            self.ptr = ffi.gc(C.CascadeClassifier_ctor(filename), Classes.Algorithm_dtor)
         else
-            self.ptr = ffi.gc(CascadeClassifier_ctor_default(), Classes.Algorithm_dtor)
+            self.ptr = ffi.gc(C.CascadeClassifier_ctor_default(), Classes.Algorithm_dtor)
         end
     end
 
