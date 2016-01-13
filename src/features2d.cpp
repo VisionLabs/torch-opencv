@@ -13,8 +13,8 @@ KeyPointArray::KeyPointArray(const std::vector<cv::KeyPoint> & v)
 {
     this->size = v.size();
     this->data = static_cast<KeyPointWrapper *>(
-            malloc(sizeof(KeyPointWrapper) * this->size));
-    for (int i = 0; i < this->size; ++i) {
+            malloc(sizeof(KeyPointWrapper) * (this->size + 1)));
+    for (int i = 1; i <= this->size; ++i) {
         this->data[i] = v[i];
     }
 }

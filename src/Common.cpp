@@ -226,10 +226,10 @@ PointWrapper::PointWrapper(const cv::Point & other) {
 }
 
 PointArray::PointArray(std::vector<cv::Point> & vec) {
-    this->data = static_cast<PointWrapper *>(malloc(vec.size() * sizeof(PointWrapper)));
+    this->data = static_cast<PointWrapper *>(malloc((vec.size() + 1) * sizeof(PointWrapper)));
     this->size = vec.size();
 
-    for (int i = 0; i < vec.size(); ++i) {
+    for (int i = 1; i <= vec.size(); ++i) {
         this->data[i] = vec[i];
     }
 }
@@ -251,10 +251,10 @@ SizeWrapper::SizeWrapper(const cv::Size & other) {
 }
 
 RectArray::RectArray(std::vector<cv::Rect> & vec) {
-    this->data = static_cast<RectWrapper *>(malloc(vec.size() * sizeof(RectWrapper)));
+    this->data = static_cast<RectWrapper *>(malloc((vec.size() + 1) * sizeof(RectWrapper)));
     this->size = vec.size();
 
-    for (int i = 0; i < vec.size(); ++i) {
+    for (int i = 1; i <= vec.size(); ++i) {
         this->data[i] = vec[i];
     }
 }
