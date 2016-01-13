@@ -481,7 +481,7 @@ void rectangle(
         struct TensorWrapper img, struct PointWrapper pt1, struct PointWrapper pt2, struct ScalarWrapper color, int thickness, int lineType, int shift);
 
 extern "C"
-void rectanglePts(
+void rectangle2(
         struct TensorWrapper img, struct RectWrapper rec, struct ScalarWrapper color, int thickness, int lineType, int shift);
 
 extern "C"
