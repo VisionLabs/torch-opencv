@@ -339,14 +339,14 @@ struct Vec2dWrapper EM_predict2(
         struct PtrWrapper ptr, struct TensorWrapper sample, struct TensorWrapper probs);
 
 bool EM_trainEM(
-        struct PtrWrapper ptr, struct TensorWrapper samples, 
-        struct TensorWrapper logLikelihoods, 
+        struct PtrWrapper ptr, struct TensorWrapper samples,
+        struct TensorWrapper logLikelihoods,
         struct TensorWrapper labels, struct TensorWrapper probs);
 
 bool EM_trainE(
         struct PtrWrapper ptr, struct TensorWrapper samples, struct TensorWrapper means0,
         struct TensorWrapper covs0, struct TensorWrapper weights0,
-        struct TensorWrapper logLikelihoods, struct TensorWrapper labels, 
+        struct TensorWrapper logLikelihoods, struct TensorWrapper labels,
         struct TensorWrapper probs);
 
 bool EM_trainM(
@@ -355,10 +355,10 @@ bool EM_trainM(
         struct TensorWrapper probs);
 
 struct Node {
-    double value; 
-    int classIdx; 
-    int parent; 
-    int left; 
+    double value;
+    int classIdx;
+    int parent;
+    int left;
     int right;
     int defaultDir;
     int split;
@@ -570,11 +570,11 @@ do
             {"sampleWeights", default = nil},
             {"varType", default = nil}
         }
-        local samples, layout, responses, varIdx, sampleIdx, sampleWeights, varType 
+        local samples, layout, responses, varIdx, sampleIdx, sampleWeights, varType
             = cv.argcheck(t, argRules)
 
         self.ptr = C.TrainData_ctor(
-            cv.wrap_tensor(samples), layout, cv.wrap_tensor(responses), cv.wrap_tensor(varIdx), 
+            cv.wrap_tensor(samples), layout, cv.wrap_tensor(responses), cv.wrap_tensor(varIdx),
             cv.wrap_tensor(sampleIdx), cv.wrap_tensor(sampleWeights), cv.wrap_tensor(varType)
         )
     end
@@ -858,7 +858,7 @@ do
 		local inputs, outputs, outputProbs, flags = cv.argcheck(t, argRules)
 
 		local result = C.NormalBayesClassifier_predictProb(
-			self.ptr, cv.wrap_tensor(inputs), cv.wrap_tensor(outputs), 
+			self.ptr, cv.wrap_tensor(inputs), cv.wrap_tensor(outputs),
 			cv.wrap_tensor(outputProbs), flags)
 		return result.val, cv.unwrap_tensors(result.tensors)
 	end
@@ -878,7 +878,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.KNearest_setDefaultK(self.ptr, val)
     end
 
@@ -891,7 +891,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.KNearest_setIsClassifier(self.ptr, val)
     end
 
@@ -904,7 +904,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.KNearest_setEmax(self.ptr, val)
     end
 
@@ -917,7 +917,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.KNearest_setAlgorithmType(self.ptr, val)
     end
 
@@ -935,7 +935,7 @@ do
         }
         local samples, k, results, neighborResponses, dist = cv.argcheck(t, argRules)
 
-        return C.KNearest_findNearest(self.ptr, cv.wrap_tensor(samples), k, 
+        return C.KNearest_findNearest(self.ptr, cv.wrap_tensor(samples), k,
             cv.wrap_tensor(results), cv.wrap_tensor(neighborResponses), cv.wrap_tensor(dist))
     end
 end
@@ -954,7 +954,7 @@ do
 	        {"val", required = true}
 	    }
 	    local val = cv.argcheck(t, argRules)
-	    
+
 	    C.SVM_setType(self.ptr, val)
 	end
 
@@ -967,7 +967,7 @@ do
 	        {"val", required = true}
 	    }
 	    local val = cv.argcheck(t, argRules)
-	    
+
 	    C.SVM_setGamma(self.ptr, val)
 	end
 
@@ -980,7 +980,7 @@ do
 	        {"val", required = true}
 	    }
 	    local val = cv.argcheck(t, argRules)
-	    
+
 	    C.SVM_setCoef0(self.ptr, val)
 	end
 
@@ -993,7 +993,7 @@ do
 	        {"val", required = true}
 	    }
 	    local val = cv.argcheck(t, argRules)
-	    
+
 	    C.SVM_setDegree(self.ptr, val)
 	end
 
@@ -1006,7 +1006,7 @@ do
 	        {"val", required = true}
 	    }
 	    local val = cv.argcheck(t, argRules)
-	    
+
 	    C.SVM_setC(self.ptr, val)
 	end
 
@@ -1019,7 +1019,7 @@ do
 	        {"val", required = true}
 	    }
 	    local val = cv.argcheck(t, argRules)
-	    
+
 	    C.SVM_setNu(self.ptr, val)
 	end
 
@@ -1032,7 +1032,7 @@ do
 	        {"val", required = true}
 	    }
 	    local val = cv.argcheck(t, argRules)
-	    
+
 	    C.SVM_setP(self.ptr, val)
 	end
 
@@ -1045,7 +1045,7 @@ do
 	        {"val", required = true}
 	    }
 	    local val = cv.argcheck(t, argRules)
-	    
+
 	    C.SVM_setClassWeights(self.ptr, cv.wrap_tensor(val))
 	end
 
@@ -1058,7 +1058,7 @@ do
 	        {"val", required = true, operator = cv.TermCriteria}
 	    }
 	    local val = cv.argcheck(t, argRules)
-	    
+
 	    C.SVM_setTermCriteria(self.ptr, val)
 	end
 
@@ -1075,7 +1075,7 @@ do
 	        {"val", required = true}
 	    }
 	    local val = cv.argcheck(t, argRules)
-	    
+
 	    C.SVM_setKernel(self.ptr, val)
 	end
 
@@ -1085,7 +1085,7 @@ do
 	--         {"val", required = true}
 	--     }
 	--     local val = cv.argcheck(t, argRules)
-	    
+
 	--     C.SVM_setCustomKernel(self.ptr, val)
 	-- end
 
@@ -1101,11 +1101,11 @@ do
 			{"degreeGrid", default = SVM.getDefaultGrid(ml.SVM_DEGREE)},
 			{"balanced", default = false}
 		}
-		local data, kFold, Cgrid, gammaGrid, pGrid, nuGrid, coeffGrid, degreeGrid, balanced 
+		local data, kFold, Cgrid, gammaGrid, pGrid, nuGrid, coeffGrid, degreeGrid, balanced
 			= cv.argcheck(t, argRules)
 
 		return C.SVM_trainAuto(self.ptr,
-			data.ptr, kFold, Cgrid.ptr, gammaGrid.ptr, pGrid.ptr, 
+			data.ptr, kFold, Cgrid.ptr, gammaGrid.ptr, pGrid.ptr,
 			nuGrid.ptr, coeffGrid.ptr, degreeGrid.ptr, balanced)
 	end
 
@@ -1149,7 +1149,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.EM_setClustersNumber(self.ptr, val)
     end
 
@@ -1162,7 +1162,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.EM_setCovarianceMatrixType(self.ptr, val)
     end
 
@@ -1175,7 +1175,7 @@ do
             {"val", required = true, operator = cv.TermCriteria}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.EM_setTermCriteria(self.ptr, val)
     end
 
@@ -1229,12 +1229,12 @@ do
             {"labels", default = nil},
             {"probs", default = nil}
         }
-        local samples, means0, covs0, weights0, logLikelihoods, labels, probs 
+        local samples, means0, covs0, weights0, logLikelihoods, labels, probs
             = cv.argcheck(t, argRules)
 
         return C.EM_trainE(
-            self.ptr, cv.wrap_tensor(samples), cv.wrap_tensor(means0), 
-            cv.wrap_tensor(covs0), cv.wrap_tensor(weights0), 
+            self.ptr, cv.wrap_tensor(samples), cv.wrap_tensor(means0),
+            cv.wrap_tensor(covs0), cv.wrap_tensor(weights0),
             cv.wrap_tensor(logLikelihoods), cv.wrap_tensor(labels), cv.wrap_tensor(probs))
     end
 
@@ -1249,7 +1249,7 @@ do
         local samples, probs0, logLikelihoods, labels, probs = cv.argcheck(t, argRules)
 
         return C.EM_trainM(
-            self.ptr, cv.wrap_tensor(samples), cv.wrap_tensor(probs0), 
+            self.ptr, cv.wrap_tensor(samples), cv.wrap_tensor(probs0),
             cv.wrap_tensor(logLikelihoods), cv.wrap_tensor(labels), cv.wrap_tensor(probs))
     end
 end
@@ -1268,7 +1268,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DTrees_setMaxCategories(self.ptr, val)
     end
 
@@ -1281,7 +1281,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DTrees_setMaxDepth(self.ptr, val)
     end
 
@@ -1294,7 +1294,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DTrees_setMinSampleCount(self.ptr, val)
     end
 
@@ -1307,7 +1307,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DTrees_setCVFolds(self.ptr, val)
     end
 
@@ -1320,7 +1320,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DTrees_setUseSurrogates(self.ptr, val)
     end
 
@@ -1333,7 +1333,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DTrees_setUse1SERule(self.ptr, val)
     end
 
@@ -1346,7 +1346,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DTrees_setTruncatePrunedTree(self.ptr, val)
     end
 
@@ -1359,7 +1359,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DTrees_setRegressionAccuracy(self.ptr, val)
     end
 
@@ -1372,7 +1372,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DTrees_setPriors(self.ptr, cv.wrap_tensor(val))
     end
 
@@ -1415,7 +1415,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.RTrees_setCalculateVarImportance(self.ptr, val)
     end
 
@@ -1428,7 +1428,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.RTrees_setActiveVarCount(self.ptr, val)
     end
 
@@ -1441,7 +1441,7 @@ do
             {"val", required = true, operator = cv.TermCriteria}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.RTrees_setTermCriteria(self.ptr, val)
     end
 
@@ -1468,7 +1468,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.Boost_setBoostType(self.ptr, val)
     end
 
@@ -1481,7 +1481,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.Boost_setWeakCount(self.ptr, val)
     end
 
@@ -1494,7 +1494,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.Boost_setWeightTrimRate(self.ptr, val)
     end
 
@@ -1519,7 +1519,7 @@ do
             {"param2", default = 0},
         }
         local method, param1, param2 = cv.argcheck(t, argRules)
-        
+
         C.ANN_MLP_setTrainMethod(self.ptr, method, param1, param2)
     end
 
@@ -1534,7 +1534,7 @@ do
             {"param2", default = 0},
         }
         local type, param1, param2 = cv.argcheck(t, argRules)
-        
+
         C.ANN_MLP_setActivationFunction(self.ptr, type, param1, param2)
     end
 
@@ -1547,7 +1547,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.ANN_MLP_setLayerSizes(self.ptr, cv.wrap_tensor(val))
     end
 
@@ -1560,7 +1560,7 @@ do
             {"val", required = true, operator = cv.TermCriteria}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.ANN_MLP_setTermCriteria(self.ptr, val)
     end
 
@@ -1573,7 +1573,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.ANN_MLP_setBackpropWeightScale(self.ptr, val)
     end
 
@@ -1586,7 +1586,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.ANN_MLP_setBackpropMomentumScale(self.ptr, val)
     end
 
@@ -1599,7 +1599,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.ANN_MLP_setRpropDW0(self.ptr, val)
     end
 
@@ -1612,7 +1612,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.ANN_MLP_setRpropDWPlus(self.ptr, val)
     end
 
@@ -1625,7 +1625,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.ANN_MLP_setRpropDWMinus(self.ptr, val)
     end
 
@@ -1638,7 +1638,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.ANN_MLP_setRpropDWMin(self.ptr, val)
     end
 
@@ -1651,7 +1651,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.ANN_MLP_setRpropDWMax(self.ptr, val)
     end
 
@@ -1664,7 +1664,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.ANN_MLP_setWeights(self.ptr, val)
     end
 
@@ -1687,7 +1687,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.LogisticRegression_setLearningRate(self.ptr, val)
     end
 
@@ -1700,7 +1700,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.LogisticRegression_setIterations(self.ptr, val)
     end
 
@@ -1713,7 +1713,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.LogisticRegression_setRegularization(self.ptr, val)
     end
 
@@ -1726,7 +1726,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.LogisticRegression_setTrainMethod(self.ptr, val)
     end
 
@@ -1739,7 +1739,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.LogisticRegression_setMiniBatchSize(self.ptr, val)
     end
 
@@ -1752,7 +1752,7 @@ do
             {"val", required = true, operator = cv.TermCriteria}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.LogisticRegression_setTermCriteria(self.ptr, val)
     end
 

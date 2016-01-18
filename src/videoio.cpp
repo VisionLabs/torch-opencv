@@ -118,7 +118,7 @@ void VideoWriter_dtor(struct VideoWriterPtr ptr)
 }
 
 extern "C"
-bool VideoWriter_open(struct VideoWriterPtr ptr, const char *filename, int fourcc, 
+bool VideoWriter_open(struct VideoWriterPtr ptr, const char *filename, int fourcc,
                       double fps, struct SizeWrapper frameSize, bool isColor)
 {
     return ptr->open(filename, fourcc, fps, frameSize, isColor);

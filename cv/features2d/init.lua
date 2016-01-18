@@ -459,7 +459,7 @@ do
             {"borderSize", required = true}
         }
         local keypoints, imageSize, borderSize = cv.argcheck(t, argRules)
-        
+
         return cv.gcarray(
             C.KeyPointsFilter_runByImageBorder(keypoints, imageSize, borderSize))
     end
@@ -632,7 +632,7 @@ do
             {"patchSize", default = 31},
             {"fastThreshold", default = 20}
         }
-        local nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K, 
+        local nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel, WTA_K,
             scoreType, patchSize, fastThreshold = cv.argcheck(t, argRules)
 
         self.ptr = ffi.gc(C.ORB_ctor(nfeatures, scaleFactor, nlevels, edgeThreshold,
@@ -760,7 +760,7 @@ end
 
 -- MSER
 
-do 
+do
     local MSER = torch.class('cv.MSER', 'cv.Feature2D', cv)
 
     function MSER:__init(t)
@@ -773,14 +773,14 @@ do
             {"_max_evolution", default = 200},
             {"_area_threshold", default = 1.01},
             {"_min_margin", default = 0.003},
-            {"_edge_blur_size", default = 5}   
+            {"_edge_blur_size", default = 5}
         }
         local _delta, _min_area, _max_area, _max_variation, _min_diversity, _max_evolution,
                 _area_threshold, _min_margin, _edge_blur_size = cv.argcheck(t, argRules)
 
         self.ptr = ffi.gc(C.MSER_ctor(_delta, _min_area, _max_area, _max_variation, _min_diversity, _max_evolution,
                                 _area_threshold, _min_margin, _edge_blur_size),
-                                Classes.Algorithm_dtor)    
+                                Classes.Algorithm_dtor)
     end
 
     function MSER:detectRegions(t)
@@ -795,7 +795,7 @@ do
             assert(bboxes:size()[2] == 4)
         end
 
-        local result = C.MSER_detectRegions(self.ptr, 
+        local result = C.MSER_detectRegions(self.ptr,
             cv.wrap_tensor(image), cv.wrap_tensor(bboxes))
 
         result = cv.unwrap_tensors(result, true)
@@ -896,7 +896,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.FastFeatureDetector_setThreshold(self.ptr, val)
     end
 
@@ -909,7 +909,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.FastFeatureDetector_setNonmaxSuppression(self.ptr, val)
     end
 
@@ -922,7 +922,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.FastFeatureDetector_setType(self.ptr, val)
     end
 
@@ -954,7 +954,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.AgastFeatureDetector_setThreshold(self.ptr, val)
     end
 
@@ -967,7 +967,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.AgastFeatureDetector_setNonmaxSuppression(self.ptr, val)
     end
 
@@ -980,7 +980,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.AgastFeatureDetector_setType(self.ptr, val)
     end
 
@@ -1003,7 +1003,7 @@ do
             {"useHarrisDetector", default = false},
             {"k", default = 0.04}
         }
-        local maxCorners, qualityLevel, minDistance, blockSize, useHarrisDetector, k = 
+        local maxCorners, qualityLevel, minDistance, blockSize, useHarrisDetector, k =
             cv.argcheck(t, argRules)
         self.ptr = ffi.gc(
             C.GFTTDetector_ctor(maxCorners, qualityLevel, minDistance, blockSize, useHarrisDetector, k),
@@ -1015,7 +1015,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.GFTTDetector_setMaxFeatures(self.ptr, val)
     end
 
@@ -1029,7 +1029,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.GFTTDetector_setQualityLevel(self.ptr, val)
     end
 
@@ -1042,7 +1042,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.GFTTDetector_setMinDistance(self.ptr, val)
     end
 
@@ -1055,7 +1055,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.GFTTDetector_setBlockSize(self.ptr, val)
     end
 
@@ -1068,7 +1068,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.GFTTDetector_setHarrisDetector(self.ptr, val)
     end
 
@@ -1081,7 +1081,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.GFTTDetector_setK(self.ptr, val)
     end
 
@@ -1133,7 +1133,7 @@ do
             {"nOctaveLayers", default = 4},
             {"diffusivity", default = cv.KAZE_DIFF_PM_G2}
         }
-        local extended, upright, threshold, nOctaves, nOctaveLayers, diffusivity = 
+        local extended, upright, threshold, nOctaves, nOctaveLayers, diffusivity =
             cv.argcheck(t, argRules)
 
         self.ptr = ffi.gc(
@@ -1146,7 +1146,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.KAZE_setExtended(self.ptr, val)
     end
 
@@ -1159,7 +1159,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.KAZE_setUpright(self.ptr, val)
     end
 
@@ -1172,7 +1172,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.KAZE_setThreshold(self.ptr, val)
     end
 
@@ -1185,7 +1185,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.KAZE_setNOctaves(self.ptr, val)
     end
 
@@ -1198,7 +1198,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.KAZE_setNOctaveLayers(self.ptr, val)
     end
 
@@ -1211,7 +1211,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.KAZE_setDiffusivity(self.ptr, val)
     end
 
@@ -1235,11 +1235,11 @@ do
             {"nOctaveLayers", default = 4},
             {"diffusivity", default = cv.KAZE_DIFF_PM_G2}
         }
-        local descriptor_type, descriptor_size, descriptor_channels, 
+        local descriptor_type, descriptor_size, descriptor_channels,
             threshold, nOctaves, nOctaveLayers, diffusivity = cv.argcheck(t, argRules)
 
         self.ptr = ffi.gc(
-            C.AKAZE_ctor(descriptor_type, descriptor_size, descriptor_channels, 
+            C.AKAZE_ctor(descriptor_type, descriptor_size, descriptor_channels,
                 threshold, nOctaves, nOctaveLayers, diffusivity),
             Classes.Algorithm_dtor)
     end
@@ -1249,7 +1249,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.AKAZE_setDescriptorType(self.ptr, val)
     end
 
@@ -1262,7 +1262,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.AKAZE_setDescriptorSize(self.ptr, val)
     end
 
@@ -1275,7 +1275,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.AKAZE_setDescriptorChannels(self.ptr, val)
     end
 
@@ -1288,7 +1288,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.AKAZE_setThreshold(self.ptr, val)
     end
 
@@ -1301,7 +1301,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.AKAZE_setNOctaves(self.ptr, val)
     end
 
@@ -1314,7 +1314,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.AKAZE_setNOctaveLayers(self.ptr, val)
     end
 
@@ -1327,7 +1327,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.AKAZE_setDiffusivity(self.ptr, val)
     end
 
@@ -1389,7 +1389,7 @@ do
 
         if trainDescriptors then
             return cv.gcarray(C.DescriptorMatcher_match_trainDescriptors(self.ptr,
-                cv.wrap_tensor(queryDescriptors), cv.wrap_tensor(trainDescriptors), 
+                cv.wrap_tensor(queryDescriptors), cv.wrap_tensor(trainDescriptors),
                 cv.wrap_tensor(mask)))
         else
             return cv.gcarray(C.DescriptorMatcher_match(self.ptr,
@@ -1412,7 +1412,7 @@ do
 
         if trainDescriptors then
             result = cv.gcarray(C.DescriptorknnMatcher_knnMatch_trainDescriptors(self.ptr,
-                cv.wrap_tensor(queryDescriptors), cv.wrap_tensors(trainDescriptors), 
+                cv.wrap_tensor(queryDescriptors), cv.wrap_tensors(trainDescriptors),
                 k, cv.wrap_tensors(mask), compactResult))
         else
             result = cv.gcarray(C.DescriptorknnMatcher_knnMatch(self.ptr,
@@ -1491,16 +1491,16 @@ function cv.drawMatches(t)
         {"matchesMask", default = nil},
         {"flags", default = cv.DRAW_MATCHES_FLAGS_DEFAULT}
     }
-    local img1, keypoints1, img2, keypoints2, matches1to2, outImg, matchColor, 
+    local img1, keypoints1, img2, keypoints2, matches1to2, outImg, matchColor,
         singlePointColor, matchesMask, flags = cv.argcheck(t, argRules)
 
     assert(
-        matchesMask == nil or 
+        matchesMask == nil or
         torch.isTensor(matchesMask) and cv.tensorType(matchesMask) == cv.CV_8S)
     assert(ffi.typeof(matches1to2) == ffi.typeof(ffi.new('struct DMatchArray')))
 
     return cv.unwrap_tensors(C.drawMatches(
-        cv.wrap_tensor(img1), keypoints1, cv.wrap_tensor(img2), keypoints2, matches1to2, 
+        cv.wrap_tensor(img1), keypoints1, cv.wrap_tensor(img2), keypoints2, matches1to2,
         cv.wrap_tensor(outImg), matchColor, singlePointColor, cv.wrap_tensor(matchesMask), flags))
 end
 
@@ -1517,18 +1517,18 @@ function cv.drawMatchesKnn(t)
         {"matchesMask", default = nil},
         {"flags", default = cv.DRAW_MATCHES_FLAGS_DEFAULT}
     }
-    local img1, keypoints1, img2, keypoints2, matches1to2, outImg, matchColor, 
+    local img1, keypoints1, img2, keypoints2, matches1to2, outImg, matchColor,
         singlePointColor, matchesMask, flags = cv.argcheck(t, argRules)
 
     assert(
-        matchesMask == nil or 
+        matchesMask == nil or
         torch.isTensor(matchesMask) and cv.tensorType(matchesMask) == cv.CV_8S)
     assert(type(matches1to2) == 'table')
 
     local matches1to2_CArray = cv.tableToDMatchArrayOfArrays(matches1to2)
 
     return cv.unwrap_tensors(C.drawMatchesKnn(
-        cv.wrap_tensor(img1), keypoints1, cv.wrap_tensor(img2), keypoints2, matches1to2_CArray, 
+        cv.wrap_tensor(img1), keypoints1, cv.wrap_tensor(img2), keypoints2, matches1to2_CArray,
         cv.wrap_tensor(outImg), matchColor, singlePointColor, cv.wrap_tensor(matchesMask), flags))
 end
 
@@ -1556,7 +1556,7 @@ function cv.computeRecallPrecisionCurve(t)
     assert(type(correctMatches1to2Mask) == 'table')
     for i = 1, #correctMatches1to2Mask do
         assert(
-            torch.isTensor(correctMatches1to2Mask[i]) and 
+            torch.isTensor(correctMatches1to2Mask[i]) and
             cv.tensorType(correctMatches1to2Mask[i]) == cv.CV_8U)
     end
 

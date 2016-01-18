@@ -286,7 +286,7 @@ struct IntArray {
 
 struct FloatArray {
     float *data;
-    int size; 
+    int size;
     inline std::vector<float>& toFloatList(std::vector<float>& res) {
         for (int i = 0; i < size; ++i)
             res.push_back(data[i]);

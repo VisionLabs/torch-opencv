@@ -215,7 +215,7 @@ do
         return cv.unwrap_tensors(
             C.BackgroundSubtractor_getBackgroundImage(self.ptr, cv.wrap_tensor(backgroundImage)))
     end
-end 
+end
 
 -- BackgroundSubtractorMOG2
 

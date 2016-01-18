@@ -35,7 +35,7 @@ struct PtrWrapper SearchParams_ctor(int checks, float eps, bool sorted);
 
 struct PtrWrapper Index_ctor_default();
 
-struct PtrWrapper Index_ctor( 
+struct PtrWrapper Index_ctor(
         struct TensorWrapper features, struct PtrWrapper params,
         int distType);
 
@@ -232,7 +232,7 @@ do
             {"distType", default = cv.FLANN_DIST_L2}
         }
         local features, params, distType = cv.argcheck(t, argRules)
-        
+
         C.Index_build(self.ptr, cv.wrap_tensor(features), params.ptr, distType)
     end
 
@@ -245,9 +245,9 @@ do
             {"params", default = defaultSearchParams}
         }
         local query, knn, indices, dists, params = cv.argcheck(t, argRules)
-        
-        local indices, dists = cv.unwrap_tensors(C.Index_knnSearch(self.ptr, 
-            cv.wrap_tensor(query), knn, cv.wrap_tensor(indices), 
+
+        local indices, dists = cv.unwrap_tensors(C.Index_knnSearch(self.ptr,
+            cv.wrap_tensor(query), knn, cv.wrap_tensor(indices),
             cv.wrap_tensor(dists), params.ptr))
         return indices + 1, dists
     end
@@ -262,9 +262,9 @@ do
             {"params", default = defaultSearchParams}
         }
         local query, radius, maxResults, indices, dists, params = cv.argcheck(t, argRules)
-        
-        local result = C.Index_radiusSearch(self.ptr, 
-            cv.wrap_tensor(query), radius, maxResults, 
+
+        local result = C.Index_radiusSearch(self.ptr,
+            cv.wrap_tensor(query), radius, maxResults,
             cv.wrap_tensor(indices), cv.wrap_tensor(dists), params.ptr)
         local indices, dists = cv.unwrap_tensors(result.tensors)
         return result.val, indices + 1, dists
@@ -275,7 +275,7 @@ do
             {"filename", required = true}
         }
         local filename = cv.argcheck(t, argRules)
-        
+
         C.Index_save(self.ptr, filename)
     end
 
@@ -285,7 +285,7 @@ do
             {"filename", required = true}
         }
         local features, filename = cv.argcheck(t, argRules)
-        
+
         return C.Index_load(self.ptr, cv.wrap_tensor(features), filename)
     end
 

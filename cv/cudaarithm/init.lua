@@ -14,7 +14,7 @@ struct TensorWrapper max(
         void *state, struct TensorWrapper src1, struct TensorWrapper src2, struct TensorWrapper dst);
 
 struct TensorPlusDouble threshold(
-        void *state, struct TensorWrapper src, 
+        void *state, struct TensorWrapper src,
         struct TensorWrapper dst, double thresh, double maxval, int type);
 
 struct TensorWrapper magnitude(
@@ -63,7 +63,7 @@ struct TensorWrapper sqrIntegral(
         void *state, struct TensorWrapper src, struct TensorWrapper sum);
 
 struct TensorWrapper mulSpectrums(
-        void *state, struct TensorWrapper src1, struct TensorWrapper src2, 
+        void *state, struct TensorWrapper src1, struct TensorWrapper src2,
         struct TensorWrapper dst, int flags, bool conjB);
 
 struct TensorWrapper mulAndScaleSpectrums(
@@ -71,7 +71,7 @@ struct TensorWrapper mulAndScaleSpectrums(
         struct TensorWrapper dst, int flags, float scale, bool conjB);
 
 struct TensorWrapper dft(
-        void *state, struct TensorWrapper src, 
+        void *state, struct TensorWrapper src,
         struct TensorWrapper dst, struct SizeWrapper dft_size, int flags);
 
 struct PtrWrapper Convolution_ctor(
@@ -121,7 +121,7 @@ function cv.cuda.threshold(t)
     }
     local src, dst, thresh, maxval, _type = cv.argcheck(t, argRules)
 
-    local retval = C.threshold(cutorch._state, 
+    local retval = C.threshold(cutorch._state,
             cv.wrap_tensor(src), cv.wrap_tensor(dst), thresh, maxval, _type)
     return retval.val, cv.unwrap_tensors(retval.tensor)
 end
@@ -195,8 +195,8 @@ function cv.cuda.cartToPolar(t)
     }
     local x, y, magnitude, angle, angleInDegrees = cv.argcheck(t, argRules)
 
-    return cv.unwrap_tensors(C.cartToPolar(cutorch._state, 
-        cv.wrap_tensor(x), cv.wrap_tensor(y), cv.wrap_tensor(magnitude), 
+    return cv.unwrap_tensors(C.cartToPolar(cutorch._state,
+        cv.wrap_tensor(x), cv.wrap_tensor(y), cv.wrap_tensor(magnitude),
         cv.wrap_tensor(angle), angleInDegrees))
 end
 
@@ -210,8 +210,8 @@ function cv.cuda.polarToCart(t)
     }
     local magnitude, angle, x, y, angleInDegrees = cv.argcheck(t, argRules)
 
-    return cv.unwrap_tensors(C.cartToPolar(cutorch._state, 
-        cv.wrap_tensor(magnitude), cv.wrap_tensor(angle), 
+    return cv.unwrap_tensors(C.cartToPolar(cutorch._state,
+        cv.wrap_tensor(magnitude), cv.wrap_tensor(angle),
         cv.wrap_tensor(x), cv.wrap_tensor(y), angleInDegrees))
 end
 
@@ -302,7 +302,7 @@ function cv.cuda.mulSpectrums(t)
     local src1, src2, dst, flags, conjB = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
-        C.mulSpectrums(cutorch._state, 
+        C.mulSpectrums(cutorch._state,
             cv.wrap_tensor(src1), cv.wrap_tensor(src2), cv.wrap_tensor(dst), flags, conjB))
 end
 
@@ -318,7 +318,7 @@ function cv.cuda.mulAndScaleSpectrums(t)
     local src1, src2, dst, flags, scale, conjB = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
-        C.mulAndScaleSpectrums(cutorch._state, 
+        C.mulAndScaleSpectrums(cutorch._state,
             cv.wrap_tensor(src1), cv.wrap_tensor(src2), cv.wrap_tensor(dst), flags, scale, conjB))
 end
 
@@ -358,7 +358,7 @@ do
         }
         local image, templ, result, ccorr = cv.argcheck(t, argRules)
 
-        return cv.unwrap_tensors(C.Convolution_convolve(cutorch._state, self.ptr, 
+        return cv.unwrap_tensors(C.Convolution_convolve(cutorch._state, self.ptr,
             cv.wrap_tensor(image), cv.wrap_tensor(templ), cv.wrap_tensor(result), ccorr))
     end
 end

@@ -31,7 +31,7 @@ struct TensorWrapper max(
 
 extern "C"
 struct TensorPlusDouble threshold(
-        struct THCState *state, struct TensorWrapper src, 
+        struct THCState *state, struct TensorWrapper src,
         struct TensorWrapper dst, double thresh, double maxval, int type)
 {
     TensorPlusDouble retval;
@@ -228,7 +228,7 @@ struct TensorWrapper sqrIntegral(
 
 extern "C"
 struct TensorWrapper mulSpectrums(
-        struct THCState *state, struct TensorWrapper src1, struct TensorWrapper src2, 
+        struct THCState *state, struct TensorWrapper src1, struct TensorWrapper src2,
         struct TensorWrapper dst, int flags, bool conjB)
 {
     if (dst.isNull()) {
@@ -258,7 +258,7 @@ struct TensorWrapper mulAndScaleSpectrums(
 
 extern "C"
 struct TensorWrapper dft(
-        struct THCState *state, struct TensorWrapper src, 
+        struct THCState *state, struct TensorWrapper src,
         struct TensorWrapper dst, struct SizeWrapper dft_size, int flags)
 {
     if (dst.isNull()) {

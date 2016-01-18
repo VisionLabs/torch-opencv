@@ -151,7 +151,7 @@ extern "C" struct TensorWrapper colorChange(struct TensorWrapper src, struct Ten
     if (dst.isNull()) {
         cv::Mat retval;
         cv::colorChange(src.toMat(), mask.toMat(), retval, red_mul, green_mul, blue_mul);
-    
+
         return TensorWrapper(retval);
     } else {
         cv::colorChange(src.toMat(), mask.toMat(), dst.toMat(), red_mul, green_mul, blue_mul);
@@ -165,7 +165,7 @@ extern "C" struct TensorWrapper illuminationChange(struct TensorWrapper src, str
     if (dst.isNull()) {
         cv::Mat retval;
         cv::illuminationChange(src.toMat(), mask.toMat(), retval, alpha, beta);
-    
+
         return TensorWrapper(retval);
     } else {
         cv::illuminationChange(src.toMat(), mask.toMat(), dst.toMat(), alpha, beta);
@@ -181,7 +181,7 @@ extern "C" struct TensorWrapper textureFlattening(struct TensorWrapper src, stru
         cv::Mat retval;
         cv::textureFlattening(src.toMat(), mask.toMat(), retval, low_threshold,
                             high_threshold, kernel_size);
-    
+
         return TensorWrapper(retval);
     } else {
         cv::textureFlattening(src.toMat(), mask.toMat(), dst.toMat(), low_threshold,
@@ -196,7 +196,7 @@ extern "C" struct TensorWrapper edgePreservingFilter(struct TensorWrapper src, s
     if (dst.isNull()) {
         cv::Mat retval;
         cv::edgePreservingFilter(src.toMat(), retval, flags, sigma_s, sigma_r);
-    
+
         return TensorWrapper(retval);
     } else {
         cv::edgePreservingFilter(src.toMat(), dst.toMat(), flags, sigma_s, sigma_r);
@@ -210,7 +210,7 @@ extern "C" struct TensorWrapper detailEnhance(struct TensorWrapper src, struct T
     if (dst.isNull()) {
         cv::Mat retval;
         cv::detailEnhance(src.toMat(), retval, sigma_s, sigma_r);
-    
+
         return TensorWrapper(retval);
     } else {
         cv::detailEnhance(src.toMat(), dst.toMat(), sigma_s, sigma_r);
@@ -240,7 +240,7 @@ extern "C" struct TensorWrapper stylization(struct TensorWrapper src, struct Ten
     if (dst.isNull()) {
         cv::Mat retval;
         cv::stylization(src.toMat(), retval, sigma_s, sigma_r);
-    
+
         return TensorWrapper(retval);
     } else {
         cv::stylization(src.toMat(), dst.toMat(), sigma_s, sigma_r);

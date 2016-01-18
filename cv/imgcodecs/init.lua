@@ -37,7 +37,7 @@ function cv.imwrite(t)
     local argRules = {
         {"filename", required = true},
         {"img", required = true},
-        {"params", default = nil, 
+        {"params", default = nil,
             operator = function(...) if ... then return torch.IntTensor(...) end end}
     }
     local filename, img, params = cv.argcheck(t, argRules)

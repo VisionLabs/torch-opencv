@@ -72,13 +72,13 @@ function optflow.calcOpticalFlowSF(t)
             {"upscale_sigma_color", required = true},
             {"speed_up_thr", required = true}
         }
-        local from, to, flow, layers, averaging_block_size, max_flow, sigma_dist, sigma_color, 
+        local from, to, flow, layers, averaging_block_size, max_flow, sigma_dist, sigma_color,
             postprocess_window, sigma_dist_fix, sigma_color_fix, occ_thr, upscale_averaging_radius,
             upscale_sigma_dist, upscale_sigma_color, speed_up_thr = cv.argcheck(t, argRules)
 
         return cv.unwrap_tensors(C.calcOpticalFlowSF_expanded(
             cv.wrap_tensor(from), cv.wrap_tensor(to), cv.wrap_tensor(flow),
-            layers, averaging_block_size, max_flow, sigma_dist, sigma_color, 
+            layers, averaging_block_size, max_flow, sigma_dist, sigma_color,
             postprocess_window, sigma_dist_fix, sigma_color_fix, occ_thr, upscale_averaging_radius,
             upscale_sigma_dist, upscale_sigma_color, speed_up_thr))
     else
@@ -111,7 +111,7 @@ function optflow.calcOpticalFlowSparseToDense(t)
         {"fgs_lambda", default = 500.0},
         {"fgs_sigma", default = 1.5}
     }
-    local from, to, flow, grid_step, k, sigma, use_post_proc, fgs_lambda, fgs_sigma = 
+    local from, to, flow, grid_step, k, sigma, use_post_proc, fgs_lambda, fgs_sigma =
         cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(C.calcOpticalFlowSparseToDense(
@@ -162,7 +162,7 @@ function optflow.calcMotionGradient(t)
     local mhi, mask, orientation, delta1, delta2, apertureSize = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(C.calcMotionGradient(
-        cv.wrap_tensor(mhi), cv.wrap_tensor(mask), cv.wrap_tensor(orientation), 
+        cv.wrap_tensor(mhi), cv.wrap_tensor(mask), cv.wrap_tensor(orientation),
         delta1, delta2, apertureSize))
 end
 
@@ -177,7 +177,7 @@ function optflow.calcGlobalOrientation(t)
     local orientation, mask, mhi, timestamp, duration = cv.argcheck(t, argRules)
 
     return C.calcGlobalOrientation(
-        cv.wrap_tensor(orientation), cv.wrap_tensor(mask), 
+        cv.wrap_tensor(orientation), cv.wrap_tensor(mask),
         cv.wrap_tensor(mhi), timestamp, duration)
 end
 

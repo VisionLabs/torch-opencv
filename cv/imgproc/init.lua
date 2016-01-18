@@ -136,7 +136,7 @@ struct TensorWrapper warpPerspective(
 
 struct TensorWrapper remap(
         struct TensorWrapper src, struct TensorWrapper map1, struct TensorWrapper map2,
-        int interpolation, struct TensorWrapper dst, 
+        int interpolation, struct TensorWrapper dst,
         int borderMode, struct ScalarWrapper borderValue);
 
 struct TensorArray convertMaps(
@@ -568,7 +568,7 @@ function cv.boxFilter(t)
 
     return cv.unwrap_tensors(
         C.boxFilter(
-            cv.wrap_tensor(src), cv.wrap_tensor(dst), ddepth, ksize[1], 
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), ddepth, ksize[1],
             ksize[2], anchor, normalize, borderType))
 end
 
@@ -1444,7 +1444,7 @@ function cv.buildPyramid(t)
     end
 
     return cv.unwrap_tensors(
-        C.buildPyramid(cv.wrap_tensor(src), cv.wrap_tensors(dst), maxlevel, borderType), 
+        C.buildPyramid(cv.wrap_tensor(src), cv.wrap_tensors(dst), maxlevel, borderType),
         true)
 end
 
@@ -1474,7 +1474,7 @@ function cv.undistort(t)
     end
 
     return cv.unwrap_tensors(
-        C.undistort(cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(cameraMatrix), 
+        C.undistort(cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(cameraMatrix),
                     cv.wrap_tensor(distCoeffs), cv.wrap_tensor(newCameraMatrix)))
 end
 
@@ -1506,7 +1506,7 @@ function cv.initUndistortRectifyMap(t)
 
     return cv.unwrap_tensors(
         C.initUndistortRectifyMap(
-            cv.wrap_tensor(cameraMatrix), cv.wrap_tensor(distCoeffs), 
+            cv.wrap_tensor(cameraMatrix), cv.wrap_tensor(distCoeffs),
             cv.wrap_tensor(R), cv.wrap_tensor(newCameraMatrix),
             size, m1type, cv.wrap_tensors(maps)))
 end
@@ -1535,7 +1535,7 @@ function cv.initWideAngleProjMap(t)
     if type(distCoeffs) == "table" then
         distCoeffs = torch.FloatTensor(distCoeffs)
     end
-    
+
     local result = C.initWideAngleProjMap(
         cv.wrap_tensor(cameraMatrix), cv.wrap_tensor(distCoeffs),
         imageSize, destImageWidth, m1type, cv.wrap_tensors(maps),
@@ -1567,8 +1567,8 @@ function cv.calcHist(t)
     if type(ranges) == "table" then
         ranges = cv.FloatArrayOfArrays(ranges)
     end
-    if uniform == nil then 
-        uniform = true 
+    if uniform == nil then
+        uniform = true
     end
     assert(hist or accumulate == false)
 
@@ -1598,10 +1598,10 @@ function cv.calcBackProject(t)
     if type(ranges) == "table" then
         ranges = cv.FloatArrayOfArrays(ranges)
     end
-    if uniform == nil then 
-        uniform = true 
+    if uniform == nil then
+        uniform = true
     end
-    
+
     return cv.unwrap_tensors(
         C.calcBackProject(
             cv.wrap_tensors(images), nimages, channels, cv.wrap_tensor(hist),
@@ -1692,7 +1692,7 @@ function cv.grabCut(t)
         {"mode", default = cv.GC_EVAL}
     }
     local img, mask, rect, bgdModel, fgdModel, iterCount, mode = cv.argcheck(t, argRules)
-    
+
     C.grabCut(
         cv.wrap_tensor(img), cv.wrap_tensor(mask), rect,
         cv.wrap_tensor(bgdModel), cv.wrap_tensor(fgdModel),
@@ -1729,8 +1729,8 @@ function cv.distanceTransformWithLabels(t)
 
     return cv.unwrap_tensors(
         C.distanceTransformWithLabels(
-            cv.wrap_tensor(src), cv.wrap_tensor(dst), 
-            cv.wrap_tensor(labels), distanceType, maskSize, labelType)) 
+            cv.wrap_tensor(src), cv.wrap_tensor(dst),
+            cv.wrap_tensor(labels), distanceType, maskSize, labelType))
 end
 
 -- area, boundingRect = cv.floodFill{...}
@@ -1749,7 +1749,7 @@ function cv.floodFill(t)
     local image, mask, seedPoint, newVal, loDiff, upDiff, flags = cv.argcheck(t, argRules)
 
     local result = C.floodFill(
-        cv.wrap_tensor(image), cv.wrap_tensor(mask), seedPoint[1], 
+        cv.wrap_tensor(image), cv.wrap_tensor(mask), seedPoint[1],
         seedPoint[2], newVal, loDiff, upDiff, flags)
     return result.val, result.rect
 end
@@ -1850,9 +1850,9 @@ function cv.connectedComponentsWithStats(t)
     local image, labels, stats, centroids, connectivity, ltype = cv.argcheck(t, argRules)
 
     local result = C.connectedComponentsWithStats(
-        cv.wrap_tensor(image), 
-        cv.wrap_tensors(labels, stats, centroids), 
-        connectivity, 
+        cv.wrap_tensor(image),
+        cv.wrap_tensors(labels, stats, centroids),
+        connectivity,
         ltype)
     return result.val, cv.unwrap_tensors(result.tensors)
 end
@@ -1905,7 +1905,7 @@ function cv.arcLength(t)
         {"closed", required = true}
     }
     local curve, closed = cv.argcheck(t, argRules)
-    
+
     return C.arcLength(cv.wrap_tensor(curve), closed)
 end
 
@@ -2312,7 +2312,7 @@ function cv.polylines(t)
     local img, pts, isClosed, color, thickness, lineType, shift = cv.argcheck(t, argRules)
 
     assert(type(pts) == 'table')
-    
+
     C.polylines(cv.wrap_tensor(img), cv.wrap_tensors(pts), isClosed, color, thickness, lineType, shift)
 end
 
@@ -2332,7 +2332,7 @@ function cv.drawContours(t)
     local image, contours, contourIdx, color, thickness, lineType, hierarchy, maxLevel, offset = cv.argcheck(t, argRules)
 
     assert(type(contours) == 'table')
-    
+
     C.drawContours(cv.wrap_tensor(image), cv.wrap_tensors(contours), contourIdx, color, thickness, lineType, cv.wrap_tensor(hierarchy), maxLevel, offset)
 end
 
@@ -2598,7 +2598,7 @@ do
                 {"templCenter", default = {-1, -1}, operator = cv.Point}
             }
             local edges, dx, dy, templCenter = cv.argcheck(t, argRules)
-            
+
             C.GeneralizedHough_setTemplate_edges(
                     self.ptr, cv.wrap_tensor(edges), cv.wrap_tensor(dx),
                     cv.wrap_tensor(dy), templCenter)
@@ -2608,7 +2608,7 @@ do
                 {"templCenter", default = {-1, -1}, operator = cv.Point}
             }
             local templ, templCenter = cv.argcheck(t, argRules)
-            
+
             C.GeneralizedHough_setTemplate(self.ptr, cv.wrap_tensor(templ), templCenter)
         end
     end
@@ -2860,7 +2860,7 @@ do
 
         self.ptr = ffi.gc(
             C.LineSegmentDetector_ctor(
-                refine, scale, sigma_scale, quant, ang_th, log_eps, density_th, n_bins), 
+                refine, scale, sigma_scale, quant, ang_th, log_eps, density_th, n_bins),
             Classes.Algorithm_dtor
         )
     end
@@ -2937,7 +2937,7 @@ do
             {"ptvec", default = nil}
         }
         local pt, ptvec = cv.argcheck(t, argRules)
-        
+
         if pt then
             return C.Subdiv2D_insert(cv.Point2f(pt))
         else
@@ -2953,7 +2953,7 @@ do
             {"pt", required = true, operator = cv.Point2f}
         }
         local pt = cv.argcheck(t, argRules)
-        
+
         local result = C.Subdiv2D_locate(self.ptr, pt)
         return result.v0, result.v1, result.v2
     end
@@ -2963,12 +2963,12 @@ do
             {"pt", required = true, operator = cv.Point2f}
         }
         local pt = cv.argcheck(t, argRules)
-        
+
         local result = C.Subdiv2D_findNearest(self.ptr, pt)
         return result.point, result.val
     end
 
-    function Subdiv2D:getEdgeList(t)        
+    function Subdiv2D:getEdgeList(t)
         return cv.unwrap_tensors(C.Subdiv2D_getEdgeList(self.ptr))
     end
 

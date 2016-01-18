@@ -203,7 +203,7 @@ do
             {"frame", default = nil}
         }
         local frame = cv.argcheck(t, argRules)
-        
+
         return cv.unwrap_tensors(C.FrameSource_nextFrame(self.ptr, cv.wrap_tensor(frame)))
     end
 
@@ -266,7 +266,7 @@ do
         local frame0, frame1, flow1, flow2 = cv.argcheck(t, argRules)
 
         return cv.unwrap_tensors(C.DenseOpticalFlowExt_calc(
-            self.ptr, cv.wrap_tensor(frame0), cv.wrap_tensor(frame1), 
+            self.ptr, cv.wrap_tensor(frame0), cv.wrap_tensor(frame1),
             cv.wrap_tensor(flow1), cv.wrap_tensor(flow2)))
     end
 
@@ -285,7 +285,7 @@ do
             {"frame", default = nil}
         }
         local frame = cv.argcheck(t, argRules)
-        
+
         return cv.unwrap_tensors(C.SuperResolution_nextFrame(self.ptr, cv.wrap_tensor(frame)))
     end
 
@@ -312,7 +312,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.SuperResolution_setScale(self.ptr, val)
     end
 
@@ -325,7 +325,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.SuperResolution_setIterations(self.ptr, val)
     end
 
@@ -338,7 +338,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.SuperResolution_setTau(self.ptr, val)
     end
 
@@ -351,7 +351,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.SuperResolution_setLabmda(self.ptr, val)
     end
 
@@ -364,7 +364,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.SuperResolution_setAlpha(self.ptr, val)
     end
 
@@ -377,7 +377,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.SuperResolution_setKernelSize(self.ptr, val)
     end
 
@@ -390,7 +390,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.SuperResolution_setBlurKernelSize(self.ptr, val)
     end
 
@@ -403,7 +403,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.SuperResolution_setBlurSigma(self.ptr, val)
     end
 
@@ -416,7 +416,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.SuperResolution_setTemporalAreaRadius(self.ptr, val)
     end
 
@@ -429,7 +429,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         self.optFlow = val
         C.SuperResolution_setOpticalFlow(self.ptr, val.ptr)
     end
@@ -465,7 +465,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.FarnebackOpticalFlow_setPyrScale(self.ptr, val)
     end
 
@@ -478,7 +478,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.FarnebackOpticalFlow_setLevelsNumber(self.ptr, val)
     end
 
@@ -491,7 +491,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.FarnebackOpticalFlow_setWindowSize(self.ptr, val)
     end
 
@@ -504,7 +504,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.FarnebackOpticalFlow_setIterations(self.ptr, val)
     end
 
@@ -517,7 +517,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.FarnebackOpticalFlow_setPolyN(self.ptr, val)
     end
 
@@ -530,7 +530,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.FarnebackOpticalFlow_setPolySigma(self.ptr, val)
     end
 
@@ -543,7 +543,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.FarnebackOpticalFlow_setFlags(self.ptr, val)
     end
 
@@ -574,7 +574,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DualTVL1OpticalFlow_setTau(self.ptr, val)
     end
 
@@ -587,7 +587,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DualTVL1OpticalFlow_setLambda(self.ptr, val)
     end
 
@@ -600,7 +600,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DualTVL1OpticalFlow_setTheta(self.ptr, val)
     end
 
@@ -613,7 +613,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DualTVL1OpticalFlow_setScalesNumber(self.ptr, val)
     end
 
@@ -626,7 +626,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DualTVL1OpticalFlow_setWarpingsNumber(self.ptr, val)
     end
 
@@ -639,7 +639,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DualTVL1OpticalFlow_setEpsilon(self.ptr, val)
     end
 
@@ -652,7 +652,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DualTVL1OpticalFlow_setIterations(self.ptr, val)
     end
 
@@ -665,7 +665,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.DualTVL1OpticalFlow_setUseInitialFlow(self.ptr, val)
     end
 
@@ -696,7 +696,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.BroxOpticalFlow_setAlpha(self.ptr, val)
     end
 
@@ -709,7 +709,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.BroxOpticalFlow_setGamma(self.ptr, val)
     end
 
@@ -722,7 +722,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.BroxOpticalFlow_setScaleFactor(self.ptr, val)
     end
 
@@ -735,7 +735,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.BroxOpticalFlow_setInnerIterations(self.ptr, val)
     end
 
@@ -748,7 +748,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.BroxOpticalFlow_setOuterIterations(self.ptr, val)
     end
 
@@ -761,7 +761,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.BroxOpticalFlow_setSolverIterations(self.ptr, val)
     end
 
@@ -786,7 +786,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.PyrLKOpticalFlow_setWindowSize(self.ptr, val)
     end
 
@@ -799,7 +799,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.PyrLKOpticalFlow_setMaxLevel(self.ptr, val)
     end
 
@@ -812,7 +812,7 @@ do
             {"val", required = true}
         }
         local val = cv.argcheck(t, argRules)
-        
+
         C.PyrLKOpticalFlow_setIterations(self.ptr, val)
     end
 

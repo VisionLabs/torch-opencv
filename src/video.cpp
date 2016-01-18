@@ -48,7 +48,7 @@ extern "C" struct TensorArray calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
                 retval[2], winSize, maxLevel,
                 criteria.orDefault(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01)),
                 flags, minEigThreshold);
-    
+
     return TensorArray(retval);
 }
 

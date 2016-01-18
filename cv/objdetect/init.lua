@@ -235,12 +235,12 @@ do
             {"nlevels", default = cv.HOGDESCRIPTOR_DEFAULT_NLEVELS},
             {"signedGradient", default = false}
         }
-        local winSize, blockSize, blockStride, cellSize, nbins, derivAperture, winSigma, 
-            histogramNormType, L2HysThreshold, gammaCorrection, nlevels, 
+        local winSize, blockSize, blockStride, cellSize, nbins, derivAperture, winSigma,
+            histogramNormType, L2HysThreshold, gammaCorrection, nlevels,
             signedGradient = cv.argcheck(t, argRules)
 
-        self.ptr = ffi.gc(C.HOGDescriptor_ctor(winSize, blockSize, blockStride, cellSize, 
-            nbins, derivAperture, winSigma, histogramNormType, L2HysThreshold, gammaCorrection, 
+        self.ptr = ffi.gc(C.HOGDescriptor_ctor(winSize, blockSize, blockStride, cellSize,
+            nbins, derivAperture, winSigma, histogramNormType, L2HysThreshold, gammaCorrection,
             nlevels, signedGradient), C.HOGDescriptor_dtor)
     end
 
@@ -312,7 +312,7 @@ do
 
         assert(ffi.typeof(searchLocations) == ffi.typeof('struct PointArray'))
 
-        local result = C.HOGDescriptor_detect(self.ptr, cv.wrap_tensor(img), hitThreshold, 
+        local result = C.HOGDescriptor_detect(self.ptr, cv.wrap_tensor(img), hitThreshold,
             winStride, padding, searchLocations)
         return cv.gcarray(result.points), cv.unwrap_tensors(result.tensor)
     end
@@ -327,10 +327,10 @@ do
             {"finalThreshold", default = 2.0},
             {"useMeanshiftGrouping", default = false}
         }
-        local img, hitThreshold, winStride, padding, scale, finalThreshold, 
+        local img, hitThreshold, winStride, padding, scale, finalThreshold,
             useMeanshiftGrouping = cv.argcheck(t, argRules)
 
-        local result = C.HOGDescriptor_detectMultiScale(self.ptr, cv.wrap_tensor(img), hitThreshold, 
+        local result = C.HOGDescriptor_detectMultiScale(self.ptr, cv.wrap_tensor(img), hitThreshold,
             winStride, padding, scale, finalThreshold, useMeanshiftGrouping)
         return cv.gcarray(result.rects), cv.unwrap_tensors(result.tensor)
     end

@@ -75,11 +75,11 @@ function cv.inpaint(t)
         {"flags", required = true}
     }
     local src, inpaintMask, dst, inpaintRadius, flags = cv.argcheck(t, argRules)
-    
+
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
     end
-    
+
     return cv.unwrap_tensors(
         C.inpaint(
             cv.wrap_tensor(src), cv.wrap_tensor(inpaintMask), cv.wrap_tensor(dst), inpaintRadius, flags))
@@ -104,7 +104,7 @@ function cv.fastNlMeansDenoising(t)
 
     if type(h) == "number" or h == nil then
         h = h or 3
-        
+
         return cv.unwrap_tensors(
             C.fastNlMeansDenoising1(
                 cv.wrap_tensor(src), cv.wrap_tensor(dst), h, templateWindowSize, searchWindowSize))
@@ -130,11 +130,11 @@ function cv.fastNlMeansDenoisingColored(t)
         {"searchWindowSize", default = 21}
     }
     local src, dst, h, hColor, templateWindowSize, searchWindowSize = cv.argcheck(t, argRules)
-    
+
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
     end
-    
+
     assert(templateWindowSize % 2 == 1)
     assert(searchWindowSize % 2 == 1)
 
@@ -156,7 +156,7 @@ function cv.fastNlMeansDenoisingMulti(t)
     }
     local srcImgs, dst, imgToDenoiseIndex, temporalWindowSize, h, templateWindowSize, searchWindowSize, h, normType = cv.argcheck(t, argRules)
 
-    if #srcImgs > 1 then 
+    if #srcImgs > 1 then
         for i = 2, #srcImgs do
             assert(srcImgs[i - 1]:type() == srcImgs[i]:type() and srcImgs[i - 1]:isSameSizeAs(srcImgs[i]))
         end
@@ -203,7 +203,7 @@ function cv.fastNlMeansDenoisingColoredMulti(t)
     }
     local srcImgs, dst, imgToDenoiseIndex, temporalWindowSize, h, hColor, templateWindowSize, searchWindowSize = cv.argcheck(t, argRules)
 
-    if #srcImgs > 1 then 
+    if #srcImgs > 1 then
         for i = 2, #srcImgs do
             assert(srcImgs[i - 1]:type() == srcImgs[i]:type() and srcImgs[i - 1]:isSameSizeAs(srcImgs[i]))
         end
@@ -216,7 +216,7 @@ function cv.fastNlMeansDenoisingColoredMulti(t)
     assert(temporalWindowSize % 2 == 1)
     assert(templateWindowSize % 2 == 1)
     assert(searchWindowSize % 2 == 1)
-    
+
     return cv.unwrap_tensors(
         C.fastNlMeansDenoisingColoredMulti(
             cv.wrap_tensors(srcImgs), cv.wrap_tensor(dst), imgToDenoiseIndex, temporalWindowSize,
@@ -356,7 +356,7 @@ function cv.detailEnhance(t)
         {"sigma_r", default = 0.15}
     }
     local src, dst, sigma_s, sigma_r = cv.argcheck(t, argRules)
-    
+
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
     end
@@ -395,7 +395,7 @@ function cv.stylization(t)
         {"sigma_r", default = 0.45}
     }
     local src, dst, sigma_s, sigma_r = cv.argcheck(t, argRules)
-    
+
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
     end
@@ -604,7 +604,7 @@ do
         local gamma = cv.argcheck(t, argRules)
 
         C.Tonemap_setGamma(self.ptr, gamma)
-    end 
+    end
 end
 
 -- TonemapDrago
@@ -776,7 +776,7 @@ do
         local color_adapt = cv.argcheck(t, argRules)
 
         C.TonemapReinhard_setColorAdaptation(self.ptr, color_adapt)
-    end    
+    end
 end
 
 -- TonemapMantiuk
@@ -880,7 +880,7 @@ do
         if type(times) == "table" then
             times = torch.FloatTensor(times)
         end
-        
+
         return cv.unwrap_tensors(
                 C.AlignMTB_process1(
                     self.ptr, cv.wrap_tensors(src), cv.wrap_tensors(dst),
@@ -894,7 +894,7 @@ do
         }
 
         local img0, img1 = cv.argcheck(t, argRules)
-        
+
         resPoint = C.AlignMTB_calculateShift(self.ptr, cv.wrap_tensor(img0), cv.wrap_tensor(img1))
         return {resPoint.x, resPoint.y}
     end
@@ -960,7 +960,7 @@ do
             {"cut", required = true}
         }
         local cut = cv.argcheck(t, argRules)
-        
+
         C.AlignMTB_setCut(self.ptr, cut)
     end
 end
@@ -1056,7 +1056,7 @@ do
             {"max_iter", default = 30},
             {"threshold", default = 0.01}
         }
-        
+
         local max_iter, threshold = cv.argcheck(t, argRules)
 
         self.ptr = ffi.gc(C.CalibrateRobertson_ctor(max_iter, threshold), Classes.Algorithm_dtor)
@@ -1139,7 +1139,7 @@ do
         if type(times) == "table" then
             times = torch.FloatTensor(times)
         end
-        
+
         if response == nil then
             return cv.unwrap_tensors(
                 C.MergeDebevec_process2(self.ptr, cv.wrap_tensors(src), cv.wrap_tensor(dst), cv.wrap_tensor(times)))
@@ -1185,7 +1185,7 @@ do
         if type(times) == "table" then
             times = torch.FloatTensor(times)
         end
-        
+
         return cv.unwrap_tensors(
                 C.MergeMertens_process1(
                     self.ptr, cv.wrap_tensors(src), cv.wrap_tensor(dst),
@@ -1253,7 +1253,7 @@ do
         if type(times) == "table" then
             times = torch.FloatTensor(times)
         end
-        
+
         if response == nil then
             return cv.unwrap_tensors(
                 C.MergeRobertson_process2(self.ptr, cv.wrap_tensors(src), cv.wrap_tensor(dst), cv.wrap_tensor(times)))

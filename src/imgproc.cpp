@@ -142,7 +142,7 @@ struct TensorWrapper sqrBoxFilter(
                          normalize, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
-        // in-place 
+        // in-place
         cv::Mat source = src.toMat();
         cv::sqrBoxFilter(source, source, ddepth, ksize, anchor,
                          normalize, borderType);
@@ -163,7 +163,7 @@ struct TensorWrapper blur(
         cv::blur(src.toMat(), retval, ksize, anchor, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
-        // in-place 
+        // in-place
         cv::Mat source = src.toMat();
         cv::blur(source, source, ksize, anchor, borderType);
     } else {
@@ -185,7 +185,7 @@ struct TensorWrapper filter2D(
                      delta, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
-        // in-place 
+        // in-place
         cv::Mat source = src.toMat();
         cv::filter2D(source, source, ddepth,
                      kernel.toMat(), anchor,
@@ -211,7 +211,7 @@ struct TensorWrapper sepFilter2D(
                         anchor, delta, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
-        // in-place 
+        // in-place
         cv::Mat source = src.toMat();
         cv::sepFilter2D(source, source, ddepth,
                         kernelX.toMat(),kernelY.toMat(),
@@ -235,7 +235,7 @@ struct TensorWrapper Sobel(
                   dx, dy, ksize, scale, delta, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
-        // in-place 
+        // in-place
         cv::Mat source = src.toMat();
         cv::Sobel(source, source, ddepth,
                   dx, dy, ksize, scale, delta, borderType);
@@ -257,7 +257,7 @@ struct TensorWrapper Scharr(
                    dx, dy, scale, delta, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
-        // in-place 
+        // in-place
         cv::Mat source = src.toMat();
         cv::Scharr(source, source, ddepth,
                    dx, dy, scale, delta, borderType);
@@ -279,7 +279,7 @@ struct TensorWrapper Laplacian(
                       ksize, scale, delta, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
-        // in-place 
+        // in-place
         cv::Mat source = src.toMat();
         cv::Laplacian(source, source, ddepth,
                       ksize, scale, delta, borderType);
@@ -300,7 +300,7 @@ struct TensorWrapper Canny(
         cv::Canny(image.toMat(), retval, threshold1, threshold2, apertureSize, L2gradient);
         return TensorWrapper(retval);
     } else if (edges.tensorPtr == image.tensorPtr) {
-        // in-place 
+        // in-place
         cv::Mat source = image.toMat();
         cv::Canny(source, source, threshold1, threshold2, apertureSize, L2gradient);
     } else {
@@ -340,7 +340,7 @@ struct TensorWrapper cornerHarris(
                          ksize, k, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
-        // in-place 
+        // in-place
         cv::Mat source = src.toMat();
         cv::cornerHarris(source, source, blockSize,
                          ksize, k, borderType);
@@ -361,7 +361,7 @@ struct TensorWrapper cornerEigenValsAndVecs(
         cv::cornerEigenValsAndVecs(src.toMat(), retval, blockSize, ksize, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
-        // in-place 
+        // in-place
         cv::Mat source = src.toMat();
         cv::cornerEigenValsAndVecs(source, source, blockSize, ksize, borderType);
     } else {
@@ -379,7 +379,7 @@ struct TensorWrapper preCornerDetect(
         cv::preCornerDetect(src.toMat(), retval, ksize, borderType);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
-        // in-place 
+        // in-place
         cv::Mat source = src.toMat();
         cv::preCornerDetect(source, source, ksize, borderType);
     } else {
@@ -716,7 +716,7 @@ struct TensorWrapper integral(
         cv::integral(src.toMat(), retval, sdepth);
         return TensorWrapper(retval);
     } else if (sum.tensorPtr == src.tensorPtr) {
-        // in-place 
+        // in-place
         cv::Mat source = src.toMat();
         cv::integral(source, source, sdepth);
     } else {
@@ -839,7 +839,7 @@ struct TensorWrapper adaptiveThreshold(
         cv::adaptiveThreshold(src.toMat(), retval, maxValue, adaptiveMethod, thresholdType, blockSize, C);
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
-        // in-place 
+        // in-place
         cv::Mat source = src.toMat();
         cv::adaptiveThreshold(source, source, maxValue, adaptiveMethod, thresholdType, blockSize, C);
     } else {

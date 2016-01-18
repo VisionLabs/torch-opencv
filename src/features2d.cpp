@@ -1002,16 +1002,16 @@ struct evaluateFeatureDetectorRetval evaluateFeatureDetector(
 {
     cv::Ptr<cv::FeatureDetector> fdetectorPtr(static_cast<cv::Feature2D *>(fdetector.ptr));
     rescueObjectFromPtr(fdetectorPtr);
-    
+
     evaluateFeatureDetectorRetval retval;
     std::vector<cv::KeyPoint> keypoints1, keypoints2;
     cv::evaluateFeatureDetector(
             img1.toMat(), img2.toMat(), H1to2.toMat(), &keypoints1, &keypoints2,
             retval.repeatability, retval.correspCount, fdetectorPtr);
-    
+
     new (&retval.keypoints1) KeyPointArray(keypoints1);
     new (&retval.keypoints2) KeyPointArray(keypoints2);
-    
+
     return retval;
 }
 

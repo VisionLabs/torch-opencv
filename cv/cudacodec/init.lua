@@ -185,7 +185,7 @@ do
         }
         local frame = cv.argcheck(t, argRules)
 
-        return cv.unwrap_tensors(C.VideoReader_nextFrame(cutorch._state, 
+        return cv.unwrap_tensors(C.VideoReader_nextFrame(cutorch._state,
             self.ptr, cv.wrap_tensor(frame)))
     end
 

@@ -110,9 +110,9 @@ struct TensorArray Index_knnSearch(
     std::vector<cv::Mat> retval(2);
     if (!indices.isNull()) retval[0] = indices;
     if (!dists.isNull())   retval[1] = dists;
-    
+
     ptr->knnSearch(query.toMat(), retval[0], retval[1], knn, params);
-    
+
     return TensorArray(retval);
 }
 
@@ -122,16 +122,16 @@ struct TensorArrayPlusInt Index_radiusSearch(
         struct TensorWrapper indices, struct TensorWrapper dists, struct SearchParamsPtr params)
 {
     struct TensorArrayPlusInt retval;
-    
+
     std::vector<cv::Mat> result(2);
     if (!indices.isNull()) result[0] = indices;
     if (!dists.isNull())   result[1] = dists;
-    
+
     retval.val = ptr->radiusSearch(
             query.toMat(), result[0], result[1], radius, maxResults, params);
-    
+
     new (&retval.tensors) TensorArray(result);
-    
+
     return retval;
 }
 

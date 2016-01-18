@@ -63,7 +63,7 @@ function cv.imshow(t)
         {"image", required = true}
     }
     local winname, image = cv.argcheck(t, argRules)
-    
+
     C.imshow(winname, cv.wrap_tensor(image))
 end
 
@@ -91,7 +91,7 @@ function cv.destroyWindow(t)
         {"winname", required = true}
     }
     local winname = cv.argcheck(t, argRules)
-    
+
     return C.destroyWindow(winname)
 end
 
@@ -121,7 +121,7 @@ function cv.moveWindow(t)
         {"y", required = true}
     }
     local winname, x, y = cv.argcheck(t, argRules)
-    
+
     return C.moveWindow(winname, x, y)
 end
 
@@ -132,7 +132,7 @@ function cv.setWindowProperty(t)
         {"prop_value", required = true}
     }
     local winname, prop_id, prop_value = cv.argcheck(t, argRules)
-    
+
     return C.setWindowProperty(winname, prop_id, prop_value)
 end
 
@@ -142,7 +142,7 @@ function cv.setWindowTitle(t)
         {"title", required = true}
     }
     local winname, title = cv.argcheck(t, argRules)
-    
+
     return C.setWindowTitle(winname, title)
 end
 
@@ -152,7 +152,7 @@ function cv.getWindowProperty(t)
         {"prop_id", required = true}
     }
     local winname, prop_id = cv.argcheck(t, argRules)
-    
+
     return C.getWindowProperty(winname, prop_id)
 end
 
@@ -163,7 +163,7 @@ function cv.setMouseCallback(t)
         {"userdata", required = true}
     }
     local winname, onMouse, userdata = cv.argcheck(t, argRules)
-    
+
     return C.setMouseCallback(winname, onMouse, userdata)
 end
 
@@ -172,7 +172,7 @@ function cv.getMouseWheelData(t)
         {"flags", required = true}
     }
     local flags = cv.argcheck(t, argRules)
-    
+
     return C.getMouseWheelData(flags)
 end
 
@@ -186,7 +186,7 @@ function cv.createTrackbar(t)
         {"userdata", default = nil}
     }
     local trackbarname, winname, value, count, onChange, userdata = cv.argcheck(t, argRules)
-    
+
     return C.createTrackbar(trackbarname, winname, value, count, onChange, userdata)
 end
 
@@ -196,7 +196,7 @@ function cv.getTrackbarPos(t)
         {"winname", required = true}
     }
     local trackbarname, winname = cv.argcheck(t, argRules)
-    
+
     return C.getTrackbarPos(trackbarname, winname)
 end
 
@@ -207,7 +207,7 @@ function cv.setTrackbarPos(t)
         {"pos", required = true}
     }
     local trackbarname, winname, pos = cv.argcheck(t, argRules)
-    
+
     return C.setTrackbarPos(trackbarname, winname, pos)
 end
 
@@ -218,7 +218,7 @@ function cv.setTrackbarMax(t)
         {"maxval", required = true}
     }
     local trackbarname, winname, maxval = cv.argcheck(t, argRules)
-    
+
     return C.setTrackbarMax(trackbarname, winname, maxval)
 end
 
@@ -227,7 +227,7 @@ function cv.updateWindow(t)
         {"winname", required = true}
     }
     local winname = cv.argcheck(t, argRules)
-    
+
     return C.updateWindow(winname)
 end
 
@@ -238,7 +238,7 @@ function cv.displayOverlay(t)
         {"delayms", required = true}
     }
     local winname, text, delayms = cv.argcheck(t, argRules)
-    
+
     return C.displayOverlay(winname, text, delayms)
 end
 
@@ -249,7 +249,7 @@ function cv.displayStatusBar(t)
         {"delayms", required = true}
     }
     local winname, text, delayms = cv.argcheck(t, argRules)
-    
+
     return C.displayStatusBar(winname, text, delayms)
 end
 
@@ -258,7 +258,7 @@ function cv.saveWindowParameters(t)
         {"windowName", required = true}
     }
     local windowName = cv.argcheck(t, argRules)
-    
+
     return C.saveWindowParameters(windowName)
 end
 
@@ -267,7 +267,7 @@ function cv.loadWindowParameters(t)
         {"windowName", required = true}
     }
     local windowName = cv.argcheck(t, argRules)
-    
+
     return C.loadWindowParameters(windowName)
 end
 

@@ -19,15 +19,15 @@ local edges = frame.new(frame:size()[1], frame:size()[2])
 
 while true do
     cv.cvtColor{frame, edges, cv.COLOR_BGR2GRAY}
-    
+
     cv.GaussianBlur{
-        edges, 
-        edges, 
-        ksize = {7,7}, 
+        edges,
+        edges,
+        ksize = {7,7},
         sigmaX = 1.5,
         sigmaY = 1.5
     }
-    
+
     cv.Canny{
         edges,
         edges,

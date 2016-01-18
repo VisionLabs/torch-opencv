@@ -283,7 +283,7 @@ function empty_tensor_of_type(code)
 end
 
 -- torch.RealTensor ---> tensor:cdata(), tensor_type_CV_code
-local 
+local
 function prepare_for_wrapping(tensor)
     return tensor:cdata(), cv.tensorType(tensor)
 end
@@ -325,9 +325,9 @@ function cv.unwrap_tensors(wrapper, toTable)
         if wrapper.tensorPtr == nil then
             return
         end
-        
+
         retval = empty_tensor_of_type(wrapper.typeCode)
-        
+
         if wrapper.typeCode == cv.CV_CUDA then
             CUDACommon_C.transfer_tensor_CUDA(cutorch._state, retval:cdata(), wrapper.tensorPtr)
         else
@@ -461,7 +461,7 @@ function cv.newArray(elemType, data)
         fullTypeName = elemType:lower()
         retval = ffi.new('struct ' .. elemType .. 'Array')
     end
-    
+
     if not data then
         -- create an array with no data
         -- here, we assume that our C function will resize the array
@@ -478,7 +478,7 @@ function cv.newArray(elemType, data)
 
     retval.data = ffi.gc(C.malloc(#data * ffi.sizeof(fullTypeName)), C.free)
     retval.size = #data
-    
+
 
     if elemType:byte(3) == 46 then
         for i, value in ipairs(data) do
@@ -502,7 +502,7 @@ function cv.numberArrayOfArrays(elemType, data)
     -- first, compute relative addresses
     retval.pointers = ffi.gc(C.malloc(#data * ffi.sizeof(elemType:lower() .. '*') + 1), C.free)
     retval.pointers[0] = nil
-    
+
     for i, row in ipairs(data) do
         data[i] = data[i-1] + #row
     end
@@ -533,7 +533,7 @@ function cv.arrayToLua(array, outputType, output)
         C.free(array.data)
         return output
     end
-    
+
     if     outputType == 'table' then
         retval = {}
     elseif outputType == 'Tensor' then

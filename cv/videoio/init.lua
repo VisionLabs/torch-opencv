@@ -60,7 +60,7 @@ do
             {"device", required = true}
         }
         local device = cv.argcheck(t, argRules)
-        
+
         return C.VideoCapture_open(self.ptr, device)
     end
 
@@ -69,7 +69,7 @@ do
     end
 
     function VideoCapture:release()
-        C.VideoCapture_release(self.ptr)        
+        C.VideoCapture_release(self.ptr)
     end
 
     function VideoCapture:grab()
@@ -116,7 +116,7 @@ do
             {"propId", required = true}
         }
         local propId = cv.argcheck(t, argRules)
-        
+
         return C.VideoCapture_get(self.ptr, propId)
     end
 end
@@ -131,7 +131,7 @@ struct PtrWrapper VideoWriter_ctor(
 
 void VideoWriter_dtor(struct PtrWrapper ptr);
 
-bool VideoWriter_open(struct PtrWrapper ptr, const char *filename, int fourcc, 
+bool VideoWriter_open(struct PtrWrapper ptr, const char *filename, int fourcc,
                       double fps, struct SizeWrapper frameSize, bool isColor);
 
 bool VideoWriter_isOpened(struct PtrWrapper ptr);
@@ -162,7 +162,7 @@ do
         if t.filename then
             if isColor == nil then isColor = true end
             self.ptr = ffi.gc(C.VideoWriter_ctor(
-                filename, fourcc, fps, frameSize, isColor), 
+                filename, fourcc, fps, frameSize, isColor),
                 C.VideoWriter_dtor)
         else
             self.ptr = ffi.gc(C.VideoWriter_ctor_default(), C.VideoWriter_dtor)
@@ -179,7 +179,7 @@ do
         }
         local filename, fourcc, fps, frameSize, isColor = cv.argcheck(t, argRules)
         if isColor == nil then isColor = true end
-        
+
         return C.VideoWriter_open(self.ptr, filename, fourcc, fps, frameSize, isColor)
     end
 
@@ -188,7 +188,7 @@ do
     end
 
     function VideoWriter:release()
-        C.VideoWriter_release(self.ptr)     
+        C.VideoWriter_release(self.ptr)
     end
 
     function VideoWriter:write(t)

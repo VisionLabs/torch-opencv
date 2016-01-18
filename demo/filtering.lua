@@ -10,14 +10,14 @@ end
 
 local image = cv.imread{arg[1] or 'demo/lena.jpg'}
 
-if not image or image:nDimension() == 0 then
+if not image then
     print("Problem loading image\n")
     os.exit(0)
 end
 
 cv.putText{
-    img=image, 
-    text="Some text on top of the image", 
+    img=image,
+    text="Some text on top of the image",
     org={x=15, y=50},
     fontFace=cv.FONT_HERSHEY_DUPLEX,
     fontScale=0.95,

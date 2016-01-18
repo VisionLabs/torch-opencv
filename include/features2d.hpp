@@ -7,7 +7,7 @@ struct KeyPointWrapper {
     struct Point2fWrapper pt;
     float size, angle, response;
     int octave, class_id;
-    
+
     KeyPointWrapper(const cv::KeyPoint & other);
     inline operator cv::KeyPoint() { return cv::KeyPoint(pt, size, angle, response, octave, class_id); }
 };

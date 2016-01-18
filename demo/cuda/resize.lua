@@ -9,7 +9,6 @@ if not arg[1] then
     print('Now using demo/lena.jpg')
 end
 
--- TODO #58
 local img = cv.imread {arg[1] or 'demo/lena.jpg', cv.IMREAD_COLOR}
 local imgCUDA = img:float():cuda() / 255
 local resized = cv.cuda.resize{imgCUDA, {1024, 768}}
