@@ -159,7 +159,7 @@ function cv.cuda.rotate(t)
     local src, dst, dsize, angle, xShift, yShift, interpolation = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
-        C.resize(cutorch._state,
+        C.rotate(cutorch._state,
             cv.wrap_tensor(src), cv.wrap_tensor(dst), dsize, angle, xShift, yShift, interpolation))
 end
 
