@@ -245,6 +245,11 @@ Point2fWrapper::Point2fWrapper(const cv::Point2f & other) {
     this->y = other.y;
 }
 
+Point2dWrapper::Point2dWrapper(const cv::Point2d & other) {
+    this->x = other.x;
+    this->y = other.y;
+}
+
 SizeWrapper::SizeWrapper(const cv::Size & other) {
     this->height = other.height;
     this->width = other.width;

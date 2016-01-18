@@ -76,6 +76,10 @@ struct Point2fWrapper {
     float x, y;
 };
 
+struct Point2dWrapper {
+    double x, y;
+};
+
 struct RotatedRectWrapper {
     struct Point2fWrapper center;
     struct Size2fWrapper size;
@@ -422,6 +426,10 @@ end
 
 function cv.Point2f(...)
     return ffi.new('struct Point2fWrapper', ...)
+end
+
+function cv.Point2d(...)
+    return ffi.new('struct Point2dWrapper', ...)
 end
 
 function cv.RotatedRect(...)

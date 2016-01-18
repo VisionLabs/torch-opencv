@@ -162,6 +162,14 @@ struct Point2fWrapper {
     inline Point2fWrapper() {}
 };
 
+struct Point2dWrapper {
+    double x, y;
+
+    inline operator cv::Point2d() { return cv::Point2d(x, y); }
+    Point2dWrapper(const cv::Point2d & other);
+    inline Point2dWrapper() {}
+};
+
 struct RotatedRectWrapper {
     struct Point2fWrapper center;
     struct Size2fWrapper size;

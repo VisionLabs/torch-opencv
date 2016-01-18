@@ -9,7 +9,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 SET(OPENCV_MODULES_TO_WRAP
         imgcodecs highgui features2d flann imgproc ml optflow photo superres videoio video
-        objdetect cudaarithm cudacodec cudawarping)
+        objdetect cudaarithm cudacodec cudawarping calib3d)
 
 # Unfortunately, OpenCVConfig.cmake doesn't make use of FIND_PACKAGE's "OPTIONAL_COMPONENTS"
 # So let's invoke FIND_PACKAGE twice:
