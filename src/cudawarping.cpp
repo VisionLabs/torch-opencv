@@ -1,5 +1,4 @@
 #include <cudawarping.hpp>
-#include <include/highgui.hpp>
 
 extern "C"
 struct TensorWrapper remap(struct THCState *state,
