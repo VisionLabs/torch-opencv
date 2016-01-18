@@ -196,14 +196,14 @@ do
     function BackgroundSubtractor:apply(t)
         local argRules = {
             {"image", required = true},
-            {"fgmast", default = nil},
+            {"fgmask", default = nil},
             {"learningRate", default = -1}
         }
         local image, fgmast, learningRate = cv.argcheck(t, argRules)
 
         return cv.unwrap_tensors(
                 C.BackgroundSubtractor_apply(
-                    self.ptr, cv.wrap_tensors(image), cv.wrap_tensor(fgmast), learningRate))
+                    self.ptr, cv.wrap_tensor(image), cv.wrap_tensor(fgmask), learningRate))
     end
 
     function BackgroundSubtractor:getBackgroundImage(t)
