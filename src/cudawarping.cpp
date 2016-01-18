@@ -1,4 +1,5 @@
 #include <cudawarping.hpp>
+#include <include/highgui.hpp>
 
 extern "C"
 struct TensorWrapper remap(struct THCState *state,
@@ -26,18 +27,10 @@ struct TensorWrapper resize(struct THCState *state,
         struct SizeWrapper dsize, double fx, double fy,
         int interpolation)
 {
-    if (dst.isNull()) {
-        cuda::GpuMat retval;
-        cuda::resize(src.toGpuMat(), retval, dsize, fx, fy, interpolation);
-        return TensorWrapper(retval, state);
-    } else if (dst.tensorPtr == src.tensorPtr) {
-        // in-place
-        cuda::GpuMat source = src.toGpuMat();
-        cuda::resize(source, source, dsize, fx, fy, interpolation);
-    } else {
-        cuda::resize(src.toGpuMat(), dst.toGpuMat(), dsize, fx, fy, interpolation);
-    }
-    return dst;
+    cuda::GpuMat retval;
+    if (!dst.isNull()) retval = dst.toGpuMat();
+    cuda::resize(src.toGpuMat(), retval, dsize, fx, fy, interpolation);
+    return TensorWrapper(retval, state);
 }
 
 
@@ -63,15 +56,15 @@ struct TensorWrapper warpAffine(struct THCState *state,
 
 extern "C"
 struct TensorArray buildWarpAffineMaps(
-        struct THCState *state, struct TensorWrapper M, bool inverse, 
+        struct THCState *state, struct TensorWrapper M, bool inverse,
         struct SizeWrapper dsize, struct TensorWrapper xmap, struct TensorWrapper ymap)
 {
     std::vector<cuda::GpuMat> retval(2);
     if (!xmap.isNull()) retval[0] = xmap.toGpuMat();
     if (!ymap.isNull()) retval[1] = ymap.toGpuMat();
-    
+
     cuda::buildWarpAffineMaps(M.toGpuMat(), inverse, dsize, retval[0], retval[1]);
-    
+
     return TensorArray(retval, state);
 }
 

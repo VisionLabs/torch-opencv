@@ -33,7 +33,7 @@ TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state) {
     }
 
     assert(mat.depth() == CV_32F);
-    this->typeCode = 66;
+    this->typeCode = CV_CUDA;
 
     THCudaTensor *outputPtr = new THCudaTensor;
 
@@ -65,7 +65,7 @@ TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state) {
     outputPtr->size[1] = mat.cols;
 
     outputPtr->stride[0] = mat.step / sizeMultiplier;
-    outputPtr->stride[1] = 1;
+    outputPtr->stride[1] = mat.channels();
 
     outputPtr->storageOffset = 0;
 
