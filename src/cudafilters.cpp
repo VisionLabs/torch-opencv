@@ -1,5 +1,35 @@
 #include <cudafilters.hpp>
 
+namespace {
+    class StackAllocator;
+}
+
+class FakeStreamImpl {
+public:
+    cudaStream_t stream;
+    bool ownStream;
+
+    cv::Ptr<StackAllocator> stackAllocator;
+
+    FakeStreamImpl();
+    explicit FakeStreamImpl(cudaStream_t stream);
+
+    ~FakeStreamImpl();
+};
+
+class FakeStream {
+    cv::Ptr <FakeStreamImpl> impl_;
+};
+
+extern "C"
+void f(cuda::Stream *x) {
+}
+
+cuda::Stream cutorchToOpenCVStream(THCState *state) {
+
+    state->currentStream;
+}
+
 extern "C"
 struct TensorWrapper Filter_apply(struct THCState *state,
     struct FilterPtr ptr, struct TensorWrapper src, struct TensorWrapper dst)

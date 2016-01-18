@@ -1,3 +1,4 @@
+require 'cutorch'
 local cuda = {}
 
 cuda.SF_UYVY = 0
@@ -26,5 +27,13 @@ cuda.CHROMA_FORMAT_Monochrome = 0
 cuda.CHROMA_FORMAT_YUV420 = 1
 cuda.CHROMA_FORMAT_YUV422 = 2
 cuda.CHROMA_FORMAT_YUV444 = 3
+
+cuda._cvDummyStream = C.getEmptyStream()
+
+function cuda.getStreamInfo()
+	local cutorchState = cutorch._state
+	C.updateCvDummyStream(cuda._cvDummyStream, cutorchState)
+	return cuda._cvDummyStream, cutorchState
+end
 
 return cuda
