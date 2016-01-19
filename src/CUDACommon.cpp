@@ -110,6 +110,15 @@ TensorArray::TensorArray(std::vector<cuda::GpuMat> & matList, THCState *state):
     }
 }
 
+std::vector<cv::cuda::GpuMat> TensorArray::toGpuMatList() {
+    std::vector<cuda::GpuMat> retval(this->size);
+    for (int i = 0; i < this->size; ++i) {
+        // TODO: avoid temporary object
+        retval[i] = this->tensors[i].toGpuMat();
+    }
+    return retval;
+}
+
 /************************ Fake OpenCV/CUDA classes *************************/
 
 FakeDefaultDeviceInitializer initializer;

@@ -20,8 +20,10 @@ extern "C" float getFloatMax() { return FLT_MAX; }
 /***************** Tensor <=> Mat conversion *****************/
 
 #define TO_MAT_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toMat())
+#define TO_GPUMAT_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toGpuMat())
 
 #define TO_MAT_LIST_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toMatList())
+#define TO_GPUMAT_LIST_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toGpuMatList())
 
 struct TensorWrapper {
     void *tensorPtr;
@@ -56,6 +58,7 @@ struct TensorArray {
 
     #ifdef WITH_CUDA
     TensorArray(std::vector<cv::cuda::GpuMat> & matList, THCState *state);
+    std::vector<cv::cuda::GpuMat> toGpuMatList();
     #endif
 
     operator std::vector<cv::Mat>();
