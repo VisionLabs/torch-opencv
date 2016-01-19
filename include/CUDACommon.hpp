@@ -5,12 +5,6 @@ namespace cuda = cv::cuda;
 
 #define CV_CUDA 66
 
-cuda::GpuMat TensorWrapper::toGpuMat();
-
-TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state);
-TensorWrapper::TensorWrapper(cuda::GpuMat && mat, THCState *state);
-TensorArray::TensorArray(std::vector<cuda::GpuMat> & matList, THCState *state);
-
 // Kill "destination" and assign "source" data to it.
 // "destination" is always supposed to be an empty Tensor
 extern "C"
@@ -125,3 +119,14 @@ public:
         stackAllocator = cv::makePtr<FakeStackAllocator>(stream);
     }
 };
+
+/*  Whenever we call an OpenCV-CUDA function from Lua, it's necessary
+ *  to tell OpenCV which device and stream currently in use by cutorch.
+ *  For this, a single `cv::cuda::Stream` (in form of `FakeStream`) object
+ *  is stored. When invoking an OpenCV function, we must
+ *  refresh that object and pass through a reference to it. */
+
+// Create that object
+FakeStream fakeStream;
+
+cuda::Stream & prepareStream(cutorchInfo info);

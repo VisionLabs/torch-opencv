@@ -7,42 +7,42 @@ cv.cuda = cv.cuda or require 'cv._env_cuda'
 local ffi = require 'ffi'
 
 ffi.cdef[[
-struct TensorWrapper remap(struct THCState *state,
+struct TensorWrapper remap(struct cutorchInfo info,
                            struct TensorWrapper src, struct TensorWrapper map1,
                            struct TensorWrapper map2, int interpolation, struct TensorWrapper dst,
                            int borderMode, struct ScalarWrapper borderValue);
 
-struct TensorWrapper resize(struct THCState *state,
+struct TensorWrapper resize(struct cutorchInfo info,
                             struct TensorWrapper src, struct TensorWrapper dst,
                             struct SizeWrapper dsize, double fx, double fy,
                             int interpolation);
 
-struct TensorWrapper warpAffine(struct THCState *state,
+struct TensorWrapper warpAffine(struct cutorchInfo info,
                                 struct TensorWrapper src, struct TensorWrapper dst,
                                 struct TensorWrapper M, struct SizeWrapper dsize,
                                 int flags, int borderMode, struct ScalarWrapper borderValue);
 
 struct TensorArray buildWarpAffineMaps(
-        struct THCState *state, struct TensorWrapper M, bool inverse,
+        struct cutorchInfo info, struct TensorWrapper M, bool inverse,
         struct SizeWrapper dsize, struct TensorWrapper xmap, struct TensorWrapper ymap);
 
-struct TensorWrapper warpPerspective(struct THCState *state,
+struct TensorWrapper warpPerspective(struct cutorchInfo info,
                                      struct TensorWrapper src, struct TensorWrapper dst,
                                      struct TensorWrapper M, struct SizeWrapper dsize,
                                      int flags, int borderMode, struct ScalarWrapper borderValue);
 
 struct TensorArray buildWarpPerspectiveMaps(
-        struct THCState *state, struct TensorWrapper M, bool inverse,
+        struct cutorchInfo info, struct TensorWrapper M, bool inverse,
         struct SizeWrapper dsize, struct TensorWrapper xmap, struct TensorWrapper ymap);
 
 struct TensorWrapper rotate(
-        struct THCState *state, struct TensorWrapper src, struct TensorWrapper dst,
+        struct cutorchInfo info, struct TensorWrapper src, struct TensorWrapper dst,
         struct SizeWrapper dsize, double angle, double xShift, double yShift, int interpolation);
 
-struct TensorWrapper pyrDown(struct THCState *state,
+struct TensorWrapper pyrDown(struct cutorchInfo info,
                              struct TensorWrapper src, struct TensorWrapper dst);
 
-struct TensorWrapper pyrUp(struct THCState *state,
+struct TensorWrapper pyrUp(struct cutorchInfo info,
                            struct TensorWrapper src, struct TensorWrapper dst);
 ]]
 
@@ -61,7 +61,7 @@ function cv.cuda.remap(t)
     local src, map1, map2, interpolation, dst, borderMode, borderValue = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
-        C.remap(cutorch._state,
+        C.remap(cv.cuda._info(),
             cv.wrap_tensor(src), cv.wrap_tensor(map1), cv.wrap_tensor(map2),
             interpolation, cv.wrap_tensor(dst), borderMode, borderValue))
 end
@@ -78,7 +78,7 @@ function cv.cuda.resize(t)
     local src, dsize, dst, fx, fy, interpolation = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
-        C.resize(cutorch._state,
+        C.resize(cv.cuda._info(),
             cv.wrap_tensor(src), cv.wrap_tensor(dst), dsize, fx, fy, interpolation))
 end
 
@@ -95,7 +95,7 @@ function cv.cuda.warpAffine(t)
     local src, dst, M, dsize, flags, borderMode, borderValue = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
-        C.warpAffine(cutorch._state,
+        C.warpAffine(cv.cuda._info(),
             cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(M), dsize,
             flags, borderMode, borderValue))
 end
@@ -110,7 +110,7 @@ function cv.cuda.buildWarpAffineMaps(t)
     }
     local M, inverse, dsize, xmap, ymap = cv.argcheck(t, argRules)
 
-    return cv.unwrap_tensors(C.buildWarpAffineMaps(cutorch._state,
+    return cv.unwrap_tensors(C.buildWarpAffineMaps(cv.cuda._info(),
         cv.wrap_tensor(M), inverse, dsize, cv.wrap_tensor(xmap), cv.wrap_tensor(ymap)))
 end
 
@@ -127,7 +127,7 @@ function cv.cuda.warpPerspective(t)
     local src, dst, M, dsize, flags, borderMode, borderValue = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
-        C.warpPerspective(cutorch._state,
+        C.warpPerspective(cv.cuda._info(),
             cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(M), dsize,
             flags, borderMode, borderValue))
 end
@@ -142,7 +142,7 @@ function cv.cuda.buildWarpPerspectiveMaps(t)
     }
     local M, inverse, dsize, xmap, ymap = cv.argcheck(t, argRules)
 
-    return cv.unwrap_tensors(C.buildWarpPerspectiveMaps(cutorch._state,
+    return cv.unwrap_tensors(C.buildWarpPerspectiveMaps(cv.cuda._info(),
         cv.wrap_tensor(M), inverse, dsize, cv.wrap_tensor(xmap), cv.wrap_tensor(ymap)))
 end
 
@@ -159,7 +159,7 @@ function cv.cuda.rotate(t)
     local src, dst, dsize, angle, xShift, yShift, interpolation = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
-        C.rotate(cutorch._state,
+        C.rotate(cv.cuda._info(),
             cv.wrap_tensor(src), cv.wrap_tensor(dst), dsize, angle, xShift, yShift, interpolation))
 end
 
@@ -173,7 +173,7 @@ function cv.cuda.pyrDown(t)
     local src, dst, dstSize, borderType = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
-        C.pyrDown(cutorch._state,
+        C.pyrDown(cv.cuda._info(),
             cv.wrap_tensor(src), cv.wrap_tensor(dst),
             dstSize, borderType))
 end
@@ -188,7 +188,7 @@ function cv.cuda.pyrUp(t)
     local src, dst, dstSize, borderType = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
-        C.pyrUp(cutorch._state,
+        C.pyrUp(cv.cuda._info(),
             cv.wrap_tensor(src), cv.wrap_tensor(dst),
             dstSize, borderType))
 end

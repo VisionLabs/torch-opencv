@@ -10,12 +10,12 @@ ffi.cdef[[
 struct PtrWrapper BackgroundSubtractorMOG_ctor(
         int History, int NMixtures, double BackgroundRatio, double NoiseSigma);
 
-struct TensorWrapper BackgroundSubtractorMOG_apply(THCState *state,
+struct TensorWrapper BackgroundSubtractorMOG_apply(struct cutorchInfo info,
                                                     struct PtrWrapper ptr, struct TensorWrapper image,
                                                     struct TensorWrapper fgmask, double learningRate);
 
 struct TensorWrapper BackgroundSubtractorMOG_getBackgroundImage(
-        THCState *state, struct PtrWrapper ptr,
+        struct cutorchInfo info, struct PtrWrapper ptr,
         struct TensorWrapper backgroundImage);
 
 void BackgroundSubtractorMOG_setHistory(struct PtrWrapper ptr, int val);
@@ -37,12 +37,12 @@ double BackgroundSubtractorMOG_getNoiseSigma(struct PtrWrapper ptr);
 struct PtrWrapper BackgroundSubtractorMOG2_ctor(
         int history, double varThreshold, bool detectShadows);
 
-struct TensorWrapper BackgroundSubtractorMOG2_apply(THCState *state,
+struct TensorWrapper BackgroundSubtractorMOG2_apply(struct cutorchInfo info,
         struct PtrWrapper ptr, struct TensorWrapper image,
         struct TensorWrapper fgmask, double learningRate);
 
 struct TensorWrapper BackgroundSubtractorMOG2_getBackgroundImage(
-        THCState *state, struct PtrWrapper ptr,
+        struct cutorchInfo info, struct PtrWrapper ptr,
         struct TensorWrapper backgroundImage);
 
 int BackgroundSubtractorMOG2_getHistory(struct PtrWrapper ptr);
@@ -119,7 +119,7 @@ do
             {"learningRate", default = -1}
         }
         return cv.unwrap_tensors(C.BackgroundSubtractor_apply(
-            cutorch._state, self.ptr, cv.argcheck(t, argRules)))
+            cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
     end
 
     function BackgroundSubtractorMOG:getBackgroundImage(t)
@@ -127,7 +127,7 @@ do
             {"backgroundImage", default = nil, operator = cv.wrap_tensor}
         }
         return cv.unwrap_tensors(C.BackgroundSubtractor_getBackgroundImage(
-            cutorch._state, self.ptr, cv.argcheck(t, argRules)))
+            cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
     end
 
     function BackgroundSubtractorMOG:setHistory(t)
@@ -194,7 +194,7 @@ do
             {"learningRate", default = -1}
         }
         return cv.unwrap_tensors(C.BackgroundSubtractor_apply(
-            cutorch._state, self.ptr, cv.argcheck(t, argRules)))
+            cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
     end
 
     function BackgroundSubtractorMOG2:getBackgroundImage(t)
@@ -204,7 +204,7 @@ do
         local backgroundImage = cv.argcheck(t, argRules)
 
         return cv.unwrap_tensors(C.BackgroundSubtractor_getBackgroundImage(
-            cutorch._state, self.ptr, cv.argcheck(t, argRules)))
+            cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
     end
 
     function BackgroundSubtractorMOG2:getHistory()

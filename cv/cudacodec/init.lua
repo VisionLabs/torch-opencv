@@ -55,7 +55,7 @@ struct PtrWrapper VideoReader_ctor(const char *filename);
 void VideoReader_dtor(struct PtrWrapper ptr);
 
 struct TensorWrapper VideoReader_nextFrame(
-        struct THCState *state, struct PtrWrapper ptr, struct TensorWrapper frame);
+        struct cutorchInfo info, struct PtrWrapper ptr, struct TensorWrapper frame);
 
 struct FormatInfo VideoReader_format(struct PtrWrapper ptr);
 ]]
@@ -185,7 +185,7 @@ do
         }
         local frame = cv.argcheck(t, argRules)
 
-        return cv.unwrap_tensors(C.VideoReader_nextFrame(cutorch._state,
+        return cv.unwrap_tensors(C.VideoReader_nextFrame(cv.cuda._info(),
             self.ptr, cv.wrap_tensor(frame)))
     end
 

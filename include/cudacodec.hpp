@@ -51,7 +51,7 @@ void VideoReader_dtor(struct VideoReaderPtr ptr);
 
 extern "C"
 struct TensorWrapper VideoReader_nextFrame(
-        struct THCState *state, struct VideoReaderPtr ptr, struct TensorWrapper frame);
+        struct cutorchInfo info, struct VideoReaderPtr ptr, struct TensorWrapper frame);
 
 extern "C"
 struct cudacodec::FormatInfo VideoReader_format(struct VideoReaderPtr ptr);

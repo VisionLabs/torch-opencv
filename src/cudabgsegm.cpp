@@ -9,25 +9,25 @@ struct BackgroundSubtractorMOGPtr BackgroundSubtractorMOG_ctor(
 }
 
 extern "C"
-struct TensorWrapper BackgroundSubtractorMOG_apply(THCState *state,
+struct TensorWrapper BackgroundSubtractorMOG_apply(struct cutorchInfo info,
                                                     struct BackgroundSubtractorMOGPtr ptr, struct TensorWrapper image,
                                                     struct TensorWrapper fgmask, double learningRate)
 {
     cuda::GpuMat retval;
     if (!fgmask.isNull()) retval = fgmask.toGpuMat();
     ptr->apply(image.toGpuMat(), retval, learningRate);
-    return TensorWrapper(retval, state);
+    return TensorWrapper(retval, info.state);
 }
 
 extern "C"
 struct TensorWrapper BackgroundSubtractorMOG_getBackgroundImage(
-        THCState *state, struct BackgroundSubtractorMOGPtr ptr,
+        struct cutorchInfo info, struct BackgroundSubtractorMOGPtr ptr,
         struct TensorWrapper backgroundImage)
 {
     cuda::GpuMat retval;
     if (!backgroundImage.isNull()) retval = backgroundImage.toGpuMat();
     ptr->getBackgroundImage(retval);
-    return TensorWrapper(retval, state);
+    return TensorWrapper(retval, info.state);
 }
 
 extern "C"
@@ -87,25 +87,25 @@ struct BackgroundSubtractorMOG2Ptr BackgroundSubtractorMOG2_ctor(
 }
 
 extern "C"
-struct TensorWrapper BackgroundSubtractorMOG2_apply(THCState *state,
+struct TensorWrapper BackgroundSubtractorMOG2_apply(struct cutorchInfo info,
         struct BackgroundSubtractorMOG2Ptr ptr, struct TensorWrapper image,
         struct TensorWrapper fgmask, double learningRate)
 {
     cuda::GpuMat retval;
     if (!fgmask.isNull()) retval = fgmask.toGpuMat();
     ptr->apply(image.toGpuMat(), retval, learningRate);
-    return TensorWrapper(retval, state);
+    return TensorWrapper(retval, info.state);
 }
 
 extern "C"
 struct TensorWrapper BackgroundSubtractorMOG2_getBackgroundImage(
-        THCState *state, struct BackgroundSubtractorMOG2Ptr ptr,
+        struct cutorchInfo info, struct BackgroundSubtractorMOG2Ptr ptr,
         struct TensorWrapper backgroundImage)
 {
     cuda::GpuMat retval;
     if (!backgroundImage.isNull()) retval = backgroundImage.toGpuMat();
     ptr->getBackgroundImage(retval);
-    return TensorWrapper(retval, state);
+    return TensorWrapper(retval, info.state);
 }
 
 extern "C"

@@ -7,7 +7,7 @@ cv.cuda = cv.cuda or require 'cv._env_cuda'
 local ffi = require 'ffi'
 
 ffi.cdef[[
-struct TensorWrapper DenseOpticalFlow_calc(struct THCState *state,
+struct TensorWrapper DenseOpticalFlow_calc(struct cutorchInfo info,
     struct PtrWrapper ptr, struct TensorWrapper I0, struct TensorWrapper I1,
     struct TensorWrapper flow);
 
@@ -174,7 +174,7 @@ do
         }
 
         return cv.unwrap_tensors(C.DenseOpticalFlow_calc(
-            cutorch._state, self.ptr, cv.argcheck(t, argRules)))
+            cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
     end
 end
 
@@ -191,7 +191,7 @@ do
         }
 
         return cv.unwrap_tensors(C.SparseOpticalFlow_calc(
-            cutorch._state, self.ptr, cv.argcheck(t, argRules)))
+            cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
     end
 end
 

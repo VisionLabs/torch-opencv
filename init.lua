@@ -307,7 +307,7 @@ function cv.wrap_tensors(...)
         args = args[1]
     end
 
-    wrapper = ffi.new("struct TensorArray")
+    local wrapper = ffi.new("struct TensorArray")
     wrapper.size = #args
     wrapper.tensors = ffi.gc(C.malloc(#args * ffi.sizeof("struct TensorWrapper *")), C.free)
 
@@ -326,7 +326,7 @@ function cv.unwrap_tensors(wrapper, toTable)
             return
         end
 
-        retval = empty_tensor_of_type(wrapper.typeCode)
+        local retval = empty_tensor_of_type(wrapper.typeCode)
 
         if wrapper.typeCode == cv.CV_CUDA then
             CUDACommon_C.transfer_tensor_CUDA(cutorch._state, retval:cdata(), wrapper.tensorPtr)
@@ -342,11 +342,11 @@ function cv.unwrap_tensors(wrapper, toTable)
             return
         end
 
-        retval = {}
+        local retval = {}
         for i = 0,wrapper.size-1 do
-            temp_tensor = empty_tensor_of_type(wrapper.tensors[i].typeCode)
-            C.transfer_tensor(temp_tensor:cdata(), wrapper.tensors[i].tensorPtr)
-            table.insert(retval, temp_tensor)
+            local tempTensor = empty_tensor_of_type(wrapper.tensors[i].typeCode)
+            C.transfer_tensor(tempTensor:cdata(), wrapper.tensors[i].tensorPtr)
+            table.insert(retval, tempTensor)
         end
 
         C.free(wrapper.tensors)
@@ -538,7 +538,7 @@ function cv.arrayToLua(array, outputType, output)
         retval = {}
     elseif outputType == 'Tensor' then
         -- ctype has the form 'ctype<struct IntArray>'
-        ctype = tostring(ffi.typeof(array))
+        local ctype = tostring(ffi.typeof(array))
         local typeStart = 14
         local typeEnd = ctype:find('Arr') - 1
         retval = torch[ctype:sub(typeStart, typeEnd) .. 'Tensor'](array.size)

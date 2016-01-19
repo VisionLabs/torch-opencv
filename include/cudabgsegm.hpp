@@ -25,13 +25,13 @@ struct BackgroundSubtractorMOGPtr BackgroundSubtractorMOG_ctor(
         int History, int NMixtures, double BackgroundRatio, double NoiseSigma);
 
 extern "C"
-struct TensorWrapper BackgroundSubtractorMOG_apply(THCState *state,
+struct TensorWrapper BackgroundSubtractorMOG_apply(struct cutorchInfo info,
                                                    struct BackgroundSubtractorMOGPtr ptr, struct TensorWrapper image,
                                                    struct TensorWrapper fgmask, double learningRate);
 
 extern "C"
 struct TensorWrapper BackgroundSubtractorMOG_getBackgroundImage(
-        THCState *state, struct BackgroundSubtractorMOGPtr ptr,
+        struct cutorchInfo info, struct BackgroundSubtractorMOGPtr ptr,
         struct TensorWrapper backgroundImage);
 
 extern "C"
@@ -63,13 +63,13 @@ struct BackgroundSubtractorMOG2Ptr BackgroundSubtractorMOG2_ctor(
         int history, double varThreshold, bool detectShadows);
 
 extern "C"
-struct TensorWrapper BackgroundSubtractorMOG2_apply(THCState *state,
+struct TensorWrapper BackgroundSubtractorMOG2_apply(struct cutorchInfo info,
                                                     struct BackgroundSubtractorMOG2Ptr ptr, struct TensorWrapper image,
                                                     struct TensorWrapper fgmask, double learningRate);
 
 extern "C"
 struct TensorWrapper BackgroundSubtractorMOG2_getBackgroundImage(
-        THCState *state, struct BackgroundSubtractorMOG2Ptr ptr,
+        struct cutorchInfo info, struct BackgroundSubtractorMOG2Ptr ptr,
         struct TensorWrapper backgroundImage);
 
 extern "C"

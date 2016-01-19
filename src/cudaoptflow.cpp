@@ -1,16 +1,16 @@
 #include <cudaoptflow.hpp>
 
-struct TensorWrapper DenseOpticalFlow_calc(struct THCState *state,
+struct TensorWrapper DenseOpticalFlow_calc(struct cutorchInfo info,
     struct DenseOpticalFlowPtr ptr, struct TensorWrapper I0, struct TensorWrapper I1,
     struct TensorWrapper flow)
 {
     cuda::GpuMat retval;
     if (!flow.isNull()) retval = flow.toGpuMat();
     ptr->calc(I0.toGpuMat(), I1.toGpuMat(), retval);
-    return TensorWrapper(retval, state);
+    return TensorWrapper(retval, info.state);
 }
 
-struct TensorArray SparseOpticalFlow_calc(struct THCState *state,
+struct TensorArray SparseOpticalFlow_calc(struct cutorchInfo info,
     struct SparseOpticalFlowPtr ptr, struct TensorWrapper prevImg, struct TensorWrapper nextImg,
     struct TensorWrapper prevPts, struct TensorWrapper nextPts, struct TensorWrapper status,
     bool outputErr, struct TensorWrapper err)
@@ -23,7 +23,7 @@ struct TensorArray SparseOpticalFlow_calc(struct THCState *state,
     ptr->calc(prevImg.toGpuMat(), nextImg.toGpuMat(), prevPts.toGpuMat(),
             retval[0], retval[1], outputErr ? retval[2] : cv::noArray());
 
-    return TensorArray(retval, state);
+    return TensorArray(retval, info.state);
 }
 
 extern "C"

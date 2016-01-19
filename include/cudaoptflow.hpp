@@ -65,7 +65,7 @@ struct OpticalFlowDual_TVL1Ptr {
     inline cuda::OpticalFlowDual_TVL1 & operator*() { return *static_cast<cuda::OpticalFlowDual_TVL1 *>(this->ptr); }
 };
 
-struct TensorWrapper DenseOpticalFlow_calc(struct THCState *state,
+struct TensorWrapper DenseOpticalFlow_calc(struct cutorchInfo info,
                                            struct DenseOpticalFlowPtr ptr, struct TensorWrapper I0, struct TensorWrapper I1,
                                            struct TensorWrapper flow);
 

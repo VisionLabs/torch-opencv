@@ -1,20 +1,5 @@
 #include <cudafilters.hpp>
 
-/*  Whenever we call an OpenCV-CUDA function from Lua, it's necessary
- *  to tell OpenCV which device and stream currently in use by cutorch.
- *  For this, as `cv.cuda<whatever` is required and loaded, it stores a single
- *  `cv::cuda::Stream` object. When invoking an OpenCV function, we must
- *  refresh that object and pass through a reference to it. */
-
-// Create that object
-FakeStream fakeStream;
-
-cuda::Stream & prepareStream(cutorchInfo info) {
-    cuda::setDevice(info.deviceID - 1);
-    fakeStream.impl_ = cv::makePtr<FakeStreamImpl>(info.state->currentStream);
-    return *reinterpret_cast<cuda::Stream *>(&fakeStream);
-}
-
 extern "C"
 struct TensorWrapper Filter_apply(cutorchInfo info,
     struct FilterPtr ptr, struct TensorWrapper src, struct TensorWrapper dst)

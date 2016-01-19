@@ -60,12 +60,12 @@ void VideoReader_dtor(struct VideoReaderPtr ptr)
 
 extern "C"
 struct TensorWrapper VideoReader_nextFrame(
-        struct THCState *state, struct VideoReaderPtr ptr, struct TensorWrapper frame)
+        struct cutorchInfo info, struct VideoReaderPtr ptr, struct TensorWrapper frame)
 {
     if (frame.isNull()) {
         cuda::GpuMat retval;
         ptr->nextFrame(retval);
-        return TensorWrapper(retval, state);
+        return TensorWrapper(retval, info.state);
     } else {
         ptr->nextFrame(frame.toGpuMat());
         return frame;
