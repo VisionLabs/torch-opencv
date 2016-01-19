@@ -8,14 +8,17 @@ struct TensorWrapper remap(struct cutorchInfo info,
 {
     if (dst.isNull()) {
         cuda::GpuMat retval;
-        cuda::remap(src.toGpuMat(), retval, map1.toGpuMat(), map2.toGpuMat(), interpolation, borderMode, borderValue);
+        cuda::remap(src.toGpuMat(), retval, map1.toGpuMat(), map2.toGpuMat(),
+                    interpolation, borderMode, borderValue, prepareStream(info));
         return TensorWrapper(retval, info.state);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cuda::GpuMat source = src.toGpuMat();
-        cuda::remap(source, source, map1.toGpuMat(), map2.toGpuMat(), interpolation, borderMode, borderValue);
+        cuda::remap(source, source, map1.toGpuMat(), map2.toGpuMat(), interpolation,
+                    borderMode, borderValue, prepareStream(info));
     } else {
-        cuda::remap(src.toGpuMat(), dst.toGpuMat(), map1.toGpuMat(), map2.toGpuMat(), interpolation, borderMode, borderValue);
+        cuda::remap(src.toGpuMat(), dst.toGpuMat(), map1.toGpuMat(), map2.toGpuMat(),
+                    interpolation, borderMode, borderValue, prepareStream(info));
     }
     return dst;
 }
@@ -28,7 +31,7 @@ struct TensorWrapper resize(struct cutorchInfo info,
 {
     cuda::GpuMat retval;
     if (!dst.isNull()) retval = dst.toGpuMat();
-    cuda::resize(src.toGpuMat(), retval, dsize, fx, fy, interpolation);
+    cuda::resize(src.toGpuMat(), retval, dsize, fx, fy, interpolation, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
 
@@ -41,14 +44,17 @@ struct TensorWrapper warpAffine(struct cutorchInfo info,
 {
     if (dst.isNull()) {
         cuda::GpuMat retval;
-        cuda::warpAffine(src.toGpuMat(), retval, M.toGpuMat(), dsize, flags, borderMode, borderValue);
+        cuda::warpAffine(src.toGpuMat(), retval, M.toGpuMat(), dsize, flags,
+                         borderMode, borderValue, prepareStream(info));
         return TensorWrapper(retval, info.state);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cuda::GpuMat source = src.toGpuMat();
-        cuda::warpAffine(source, source, M.toGpuMat(), dsize, flags, borderMode, borderValue);
+        cuda::warpAffine(source, source, M.toGpuMat(), dsize, flags, borderMode,
+                         borderValue, prepareStream(info));
     } else {
-        cuda::warpAffine(src.toGpuMat(), dst.toGpuMat(), M.toGpuMat(), dsize, flags, borderMode, borderValue);
+        cuda::warpAffine(src.toGpuMat(), dst.toGpuMat(), M.toGpuMat(), dsize,
+                         flags, borderMode, borderValue, prepareStream(info));
     }
     return dst;
 }
@@ -62,7 +68,8 @@ struct TensorArray buildWarpAffineMaps(
     if (!xmap.isNull()) retval[0] = xmap.toGpuMat();
     if (!ymap.isNull()) retval[1] = ymap.toGpuMat();
 
-    cuda::buildWarpAffineMaps(M.toGpuMat(), inverse, dsize, retval[0], retval[1]);
+    cuda::buildWarpAffineMaps(M.toGpuMat(), inverse, dsize,
+                              retval[0], retval[1], prepareStream(info));
 
     return TensorArray(retval, info.state);
 }
@@ -75,14 +82,17 @@ struct TensorWrapper warpPerspective(struct cutorchInfo info,
 {
     if (dst.isNull()) {
         cuda::GpuMat retval;
-        cuda::warpPerspective(src.toGpuMat(), retval, M.toGpuMat(), dsize, flags, borderMode, borderValue);
+        cuda::warpPerspective(src.toGpuMat(), retval, M.toGpuMat(), dsize,
+                              flags, borderMode, borderValue, prepareStream(info));
         return TensorWrapper(retval, info.state);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cuda::GpuMat source = src.toGpuMat();
-        cuda::warpPerspective(source, source, M.toGpuMat(), dsize, flags, borderMode, borderValue);
+        cuda::warpPerspective(source, source, M.toGpuMat(), dsize, flags,
+                              borderMode, borderValue, prepareStream(info));
     } else {
-        cuda::warpPerspective(src.toGpuMat(), dst.toGpuMat(), M.toGpuMat(), dsize, flags, borderMode, borderValue);
+        cuda::warpPerspective(src.toGpuMat(), dst.toGpuMat(), M.toGpuMat(),
+                              dsize, flags, borderMode, borderValue, prepareStream(info));
     }
     return dst;
 }
@@ -96,7 +106,8 @@ struct TensorArray buildWarpPerspectiveMaps(
     if (!xmap.isNull()) retval[0] = xmap.toGpuMat();
     if (!ymap.isNull()) retval[1] = ymap.toGpuMat();
 
-    cuda::buildWarpPerspectiveMaps(M.toGpuMat(), inverse, dsize, retval[0], retval[1]);
+    cuda::buildWarpPerspectiveMaps(M.toGpuMat(), inverse, dsize,
+                                   retval[0], retval[1], prepareStream(info));
 
     return TensorArray(retval, info.state);
 }
@@ -108,7 +119,8 @@ struct TensorWrapper rotate(
 {
     cuda::GpuMat dstMat;
     if (!dst.isNull()) dstMat = dst.toGpuMat();
-    cuda::rotate(src.toGpuMat(), dstMat, dsize, angle, xShift, yShift, interpolation);
+    cuda::rotate(src.toGpuMat(), dstMat, dsize, angle, xShift, yShift,
+                 interpolation, prepareStream(info));
     return TensorWrapper(dstMat, info.state);
 }
 
@@ -118,14 +130,14 @@ struct TensorWrapper pyrDown(struct cutorchInfo info,
 {
     if (dst.isNull()) {
         cuda::GpuMat retval;
-        cuda::pyrDown(src.toGpuMat(), retval);
+        cuda::pyrDown(src.toGpuMat(), retval, prepareStream(info));
         return TensorWrapper(retval, info.state);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cuda::GpuMat source = src.toGpuMat();
-        cuda::pyrDown(source, source);
+        cuda::pyrDown(source, source, prepareStream(info));
     } else {
-        cuda::pyrDown(src.toGpuMat(), dst.toGpuMat());
+        cuda::pyrDown(src.toGpuMat(), dst.toGpuMat(), prepareStream(info));
     }
     return dst;
 }
@@ -136,14 +148,14 @@ struct TensorWrapper pyrUp(struct cutorchInfo info,
 {
     if (dst.isNull()) {
         cuda::GpuMat retval;
-        cuda::pyrUp(src.toGpuMat(), retval);
+        cuda::pyrUp(src.toGpuMat(), retval, prepareStream(info));
         return TensorWrapper(retval, info.state);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cuda::GpuMat source = src.toGpuMat();
-        cuda::pyrUp(source, source);
+        cuda::pyrUp(source, source, prepareStream(info));
     } else {
-        cuda::pyrUp(src.toGpuMat(), dst.toGpuMat());
+        cuda::pyrUp(src.toGpuMat(), dst.toGpuMat(), prepareStream(info));
     }
     return dst;
 }

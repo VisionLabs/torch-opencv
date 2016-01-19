@@ -6,7 +6,7 @@ struct TensorWrapper DenseOpticalFlow_calc(struct cutorchInfo info,
 {
     cuda::GpuMat retval;
     if (!flow.isNull()) retval = flow.toGpuMat();
-    ptr->calc(I0.toGpuMat(), I1.toGpuMat(), retval);
+    ptr->calc(I0.toGpuMat(), I1.toGpuMat(), retval, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
 
@@ -21,7 +21,7 @@ struct TensorArray SparseOpticalFlow_calc(struct cutorchInfo info,
     if (!err.isNull())     retval[2] = err.toGpuMat();
 
     ptr->calc(prevImg.toGpuMat(), nextImg.toGpuMat(), prevPts.toGpuMat(),
-            retval[0], retval[1], outputErr ? retval[2] : cv::noArray());
+            retval[0], retval[1], outputErr ? retval[2] : cv::noArray(), prepareStream(info));
 
     return TensorArray(retval, info.state);
 }
