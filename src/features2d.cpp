@@ -1,33 +1,5 @@
 #include <features2d.hpp>
 
-KeyPointWrapper::KeyPointWrapper(const cv::KeyPoint & other) {
-    this->pt = other.pt;
-    this->size = other.size;
-    this->angle = other.angle;
-    this->response = other.response;
-    this->octave = other.octave;
-    this->class_id = other.class_id;
-}
-
-KeyPointArray::KeyPointArray(const std::vector<cv::KeyPoint> & v)
-{
-    this->size = v.size();
-    this->data = static_cast<KeyPointWrapper *>(
-            malloc(sizeof(KeyPointWrapper) * (this->size + 1)));
-    for (int i = 1; i <= this->size; ++i) {
-        this->data[i] = v[i];
-    }
-}
-
-KeyPointArray::operator std::vector<cv::KeyPoint>()
-{
-    std::vector<cv::KeyPoint> retval(this->size);
-    for (int i = 0; i < this->size; ++i) {
-        retval[i] = this->data[i];
-    }
-    return retval;
-}
-
 // KeyPointsFilter
 
 extern "C"

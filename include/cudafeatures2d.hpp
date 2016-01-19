@@ -11,3 +11,12 @@ struct DescriptorMatcherPtr {
     inline cuda::DescriptorMatcher & operator*() { return *static_cast<cuda::DescriptorMatcher *>(this->ptr); }
 };
 
+// Feature2DAsync
+
+struct Feature2DAsyncPtr {
+    void *ptr;
+    inline cuda::Feature2DAsync * operator->() { return static_cast<cuda::Feature2DAsync *>(ptr); }
+    inline Feature2DAsyncPtr(cuda::Feature2DAsync *ptr) { this->ptr = ptr; }
+    inline cuda::Feature2DAsync & operator*() { return *static_cast<cuda::Feature2DAsync *>(this->ptr); }
+};
+

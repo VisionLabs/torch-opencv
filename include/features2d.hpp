@@ -3,29 +3,6 @@
 #include <flann.hpp>
 #include <opencv2/features2d.hpp>
 
-struct KeyPointWrapper {
-    struct Point2fWrapper pt;
-    float size, angle, response;
-    int octave, class_id;
-
-    KeyPointWrapper(const cv::KeyPoint & other);
-    inline operator cv::KeyPoint() { return cv::KeyPoint(pt, size, angle, response, octave, class_id); }
-};
-
-struct KeyPointArray {
-    struct KeyPointWrapper *data;
-    int size;
-
-    KeyPointArray() {}
-    KeyPointArray(const std::vector<cv::KeyPoint> & v);
-    operator std::vector<cv::KeyPoint>();
-};
-
-struct TensorPlusKeyPointArray {
-    struct TensorWrapper tensor;
-    struct KeyPointArray keypoints;
-};
-
 struct evaluateFeatureDetectorRetval {
     struct KeyPointArray keypoints1, keypoints2;
     float repeatability;

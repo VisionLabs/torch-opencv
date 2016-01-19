@@ -23,7 +23,7 @@ extern "C" float getFloatMax() { return FLT_MAX; }
 #define TO_GPUMAT_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toGpuMat())
 
 #define TO_MAT_LIST_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toMatList())
-#define TO_GPUMAT_LIST_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toGpuMatList())
+#define TO_GPUMAT_LIST_OR_NOARRAY(mat) (mat.isNull() ? std::vector<cuda::GpuMat>() : mat.toGpuMatList())
 
 struct TensorWrapper {
     void *tensorPtr;
@@ -216,6 +216,24 @@ struct DMatchArrayOfArrays {
     operator std::vector<std::vector<cv::DMatch>>();
 };
 
+struct KeyPointWrapper {
+    struct Point2fWrapper pt;
+    float size, angle, response;
+    int octave, class_id;
+
+    KeyPointWrapper(const cv::KeyPoint & other);
+    inline operator cv::KeyPoint() { return cv::KeyPoint(pt, size, angle, response, octave, class_id); }
+};
+
+struct KeyPointArray {
+    struct KeyPointWrapper *data;
+    int size;
+
+    KeyPointArray() {}
+    KeyPointArray(const std::vector<cv::KeyPoint> & v);
+    operator std::vector<cv::KeyPoint>();
+};
+
 /***************** Helper wrappers for [OpenCV class + some primitive] *****************/
 
 struct TensorPlusDouble {
@@ -335,6 +353,11 @@ struct TensorArrayPlusRectArray {
 struct TensorPlusPointArray {
     struct TensorWrapper tensor;
     struct PointArray points;
+};
+
+struct TensorPlusKeyPointArray {
+    struct TensorWrapper tensor;
+    struct KeyPointArray keypoints;
 };
 
 // Arrays of arrays
