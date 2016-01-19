@@ -28,12 +28,17 @@ cuda.CHROMA_FORMAT_YUV420 = 1
 cuda.CHROMA_FORMAT_YUV422 = 2
 cuda.CHROMA_FORMAT_YUV444 = 3
 
-cuda._cvDummyStream = C.getEmptyStream()
+local ffi = require 'ffi'
 
-function cuda.getStreamInfo()
-	local cutorchState = cutorch._state
-	C.updateCvDummyStream(cuda._cvDummyStream, cutorchState)
-	return cuda._cvDummyStream, cutorchState
+ffi.cdef[[
+struct cutorchInfo {
+    int deviceID;
+    struct THCState *state;
+};
+]]
+
+function cuda._info()
+    return ffi.new('struct cutorchInfo', cutorch.getDevice(), cutorch._state)
 end
 
 return cuda

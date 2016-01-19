@@ -2,7 +2,7 @@ local cv = require 'cv._env'
 require 'cutorch'
 
 -- TODO: remove this after gathering all CUDA packages in a single submodule
-cv.cuda = cv.cuda or {}
+cv.cuda = cv.cuda or require 'cv._env_cuda'
 
 local ffi = require 'ffi'
 

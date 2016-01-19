@@ -1,43 +1,28 @@
 #include <cudafilters.hpp>
 
-namespace {
-    class StackAllocator;
-}
+/*  Whenever we call an OpenCV-CUDA function from Lua, it's necessary
+ *  to tell OpenCV which device and stream currently in use by cutorch.
+ *  For this, as `cv.cuda<whatever` is required and loaded, it stores a single
+ *  `cv::cuda::Stream` object. When invoking an OpenCV function, we must
+ *  refresh that object and pass through a reference to it. */
 
-class FakeStreamImpl {
-public:
-    cudaStream_t stream;
-    bool ownStream;
+// Create that object
+FakeStream fakeStream;
 
-    cv::Ptr<StackAllocator> stackAllocator;
-
-    FakeStreamImpl();
-    explicit FakeStreamImpl(cudaStream_t stream);
-
-    ~FakeStreamImpl();
-};
-
-class FakeStream {
-    cv::Ptr <FakeStreamImpl> impl_;
-};
-
-extern "C"
-void f(cuda::Stream *x) {
-}
-
-cuda::Stream cutorchToOpenCVStream(THCState *state) {
-
-    state->currentStream;
+cuda::Stream & prepareStream(cutorchInfo info) {
+    cuda::setDevice(info.deviceID - 1);
+    fakeStream.impl_ = cv::makePtr<FakeStreamImpl>(info.state->currentStream);
+    return *reinterpret_cast<cuda::Stream *>(&fakeStream);
 }
 
 extern "C"
-struct TensorWrapper Filter_apply(struct THCState *state,
+struct TensorWrapper Filter_apply(cutorchInfo info,
     struct FilterPtr ptr, struct TensorWrapper src, struct TensorWrapper dst)
 {
     cuda::GpuMat retval;
     if (!dst.isNull()) retval = dst.toGpuMat();
-    ptr->apply(src.toGpuMat(), retval);
-    return TensorWrapper(retval, state);
+    ptr->apply(src.toGpuMat(), retval, prepareStream(info));
+    return TensorWrapper(retval, info.state);
 }
 
 extern "C"

@@ -2,12 +2,12 @@ local cv = require 'cv._env'
 require 'cutorch'
 
 -- TODO: remove this after gathering all CUDA packages in a single submodule
-cv.cuda = cv.cuda or {}
+cv.cuda = cv.cuda or require 'cv._env_cuda'
 
 local ffi = require 'ffi'
 
 ffi.cdef[[
-struct TensorWrapper Filter_apply(struct THCState *state,
+struct TensorWrapper Filter_apply(struct cutorchInfo info,
     struct PtrWrapper ptr, struct TensorWrapper src, struct TensorWrapper dst);
 
 struct PtrWrapper createBoxFilter(
@@ -80,7 +80,7 @@ do
         local src, dst = cv.argcheck(t, argRules)
 
         return cv.unwrap_tensors(C.Filter_apply(
-            cutorch._state, self.ptr, cv.wrap_tensor(src), cv.wrap_tensor(dst)))
+            cv.cuda._info(), self.ptr, cv.wrap_tensor(src), cv.wrap_tensor(dst)))
     end
 end
 

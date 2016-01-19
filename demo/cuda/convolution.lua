@@ -31,8 +31,6 @@ local edges = conv:convolve{image, filter}
 cv.imshow{"Edges", edges:float()}
 cv.waitKey{0}
 
-print(edges:size())
-
 require 'cv.cudafilters'
 
 -- You can also get `cv.CV_32F` value by calling 
@@ -42,5 +40,3 @@ edges = Sobel:apply{image}
 
 cv.imshow{"Edges", edges:float()}
 cv.waitKey{0}
-
-print(edges:size())

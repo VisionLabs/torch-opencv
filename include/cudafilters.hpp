@@ -12,7 +12,7 @@ struct FilterPtr {
 };
 
 extern "C"
-struct TensorWrapper Filter_apply(struct THCState *state,
+struct TensorWrapper Filter_apply(struct cutorchInfo info,
     struct FilterPtr ptr, struct TensorWrapper src, struct TensorWrapper dst);
 
 extern "C"
