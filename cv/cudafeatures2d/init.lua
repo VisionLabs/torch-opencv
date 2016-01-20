@@ -251,4 +251,49 @@ do
     end
 end
 
+do
+    local Feature2DAsync = torch.class('cuda.Feature2DAsync', cv.cuda)
+
+    function Feature2DAsync:detectAsync(t)
+        local argRules = {
+            {"image", required = true, operator = cv.wrap_tensor},
+            {"keypoints", default = nil, operator = cv.wrap_tensor},
+            {"mask", default = nil, operator = cv.wrap_tensor}
+        }
+        return cv.unwrap_tensors(C.Feature2DAsync_detectAsync(
+            cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
+    end
+
+    function Feature2DAsync:computeAsync(t)
+        local argRules = {
+            {"image", required = true, operator = cv.wrap_tensor},
+            {"keypoints", default = nil, operator = cv.wrap_tensor},
+            {"descriptors", default = nil, operator = cv.wrap_tensor}
+        }
+        return cv.unwrap_tensors(C.Feature2DAsync_computeAsync(
+            cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
+    end
+
+    function Feature2DAsync:detectAndComputeAsync(t)
+        local argRules = {
+            {"image", required = true, operator = cv.wrap_tensor},
+            {"mask", default = nil, operator = cv.wrap_tensor},
+            {"keypoints", default = nil, operator = cv.wrap_tensor},
+            {"descriptors", default = nil, operator = cv.wrap_tensor},
+            {"useProvidedKeypoints", default = false}
+        }
+        return cv.unwrap_tensors(C.Feature2DAsync_detectAndComputeAsync(
+            cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
+    end
+
+    function Feature2DAsync:convert(t)
+        local argRules = {
+            {"gpu_keypoints", required = true, operator = cv.wrap_tensor}
+        }
+        return cv.gcarray(C.Feature2DAsync_convert(self.ptr, cv.argcheck(t, argRules)))
+    end
+end
+
+
+
 return cv.cuda
