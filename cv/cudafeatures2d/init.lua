@@ -1,5 +1,6 @@
 local cv = require 'cv._env'
 require 'cutorch'
+require 'cv.features2d'
 
 -- TODO: remove this after gathering all CUDA packages in a single submodule
 cv.cuda = cv.cuda or require 'cv._env_cuda'
@@ -82,10 +83,10 @@ struct TensorArray Feature2DAsync_detectAndComputeAsync(
 struct KeyPointArray Feature2DAsync_convert(
         struct Feature2DAsyncPtr ptr, struct TensorWrapper gpu_keypoints);
 
-struct FastFeatureDetectorPtr FasfFeatureDetector_ctor(
+struct FastFeatureDetectorPtr FastFeatureDetector_ctor(
         int threshold, bool nonmaxSuppression, int type, int max_npoints);
 
-void FasfFeatureDetector_dtor(struct FastFeatureDetectorPtr ptr);
+void FastFeatureDetector_dtor(struct FastFeatureDetectorPtr ptr);
 
 void FastFeatureDetector_setMaxNumPoints(struct FastFeatureDetectorPtr ptr, int val);
 
@@ -95,7 +96,7 @@ struct ORBPtr ORB_ctor(
         int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, 
         int WTA_K, int scoreType, int patchSize, int fastThreshold, bool blurForDescriptor);
 
-void FasfFeatureDetector_dtor(struct ORBPtr ptr);
+void FastFeatureDetector_dtor(struct ORBPtr ptr);
 
 void ORB_setBlurForDescriptor(struct ORBPtr ptr, bool val);
 
@@ -252,9 +253,9 @@ do
 end
 
 do
-    local Feature2DAsync = torch.class('cuda.Feature2DAsync', cv.cuda)
+    local Feature2DAsync = torch.class('cuda.Feature2DAsync', 'cv.Feature2D', cv.cuda)
 
-    function Feature2DAsync:detectAsync(t)
+    function Feature2DAsync:detect(t)
         local argRules = {
             {"image", required = true, operator = cv.wrap_tensor},
             {"keypoints", default = nil, operator = cv.wrap_tensor},
@@ -264,7 +265,7 @@ do
             cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
     end
 
-    function Feature2DAsync:computeAsync(t)
+    function Feature2DAsync:compute(t)
         local argRules = {
             {"image", required = true, operator = cv.wrap_tensor},
             {"keypoints", default = nil, operator = cv.wrap_tensor},
@@ -274,7 +275,7 @@ do
             cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
     end
 
-    function Feature2DAsync:detectAndComputeAsync(t)
+    function Feature2DAsync:detectAndCompute(t)
         local argRules = {
             {"image", required = true, operator = cv.wrap_tensor},
             {"mask", default = nil, operator = cv.wrap_tensor},
@@ -294,6 +295,31 @@ do
     end
 end
 
+do
+    local FastFeatureDetector = torch.class(
+        'cuda.FastFeatureDetector', 'cuda.Feature2DAsync', cv.cuda)
 
+    function FastFeatureDetector:__init(t)
+        local argRules = {
+            {"threshold", default = 10},
+            {"nonmaxSuppression", default = true},
+            {"type", default = cv.FastFeatureDetector_TYPE_9_16},
+            {"max_npoints", default = 5000}
+        }
+        self.ptr = ffi.gc(C.FastFeatureDetector_ctor(
+            cv.argcheck(t, argRules), C.Feature2DAsync_dtor)
+    end
+
+    function FastFeatureDetector:setMaxNumPoints(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        C.FastFeatureDetector_setMaxNumPoints(self.ptr, cv.argcheck(t, argRules))
+    end
+
+    function FastFeatureDetector:getMaxNumPoints()
+        return C.FastFeatureDetector_getMaxNumPoints(self.ptr)
+    end
+end
 
 return cv.cuda

@@ -204,17 +204,11 @@ struct KeyPointArray Feature2DAsync_convert(
 }
 
 extern "C"
-struct FastFeatureDetectorPtr FasfFeatureDetector_ctor(
+struct FastFeatureDetectorPtr FastFeatureDetector_ctor(
         int threshold, bool nonmaxSuppression, int type, int max_npoints)
 {
     return rescueObjectFromPtr(
             cuda::FastFeatureDetector::create(threshold, nonmaxSuppression, type, max_npoints));
-}
-
-extern "C"
-void FasfFeatureDetector_dtor(struct FastFeatureDetectorPtr ptr)
-{
-    delete static_cast<cuda::FasfFeatureDetector *>(ptr.ptr);
 }
 
 extern "C"
@@ -237,12 +231,6 @@ struct ORBPtr ORB_ctor(
     return rescueObjectFromPtr(
             cuda::ORB::create(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel,
             WTA_K, scoreType, patchSize, fastThreshold, blurForDescriptor));
-}
-
-extern "C"
-void FasfFeatureDetector_dtor(struct ORBPtr ptr)
-{
-    delete static_cast<cuda::ORB *>(ptr.ptr);
 }
 
 extern "C"
