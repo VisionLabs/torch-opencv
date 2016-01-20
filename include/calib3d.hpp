@@ -113,4 +113,40 @@ struct TensorWrapper findHomography2(
 	struct TensorWrapper srcPoints, struct TensorWrapper dstPoints,
 	struct TensorWrapper mask, int method, double ransacReprojThreshold);
 
+extern "C"
+struct TensorPlusRect getOptimalNewCameraMatrix(
+	struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+	struct SizeWrapper imageSize, double alpha, struct SizeWrapper newImgSize,
+	bool centerPrincipalPoint);
+
+extern "C"
+struct RectWrapper getValidDisparityROI(
+	struct RectWrapper roi1, struct RectWrapper roi2,
+	int minDisparity, int numberOfDisparities, int SADWindowSize);
+
+extern "C"
+struct TensorWrapper initCameraMatrix2D(
+	struct TensorArray objectPoints, struct TensorArray imagePoints,
+   	struct SizeWrapper imageSize, double aspectRatio);
+
+extern "C"
+struct TensorArray matMulDeriv(
+	struct TensorWrapper A, struct TensorWrapper B);
+
+extern "C"
+struct TensorArray projectPoints(
+	struct TensorWrapper objectPoints, struct TensorWrapper rvec,
+	struct TensorWrapper tvec, struct TensorWrapper cameraMatrix,
+	struct TensorWrapper distCoeffs, struct TensorWrapper imagePoints,
+	struct TensorWrapper jacobian, double aspectRatio);
+
+extern "C"
+struct TensorArrayPlusInt recoverPose(
+	struct TensorWrapper E, struct TensorWrapper points1,
+	struct TensorWrapper points2, double focal,
+	struct Point2dWrapper pp, struct TensorWrapper mask);
+
+	
+
+
 

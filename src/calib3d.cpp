@@ -241,6 +241,78 @@ struct TensorWrapper findHomography2(
                                             ransacReprojThreshold));
 }
 
+extern "C"
+struct TensorPlusRect getOptimalNewCameraMatrix(
+	struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+	struct SizeWrapper imageSize, double alpha, struct SizeWrapper newImgSize,
+	bool centerPrincipalPoint)
+{
+    struct TensorPlusRect result;
+    cv::Rect* validPixROI;
+    new(&result.tensor) TensorWrapper(
+				cv::getOptimalNewCameraMatrix(cameraMatrix.toMat(), distCoeffs.toMat(),
+	                                              	      imageSize, alpha, newImgSize,
+                                                              validPixROI, centerPrincipalPoint));
+    result.rect = *validPixROI;
+    return result;
+}
+
+extern "C"
+struct RectWrapper getValidDisparityROI(
+	struct RectWrapper roi1, struct RectWrapper roi2,
+	int minDisparity, int numberOfDisparities, int SADWindowSize)
+{
+    return RectWrapper(cv::getValidDisparityROI(roi1, roi2, minDisparity,
+                                                numberOfDisparities, SADWindowSize));
+}
+
+extern "C"
+struct TensorWrapper initCameraMatrix2D(
+	struct TensorArray objectPoints, struct TensorArray imagePoints,
+   	struct SizeWrapper imageSize, double aspectRatio)
+{
+    return TensorWrapper(cv::initCameraMatrix2D(objectPoints.toMatList(), imagePoints.toMatList(), imageSize, aspectRatio));
+}
+
+extern "C"
+struct TensorArray matMulDeriv(
+	struct TensorWrapper A, struct TensorWrapper B)
+{
+    std::vector<cv::Mat> result(2);
+    cv::matMulDeriv(A.toMat(), B.toMat(), result[0], result[1]);
+    return TensorArray(result);
+}
+
+extern "C"
+struct TensorArray projectPoints(
+	struct TensorWrapper objectPoints, struct TensorWrapper rvec,
+	struct TensorWrapper tvec, struct TensorWrapper cameraMatrix,
+	struct TensorWrapper distCoeffs, struct TensorWrapper imagePoints,
+	struct TensorWrapper jacobian, double aspectRatio)
+{
+    std::vector<cv::Mat> result;
+    if(!imagePoints.isNull()) result[0] = imagePoints.toMat();
+    if(!jacobian.isNull()) result[1] = jacobian.toMat();
+    cv::projectPoints(objectPoints.toMat(), rvec.toMat(), tvec.toMat(),
+                      cameraMatrix.toMat(), distCoeffs.toMat(), result[0],
+                      result[1], aspectRatio);
+    return TensorArray(result);
+}
+
+extern "C"
+struct TensorArrayPlusInt recoverPose(
+	struct TensorWrapper E, struct TensorWrapper points1,
+	struct TensorWrapper points2, double focal,
+	struct Point2dWrapper pp, struct TensorWrapper mask)
+{
+    struct TensorArrayPlusInt result;
+    std::vector<cv::Mat> vec(2);
+    result.val = cv::recoverPose(E.toMat(), points1.toMat(), points2.toMat(), vec[0],
+                                 vec[1], focal, pp, TO_MAT_OR_NOARRAY(mask));
+    new(&result.tensors) TensorArray(vec);
+    return result;
+}
+
 
 
 

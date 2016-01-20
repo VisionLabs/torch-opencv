@@ -129,6 +129,11 @@ struct TensorPlusBool {
     bool val;
 };
 
+struct TensorPlusRect {
+    struct TensorWrapper tensor;
+    struct RectWrapper rect;
+};
+
 struct TensorArrayPlusInt {
     struct TensorArray tensors;
     int val;

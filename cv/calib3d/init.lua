@@ -51,7 +51,6 @@ void drawChessboardCorners(
 	struct TensorWrapper image, struct SizeWrapper patternSize,
 	struct TensorWrapper corners, bool patternWasFound);
 
-extern "C"
 struct TensorArrayPlusInt estimateAffine3D(
 	struct TensorWrapper src, struct TensorWrapper dst,
 	double ransacThreshold, double confidence);
@@ -92,6 +91,34 @@ struct TensorWrapper findHomography(
 struct TensorWrapper findHomography2(
 	struct TensorWrapper srcPoints, struct TensorWrapper dstPoints,
 	struct TensorWrapper mask, int method, double ransacReprojThreshold);
+
+struct TensorPlusRect getOptimalNewCameraMatrix(
+	struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+	struct SizeWrapper imageSize, double alpha, struct SizeWrapper newImgSize,
+	bool centerPrincipalPoint);
+
+struct RectWrapper getValidDisparityROI(
+	struct RectWrapper roi1, struct RectWrapper roi2,
+	int minDisparity, int numberOfDisparities, int SADWindowSize);
+
+struct TensorWrapper initCameraMatrix2D(
+	struct TensorArray objectPoints, struct TensorArray imagePoints,
+   	struct SizeWrapper imageSize, double aspectRatio);
+
+struct TensorArray matMulDeriv(
+	struct TensorWrapper A, struct TensorWrapper B);
+
+struct TensorArray projectPoints(
+	struct TensorWrapper objectPoints, struct TensorWrapper rvec,
+	struct TensorWrapper tvec, struct TensorWrapper cameraMatrix,
+	struct TensorWrapper distCoeffs, struct TensorWrapper imagePoints,
+	struct TensorWrapper jacobian, double aspectRatio);
+
+struct TensorArrayPlusInt recoverPose(
+	struct TensorWrapper E, struct TensorWrapper points1,
+	struct TensorWrapper points2, double focal,
+	struct Point2dWrapper pp, struct TensorWrapper mask);
+
 ]]
 
 local C = ffi.load(cv.libPath('calib3d'))
@@ -382,6 +409,88 @@ function cv.findHomography2(t)
 				cv.wrap_tensor(srcPoints), cv.wrap_tensor(dstPoints),
 				cv.wrap_tensor(mask), method, ransacReprojThreshold))
 end
+
+function cv.getOptimalNewCameraMatrix(t)
+    local argRules = {
+       {"cameraMatrix", required = true},
+       {"distCoeffs", requierd = true},
+       {"imageSize", required = true, operator = cv.Size},
+       {"alpha", required = true},
+       {"newImgSize", default = cv.Size(), operator = cv.Size},
+       {"centerPrincipalPoint", default = false}}
+    local cameraMatrix, distCoeffs, imageSize, alpha,
+          newImgSize, centerPrincipalPoint = cv.argcheck(t, argRules)
+    local result  = C.getOptimalNewCameraMatrix(
+				cv.wrap_tensor(cameraMatrix), cv.wrap_tensor(distCoeffs),
+ 				imageSize, alpha, newImgSize, centerPrincipalPoint)
+    return cv.unwrap_tensors(result.tensor), result.rect
+end
+
+function cv.getValidDisparityROI(t)
+    local argRules = {
+        {"roi1", required = true},
+        {"roi2", required = true},
+        {"minDisparity", required = true},
+        {"numberOfDisparities", required = true},
+        {"SADWindowSize", required = true}}
+    local roi1, roi2, minDisparity, numberOfDisparities, SADWindowSize = cv.argcheck(t, argRules)
+    return C.getValidDisparityROI(roi1, roi2, minDisparity, numberOfDisparities, SADWindowSize)  
+end
+
+function cv.initCameraMatrix2D(t)
+    local argRules = {
+        {"objectPoints", required = true},
+        {"imagePoints", required = true},
+        {"imageSize", required = true, operator = cv.Size},
+        {"aspectRatio", default = 1.0}}
+    local objectPoints, imagePoints, imageSize, aspectRatio = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+			C.initCameraMatrix2D(
+				cv.wrap_tensors(objectPoints), cv.wrap_tensors(imagePoints),
+				imageSize, aspectRatio))
+end
+
+function matMulDeriv(t)
+    local argRules = {
+        {"A", required = true},
+        {"B", required = true}}
+    local A, B = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(C.matMulDeriv(A, B))
+end
+
+function cv.projectPoints(t)
+    local argRules = {
+        {"objectPoints", required = true},
+        {"rvec", required = true},
+        {"tvec", required = true},
+        {"cameraMatrix", required = true},
+        {"distCoeffs", required = true},
+        {"imagePoints", default = nil},
+        {"jacobian", default = nil},
+        {"aspectRatio", default = 0}}
+    local objectPoints, rvec, tvec, cameraMatrix, distCoeffs,
+          imagePoints, jacobian, aspectRatio = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+		C.projectPoints(
+			cv.wrap_tensor(objectPoints), cv.wrap_tensor(rvec),
+			cv.wrap_tensor(tvec), cv.wrap_tensor(cameraMatrix),
+			cv.wrap_tensor(distCoeffs), cv.wrap_tensor(imagePoints),
+			cv.wrap_tensor(jacobian), aspectRatio))
+end
+        
+function cv.recoverPose(t)
+    local argRules = {
+        {"E", required = true},
+        {"points1", required = true},
+        {"points2", required = true},
+        {"focal", default = 1.0},
+        {"Point2d", default = cv.Point2d(0,0), operator = cv.Point2d},
+        {"mask", default = nil}}
+    local E, points1, points2, focal, Point2d, mask = cv.argcheck(t, argRules)
+    local result = C.recoverPose(cv.wrap_tensor(E), cv.wrap_tensor(points1), cv.wrap_tensor(points2), focal, Point2d, mask)
+    return result.val, cv.unwrap_tensors(result.tensors)
+end
+
 
 return cv
 
