@@ -187,3 +187,57 @@ struct KeyPointArray Feature2DAsync_convert(
     ptr->convert(gpu_keypoints.toGpuMat(), retval);
     return KeyPointArray(retval);
 }
+
+extern "C"
+struct FastFeatureDetectorPtr FasfFeatureDetector_ctor(
+        int threshold, bool nonmaxSuppression, int type, int max_npoints)
+{
+    return rescueObjectFromPtr(
+            cuda::FastFeatureDetector::create(threshold, nonmaxSuppression, type, max_npoints));
+}
+
+extern "C"
+void FasfFeatureDetector_dtor(struct FastFeatureDetectorPtr ptr)
+{
+    delete static_cast<cuda::FasfFeatureDetector *>(ptr.ptr);
+}
+
+extern "C"
+void FastFeatureDetector_setMaxNumPoints(struct FastFeatureDetectorPtr ptr, int val)
+{
+    ptr->setMaxNumPoints(val);
+}
+
+extern "C"
+int FastFeatureDetector_getMaxNumPoints(struct FastFeatureDetectorPtr ptr)
+{
+    return ptr->setMaxNumPoints(val);
+}
+
+extern "C"
+struct ORBPtr ORB_ctor(
+        int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, 
+        int WTA_K, int scoreType, int patchSize, int fastThreshold, bool blurForDescriptor)
+{
+    return rescueObjectFromPtr(
+            cuda::ORB::create(nfeatures, scaleFactor, nlevels, edgeThreshold, firstLevel,
+            WTA_K, scoreType, patchSize, fastThreshold, blurForDescriptor));
+}
+
+extern "C"
+void FasfFeatureDetector_dtor(struct ORBPtr ptr)
+{
+    delete static_cast<cuda::ORB *>(ptr.ptr);
+}
+
+extern "C"
+void ORB_setBlurForDescriptor(struct ORBPtr ptr, bool val)
+{
+    ptr->setBlurForDescriptor(val);
+}
+
+extern "C"
+bool ORB_getBlurForDescriptor(struct ORBPtr ptr)
+{
+    return ptr->getBlurForDescriptor(val);
+}

@@ -20,3 +20,12 @@ struct Feature2DAsyncPtr {
     inline cuda::Feature2DAsync & operator*() { return *static_cast<cuda::Feature2DAsync *>(this->ptr); }
 };
 
+// FastFeatureDetector
+
+struct FastFeatureDetectorPtr {
+    void *ptr;
+    inline cuda::FastFeatureDetector * operator->() { return static_cast<cuda::FastFeatureDetector *>(ptr); }
+    inline FastFeatureDetectorPtr(cuda::FastFeatureDetector *ptr) { this->ptr = ptr; }
+    inline cuda::FastFeatureDetector & operator*() { return *static_cast<cuda::FastFeatureDetector *>(this->ptr); }
+};
+
