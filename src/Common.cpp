@@ -188,6 +188,20 @@ DMatchArrayOfArrays::operator std::vector<std::vector<cv::DMatch>>() {
 
 /***************** Helper wrappers for [OpenCV class + some primitive] *****************/
 
+Vec3dWrapper & Vec3dWrapper::operator=(cv::Vec3d & other) {
+   this->v0 = other[0];
+   this->v1 = other[1];
+   this->v2 = other[2];
+   return *this;
+}
+
+Vec3dWrapper::Vec3dWrapper(const cv::Vec3d & other) {
+   this->v0 = other[0];
+   this->v1 = other[1];
+   this->v2 = other[2];
+}
+   
+
 RectWrapper & RectWrapper::operator=(cv::Rect & other) {
     this->x = other.x;
     this->y = other.y;

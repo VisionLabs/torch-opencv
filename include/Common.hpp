@@ -128,6 +128,10 @@ struct Vec2dWrapper {
 
 struct Vec3dWrapper {
     double v0, v1, v2;
+    inline operator cv::Vec3d() { return cv::Vec3d(v0, v1, v2); }
+    Vec3dWrapper & operator=(cv::Vec3d & other);
+    Vec3dWrapper (const cv::Vec3d & other);
+    inline Vec3dWrapper() {}
 };
 
 struct Vec3fWrapper {
@@ -268,6 +272,11 @@ struct TensorArrayPlusBool {
     bool val;
 };
 
+struct TensorArrayPlusVec3d {
+    struct TensorArray tensors;
+    struct Vec3dWrapper vec3d;
+};
+
 struct RectPlusInt {
     struct RectWrapper rect;
     int val;
@@ -340,6 +349,12 @@ struct TensorPlusRectArray {
 struct TensorArrayPlusRectArray {
     struct TensorArray tensors;
     struct RectArray rects;
+};
+
+struct TensorArrayPlusRectArrayPlusFloat {
+    struct TensorArray tensors;
+    struct RectArray rects;
+    float val;
 };
 
 struct TensorPlusPointArray {

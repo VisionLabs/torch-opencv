@@ -154,9 +154,20 @@ struct TensorArrayPlusBool {
     bool val;
 };
 
+struct TensorArrayPlusVec3d {
+    struct TensorArray tensors;
+    struct Vec3dWrapper vec3d;
+};
+
 struct RectPlusInt {
     struct RectWrapper rect;
     int val;
+};
+
+struct TensorArrayPlusRectArrayPlusFloat {
+    struct TensorArray tensors;
+    struct RectArray rects;
+    float val;
 };
 
 struct ScalarPlusBool {

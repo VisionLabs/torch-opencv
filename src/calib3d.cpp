@@ -162,11 +162,14 @@ void filterSpeckles(
 }
 
 extern "C"
-void find4QuadCornerSubpix(
+struct TensorWrapper find4QuadCornerSubpix(
 	struct TensorWrapper img, struct TensorWrapper corners,
 	struct SizeWrapper region_size)
 {
-    cv::find4QuadCornerSubpix(img.toMat(), corners.toMat(), region_size);
+    cv::Mat corners_mat;
+    if(!corners.isNull()) corners_mat = corners.toMat();
+    cv::find4QuadCornerSubpix(img.toMat(), corners_mat, region_size);
+    return TensorWrapper(corners_mat);
 }
 
 extern "C"
@@ -250,9 +253,10 @@ struct TensorPlusRect getOptimalNewCameraMatrix(
     struct TensorPlusRect result;
     cv::Rect* validPixROI;
     new(&result.tensor) TensorWrapper(
-				cv::getOptimalNewCameraMatrix(cameraMatrix.toMat(), distCoeffs.toMat(),
-	                                              	      imageSize, alpha, newImgSize,
-                                                              validPixROI, centerPrincipalPoint));
+				cv::getOptimalNewCameraMatrix(
+						cameraMatrix.toMat(), distCoeffs.toMat(),
+	                                        imageSize, alpha, newImgSize,
+                                                validPixROI, centerPrincipalPoint));
     result.rect = *validPixROI;
     return result;
 }
@@ -271,7 +275,9 @@ struct TensorWrapper initCameraMatrix2D(
 	struct TensorArray objectPoints, struct TensorArray imagePoints,
    	struct SizeWrapper imageSize, double aspectRatio)
 {
-    return TensorWrapper(cv::initCameraMatrix2D(objectPoints.toMatList(), imagePoints.toMatList(), imageSize, aspectRatio));
+    return TensorWrapper(cv::initCameraMatrix2D(
+					objectPoints.toMatList(), imagePoints.toMatList(),
+					imageSize, aspectRatio));
 }
 
 extern "C"
@@ -313,6 +319,75 @@ struct TensorArrayPlusInt recoverPose(
     return result;
 }
 
+extern "C"
+struct TensorArrayPlusRectArrayPlusFloat rectify3Collinear(
+	struct TensorWrapper cameraMatrix1, struct TensorWrapper distCoeffs1,
+	struct TensorWrapper cameraMatrix2, struct TensorWrapper distCoeffs2,
+	struct TensorWrapper cameraMatrix3, struct TensorWrapper distCoeffs3,
+	struct TensorArray imgpt1, struct TensorArray imgpt3,
+	struct SizeWrapper imageSize, struct TensorWrapper R12,
+	struct TensorWrapper T12, struct TensorWrapper R13,
+	struct TensorWrapper T13, double alpha,
+	struct SizeWrapper newImgSize, int flags)
+{
+    struct TensorArrayPlusRectArrayPlusFloat result;
+    std::vector<cv::Mat> vec(7);
+    std::vector<cv::Rect> rec(2);
+    result.val = cv::rectify3Collinear(
+			cameraMatrix1.toMat(), distCoeffs1.toMat(), cameraMatrix2.toMat(),
+			distCoeffs2.toMat(), cameraMatrix3.toMat(), distCoeffs3.toMat(),
+			imgpt1.toMatList(), imgpt3.toMatList(), imageSize, R12.toMat(),
+			T12.toMat(), R13.toMat(), T13.toMat(), vec[0], vec[1], vec[2],
+			vec[3], vec[4], vec[5], vec[6], alpha, newImgSize,
+			&rec[0], &rec[1], flags);
+    new(&result.tensors) TensorArray(vec);
+    new(&result.rects) RectArray(rec);
+    return result;
+}
+
+extern "C"
+struct TensorWrapper reprojectImageTo3D(
+	struct TensorWrapper disparity, struct TensorWrapper _3dImage,
+	struct TensorWrapper Q, bool handleMissingValues, int ddepth)
+{
+    cv::Mat _3dImage_mat;
+    if(!_3dImage.isNull()) _3dImage_mat = _3dImage.toMat();
+    cv::reprojectImageTo3D(disparity.toMat(), _3dImage_mat, Q.toMat(), handleMissingValues, ddepth);
+    return TensorWrapper(_3dImage_mat);
+}
+
+extern "C"
+struct TensorArray Rodrigues(
+	struct TensorWrapper src, struct TensorWrapper dst, struct TensorWrapper jacobian)
+{
+    std::vector<cv::Mat> result;
+    if(!dst.isNull()) result[0] = dst.toMat();
+    if(!dst.isNull()) result[1] = jacobian.toMat();
+    cv::Rodrigues(src.toMat(), result[0], result[1]);
+    return TensorArray(result);
+}
+
+extern "C"
+struct TensorArrayPlusVec3d RQDecomp3x3(
+	struct TensorWrapper src, struct TensorWrapper mtxR, struct TensorWrapper mtxQ,
+	struct TensorWrapper Qx, struct TensorWrapper Qy, struct TensorWrapper Qz)
+{
+    struct TensorArrayPlusVec3d result;
+    std::vector<cv::Mat> vec(5);
+    if(!mtxR.isNull()) vec[0] = mtxR.toMat();
+    if(!mtxQ.isNull()) vec[1] = mtxQ.toMat();
+    if(!Qx.isNull()) vec[2] = Qx.toMat();
+    if(!Qy.isNull()) vec[3] = Qy.toMat();
+    if(!Qz.isNull()) vec[4] = Qz.toMat();
+    new(&result.vec3d) Vec3dWrapper(
+				cv::RQDecomp3x3(
+					src.toMat(), vec[0], vec[1],
+					vec[2], vec[3], vec[4]));
+    new(&result.tensors) TensorArray(vec);
+    return result;
+}
+
+   
 
 
 

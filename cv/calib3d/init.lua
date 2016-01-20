@@ -119,6 +119,27 @@ struct TensorArrayPlusInt recoverPose(
 	struct TensorWrapper points2, double focal,
 	struct Point2dWrapper pp, struct TensorWrapper mask);
 
+struct TensorArrayPlusRectArrayPlusFloat rectify3Collinear(
+	struct TensorWrapper cameraMatrix1, struct TensorWrapper distCoeffs1,
+	struct TensorWrapper cameraMatrix2, struct TensorWrapper distCoeffs2,
+	struct TensorWrapper cameraMatrix3, struct TensorWrapper distCoeffs3,
+	struct TensorArray imgpt1, struct TensorArray imgpt3,
+	struct SizeWrapper imageSize, struct TensorWrapper R12,
+	struct TensorWrapper T12, struct TensorWrapper R13,
+	struct TensorWrapper T13, double alpha,
+	struct SizeWrapper newImgSize, int flags);
+
+struct TensorWrapper reprojectImageTo3D(
+	struct TensorWrapper disparity, struct TensorWrapper _3dImage,
+	struct TensorWrapper Q, bool handleMissingValues, int ddepth);
+
+struct TensorArray Rodrigues(
+	struct TensorWrapper src, struct TensorWrapper dst, struct TensorWrapper jacobian);
+
+struct TensorArrayPlusVec3d RQDecomp3x3(
+	struct TensorWrapper src, struct TensorWrapper mtxR, struct TensorWrapper mtxQ,
+	struct TensorWrapper Qx, struct TensorWrapper Qy, struct TensorWrapper Qz);
+
 ]]
 
 local C = ffi.load(cv.libPath('calib3d'))
@@ -293,15 +314,6 @@ function cv.filterSpeckles(t)
 		maxDiff, cv.wrap_tensor(buf))
 end
 
-
---TODO  don't work cv.wrap_tensors 
-function cv.test(t)
-    local argRules = {
-        {"src", required = true}}
-    local src = cv.argcheck(t,argRules)
-    cv.wrap_tensors(src)
-end
-
 function cv.find4QuadCornerSubpix(t)
     local argRules = {
         {"img", required = true},
@@ -336,12 +348,12 @@ function cv.findEssentialMat(t)
     local argRules = {
         {"points1", required = true},
         {"points2", required = true},
-	{"focal", default = 1.0},
+        {"focal", default = 1.0},
         {"pp", operator = cv.Point2d, default = cv.Point2d(0,0)},
-	{"method", default = RANSAC},
+        {"method", default = RANSAC},
         {"prob", default = 0.999},
         {"threshold", default = 1.0},
-  	{"mask", default = nil}}
+        {"mask", default = nil}}
     local points1, points2, focal, pp, method, prob, threshold, mask = cv.argcheck(t, argRules)
     return cv.unwrap_tensors(
 			C.findEssentialMat(
@@ -351,12 +363,12 @@ end
 
 function cv.findFundamentalMat(t)
     local argRules = {
-     	{"points1", required = true},
-	{"points2", required = true},
-	{"method", default = FM_RANSAC},
- 	{"param1", default = 3.0},
-	{"param2", default = 0.99},
-	{"mask", default = nil}}
+        {"points1", required = true},
+        {"points2", required = true},
+        {"method", default = FM_RANSAC},
+        {"param1", default = 3.0},
+        {"param2", default = 0.99},
+        {"mask", default = nil}}
     local points1, points2, method, param1, param2, mask = cv.argcheck(t, argRules)
     return cv.unwrap_tensors(
 		C.findFundamentalMat(
@@ -491,7 +503,79 @@ function cv.recoverPose(t)
     return result.val, cv.unwrap_tensors(result.tensors)
 end
 
+function cv.rectify3Collinear(t)
+    local argRules = {
+        {"cameraMatrix1", required = true},
+        {"distCoeffs1", required = true},
+        {"cameraMatrix2", required = true},
+        {"distCoeffs2", required= true},
+        {"cameraMatrix3", required = true},
+        {"distCoeffs3", required = true},
+        {"imgpt1", required = true},
+        {"imgpt3", required = true},
+        {"imageSize", required = true, operator = cv.Size},
+        {"R12", required = true},
+        {"T12", required = true},
+        {"R13", required = true},
+        {"T13", required = true},
+        {"alpha", required = true},
+        {"newImgSize", required = true, operator = cv.Size},
+        {"flags", required = true}}
+    local cameraMatrix1, distCoeffs1, cameraMatrix2, distCoeffs2, cameraMatrix3,
+	  distCoeffs3, imgpt1, imgpt3, imageSize, R12, T12, R13, T13, alpha,
+          newImgSize, flags = cv.argcheck(t, argRules)
+    local result = C.rectify3Collinear(
+			cv.wrap_tensor(cameraMatrix1), cv.wrap_tensor(distCoeffs1),
+			cv.wrap_tensor(cameraMatrix2), cv.wrap_tensor(distCoeffs2),
+			cv.wrap_tensor(cameraMatrix3), cv.wrap_tensor(distCoeffs3),
+			cv.wrap_tensor(imgpt1), cv.wrap_tensors(imgpt3), imageSize,
+			cv.wrap_tensor(R12), cv.wrap_tensor(T12), cv.wrap_tensor(R13),
+			cv.wrap_tensor(T13), alpha, newImgSize, flags)
+    return result.val, cv.unwrap_tensors(result.tensors), cv.gcarray(result.rects)
+end
 
+function cv.reprojectImageTo3D(t)
+    local argRules = {
+        {"disparity", required = true},
+        {"_3dImage", default = nil},
+        {"Q", required = true},
+        {"handleMissingValues", default = false},
+        {"ddepth", default = -1}}
+    local disparity, _3dImage, Q, handleMissingValues, ddepth = cv.argcheck(t, argRules)
+    return cv_unwrap_tensors(
+			C.reprojectImageTo3D(
+				cv.wrap_tensor(disparity), cv.wrap_tensor(_3dImage),
+				cv.wrap_tensor(Q), handleMissingValues, ddepth))
+end
+
+function cv.Rodrigues(t)
+    local argRules = {
+        {"src", required = true},
+        {"dst", required = true},
+        {"jacobian", required = true}}
+    local src, dst, jacobian = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+		C.Rodrigues(
+			cv.wrap_tensor(src), cv.wrap_tensor(dst),
+			cv.wrap_tensor(jacobian)))
+end
+
+function cv.RQDecomp3x3(t)
+    local argRules = {
+        {"src", required = true},
+        {"mtxR", default = nil},
+        {"mtxQ", default = nil},
+        {"Qx", default = nil},
+        {"Qy", default = nil},
+        {"Qz", default = nil}}
+    local src, mtxR, mtxQ, Qx, Qy, Qz = cv.argcheck(t, argRules)
+    local result = C.RQDecomp3x3(
+			cv.wrap_tensor(src), cv.wrap_tensor(mtxR),
+			cv.wrap_tensor(mtxQ), cv.wrap_tensor(Qx),
+			cv.wrap_tensor(Qy), cv.wrap_tensor(Qz))
+    return result.vec3d, cv.unwrap_tensors(result.tensors)
+end
+ 
 return cv
 
 

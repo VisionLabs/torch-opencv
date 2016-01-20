@@ -73,7 +73,7 @@ void filterSpeckles(
 	double maxDiff, struct TensorWrapper buf);
  
 extern "C"
-void find4QuadCornerSubpix(
+struct TensorWrapper find4QuadCornerSubpix(
 	struct TensorWrapper img, struct TensorWrapper corners,
 	struct SizeWrapper region_size);
 
@@ -146,7 +146,30 @@ struct TensorArrayPlusInt recoverPose(
 	struct TensorWrapper points2, double focal,
 	struct Point2dWrapper pp, struct TensorWrapper mask);
 
-	
+extern "C"
+struct TensorArrayPlusRectArrayPlusFloat rectify3Collinear(
+	struct TensorWrapper cameraMatrix1, struct TensorWrapper distCoeffs1,
+	struct TensorWrapper cameraMatrix2, struct TensorWrapper distCoeffs2,
+	struct TensorWrapper cameraMatrix3, struct TensorWrapper distCoeffs3,
+	struct TensorArray imgpt1, struct TensorArray imgpt3,
+	struct SizeWrapper imageSize, struct TensorWrapper R12,
+	struct TensorWrapper T12, struct TensorWrapper R13,
+	struct TensorWrapper T13, double alpha,
+	struct SizeWrapper newImgSize, int flags);
+
+extern "C"
+struct TensorWrapper reprojectImageTo3D(
+	struct TensorWrapper disparity, struct TensorWrapper _3dImage,
+	struct TensorWrapper Q, bool handleMissingValues, int ddepth);
+
+extern "C"
+struct TensorArray Rodrigues(
+	struct TensorWrapper src, struct TensorWrapper dst, struct TensorWrapper jacobian);
+
+extern "C"
+struct TensorArrayPlusVec3d RQDecomp3x3(
+	struct TensorWrapper src, struct TensorWrapper mtxR, struct TensorWrapper mtxQ,
+	struct TensorWrapper Qx, struct TensorWrapper Qy, struct TensorWrapper Qz);
 
 
 
