@@ -17,6 +17,12 @@ void DescriptorMatcher_add(
 }
 
 extern "C"
+struct TensorArray DescriptorMatcher_getTrainDescriptors(
+        struct cutorchInfo info, struct DescriptorMatcherPtr ptr) {
+    return TensorArray(ptr->getTrainDescriptors(), info.state);
+}
+
+extern "C"
 void DescriptorMatcher_clear(struct DescriptorMatcherPtr ptr) {
     ptr->clear();
 }
@@ -57,6 +63,15 @@ struct TensorWrapper DescriptorMatcher_match_masks(
             queryDescriptors.toGpuMat(), retval,
             TO_GPUMAT_LIST_OR_NOARRAY(masks), prepareStream(info));
     return TensorWrapper(retval, info.state);
+}
+
+extern "C"
+struct DMatchArray DescriptorMatcher_matchConvert(
+         struct DescriptorMatcherPtr ptr, struct TensorWrapper gpu_matches)
+{
+    std::vector<cv::DMatch> retval;
+    ptr->matchConvert(gpu_matches.toGpuMat(), retval);
+    return DMatchArray(retval);
 }
 
 extern "C"

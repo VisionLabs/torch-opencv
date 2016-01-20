@@ -110,6 +110,22 @@ struct DMatchArrayOfArrays {
     struct DMatchArray *data;
 };
 
+struct KeyPointWrapper {
+    struct Point2fWrapper pt;
+    float size, angle, response;
+    int octave, class_id;
+};
+
+struct KeyPointArray {
+    struct KeyPointWrapper *data;
+    int size;
+};
+
+struct TensorPlusKeyPointArray {
+    struct TensorWrapper tensor;
+    struct KeyPointArray keypoints;
+};
+
 struct TensorPlusDouble {
     struct TensorWrapper tensor;
     double val;
@@ -493,8 +509,6 @@ function cv.newArray(elemType, data)
     return retval
 end
 
--- TODO: function cv.newArrayOfArrays(elemType, data)
-
 -- example: table of tables of numbers ---> struct FloatArrayOfArrays
 function cv.numberArrayOfArrays(elemType, data)
     local retval = ffi.new('struct ' .. elemType .. 'ArrayOfArrays')
@@ -550,6 +564,17 @@ function cv.arrayToLua(array, outputType, output)
 
     C.free(array.data)
     return retval
+end
+
+function cv.tableToDMatchArrayOfArrays(tbl)
+    local result = ffi.new('struct DMatchArrayOfArrays')
+    result.size = #tbl
+    result.data = ffi.gc(
+        C.malloc(#tbl * ffi.sizeof('struct DMatchArray')),
+        C.free)
+    for i = 1, #tbl do
+        result.data[i-1] = tbl[i]
+    end
 end
 
 -- make an array that has come from C++ garbage-collected

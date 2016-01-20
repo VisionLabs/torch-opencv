@@ -159,14 +159,14 @@ MomentsWrapper::MomentsWrapper(const cv::Moments & other) {
 
 DMatchArray::DMatchArray(std::vector<cv::DMatch> & other) {
     this->size = other.size();
-    size_t memSize = this->size * sizeof(DMatchWrapper);
+    size_t memSize = (this->size + 1) * sizeof(DMatchWrapper);
     this->data = static_cast<DMatchWrapper *>(malloc(memSize));
-    memcpy(this->data, other.data(), memSize);
+    memcpy(this->data, other.data() + 1, memSize - sizeof(DMatchWrapper));
 }
 
 DMatchArray::operator std::vector<cv::DMatch>() {
     std::vector<cv::DMatch> retval(this->size);
-    memcpy(retval.data(), this->data, this->size * sizeof(DMatchWrapper));
+    memcpy(retval.data(), this->data + 1, this->size * sizeof(DMatchWrapper));
     return retval;
 }
 

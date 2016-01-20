@@ -4,38 +4,11 @@ local ffi = require 'ffi'
 
 local C = ffi.load(cv.libPath('features2d'))
 
-function cv.tableToDMatchArrayOfArrays(tbl)
-    local result = ffi.new('struct DMatchArrayOfArrays')
-    result.size = #tbl
-    result.data = ffi.gc(
-        C.malloc(#tbl * ffi.sizeof('struct DMatchArray')),
-        C.free)
-    for i = 1, #tbl do
-        result.data[i-1] = tbl[i]
-    end
-end
-
 require 'cv.Classes'
 
 local Classes = ffi.load(cv.libPath('Classes'))
 
 ffi.cdef[[
-struct KeyPointWrapper {
-    struct Point2fWrapper pt;
-    float size, angle, response;
-    int octave, class_id;
-};
-
-struct KeyPointArray {
-    struct KeyPointWrapper *data;
-    int size;
-};
-
-struct TensorPlusKeyPointArray {
-    struct TensorWrapper tensor;
-    struct KeyPointArray keypoints;
-};
-
 struct evaluateFeatureDetectorRetval {
     struct KeyPointArray keypoints1, keypoints2;
     float repeatability;
@@ -1421,8 +1394,8 @@ do
         end
 
         local retval = {}
-        for i = 0, result.size - 1 do
-            retval[i + 1] = cv.gcarray(result[i])
+        for i = 0, result.size-1 do
+            retval[i+1] = cv.gcarray(result[i])
         end
 
         return retval

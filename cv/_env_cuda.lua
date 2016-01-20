@@ -38,7 +38,7 @@ struct cutorchInfo {
 ]]
 
 function cuda._info()
-    return ffi.new('struct cutorchInfo', cutorch.getDevice(), cutorch._state)
+    return ffi.new('struct cutorchInfo', cutorch.getDevice(), cutorch.getState())
 end
 
 return cuda
