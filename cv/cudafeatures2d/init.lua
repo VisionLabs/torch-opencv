@@ -307,7 +307,7 @@ do
             {"max_npoints", default = 5000}
         }
         self.ptr = ffi.gc(C.FastFeatureDetector_ctor(
-            cv.argcheck(t, argRules), C.Feature2DAsync_dtor)
+            cv.argcheck(t, argRules), C.Feature2DAsync_dtor))
     end
 
     function FastFeatureDetector:setMaxNumPoints(t)
@@ -319,6 +319,38 @@ do
 
     function FastFeatureDetector:getMaxNumPoints()
         return C.FastFeatureDetector_getMaxNumPoints(self.ptr)
+    end
+end
+
+do
+    local ORB = torch.class('cuda.ORB', 'cuda.Feature2DAsync', cv.cuda)
+
+    function ORB:__init(t)
+        local argRules = {
+            {"nfeatures", default = 500},
+            {"scaleFactor", default = 1.2},
+            {"nlevels", default = 8},
+            {"edgeThreshold", default = 31},
+            {"firstLevel", default = 0},
+            {"WTA_K", default = 2},
+            {"scoreType", default = cv.ORB_HARRIS_SCORE},
+            {"patchSize", default = 31},
+            {"fastThreshold", default = 20},
+            {"blurForDescriptor", default = false}
+        }
+        self.ptr = ffi.gc(C.ORB_ctor(
+            cv.argcheck(t, argRules), C.Feature2DAsync_dtor))
+    end
+
+    function ORB:setsetBlurForDescriptorMaxNumPoints(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        C.ORB_setBlurForDescriptor(self.ptr, cv.argcheck(t, argRules))
+    end
+
+    function ORB:getBlurForDescriptor()
+        return C.ORB_getBlurForDescriptor(self.ptr)
     end
 end
 
