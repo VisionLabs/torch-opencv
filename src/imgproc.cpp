@@ -1897,8 +1897,18 @@ int GeneralizedHoughGuil_getPosThresh(GeneralizedHoughGuilPtr ptr)
 // CLAHE
 
 extern "C"
-struct CLAHEPtr CLAHE_ctor() {
+struct CLAHEPtr CLAHE_ctor()
+{
     return rescueObjectFromPtr(cv::createCLAHE());
+}
+
+extern "C"
+struct TensorWrapper CLAHE_apply(CLAHEPtr ptr, struct TensorWrapper src, struct TensorWrapper dst)
+{
+    cv::Mat retval;
+    if (!dst.isNull()) retval = dst.toMat();
+    ptr->apply(src.toMat(), retval);
+    return TensorWrapper(retval);
 }
 
 extern "C"

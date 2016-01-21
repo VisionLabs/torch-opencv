@@ -3036,6 +3036,7 @@ function cv.LineIterator(t)
         C.LineIterator_dtor)
     local count = C.LineIterator_count(ptr)
 
+    local
     function lineIter(pos)
         if count > 0 then
             count = count - 1
