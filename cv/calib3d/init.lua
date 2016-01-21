@@ -140,6 +140,50 @@ struct TensorArrayPlusVec3d RQDecomp3x3(
 	struct TensorWrapper src, struct TensorWrapper mtxR, struct TensorWrapper mtxQ,
 	struct TensorWrapper Qx, struct TensorWrapper Qy, struct TensorWrapper Qz);
 
+struct TensorArrayPlusBool solvePnP(
+	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints,
+	struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+	struct TensorWrapper rvec, struct TensorWrapper tvec,
+	bool useExtrinsicGuess, int flags);
+
+struct TensorArrayPlusBool solvePnPRansac(
+	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints,
+	struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+	struct TensorWrapper rvec, struct TensorWrapper tvec,
+	bool useExtrinsicGuess, int iterationsCount, float reprojectionError,
+	double confidence, struct TensorWrapper inliers, int flags);
+
+double stereoCalibrate(
+	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints1,
+	struct TensorWrapper imagePoints2, struct TensorWrapper cameraMatrix1,
+	struct TensorWrapper distCoeffs1, struct TensorWrapper cameraMatrix2,
+	struct TensorWrapper distCoeffs2, struct SizeWrapper imageSize,
+	struct TensorWrapper R, struct TensorWrapper T,
+	struct TensorWrapper E, struct TensorWrapper F,
+	int flags, struct TermCriteriaWrapper criteria);
+
+struct RectArray stereoRectify(
+	struct TensorWrapper cameraMatrix1, struct TensorWrapper distCoeffs1,
+	struct TensorWrapper cameraMatrix2, struct TensorWrapper distCoeffs2,
+	struct SizeWrapper imageSize, struct TensorWrapper R,
+	struct TensorWrapper T, struct TensorWrapper R1,
+	struct TensorWrapper R2, struct TensorWrapper P1,
+	struct TensorWrapper P2, struct TensorWrapper Q,
+	int flags, double alpha, struct SizeWrapper newImageSize);
+
+struct TensorArrayPlusBool stereoRectifyUncalibrated(
+	struct TensorWrapper points1, struct TensorWrapper points2,
+	struct TensorWrapper F, struct SizeWrapper imgSize,
+	struct TensorWrapper H1, struct TensorWrapper H2, double threshold);
+
+struct TensorWrapper triangulatePoints(
+	struct TensorWrapper projMatr1, struct TensorWrapper projMatr2,
+	struct TensorWrapper projPoints1, struct TensorWrapper projPoints2);
+
+struct TensorWrapper validateDisparity(
+	struct TensorWrapper disparity, struct TensorWrapper cost,
+        int minDisparity, int numberOfDisparities, int disp12MaxDisp);
+
 ]]
 
 local C = ffi.load(cv.libPath('calib3d'))
@@ -154,7 +198,8 @@ function cv.calibrateCamera(t)
         {"rvecs", required = true},
         {"tvecs", required = true},
         {"flag", default = 0},
-        {"criteria", default = 0, operator = cv.TermCriteria}}
+        {"criteria", default = cv.TermCriteria(TERM_CRITERIA_COUNT+TERM_CRITERIA_EPS),
+                               operator = cv.TermCriteria}}
     local objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs,
       		rvecs, tvecs, flag, criteria = cv.argcheck(t, argRules)
     local result = C.calibrateCamera(
@@ -174,7 +219,8 @@ function cv.calibrationMatrixValues(t)
     local result = C.calibrationMatrixValues(
 			cv.wrap_tensor(cameraMatrix), imageSize, apertureWidth, apertureHeight)
     local retval = cv.unwrap_tensors(result)
-    return retval[1][1], retval[2][1], retval[3][1], cv.Point2d(retval[4][1], retval[5][1]),retval[6][1]
+    return retval[1][1], retval[2][1], retval[3][1],
+           cv.Point2d(retval[4][1], retval[5][1]),retval[6][1]
 end
 
 function cv.composeRT(t)
@@ -330,7 +376,8 @@ function cv.findChessboardCorners(t)
         {"patternSize", required = true, operator = cv.Size},
         {"flags", default = CALIB_CB_ADAPTIVE_THRESH+CALIB_CB_NORMALIZE_IMAGE}}
     local image, patternSize, flags = cv.argcheck(t, argRules)
-    return cv.unwrap_tensors(C.findChessboardCorners(cv.wrap_tensor(image), patternSize, flags))
+    return cv.unwrap_tensors(
+		C.findChessboardCorners(cv.wrap_tensor(image), patternSize, flags))
 end
 
 --TODO const Ptr<FeatureDetector>& blobDetector = SimpleBlobDetector::create()
@@ -499,7 +546,9 @@ function cv.recoverPose(t)
         {"Point2d", default = cv.Point2d(0,0), operator = cv.Point2d},
         {"mask", default = nil}}
     local E, points1, points2, focal, Point2d, mask = cv.argcheck(t, argRules)
-    local result = C.recoverPose(cv.wrap_tensor(E), cv.wrap_tensor(points1), cv.wrap_tensor(points2), focal, Point2d, mask)
+    local result = C.recoverPose(
+			cv.wrap_tensor(E), cv.wrap_tensor(points1),
+			cv.wrap_tensor(points2), focal, Point2d, mask)
     return result.val, cv.unwrap_tensors(result.tensors)
 end
 
@@ -575,7 +624,156 @@ function cv.RQDecomp3x3(t)
 			cv.wrap_tensor(Qy), cv.wrap_tensor(Qz))
     return result.vec3d, cv.unwrap_tensors(result.tensors)
 end
- 
+
+function cv.solvePnP(t)
+    local argRules = {
+        {"objectPoints", required = true},
+        {"imagePoints", required = true},
+        {"cameraMatrix", required = true},
+        {"distCoeffs", required = true},
+        {"rvec", default = nil},
+        {"tvec", default = nil},
+        {"useExtrinsicGuess", default = false},
+        {"flags", default = SOLVEPNP_ITERATIVE}}
+    local objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec,
+          tvec, useExtrinsicGuess, flags = cv.argcheck(t, argRules)
+    local result = C.solvePnP(
+			cv.wrap_tensor(objectPoints), cv.wrap_tensor(imagePoints),
+             		cv.wrap_tensor(cameraMatrix), cv.wrap_tensor(distCoeffs),
+               		cv.wrap_tensor(rvec), cv.wrap_tensor(tvec),
+			useExtrinsicGuess, flags)
+    return result.val, cv.unwrap_tensors(result.tensors)
+end
+
+function cv.solvePnPRansac(t)
+    local argRules = {
+        {"objectPoints", required = true},
+        {"imagePoints", required = true},
+        {"cameraMatrix", required = true},
+        {"distCoeffs", required = true},
+        {"rvec", default = nil},
+        {"tvec", default = nil},
+        {"useExtrinsicGuess", default = false},
+        {"iterationsCount", default = 10},
+        {"reprojectionError", default = 8.0},
+        {"confidence", default = 0.99},
+        {"inliers", default = nil},
+        {"flags", default = SOLVEPNP_ITERATIVE}}
+    local objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec,
+          tvec, useExtrinsicGuess, iterationsCount,reprojectionError,
+          confidence, inliers, flags = cv.argcheck(t, argRules)
+    local result = C.solvePnPRansac(
+			cv.wrap_tensor(objectPoints), cv.wrap_tensor(imagePoints),
+			cv.wrap_tensor(cameraMatrix), cv.wrap_tensor(distCoeffs),
+			cv.wrap_tensor(rvec), cv.wrap_tensor(tvec), useExtrinsicGuess, 				iterationsCount, reprojectionError, confidence,
+			cv.wrap_tensor(inliers), flags)
+    return result.val, cv.unwrap_tensors(result.tensors)
+end
+
+function cv.stereoCalibrate(t)
+    local argRules = {
+        {"objectPoints", required = true},
+        {"imagePoints1", required = true},
+        {"imagePoints2", required = true},
+        {"cameraMatrix1", required = true},
+        {"distCoeffs1", required = true},
+        {"cameraMatrix2", required = true},
+        {"distCoeffs2", required = true},
+        {"imageSize", required = true, operator = cv.Size},
+        {"R", required = true},
+        {"T", required = true},
+        {"E", required = true},
+        {"F", required = true},
+        {"flags", defauly = CALIB_FIX_INTRINSIC},
+        {"criteria", default = cv.TermCriteria(TERM_CRITERIA_COUNT+TERM_CRITERIA_EPS),
+                               operator = cv.TermCriteria}}
+    local objectPoints, imagePoints1, imagePoints2, cameraMatrix1,
+          distCoeffs1, cameraMatrix2, distCoeffs2, imageSize, R, T,
+          E, F, flags, criteria = cv.argcheck(t, argRules)
+    return C.stereoCalibrate(
+		cv.wrap_tensor(objectPoints), cv.wrap_tensor(imagePoints1),
+		cv.wrap_tensor(imagePoints2), cv.wrap_tensor(cameraMatrix1),
+		cv.wrap_tensor(distCoeffs1), cv.wrap_tensor(cameraMatrix2),
+		cv.wrap_tensor(distCoeffs2), imageSize, cv.wrap_tensor(R),
+		cv.wrap_tensor(T), cv.wrap_tensor(E), cv.wrap_tensor(F),
+		flags, criteria)
+end
+
+function cv.stereoRectify(t)
+    local argRules = {
+        {"cameraMatrix1", required = true},
+        {"distCoeffs1", required = true},
+        {"cameraMatrix2", required = true},
+        {"distCoeffs2", required = true},
+        {"imageSize", required = true, operator = cv.Size},
+        {"R", required = true},
+        {"T", required = true},
+        {"R1", required = true},
+        {"R2", required = true},
+        {"P1", required = true},
+        {"P2", required = true},
+        {"Q", required = true},
+        {"flags", default = CALIB_ZERO_DISPARITY},
+        {"alpha", default = -1},
+        {"newImageSize", default = cv.Size(), operator = cv.Size}}
+    local cameraMatrix1, distCoeffs1, cameraMatrix2, distCoeffs2,
+          imageSize, R, T, R1, R2, P1, P2, Q, flags, alpha,
+          newImageSize = cv.argcheck(t, argRules)
+    return cv.gcarray(
+		C.stereoRectify(
+			cv.wrap_tensor(cameraMatrix1), cv.wrap_tensor(distCoeffs1),
+			cv.wrap_tensor(cameraMatrix2), cv.wrap_tensor(distCoeffs2),
+			imageSize, cv.wrap_tensor(R), cv.wrap_tensor(T), cv.wrap_tensor(R1),
+			cv.wrap_tensor(R2), cv.wrap_tensor(P1), cv.wrap_tensor(P2),
+			cv.wrap_tensor(Q), flags, alpha, newImageSize))
+end
+
+function cv.stereoRectifyUncalibrated(t)
+    local argRules = {
+        {"points1", requred = true},
+        {"points2", required = true},
+        {"F", required = true},
+        {"imgSize", required = true},
+        {"H1", required = true},
+        {"H2", required = true},
+        {"threshold", default = 5}}
+    local points1, points2, F, imgSize, H1, H2, threshold = cv.argcheck(t, argRules)
+    local result = C.stereoRectifyUncalibrated(
+				cv.wrap_tensor(points1), cv.wrap_tensor(points2),
+				cv.wrap_tensor(F), imgSize, cv.wrap_tensor(H1),
+				cv.wrap_tensor(H2), threshold);
+    return result.val, cv.unwrap_tensors(result.tensors)
+end
+
+function cv.triangulatePoints(t)
+    local argRules = {
+        {"projMatr1", required = true},
+        {"projMatr2", required = true},
+        {"projPoints1", required = true},
+        {"projPoints2", required = true}}
+    local projMatr1, projMatr2, projPoints1, projPoints2 = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+			C.triangulatePoints(
+				cv.wrap_tensor(projMatr1), cv.wrap_tensor(projMatr2),
+				cv.wrap_tensor(projPoints1), cv.wrap_tensor(projPoints2))) 
+end
+
+function cv.validateDisparity(t)
+    local argRules = {
+        {"disparity", required = true},
+        {"cost", required = true},
+        {"minDisparity", required = true},
+        {"numberOfDisparities", required = true},
+        {"disp12MaxDisp", default = 1}}
+    local disparity, cost, minDisparity, numberOfDisparities,
+          disp12MaxDisp = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+		C.validateDisparity(
+			cv.wrap_tensor(disparity), cv.wrap_tensor(cost),
+			minDisparity, numberOfDisparities, disp12MaxDisp))
+end
+
+
 return cv
 
 

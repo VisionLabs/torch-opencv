@@ -387,9 +387,119 @@ struct TensorArrayPlusVec3d RQDecomp3x3(
     return result;
 }
 
-   
+extern "C"
+struct TensorArrayPlusBool solvePnP(
+	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints,
+	struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+	struct TensorWrapper rvec, struct TensorWrapper tvec,
+	bool useExtrinsicGuess, int flags)
+{
+    struct TensorArrayPlusBool result;
+    std::vector<cv::Mat> vec(2);
+    if(!rvec.isNull()) vec[0] = rvec.toMat();
+    if(!tvec.isNull()) vec[1] = tvec.toMat();
+    result.val = cv::solvePnP(objectPoints.toMat(), imagePoints.toMat(), cameraMatrix.toMat(),
+                              distCoeffs.toMat(), vec[0], vec[1], useExtrinsicGuess, flags);
+    new(&result.tensors) TensorArray(vec);
+    return result;
+}
 
+extern "C"
+struct TensorArrayPlusBool solvePnPRansac(
+	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints,
+	struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+	struct TensorWrapper rvec, struct TensorWrapper tvec,
+	bool useExtrinsicGuess, int iterationsCount, float reprojectionError,
+	double confidence, struct TensorWrapper inliers, int flags)
+{
+    struct TensorArrayPlusBool result;
+    std::vector<cv::Mat> vec(3);
+    if(!rvec.isNull()) vec[0] = rvec.toMat();
+    if(!tvec.isNull()) vec[1] = tvec.toMat();
+    if(!inliers.isNull()) vec[2] = inliers.toMat();
+    result.val = cv::solvePnPRansac(objectPoints.toMat(), imagePoints.toMat(),
+                 cameraMatrix.toMat(), distCoeffs.toMat(), vec[0], vec[1],
+                 useExtrinsicGuess, iterationsCount, reprojectionError,
+                 confidence, vec[2], flags);
+    new(&result.tensors) TensorArray(vec);
+    return result;
+}
 
+extern "C"
+double stereoCalibrate(
+	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints1,
+	struct TensorWrapper imagePoints2, struct TensorWrapper cameraMatrix1,
+	struct TensorWrapper distCoeffs1, struct TensorWrapper cameraMatrix2,
+	struct TensorWrapper distCoeffs2, struct SizeWrapper imageSize,
+	struct TensorWrapper R, struct TensorWrapper T,
+	struct TensorWrapper E, struct TensorWrapper F,
+	int flags, struct TermCriteriaWrapper criteria)
+{
+    return cv::stereoCalibrate(
+		objectPoints.toMat(), imagePoints1.toMat(), imagePoints2.toMat(),
+		cameraMatrix1.toMat(), distCoeffs1.toMat(), cameraMatrix2.toMat(),
+		distCoeffs2.toMat(), imageSize, R.toMat(), T.toMat(), E.toMat(),
+		F.toMat(), flags, criteria);
+}
+
+extern "C"
+struct RectArray stereoRectify(
+	struct TensorWrapper cameraMatrix1, struct TensorWrapper distCoeffs1,
+	struct TensorWrapper cameraMatrix2, struct TensorWrapper distCoeffs2,
+	struct SizeWrapper imageSize, struct TensorWrapper R,
+	struct TensorWrapper T, struct TensorWrapper R1,
+	struct TensorWrapper R2, struct TensorWrapper P1,
+	struct TensorWrapper P2, struct TensorWrapper Q,
+	int flags, double alpha,struct SizeWrapper newImageSize)
+{
+    std::vector<cv::Rect> rec(2);
+    cv::stereoRectify(
+		cameraMatrix1.toMat(), distCoeffs1.toMat(),
+		cameraMatrix2.toMat(), distCoeffs2.toMat(),
+		imageSize, R.toMat(), T.toMat(), R1.toMat(),
+		R2.toMat(), P1.toMat(), P2.toMat(), Q.toMat(),
+		flags, alpha, newImageSize, &rec[0], &rec[1]);
+    return RectArray(rec);
+}
+
+extern "C"
+struct TensorArrayPlusBool stereoRectifyUncalibrated(
+	struct TensorWrapper points1, struct TensorWrapper points2,
+	struct TensorWrapper F, struct SizeWrapper imgSize,
+	struct TensorWrapper H1, struct TensorWrapper H2, double threshold)
+{
+    struct TensorArrayPlusBool result;
+    std::vector<cv::Mat> vec(2);
+    if(!H1.isNull()) vec[0] = H1.toMat();
+    if(!H2.isNull()) vec[1] = H2.toMat();
+    cv::stereoRectifyUncalibrated(
+		points1.toMat(), points2.toMat(), F.toMat(),
+		imgSize, vec[0], vec[1], threshold);
+    new(&result.tensors) TensorArray(vec);    
+    return result;
+}
+
+extern "C"
+struct TensorWrapper triangulatePoints(
+	struct TensorWrapper projMatr1, struct TensorWrapper projMatr2,
+	struct TensorWrapper projPoints1, struct TensorWrapper projPoints2)
+{
+    cv::Mat points4D;
+    cv::triangulatePoints(projMatr1.toMat(), projMatr2.toMat(),
+                          projPoints1.toMat(), projPoints2.toMat(), points4D);
+    return TensorWrapper(points4D);
+}
+
+extern "C"
+struct TensorWrapper validateDisparity(
+	struct TensorWrapper disparity, struct TensorWrapper cost,
+        int minDisparity, int numberOfDisparities, int disp12MaxDisp)
+{
+   cv::validateDisparity(
+		disparity.toMat(), cost.toMat(), minDisparity,
+		numberOfDisparities, disp12MaxDisp);
+    return disparity;
+}
 
 
 

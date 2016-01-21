@@ -171,5 +171,64 @@ struct TensorArrayPlusVec3d RQDecomp3x3(
 	struct TensorWrapper src, struct TensorWrapper mtxR, struct TensorWrapper mtxQ,
 	struct TensorWrapper Qx, struct TensorWrapper Qy, struct TensorWrapper Qz);
 
+extern "C"
+struct TensorArrayPlusBool solvePnP(
+	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints,
+	struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+	struct TensorWrapper rvec, struct TensorWrapper tvec,
+	bool useExtrinsicGuess, int flags);
+
+extern "C"
+struct TensorArrayPlusBool solvePnPRansac(
+	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints,
+	struct TensorWrapper cameraMatrix, struct TensorWrapper distCoeffs,
+	struct TensorWrapper rvec, struct TensorWrapper tvec,
+	bool useExtrinsicGuess, int iterationsCount, float reprojectionError,
+	double confidence, struct TensorWrapper inliers, int flags);
+
+extern "C"
+double stereoCalibrate(
+	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints1,
+	struct TensorWrapper imagePoints2, struct TensorWrapper cameraMatrix1,
+	struct TensorWrapper distCoeffs1, struct TensorWrapper cameraMatrix2,
+	struct TensorWrapper distCoeffs2, struct SizeWrapper imageSize,
+	struct TensorWrapper R, struct TensorWrapper T,
+	struct TensorWrapper E, struct TensorWrapper F,
+	int flags, struct TermCriteriaWrapper criteria);
+
+extern "C"
+struct RectArray stereoRectify(
+	struct TensorWrapper cameraMatrix1, struct TensorWrapper distCoeffs1,
+	struct TensorWrapper cameraMatrix2, struct TensorWrapper distCoeffs2,
+	struct SizeWrapper imageSize, struct TensorWrapper R,
+	struct TensorWrapper T, struct TensorWrapper R1,
+	struct TensorWrapper R2, struct TensorWrapper P1,
+	struct TensorWrapper P2, struct TensorWrapper Q,
+	int flags, double alpha, struct SizeWrapper newImageSize);
+
+extern "C"
+struct TensorArrayPlusBool stereoRectifyUncalibrated(
+	struct TensorWrapper points1, struct TensorWrapper points2,
+	struct TensorWrapper F, struct SizeWrapper imgSize,
+	struct TensorWrapper H1, struct TensorWrapper H2, double threshold);
+
+extern "C"
+struct TensorWrapper triangulatePoints(
+	struct TensorWrapper projMatr1, struct TensorWrapper projMatr2,
+	struct TensorWrapper projPoints1, struct TensorWrapper projPoints2);
+
+extern "C"
+struct TensorWrapper validateDisparity(
+	struct TensorWrapper disparity, struct TensorWrapper cost,
+        int minDisparity, int numberOfDisparities, int disp12MaxDisp);
+
+
+
+
+
+
+
+
+
 
 
