@@ -446,6 +446,126 @@ end
 
 --- ***************** Other helper structs *****************
 
+--[[
+Makes an <IntArray, FloatArray, ...> from a table of numbers.
+Generally, if you're calling a function that uses Array many
+times, consider reusing the retval of this function.
+
+Example (not very realistic):
+
+cv.calcHist{images=im, channels={3,3,1,3,4}, ......}
+
+OR
+
+ch = cv.newArray('Int', {3,3,1,3,4})
+for i = 1,1e8 do
+    cv.calcHist{images=im, channels=ch, ...}
+    ......
+--]]
+function cv.newArray(elemType, data)
+    local retval
+    local fullTypeName
+    local shortTypeName
+
+    if elemType:byte(3) == 46 then
+        -- there's a period after 2 symbols: likely "cv.Something"
+        shortTypeName = elemType:sub(4)
+        fullTypeName = 'struct ' .. shortTypeName .. 'Wrapper'
+        retval = ffi.new('struct ' .. shortTypeName .. 'Array')
+    else
+        -- C primitive type, such as 'Int' or 'Float'
+        fullTypeName = elemType:lower()
+        retval = ffi.new('struct ' .. elemType .. 'Array')
+    end
+
+    if not data then
+        -- create an array with no data
+        -- here, we assume that our C function will resize the array
+        retval.data = ffi.gc(cv.NULLPTR, C.free)
+        retval.size = 0
+        return retval
+    end
+
+    if type(data) == 'number' then
+        retval.data = ffi.gc(C.malloc(data * ffi.sizeof(fullTypeName)), C.free)
+        retval.size = data
+        return retval
+    end
+
+    retval.data = ffi.gc(C.malloc(#data * ffi.sizeof(fullTypeName)), C.free)
+    retval.size = #data
+
+
+    if elemType:byte(3) == 46 then
+        for i, value in ipairs(data) do
+            retval.data[i-1] = cv[shortTypeName](data[i])
+        end
+    else
+        for i, value in ipairs(data) do
+            retval.data[i-1] = data[i]
+        end
+    end
+
+    return retval
+end
+
+-- example: table of tables of numbers ---> struct FloatArrayOfArrays
+function cv.numberArrayOfArrays(elemType, data)
+    local retval = ffi.new('struct ' .. elemType .. 'ArrayOfArrays')
+
+    -- first, compute relative addresses
+    retval.pointers = ffi.gc(C.malloc(#data * ffi.sizeof(elemType:lower() .. '*') + 1), C.free)
+    retval.pointers[0] = nil
+
+    for i, row in ipairs(data) do
+        data[i] = data[i-1] + #row
+    end
+    retval.realData = ffi.gc(C.malloc(totalElemSize * ffi.sizeof(elemType:lower())), C.free)
+
+    retval.pointers[0] = retval.realData
+    local counter = 0
+    for i, row in ipairs(data) do
+        -- fill data
+        for j, elem in ipairs(row) do
+            retval.realData[counter] = elem
+            counter = counter + 1
+        end
+        -- transform relative addresses to absolute
+        retval.pointers[i] = retval.pointers[i] + retval.realData
+    end
+end
+
+
+function cv.arrayToLua(array, outputType, output)
+    local retval
+
+    if output then
+        for i = 1,array.size do
+            output[i] = array.data[i-1]
+        end
+
+        C.free(array.data)
+        return output
+    end
+
+    if     outputType == 'table' then
+        retval = {}
+    elseif outputType == 'Tensor' then
+        -- ctype has the form 'ctype<struct IntArray>'
+        local ctype = tostring(ffi.typeof(array))
+        local typeStart = 14
+        local typeEnd = ctype:find('Arr') - 1
+        retval = torch[ctype:sub(typeStart, typeEnd) .. 'Tensor'](array.size)
+    end
+
+    for i = 1,array.size do
+        retval[i] = array.data[i-1]
+    end
+
+    C.free(array.data)
+    return retval
+end
+
 function cv.tableToDMatchArrayOfArrays(tbl)
     local result = ffi.new('struct DMatchArrayOfArrays')
     result.size = #tbl
