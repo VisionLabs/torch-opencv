@@ -141,6 +141,10 @@ struct Vec3iWrapper {
     int v0, v1, v2;
 };
 
+struct Vec4iWrapper {
+    int v0, v1, v2, v3;
+};
+
 struct RectWrapper {
     int x, y, width, height;
 

@@ -43,6 +43,20 @@ cuda.COLOR_BayerGB2GRAY_MHT = 261
 cuda.COLOR_BayerRG2GRAY_MHT = 262
 cuda.COLOR_BayerGR2GRAY_MHT = 263
 
+cuda.ALPHA_OVER = 0
+cuda.ALPHA_IN = 1
+cuda.ALPHA_OUT = 2
+cuda.ALPHA_ATOP = 3
+cuda.ALPHA_XOR = 4
+cuda.ALPHA_PLUS = 5
+cuda.ALPHA_OVER_PREMUL = 6
+cuda.ALPHA_IN_PREMUL = 7
+cuda.ALPHA_OUT_PREMUL = 8
+cuda.ALPHA_ATOP_PREMUL = 9
+cuda.ALPHA_XOR_PREMUL = 10
+cuda.ALPHA_PLUS_PREMUL = 11
+cuda.ALPHA_PREMUL = 12
+
 local ffi = require 'ffi'
 
 ffi.cdef[[

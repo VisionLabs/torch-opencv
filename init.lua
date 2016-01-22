@@ -64,6 +64,14 @@ struct Vec3fWrapper {
     float v0, v1, v2;
 };
 
+struct Vec3iWrapper {
+    int v0, v1, v2;
+};
+
+struct Vec4iWrapper {
+    int v0, v1, v2, v3;
+};
+
 struct RectWrapper {
     int x, y, width, height;
 };
@@ -430,6 +438,10 @@ end
 
 function cv.Vec3d(...)
     return ffi.new('struct Vec3dWrapper', ...)
+end
+
+function cv.Vec4i(...)
+    return ffi.new('struct Vec4iWrapper', ...)
 end
 
 function cv.Point(...)
