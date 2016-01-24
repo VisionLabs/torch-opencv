@@ -36,7 +36,7 @@ struct TensorWrapper StereoBeliefPropagation_compute(struct cutorchInfo info,
 }
 
 extern "C"
-struct TensorWrapper StereoBeliefPropagation_compute_data(struct cutorchInfo info,
+struct TensorWrapper StereoBeliefPropagation_compute2(struct cutorchInfo info,
         struct StereoBeliefPropagationPtr ptr, struct TensorWrapper data,
         struct TensorWrapper disparity)
 {
@@ -140,15 +140,64 @@ struct Vec3iWrapper StereoBeliefPropagation_estimateRecommendedParams(int width,
 }
 
 extern "C"
-struct TensorWrapper reprojectImageTo3D(struct cutorchInfo info,
-        struct TensorWrapper disparity, struct TensorWrapper _3dImage,
-        struct TensorWrapper Q, bool handleMissingValues, int ddepth)
+int StereoConstantSpaceBP_getNrPlane(struct StereoConstantSpaceBPPtr ptr)
 {
-    cuda::GpuMat _3dImage_GpuMat;
-    if (!_3dImage.isNull()) _3dImage_GpuMat = _3dImage.toGpuMat();
-    cuda::reprojectImageTo3D(
-            disparity.toGpuMat(), _3dImage_GpuMat, Q.toGpuMat(),
-            handleMissingValues, ddepth, prepareStream(info));
-    return TensorWrapper(_3dImage_GpuMat, info.state);
+    return ptr->getNrPlane();
 }
 
+extern "C"
+void StereoConstantSpaceBP_setNrPlane(struct StereoConstantSpaceBPPtr ptr, int val)
+{
+    ptr->setNrPlane(val);
+}
+
+extern "C"
+bool StereoConstantSpaceBP_getUseLocalInitDataCost(struct StereoConstantSpaceBPPtr ptr)
+{
+    return ptr->getUseLocalInitDataCost();
+}
+
+extern "C"
+void StereoConstantSpaceBP_setUseLocalInitDataCost(struct StereoConstantSpaceBPPtr ptr, bool val)
+{
+    ptr->setUseLocalInitDataCost(val);
+}
+
+extern "C"
+struct Vec4iWrapper StereoConstantSpaceBP_estimateRecommendedParams(int width, int height)
+{
+    Vec4iWrapper retval;
+    cuda::StereoConstantSpaceBP::estimateRecommendedParams(
+            width, height, &retval.v0, &retval.v1, &retval.v2, &retval.v3);
+    return retval;
+}
+
+extern "C"
+struct StereoConstantSpaceBPPtr createStereoConstantSpaceBP(
+        int ndisp, int iters, int levels, int nr_plane, int msg_type)
+{
+    return rescueObjectFromPtr(cuda::createStereoConstantSpaceBP(
+            ndisp, iters, levels, nr_plane, msg_type));
+}
+
+extern "C"
+struct TensorWrapper reprojectImageTo3D(
+        struct cutorchInfo info, struct TensorWrapper disp,
+        struct TensorWrapper xyzw, struct TensorWrapper Q, int dst_cn)
+{
+    cuda::GpuMat retval;
+    if (!xyzw.isEmpty()) retval = xyzw.toGpuMat();
+    cuda::reprojectImageTo3D(disp.toGpuMat(), retval, Q.toGpuMat(), dst_cn, prepareStream(info));
+    return TensorWrapper(retval, info.state);
+}
+
+extern "C"
+struct TensorWrapper drawColorDisp(
+        struct cutorchInfo info, struct TensorWrapper src_disp,
+        struct TensorWrapper dst_disp, int ndisp)
+{
+    cuda::GpuMat retval;
+    if (!dst_disp.isEmpty()) retval = dst_disp.toGpuMat();
+    cuda::drawColorDisp(src_disp.toGpuMat(), retval, ndisp, prepareStream(info));
+    return TensorWrapper(retval, info.state);
+}
