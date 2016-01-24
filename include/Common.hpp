@@ -203,7 +203,7 @@ struct DMatchArray {
     struct DMatchWrapper *data;
 
     DMatchArray() {}
-    DMatchArray(std::vector<cv::DMatch> & other);
+    DMatchArray(const std::vector<cv::DMatch> & other);
     operator std::vector<cv::DMatch>();
 };
 
@@ -212,7 +212,7 @@ struct DMatchArrayOfArrays {
     struct DMatchArray *data;
 
     DMatchArrayOfArrays() {}
-    DMatchArrayOfArrays(std::vector<std::vector<cv::DMatch>> & other);
+    DMatchArrayOfArrays(const std::vector<std::vector<cv::DMatch>> & other);
     operator std::vector<std::vector<cv::DMatch>>();
 };
 
@@ -325,7 +325,7 @@ struct PointArray {
     int size;
 
     PointArray() {}
-    PointArray(std::vector<cv::Point> & vec);
+    PointArray(const std::vector<cv::Point> & vec);
     operator std::vector<cv::Point>();
 };
 
@@ -334,7 +334,7 @@ struct RectArray {
     int size;
 
     RectArray() {}
-    RectArray(std::vector<cv::Rect> & vec);
+    RectArray(const std::vector<cv::Rect> & vec);
     operator std::vector<cv::Rect>();
 };
 

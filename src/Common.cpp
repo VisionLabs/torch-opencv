@@ -157,11 +157,10 @@ MomentsWrapper::MomentsWrapper(const cv::Moments & other) {
     nu21 = other.nu21; nu12 = other.nu12; nu03 = other.nu03;
 }
 
-DMatchArray::DMatchArray(std::vector<cv::DMatch> & other) {
+DMatchArray::DMatchArray(const std::vector<cv::DMatch> & other) {
     this->size = other.size();
-    size_t memSize = (this->size + 1) * sizeof(DMatchWrapper);
-    this->data = static_cast<DMatchWrapper *>(malloc(memSize));
-    memcpy(this->data, other.data() + 1, memSize - sizeof(DMatchWrapper));
+    this->data = static_cast<DMatchWrapper *>(malloc((this->size + 1) * sizeof(DMatchWrapper)));
+    memcpy(this->data + 1, other.data(), this->size * sizeof(DMatchWrapper));
 }
 
 DMatchArray::operator std::vector<cv::DMatch>() {
@@ -170,7 +169,7 @@ DMatchArray::operator std::vector<cv::DMatch>() {
     return retval;
 }
 
-DMatchArrayOfArrays::DMatchArrayOfArrays(std::vector<std::vector<cv::DMatch>> & other) {
+DMatchArrayOfArrays::DMatchArrayOfArrays(const std::vector<std::vector<cv::DMatch>> & other) {
     this->size = other.size();
     this->data = static_cast<DMatchArray *>(malloc(this->size * sizeof(DMatchArray)));
     for (int i = 0; i < this->size; ++i) {
@@ -200,8 +199,8 @@ KeyPointArray::KeyPointArray(const std::vector<cv::KeyPoint> & v)
     this->size = v.size();
     this->data = static_cast<KeyPointWrapper *>(
             malloc(sizeof(KeyPointWrapper) * (this->size + 1)));
-    for (int i = 1; i <= this->size; ++i) {
-        this->data[i] = v[i];
+    for (int i = 0; i < this->size; ++i) {
+        this->data[i + 1] = v[i];
     }
 }
 
@@ -209,12 +208,10 @@ KeyPointArray::operator std::vector<cv::KeyPoint>()
 {
     std::vector<cv::KeyPoint> retval(this->size);
     for (int i = 0; i < this->size; ++i) {
-        retval[i] = this->data[i];
+        retval[i] = this->data[i + 1];
     }
     return retval;
 }
-
-/***************** Helper wrappers for [OpenCV class + some primitive] *****************/
 
 RectWrapper & RectWrapper::operator=(cv::Rect & other) {
     this->x = other.x;
@@ -253,18 +250,18 @@ PointWrapper::PointWrapper(const cv::Point & other) {
     this->y = other.y;
 }
 
-PointArray::PointArray(std::vector<cv::Point> & vec) {
+PointArray::PointArray(const std::vector<cv::Point> & vec) {
     this->data = static_cast<PointWrapper *>(malloc((vec.size() + 1) * sizeof(PointWrapper)));
     this->size = vec.size();
 
-    for (int i = 1; i <= vec.size(); ++i) {
-        this->data[i] = vec[i];
+    for (int i = 0; i < vec.size(); ++i) {
+        this->data[i + 1] = vec[i];
     }
 }
 
 PointArray::operator std::vector<cv::Point>() {
     std::vector<cv::Point> retval(this->size);
-    memcpy(retval.data(), this->data, this->size * sizeof(PointWrapper));
+    memcpy(retval.data(), this->data + 1, this->size * sizeof(PointWrapper));
     return retval;
 }
 
@@ -278,17 +275,17 @@ SizeWrapper::SizeWrapper(const cv::Size & other) {
     this->width = other.width;
 }
 
-RectArray::RectArray(std::vector<cv::Rect> & vec) {
+RectArray::RectArray(const std::vector<cv::Rect> & vec) {
     this->data = static_cast<RectWrapper *>(malloc((vec.size() + 1) * sizeof(RectWrapper)));
     this->size = vec.size();
 
-    for (int i = 1; i <= vec.size(); ++i) {
-        this->data[i] = vec[i];
+    for (int i = 0; i < vec.size(); ++i) {
+        this->data[i + 1] = vec[i];
     }
 }
 
 RectArray::operator std::vector<cv::Rect>() {
     std::vector<cv::Rect> retval(this->size);
-    memcpy(retval.data(), this->data, this->size * sizeof(RectWrapper));
+    memcpy(retval.data(), this->data + 1, this->size * sizeof(RectWrapper));
     return retval;
 }
