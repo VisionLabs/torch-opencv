@@ -16,7 +16,7 @@ struct TensorWrapper demosaicing(struct cutorchInfo info,
 {
     cuda::GpuMat retval;
     if (!dst.isNull()) retval = dst.toGpuMat();
-    cuda::demosaicing(_src.toGpuMat(), retval, code, dcn, prepareStream(info));
+    cuda::demosaicing(src.toGpuMat(), retval, code, dcn, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
 
@@ -54,7 +54,7 @@ struct TensorWrapper calcHist(
         struct cutorchInfo info, struct TensorWrapper src, struct TensorWrapper hist)
 {
     cuda::GpuMat retval;
-    if (!dst.isNull()) retval = dst.toGpuMat();
+    if (!hist.isNull()) retval = hist.toGpuMat();
     cuda::calcHist(src.toGpuMat(), retval, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -216,6 +216,6 @@ struct TensorWrapper blendLinear(struct cutorchInfo info,
     if (!result.isNull()) retval = result.toGpuMat();
     cuda::blendLinear(
             img1.toGpuMat(), img2.toGpuMat(), weights1.toGpuMat(), weights2.toGpuMat(),
-            retval, kernel_size, sigma_color, prepareStream(info));
+            retval, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }

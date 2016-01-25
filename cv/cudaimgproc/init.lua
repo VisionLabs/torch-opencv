@@ -15,7 +15,7 @@ struct TensorWrapper demosaicing(struct cutorchInfo info,
 
 void swapChannels(
         struct cutorchInfo info, struct TensorWrapper image,
-        struct TensorWrapper dstOrder);
+        struct Vec4iWrapper dstOrder);
 
 struct TensorWrapper gammaCorrection(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst, bool forward);

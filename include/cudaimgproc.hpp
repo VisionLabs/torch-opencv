@@ -40,7 +40,7 @@ struct TensorWrapper demosaicing(struct cutorchInfo info,
 extern "C"
 void swapChannels(
         struct cutorchInfo info, struct TensorWrapper image,
-        struct TensorWrapper dstOrder);
+        struct Vec4iWrapper dstOrder);
 
 extern "C"
 struct TensorWrapper gammaCorrection(struct cutorchInfo info,
