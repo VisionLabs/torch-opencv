@@ -29,6 +29,15 @@ struct FastFeatureDetectorPtr {
     inline cuda::FastFeatureDetector & operator*() { return *static_cast<cuda::FastFeatureDetector *>(this->ptr); }
 };
 
+// ORB
+
+struct ORBPtr {
+    void *ptr;
+    inline cuda::ORB * operator->() { return static_cast<cuda::ORB *>(ptr); }
+    inline ORBPtr(cuda::ORB *ptr) { this->ptr = ptr; }
+    inline cuda::ORB & operator*() { return *static_cast<cuda::ORB *>(this->ptr); }
+};
+
 extern "C"
 struct DescriptorMatcherPtr createBFMatcher(int normType);
 
@@ -126,11 +135,11 @@ struct KeyPointArray Feature2DAsync_convert(
         struct Feature2DAsyncPtr ptr, struct TensorWrapper gpu_keypoints);
 
 extern "C"
-struct FastFeatureDetectorPtr FasfFeatureDetector_ctor(
+struct FastFeatureDetectorPtr FastFeatureDetector_ctor(
         int threshold, bool nonmaxSuppression, int type, int max_npoints);
 
 extern "C"
-void FasfFeatureDetector_dtor(struct FastFeatureDetectorPtr ptr);
+void FastFeatureDetector_dtor(struct FastFeatureDetectorPtr ptr);
 
 extern "C"
 void FastFeatureDetector_setMaxNumPoints(struct FastFeatureDetectorPtr ptr, int val);
@@ -142,9 +151,6 @@ extern "C"
 struct ORBPtr ORB_ctor(
         int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel,
         int WTA_K, int scoreType, int patchSize, int fastThreshold, bool blurForDescriptor);
-
-extern "C"
-void FasfFeatureDetector_dtor(struct ORBPtr ptr);
 
 extern "C"
 void ORB_setBlurForDescriptor(struct ORBPtr ptr, bool val);

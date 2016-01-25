@@ -19,7 +19,8 @@ void DescriptorMatcher_add(
 extern "C"
 struct TensorArray DescriptorMatcher_getTrainDescriptors(
         struct cutorchInfo info, struct DescriptorMatcherPtr ptr) {
-    return TensorArray(ptr->getTrainDescriptors(), info.state);
+    std::vector<cuda::GpuMat> retval = ptr->getTrainDescriptors();
+    return TensorArray(retval, info.state);
 }
 
 extern "C"
@@ -220,7 +221,7 @@ void FastFeatureDetector_setMaxNumPoints(struct FastFeatureDetectorPtr ptr, int 
 extern "C"
 int FastFeatureDetector_getMaxNumPoints(struct FastFeatureDetectorPtr ptr)
 {
-    return ptr->setMaxNumPoints(val);
+    return ptr->getMaxNumPoints();
 }
 
 extern "C"
@@ -242,5 +243,5 @@ void ORB_setBlurForDescriptor(struct ORBPtr ptr, bool val)
 extern "C"
 bool ORB_getBlurForDescriptor(struct ORBPtr ptr)
 {
-    return ptr->getBlurForDescriptor(val);
+    return ptr->getBlurForDescriptor();
 }

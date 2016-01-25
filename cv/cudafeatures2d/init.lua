@@ -96,8 +96,6 @@ struct ORBPtr ORB_ctor(
         int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, 
         int WTA_K, int scoreType, int patchSize, int fastThreshold, bool blurForDescriptor);
 
-void FastFeatureDetector_dtor(struct ORBPtr ptr);
-
 void ORB_setBlurForDescriptor(struct ORBPtr ptr, bool val);
 
 bool ORB_getBlurForDescriptor(struct ORBPtr ptr);
