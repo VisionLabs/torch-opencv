@@ -501,5 +501,327 @@ struct TensorWrapper validateDisparity(
     return disparity;
 }
 
+/****************** Classes ******************/
+
+//StereoMatcher
+
+extern "C"
+struct TensorWrapper compute(
+	struct StereoMatcherPtr ptr, struct TensorWrapper left,
+	struct TensorWrapper right, struct TensorWrapper disparity)
+{
+    cv::Mat disparity_mat;
+    if(!disparity.isNull()) disparity_mat = disparity.toMat();
+    ptr->compute(left.toMat(), right.toMat(), disparity_mat);
+    return TensorWrapper(disparity_mat);
+}
+
+extern "C"
+int StereoMatcher_getBlockSize(
+	struct StereoMatcherPtr ptr)
+{
+    return ptr->getBlockSize();
+}
+
+extern "C"
+int StereoMatcher_getDisp12MaxDiff(
+	struct StereoMatcherPtr ptr)
+{
+    return ptr->getDisp12MaxDiff();
+}
+
+extern "C"
+int StereoMatcher_getMinDisparity(
+	struct StereoMatcherPtr ptr)
+{
+    return ptr->getMinDisparity();
+}
+
+extern "C"
+int StereoMatcher_getNumDisparities(
+	struct StereoMatcherPtr ptr)
+{
+    return ptr->getNumDisparities();
+}
+
+extern "C"
+int StereoMatcher_getSpeckleRange(
+	struct StereoMatcherPtr ptr)
+{
+    return ptr->getSpeckleRange();
+}
+
+extern "C"
+int StereoMatcher_getSpeckleWindowSize(
+	struct StereoMatcherPtr ptr)
+{
+    return ptr->getSpeckleWindowSize();
+}
+
+extern "C"
+void StereoMatcher_setBlockSize(
+	struct StereoMatcherPtr ptr, int blockSize)
+{
+    ptr->setBlockSize(blockSize);
+}
+
+extern "C"
+void StereoMatcher_setDisp12MaxDiff(
+	struct StereoMatcherPtr ptr, int disp12MaxDiff)
+{
+    ptr->setDisp12MaxDiff(disp12MaxDiff);
+}
+
+extern "C"
+void StereoMatcher_setMinDisparity(
+	struct StereoMatcherPtr ptr, int minDisparity)
+{
+    ptr->setMinDisparity(minDisparity);
+}
+
+extern "C"
+void StereoMatcher_setNumDisparities(
+	struct StereoMatcherPtr ptr, int numDisparities)
+{
+    ptr->setNumDisparities(numDisparities);
+}
+
+extern "C"
+void StereoMatcher_setSpeckleRange(
+	struct StereoMatcherPtr ptr, int speckleRange)
+{
+    ptr->setSpeckleRange(speckleRange);
+}
+
+extern "C"
+void StereoMatcher_setSpeckleWindowSize(
+	struct StereoMatcherPtr ptr, int speckleWindowSize)
+{
+    ptr->setSpeckleWindowSize(speckleWindowSize);
+}
+
+//StereoBM
+
+extern "C"
+struct StereoBMPtr StereoBM_ctor(
+	int numDisparities, int blockSize)
+{
+    return rescueObjectFromPtr(
+		cv::StereoBM::create(numDisparities, blockSize));
+}
+
+extern "C"
+int StereoBM_getPreFilterCap(
+	struct StereoBMPtr ptr)
+{
+    return ptr->getPreFilterCap();
+}
+
+extern "C"
+int StereoBM_getPreFilterSize(
+	struct StereoBMPtr ptr)
+{
+    return ptr->getPreFilterSize();
+}
+
+extern "C"
+int StereoBM_getPreFilterType(
+	struct StereoBMPtr ptr)
+{
+    return ptr->getPreFilterType();
+}
+
+extern "C"
+struct RectWrapper StereoBM_getROI1(
+	struct StereoBMPtr ptr)
+{
+    return ptr->getROI1();
+}
+
+extern "C"
+struct RectWrapper StereoBM_getROI2(
+	struct StereoBMPtr ptr)
+{
+    return ptr->getROI2();
+}
+
+extern "C"
+int StereoBM_getSmallerBlockSize(
+	struct StereoBMPtr ptr)
+{
+    return ptr->getSmallerBlockSize();
+}
+
+extern "C"
+int StereoBM_getTextureThreshold(
+	struct StereoBMPtr ptr)
+{
+    return ptr->getTextureThreshold();
+}
+
+extern "C"
+int StereoBM_getUniquenessRatio(
+	struct StereoBMPtr ptr)
+{
+    return ptr->getUniquenessRatio();
+}
+
+extern "C"
+void StereoBM_setPreFilterCap(
+	struct StereoBMPtr ptr, int preFilterCap)
+{
+    ptr->setPreFilterCap(preFilterCap);
+}
+
+extern "C"
+void StereoBM_setPreFilterSize(
+	struct StereoBMPtr ptr, int preFilterSize)
+{
+    ptr->setPreFilterSize(preFilterSize);
+}
+
+extern "C"
+void StereoBM_setPreFilterType(
+	struct StereoBMPtr ptr, int preFilterType)
+{
+    ptr->setPreFilterType(preFilterType);
+}
+
+extern "C"
+void StereoBM_setROI1(
+	struct StereoBMPtr ptr, RectWrapper roi1)
+{
+    ptr->setROI1(roi1);
+}
+
+extern "C"
+void StereoBM_setROI2(
+	struct StereoBMPtr ptr, RectWrapper roi2)
+{
+    ptr->setROI2(roi2);
+}
+
+extern "C"
+void StereoBM_setSmallerBlockSize(
+	struct StereoBMPtr ptr, int blockSize)
+{
+    ptr->setSmallerBlockSize(blockSize);
+}
+
+extern "C"
+void StereoBM_setTextureThreshold(
+	struct StereoBMPtr ptr, int textureThreshold)
+{
+    ptr->setTextureThreshold(textureThreshold);
+}
+
+extern "C"
+void StereoBM_setUniquenessRatio(
+	struct StereoBMPtr ptr, int uniquenessRatio)
+{
+    ptr->setUniquenessRatio(uniquenessRatio);
+}
+
+//StereoSGBM
+
+extern "C"
+struct StereoSGBMPtr StereoSGBM_ctor(
+	int minDisparity, int numDisparities, int blockSize,
+	int P1, int P2, int disp12MaxDiff, int preFilterCap,
+	int uniquenessRatio, int speckleWindowSize,
+	int speckleRange, int mode)
+{
+    return rescueObjectFromPtr(
+		cv::StereoSGBM::create(
+			minDisparity, numDisparities, blockSize, P1, P2,
+			disp12MaxDiff, preFilterCap, uniquenessRatio,
+			speckleWindowSize, speckleRange, mode));
+}
+
+extern "C"
+int StereoSGBM_getMode(
+	struct StereoSGBMPtr ptr)
+{
+    return ptr->getMode();
+}
+
+extern "C"
+int StereoSGBM_getP1(
+	struct StereoSGBMPtr ptr)
+{
+    return ptr->getP1();
+}
+
+extern "C"
+int StereoSGBM_getP2(
+	struct StereoSGBMPtr ptr)
+{
+    return ptr->getP2();
+}
+
+extern "C"
+int StereoSGBM_getPreFilterCap(
+	struct StereoSGBMPtr ptr)
+{
+    return ptr->getPreFilterCap();
+}
+
+extern "C"
+int StereoSGBM_getUniquenessRatio(
+	struct StereoSGBMPtr ptr)
+{
+    return ptr->getUniquenessRatio();
+}
+
+extern "C"
+void StereoSGBM_setMode(
+	struct StereoSGBMPtr ptr, int mode)
+{
+    ptr->setMode(mode);
+}
+
+
+extern "C"
+void StereoSGBM_setP1(
+	struct StereoSGBMPtr ptr, int P1)
+{
+    ptr->setP1(P1);
+}
+
+extern "C"
+void StereoSGBM_setP2(
+	struct StereoSGBMPtr ptr, int P2)
+{
+    ptr->setP2(P2);
+}
+
+extern "C"
+void StereoSGBM_setPreFilterCap(
+	struct StereoSGBMPtr ptr, int preFilterCap)
+{
+    ptr->setPreFilterCap(preFilterCap);
+}
+
+extern "C"
+void StereoSGBM_setUniquenessRatio(
+	struct StereoSGBMPtr ptr, int uniquenessRatio)
+{
+    ptr->setUniquenessRatio(uniquenessRatio);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

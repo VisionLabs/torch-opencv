@@ -773,13 +773,415 @@ function cv.validateDisparity(t)
 			minDisparity, numberOfDisparities, disp12MaxDisp))
 end
 
+--- ***************** Classes *****************
+
+require 'cv.Classes'
+
+local Classes = ffi.load(cv.libPath('Classes'))
+
+ffi.cdef[[
+
+struct TensorWrapper StereoMatcher_compute(
+	struct StereoMatcherPtr ptr, struct TensorWrapper left,
+	struct TensorWrapper right, struct TensorWrapper disparity);
+
+int StereoMatcher_getBlockSize(
+	struct StereoMatcherPtr ptr);
+
+int StereoMatcher_getDisp12MaxDiff(
+	struct StereoMatcherPtr ptr);
+
+int StereoMatcher_getMinDisparity(
+	struct StereoMatcherPtr ptr);
+
+int StereoMatcher_getNumDisparities(
+	struct StereoMatcherPtr ptr);
+
+int StereoMatcher_getSpeckleRange(
+	struct StereoMatcherPtr ptr);
+
+int StereoMatcher_getSpeckleWindowSize(
+	struct StereoMatcherPtr ptr);
+
+void StereoMatcher_setBlockSize(
+	struct StereoMatcherPtr ptr, int blockSize);
+
+void StereoMatcher_setDisp12MaxDiff(
+	struct StereoMatcherPtr ptr, int disp12MaxDiff);
+
+void StereoMatcher_setMinDisparity(
+	struct StereoMatcherPtr ptr, int minDisparity);
+
+void StereoMatcher_setNumDisparities(
+	struct StereoMatcherPtr ptr, int numDisparities);
+
+void StereoMatcher_setSpeckleRange(
+	struct StereoMatcherPtr ptr, int speckleRange);
+
+void StereoMatcher_setSpeckleWindowSize(
+	struct StereoMatcherPtr ptr, int speckleWindowSize);
+
+struct StereoBMPtr StereoBM_ctor(
+	int numDisparities, int blockSize);
+
+int StereoBM_getPreFilterCap(
+	struct StereoBMPtr ptr);
+
+int StereoBM_getPreFilterSize(
+	struct StereoBMPtr ptr);
+
+int StereoBM_getPreFilterType(
+	struct StereoBMPtr ptr);
+
+struct RectWrapper StereoBM_getROI1(
+	struct StereoBMPtr ptr);
+
+struct RectWrapper StereoBM_getROI2(
+	struct StereoBMPtr ptr);
+
+int StereoBM_getSmallerBlockSize(
+	struct StereoBMPtr ptr);
+
+int StereoBM_getTextureThreshold(
+	struct StereoBMPtr ptr);
+
+int StereoBM_getUniquenessRatio(
+	struct StereoBMPtr ptr);
+
+void StereoBM_setPreFilterCap(
+	struct StereoBMPtr ptr, int preFilterCap);
+
+void StereoBM_setPreFilterSize(
+	struct StereoBMPtr ptr, int preFilterSize);
+
+void StereoBM_setPreFilterType(
+	struct StereoBMPtr ptr, int preFilterType);
+
+void StereoBM_setROI1(
+	struct StereoBMPtr ptr, RectWrapper roi1);
+
+void StereoBM_setROI2(
+	struct StereoBMPtr ptr, RectWrapper roi2);
+
+void StereoBM_setSmallerBlockSize(
+	struct StereoBMPtr ptr, int blockSize);
+
+void StereoBM_setTextureThreshold(
+	struct StereoBMPtr ptr, int textureThreshold);
+
+void StereoBM_setUniquenessRatio(
+	struct StereoBMPtr ptr, int uniquenessRatio);
+
+struct StereoSGBMPtr StereoSGBM_ctor(
+	int minDisparity, int numDisparities, int blockSize,
+	int P1, int P2, int disp12MaxDiff, int preFilterCap,
+	int uniquenessRatio, int speckleWindowSize,
+	int speckleRange, int mode);
+
+int StereoSGBM_getMode(
+	struct StereoSGBMPtr ptr);
+
+int StereoSGBM_getP1(
+	struct StereoSGBMPtr ptr);
+
+int StereoSGBM_getP2(
+	struct StereoSGBMPtr ptr);
+
+int StereoSGBM_getPreFilterCap(
+	struct StereoSGBMPtr ptr);
+
+int StereoSGBM_getUniquenessRatio(
+	struct StereoSGBMPtr ptr);
+
+void StereoSGBM_setMode(
+	struct StereoSGBMPtr ptr, int mode);
+
+void StereoSGBM_setP1(
+	struct StereoSGBMPtr ptr, int P1);
+
+void StereoSGBM_setP2(
+	struct StereoSGBMPtr ptr, int P2);
+
+void StereoSGBM_setPreFilterCap(
+	struct StereoSGBMPtr ptr, int preFilterCap);
+
+void StereoSGBM_setUniquenessRatio(
+	struct StereoSGBMPtr ptr, int uniquenessRatio);
+]]
+
+--StereoMatcher
+
+do
+    local StereoMatcher = torch.class('cv.StereoMatcher', 'cv.Algorithm', cv)
+
+    function StereoMatcher:compute(t)
+        local argRules = {
+            {"left", required = true},
+            {"right", required = true},
+            {"disparity", default = nil}}
+    local left, right, right = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+			C.StereoMatcher_compute(
+				self.ptr, cv.wrap_tensor(left), cv.wrap_tensor(right),
+				cv.wrap_tensor(disparity)))
+    end
+
+    function StereoMatcher:getBlockSize()
+        return C.StereoMatcher_getBlockSize(self.ptr)
+    end
+
+    function StereoMatcher:getDisp12MaxDiff()
+        return C.StereoMatcher_getDisp12MaxDiff(self.ptr)
+    end
+
+    function StereoMatcher:getMinDisparity()
+        return C.StereoMatcher_getMinDisparity(self.ptr)
+    end
+
+    function StereoMatcher:getNumDisparities()
+        return C.StereoMatcher_getNumDisparities(self.ptr)
+    end
+
+    function StereoMatcher:getSpeckleRange()
+        return C.StereoMatcher_getSpeckleRange(self.ptr)
+    end
+
+    function StereoMatcher:getSpeckleWindowSize()
+        return C.StereoMatcher_getSpeckleWindowSize(self.ptr)
+    end
+
+    function StereoMatcher:setBlockSize(t)
+        local argRules = {
+            {"setBlockSize", required = true}}
+        local setBlockSize = cv.argcheck(t, argRules)
+        C.StereoMatcher_setBlockSize(self.ptr, setBlockSize)
+    end
+
+    function StereoMatcher:setDisp12MaxDiff(t)
+        local argRules = {
+            {"disp12MaxDiff", required = true}}
+        local disp12MaxDiff = cv.argcheck(t, argRules)
+        C.StereoMatcher_setDisp12MaxDiff(self.ptr, disp12MaxDiff)
+    end
+
+    function StereoMatcher:setMinDisparity(t)
+        local argRules = {
+            {"minDisparity", required = true}}
+        local minDisparity = cv.argcheck(t, argRules)
+        C.StereoMatcher_setMinDisparity(self.ptr, minDisparity)
+    end
+
+    function StereoMatcher:setNumDisparities(t)
+        local argRules = {
+            {"numDisparities", required = true}}
+        local numDisparities = cv.argcheck(t, argRules)
+        C.StereoMatcher_setNumDisparities(self.ptr, numDisparities)
+    end
+
+    function StereoMatcher:setSpeckleRange(t)
+        local argRules = {
+            {"speckleRange", required = true}}
+        local speckleRange = cv.argcheck(t, argRules)
+        C.StereoMatcher_setSpeckleRange(self.ptr, speckleRange)
+    end
+
+    function StereoMatcher:setSpeckleWindowSize(t)
+        local argRules = {
+            {"speckleWindowSize", required = true}}
+        local speckleWindowSize = cv.argcheck(t, argRules)
+        C.StereoMatcher_setSpeckleWindowSize(self.ptr, speckleWindowSize)
+    end
+end
+
+--StereoBM
+
+do
+    local StereoBM = torch.class('cv.StereoBM', 'cv.StereoMatcher', cv)
+
+    function StereoBM:__init()
+        local argRules = {
+            {"numDisparities", default = 0},
+            {"blockSize", default = 21}}
+        local numDisparities, blockSize = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(
+			C.StereoBM_ctor(numDisparities, blockSize),
+			Classes.Algorithm_dtor)
+    end
+
+    function StereoBM:getPreFilterCap()
+        return C.StereoBM_getPreFilterCap(self.ptr)
+    end
+
+    function StereoBM:getPreFilterSize()
+        return C.StereoBM_getPreFilterSize(self.ptr)
+    end
+
+    function StereoBM:getPreFilterType()
+        return C.StereoBM_getPreFilterType(self.ptr)
+    end
+
+    function StereoBM:getROI1()
+        return C.StereoBM_getROI1(self.ptr)
+    end
+
+    function StereoBM:getROI2()
+        return C.StereoBM_getROI2(self.ptr)
+    end
+
+    function StereoBM:getSmallerBlockSize()
+        return C.StereoBM_getSmallerBlockSize(self.ptr)
+    end
+
+    function StereoBM:getTextureThreshold()
+        return C.StereoBM_getTextureThreshold(self.ptr)
+    end
+
+    function StereoBM:getUniquenessRatio()
+        return C.StereoBM_getUniquenessRatio(self.ptr)
+    end
+
+    function StereoBM:setPreFilterCap()
+        local argRules = {
+            {"preFilterCap", required = true}}
+        local preFilterCap = cv.argcheck(t, argRules)
+        C.StereoBM_setPreFilterCap(self.ptr, preFilterCap)
+    end
+
+    function StereoBM:setPreFilterSize()
+        local argRules = {
+            {"preFilterSize", required = true}}
+        local preFilterSize = cv.argcheck(t, argRules)
+        C.StereoBM_setPreFilterSize(self.ptr, preFilterSize)
+    end
+
+    function StereoBM:setPreFilterType()
+        local argRules = {
+            {"preFilterType", required = true}}
+        local preFilterType = cv.argcheck(t, argRules)
+        C.StereoBM_setPreFilterType(self.ptr, preFilterType)
+    end
+
+    function StereoBM:setROI1()
+        local argRules = {
+            {"roi1", required = true}}
+        local roi1 = cv.argcheck(t, argRules)
+        C.StereoBM_setROI1(self.ptr, roi1)
+    end
+
+    function StereoBM:setROI2()
+        local argRules = {
+            {"roi2", required = true}}
+        local roi2 = cv.argcheck(t, argRules)
+        C.StereoBM_setROI2(self.ptr, roi2)
+    end
+
+    function StereoBM:setSmallerBlockSize()
+        local argRules = {
+            {"blockSize", required = true}}
+        local blockSize = cv.argcheck(t, argRules)
+        C.StereoBM_setSmallerBlockSize(self.ptr, blockSize)
+    end
+
+    function StereoBM:setTextureThreshold()
+        local argRules = {
+            {"textureThreshold", required = true}}
+        local textureThreshold = cv.argcheck(t, argRules)
+        C.StereoBM_setTextureThreshold(self.ptr, textureThreshold)
+    end
+
+    function StereoBM:setUniquenessRatio()
+        local argRules = {
+            {"uniquenessRatio", required = true}}
+        local uniquenessRatio = cv.argcheck(t, argRules)
+        C.StereoBM_setUniquenessRatio(self.ptr, uniquenessRatio)
+    end
+end
+
+--StereoSGBM
+
+do
+    local StereoSGBM = torch.class('cv.StereoSGBM', 'cv.StereoMatcher', cv)
+
+    function StereoSGBM:__init()
+        local argRules = {
+            {"minDisparity", required = true},
+            {"numDisparities", required = true},
+            {"blockSize", required = true},
+            {"P1", default = 0},
+            {"P2", default = 0},
+            {"disp12MaxDiff", default = 0},
+            {"preFilterCap", default = 0},
+            {"uniquenessRatio", default = 0},
+            {"speckleWindowSize", default = 0},
+            {"speckleRange", default = 0},
+            {"mode", default = cv.StereoSGBM_MODE_SGBM}}
+        local minDisparity, numDisparities, blockSize, P1, P2, disp12MaxDiff,
+              preFilterCap, uniquenessRatio, speckleWindowSize,
+              speckleRange, mode = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(
+			C.StereoSGBM_ctor(
+				minDisparity, numDisparities, blockSize, P1, P2,
+				disp12MaxDiff, preFilterCap, uniquenessRatio,
+				speckleWindowSize, speckleRange, mode))
+    end
+
+    function StereoSGBM:getMode()
+        return C.StereoSGBM_getMode(self.ptr)
+    end
+
+    function StereoSGBM:getP1()
+        return C.StereoSGBM_getP1(self.ptr)
+    end
+
+    function StereoSGBM:getP2()
+        return C.StereoSGBM_getP2(self.ptr)
+    end
+
+    function StereoSGBM:getPreFilterCap()
+        return C.StereoSGBM_getPreFilterCap(self.ptr)
+    end
+
+    function StereoSGBM:getUniquenessRatio()
+        return C.StereoSGBM_getUniquenessRatio(self.ptr)
+    end
+
+    function StereoSGBM:setMode(t)
+        local argRules = {
+            {"mode", required = true}}
+        local mode = cv.argcheck(t, argRules)
+        C.StereoSGBM_setMode(self.ptr, mode)
+    end
+
+    function StereoSGBM:setP1(t)
+        local argRules = {
+            {"P1", required = true}}
+        local P1 = cv.argcheck(t, argRules)
+        C.StereoSGBM_setP1(self.ptr, P1)
+    end
+
+    function StereoSGBM:setP2(t)
+        local argRules = {
+            {"P2", required = true}}
+        local P2 = cv.argcheck(t, argRules)
+        C.StereoSGBM_setP2(self.ptr, P2)
+    end
+
+    function StereoSGBM:setPreFilterCap(t)
+        local argRules = {
+            {"preFilterCap", required = true}}
+        local preFilterCap = cv.argcheck(t, argRules)
+        C.StereoSGBM_setPreFilterCap(self.ptr, preFilterCap)
+    end
+
+    function StereoSGBM:setUniquenessRatio(t)
+        local argRules = {
+            {"uniquenessRatio", required = true}}
+        local uniquenessRatio = cv.argcheck(t, argRules)
+        C.StereoSGBM_setUniquenessRatio(self.ptr, uniquenessRatio)
+    end
+end
 
 return cv
-
-
-
-
-
 
 
 
