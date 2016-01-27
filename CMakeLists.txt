@@ -5,7 +5,6 @@ OPTION(BUILD_TESTS  "Build C tests"         OFF)
 OPTION(BUILD_CUDA   "Wrap CUDA packages"    ON)
 
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 SET(OPENCV_MODULES_TO_WRAP
         imgcodecs highgui features2d flann imgproc ml optflow photo superres videoio video
@@ -24,10 +23,6 @@ FIND_PACKAGE(OpenCV 3 REQUIRED)
 # Once more (silently) to look for the installed modules
 FIND_PACKAGE(OpenCV 3 OPTIONAL_COMPONENTS ${OPENCV_MODULES_TO_WRAP})
 
-MESSAGE(STATUS "OpenCV Include dirs: ${OpenCV_INCLUDE_DIRS}")
-MESSAGE(STATUS "OpenCV Library dirs: ${OpenCV_LIB_DIR}")
-MESSAGE(STATUS "OpenCV Libraries: ${OpenCV_LIBS}")
-
 IF(LUAROCKS_PREFIX)
     MESSAGE(STATUS "Installing Torch through Luarocks")
     STRING(REGEX REPLACE "(.*)lib/luarocks/rocks.*" "\\1" CMAKE_INSTALL_PREFIX  "${LUAROCKS_PREFIX}")
@@ -36,6 +31,13 @@ ENDIF()
 
 FIND_PACKAGE(Torch REQUIRED)
 INCLUDE_DIRECTORIES(${Torch_INSTALL_INCLUDE} ${OpenCV_INCLUDE_DIRS})
+
+SET(CXX_STANDARD_REQUIRED ON)
+
+FUNCTION(ADD_LIBRARY)
+    _ADD_LIBRARY(${ARGN})
+    SET_PROPERTY(TARGET ${ARGV0} PROPERTY CXX_STANDARD 11)
+ENDFUNCTION()
 
 FILE(GLOB luasrc *.lua cv/*.lua)
 SET(luasrc ${luasrc})
@@ -96,7 +98,5 @@ IF (BUILD_TESTS)
     FILE(GLOB Tests_SRC "${SOURCE_DIR}/tests/*.cpp")
     ADD_LIBRARY(Tests SHARED ${Tests_SRC})
     TARGET_LINK_LIBRARIES(Tests Common)
-endif()
-
-
+ENDIF()
 
