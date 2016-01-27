@@ -3,7 +3,7 @@
 #include <opencv2/calib3d.hpp>
 
 extern "C"
-double calibrateCamera(
+struct calibrateCameraRetval calibrateCamera(
 	struct TensorArray objectPoints, struct TensorArray imagePoints,
 	struct SizeWrapper imageSize, struct TensorWrapper cameraMatrix,
 	struct TensorWrapper distCoeffs, struct TensorArray rvecs,
@@ -188,7 +188,7 @@ struct TensorArrayPlusBool solvePnPRansac(
 	double confidence, struct TensorWrapper inliers, int flags);
 
 extern "C"
-double stereoCalibrate(
+struct TensorArrayPlusDouble stereoCalibrate(
 	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints1,
 	struct TensorWrapper imagePoints2, struct TensorWrapper cameraMatrix1,
 	struct TensorWrapper distCoeffs1, struct TensorWrapper cameraMatrix2,

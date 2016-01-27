@@ -2,7 +2,7 @@ local cv = require 'cv._env'
 local ffi = require 'ffi'
 
 ffi.cdef[[
-double calibrateCamera(
+struct calibrateCameraRetval calibrateCamera(
 	struct TensorArray objectPoints, struct TensorArray imagePoints,
 	struct SizeWrapper imageSize, struct TensorWrapper cameraMatrix,
 	struct TensorWrapper distCoeffs, struct TensorArray rvecs,
@@ -153,7 +153,7 @@ struct TensorArrayPlusBool solvePnPRansac(
 	bool useExtrinsicGuess, int iterationsCount, float reprojectionError,
 	double confidence, struct TensorWrapper inliers, int flags);
 
-double stereoCalibrate(
+struct TensorArrayPlusDouble stereoCalibrate(
 	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints1,
 	struct TensorWrapper imagePoints2, struct TensorWrapper cameraMatrix1,
 	struct TensorWrapper distCoeffs1, struct TensorWrapper cameraMatrix2,
@@ -193,10 +193,10 @@ function cv.calibrateCamera(t)
         {"objectPoints", required = true},
         {"imagePoints", required = true},
         {"imageSize", required = true, operator = cv.Size},
-        {"cameraMatrix", required = true}, 
-        {"distCoeffs", required = true},
-        {"rvecs", required = true},
-        {"tvecs", required = true},
+        {"cameraMatrix", default = nil}, 
+        {"distCoeffs", default = nil},
+        {"rvecs", default = nil},
+        {"tvecs", default = nil},
         {"flag", default = 0},
         {"criteria", default = cv.TermCriteria(TERM_CRITERIA_COUNT+TERM_CRITERIA_EPS),
                                operator = cv.TermCriteria}}
@@ -206,7 +206,9 @@ function cv.calibrateCamera(t)
 			cv.wrap_tensors(objectPoints), cv.wrap_tensors(imagePoints),
 			imageSize, cv.wrap_tensor(cameraMatrix), cv.wrap_tensor(distCoeffs),
 			cv.wrap_tensors(rvecs), cv.wrap_tensors(tvecs), flag, criteria)
-    return result
+    return result.retval, cv.unwrap_tensors(result.intrinsics),
+           cv.unwrap_tensors(result.rvecs, true),
+           cv.unwrap_tensors(result.tvecs, true) 
 end 
 
 function cv.calibrationMatrixValues(t)
@@ -690,13 +692,14 @@ function cv.stereoCalibrate(t)
     local objectPoints, imagePoints1, imagePoints2, cameraMatrix1,
           distCoeffs1, cameraMatrix2, distCoeffs2, imageSize, R, T,
           E, F, flags, criteria = cv.argcheck(t, argRules)
-    return C.stereoCalibrate(
-		cv.wrap_tensor(objectPoints), cv.wrap_tensor(imagePoints1),
-		cv.wrap_tensor(imagePoints2), cv.wrap_tensor(cameraMatrix1),
-		cv.wrap_tensor(distCoeffs1), cv.wrap_tensor(cameraMatrix2),
-		cv.wrap_tensor(distCoeffs2), imageSize, cv.wrap_tensor(R),
-		cv.wrap_tensor(T), cv.wrap_tensor(E), cv.wrap_tensor(F),
-		flags, criteria)
+    local result C.stereoCalibrate(
+			cv.wrap_tensor(objectPoints), cv.wrap_tensor(imagePoints1),
+			cv.wrap_tensor(imagePoints2), cv.wrap_tensor(cameraMatrix1),
+			cv.wrap_tensor(distCoeffs1), cv.wrap_tensor(cameraMatrix2),
+			cv.wrap_tensor(distCoeffs2), imageSize, cv.wrap_tensor(R),
+			cv.wrap_tensor(T), cv.wrap_tensor(E), cv.wrap_tensor(F),
+			flags, criteria)
+    return result.val, cv.unwrap_tensors(result.tensors)
 end
 
 function cv.stereoRectify(t)

@@ -1,15 +1,27 @@
 #include <calib3d.hpp>
 
 extern "C"
-double calibrateCamera(
+struct calibrateCameraRetval calibrateCamera(
 	struct TensorArray objectPoints, struct TensorArray imagePoints,
 	struct SizeWrapper imageSize, struct TensorWrapper cameraMatrix,
 	struct TensorWrapper distCoeffs, struct TensorArray rvecs,
 	struct TensorArray tvecs, int flags, struct TermCriteriaWrapper criteria)
 {   
-    return cv::calibrateCamera(objectPoints.toMatList(), imagePoints.toMatList(),
-			       imageSize, cameraMatrix.toMat(), distCoeffs.toMat(),
-			       rvecs.toMatList(), tvecs.toMatList(), flags, criteria);
+    struct calibrateCameraRetval result;
+    std::vector<cv::Mat> intrinsics(2), rvecs_vec, tvecs_vec;
+
+    if(!cameraMatrix.isNull()) intrinsics[0] = cameraMatrix.toMat();
+    if(!distCoeffs.isNull()) intrinsics[1] = distCoeffs.toMat();
+    if(!rvecs.isNull()) rvecs_vec = rvecs.toMatList();
+    if(!tvecs.isNull()) tvecs_vec = tvecs.toMatList();
+
+    result.retval = cv::calibrateCamera(objectPoints.toMatList(), imagePoints.toMatList(),
+			       		imageSize, intrinsics[0], intrinsics[1],
+			       		rvecs_vec, tvecs_vec, flags, criteria);
+    new(&result.intrinsics) TensorArray(intrinsics);
+    new(&result.rvecs) TensorArray(rvecs_vec);
+    new(&result.tvecs) TensorArray(tvecs_vec);
+    return result;
 }
 
 extern "C"
@@ -426,7 +438,7 @@ struct TensorArrayPlusBool solvePnPRansac(
 }
 
 extern "C"
-double stereoCalibrate(
+struct TensorArrayPlusDouble stereoCalibrate(
 	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints1,
 	struct TensorWrapper imagePoints2, struct TensorWrapper cameraMatrix1,
 	struct TensorWrapper distCoeffs1, struct TensorWrapper cameraMatrix2,
@@ -435,11 +447,25 @@ double stereoCalibrate(
 	struct TensorWrapper E, struct TensorWrapper F,
 	int flags, struct TermCriteriaWrapper criteria)
 {
-    return cv::stereoCalibrate(
-		objectPoints.toMat(), imagePoints1.toMat(), imagePoints2.toMat(),
-		cameraMatrix1.toMat(), distCoeffs1.toMat(), cameraMatrix2.toMat(),
-		distCoeffs2.toMat(), imageSize, R.toMat(), T.toMat(), E.toMat(),
-		F.toMat(), flags, criteria);
+    struct TensorArrayPlusDouble result;
+    std::vector<cv::Mat> vec(8);
+    
+    if(!cameraMatrix1.isNull()) vec[0] = cameraMatrix1.toMat();
+    if(!distCoeffs1.isNull()) vec[1] = distCoeffs1.toMat();
+    if(!cameraMatrix2.isNull()) vec[2] = cameraMatrix2.toMat();
+    if(!distCoeffs2.isNull()) vec[3] = distCoeffs2.toMat();
+    if(!R.isNull()) vec[4] = R.toMat();
+    if(!T.isNull()) vec[5] = T.toMat();
+    if(!E.isNull()) vec[6] = E.toMat();
+    if(!F.isNull()) vec[6] = F.toMat();
+
+    result.val = cv::stereoCalibrate(
+			objectPoints.toMat(), imagePoints1.toMat(),
+			imagePoints2.toMat(), vec[0], vec[1], vec[2],
+			vec[3], imageSize, vec[4], vec[5], vec[6],
+			vec[7], flags, criteria);
+    new(&result.tensors) TensorArray(vec);
+    return result;
 }
 
 extern "C"

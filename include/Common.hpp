@@ -362,6 +362,11 @@ struct TensorPlusPointArray {
     struct PointArray points;
 };
 
+struct calibrateCameraRetval {
+    double retval;
+    struct TensorArray intrinsics, rvecs, tvecs;
+};
+
 // Arrays of arrays
 
 struct FloatArrayOfArrays {

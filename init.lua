@@ -114,6 +114,11 @@ struct DMatchArrayOfArrays {
     struct DMatchArray *data;
 };
 
+struct calibrateCameraRetval {
+    double retval;
+    struct TensorArray rvecs, tvecs, intrinsics;
+};
+
 struct TensorPlusDouble {
     struct TensorWrapper tensor;
     double val;
