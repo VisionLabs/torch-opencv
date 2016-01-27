@@ -10,6 +10,9 @@ struct TensorArrayPlusBool imreadmulti(const char *filename, int flags);
 bool imwrite(const char *filename, struct TensorWrapper img, struct TensorWrapper params);
 
 struct TensorWrapper imdecode(struct TensorWrapper buf, int flags);
+
+struct TensorWrapper imencode(
+        const char *ext, struct TensorWrapper img, struct TensorWrapper params);
 ]]
 
 local C = ffi.load(cv.libPath('imgcodecs'))
@@ -53,6 +56,17 @@ function cv.imdecode(t)
     local buf, flags = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(C.imdecode(cv.wrap_tensor(buf), flags))
+end
+
+function cv.imencode(t)
+    local argRules = {
+        {"ext", required = true},
+        {"img", required = true},
+        {"params", default = nil}
+    }
+    local ext, img, params = cv.argcheck(t, argRules)
+
+    return cv.unwrap_tensors(C.imencode(ext, cv.wrap_tensor(img), cv.wrap_tensor(params)))
 end
 
 return cv

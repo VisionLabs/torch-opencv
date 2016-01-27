@@ -839,11 +839,16 @@ function cv.AGAST(t)
     local argRules = {
         {"image", required = true},
         {"threshold", required = true},
-        {"nonmaxSuppression", default = true}
+        {"nonmaxSuppression", default = true},
+        {"type", default = nil}
     }
-    local image, threshold, nonmaxSuppression = cv.argcheck(t, argRules)
+    local image, threshold, nonmaxSuppression, type_ = cv.argcheck(t, argRules)
 
-    return cv.gcarray(C.AGAST(cv.wrap_tensor(image), threshold, nonmaxSuppression))
+    if t[4] or t.type then
+        return cv.gcarray(C.AGAST_type(cv.wrap_tensor(image), threshold, nonmaxSuppression, type_))
+    else
+        return cv.gcarray(C.AGAST(cv.wrap_tensor(image), threshold, nonmaxSuppression))
+    end
 end
 
 -- FastFeatureDetector

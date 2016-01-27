@@ -15,11 +15,17 @@ if not image then
     os.exit(0)
 end
 
+cv.namedWindow{"win1"}
+cv.setWindowTitle{"win1", "Original image"}
+cv.imshow{"win1", image}
+cv.waitKey{0}
+
 local keyPts = cv.AGAST{image, threshold=34, nonmaxSuppression=true}
 
 -- show keypoints to the user
 local imgWithAllKeypoints = cv.drawKeypoints{image, keyPts}
-cv.imshow{keyPts.size .. " keypoints by AGAST", imgWithAllKeypoints}
+cv.setWindowTitle{"win1", keyPts.size .. " keypoints by AGAST"}
+cv.imshow{"win1", imgWithAllKeypoints}
 cv.waitKey{0}
 
 -- remove keypoints within 40 pixels from image border
@@ -28,5 +34,6 @@ keyPts = cv.KeyPointsFilter.runByImageBorder{keyPts, imageSize, 40}
 
 -- show again, with reduced number of keypoints
 local imgWithSomeKeypoints = cv.drawKeypoints{image, keyPts}
-cv.imshow{keyPts.size .. " remaining keypoints", imgWithSomeKeypoints}
+cv.setWindowTitle{"win1", keyPts.size .. " remaining keypoints"}
+cv.imshow{"win1", imgWithSomeKeypoints}
 cv.waitKey{0}

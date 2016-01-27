@@ -30,3 +30,12 @@ struct TensorWrapper imdecode(struct TensorWrapper buf, int flags)
 {
     return TensorWrapper(cv::imdecode(buf.toMat(), flags));
 }
+
+extern "C"
+struct TensorWrapper imencode(
+        const char *ext, struct TensorWrapper img, struct TensorWrapper params)
+{
+    std::vector<unsigned char> retval;
+    cv::imencode(ext, img.toMat(), retval, params.toMat());
+    return TensorWrapper(cv::Mat(retval));
+}

@@ -12,3 +12,7 @@ bool imwrite(const char *filename, struct TensorWrapper img, struct TensorWrappe
 
 extern "C"
 struct TensorWrapper imdecode(struct TensorWrapper buf, int flags);
+
+extern "C"
+struct TensorWrapper imencode(
+        const char *ext, struct TensorWrapper img, struct TensorWrapper params);

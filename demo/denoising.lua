@@ -3,16 +3,12 @@ require 'cv.photo'
 require 'cv.imgcodecs'
 require 'cv.highgui'
 
-local image
-
-if not arg[1] or not arg[2] then
-    local lena = cv.imread{'demo/lena.jpg'}
-    image = {lena, lena}
-else
-    image = {cv.imread{arg[1]}, cv.imread{arg[2]}}
+if not arg[1] then
+    print('Usage: `th demo/denoising.lua path-to-image`')
+    print('Now using demo/lena.jpg')
 end
+    
+local image = cv.imread{arg[1] or 'demo/lena.jpg'}
 
-local dst = cv.fastNlMeansDenoisingColoredMulti{image, nil, 1, 1};
-
-cv.imshow{winname = "Denoised image", image = dst}
+cv.imshow{"Denoised image", cv.fastNlMeansDenoising{image}}
 cv.waitKey{0}
