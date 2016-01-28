@@ -20,7 +20,8 @@ cv.setWindowTitle{"win1", "Original image"}
 cv.imshow{"win1", image}
 cv.waitKey{0}
 
-local keyPts = cv.AGAST{image, threshold=34, nonmaxSuppression=true}
+local AGAST = cv.AgastFeatureDetector{threshold=34}
+local keyPts = AGAST:detect{image}
 
 -- show keypoints to the user
 local imgWithAllKeypoints = cv.drawKeypoints{image, keyPts}
@@ -28,9 +29,9 @@ cv.setWindowTitle{"win1", keyPts.size .. " keypoints by AGAST"}
 cv.imshow{"win1", imgWithAllKeypoints}
 cv.waitKey{0}
 
--- remove keypoints within 40 pixels from image border
+-- remove keypoints within 60 pixels from image border
 local imageSize = {image:size()[2], image:size()[1]}
-keyPts = cv.KeyPointsFilter.runByImageBorder{keyPts, imageSize, 40}
+keyPts = cv.KeyPointsFilter.runByImageBorder{keyPts, imageSize, 60}
 
 -- show again, with reduced number of keypoints
 local imgWithSomeKeypoints = cv.drawKeypoints{image, keyPts}

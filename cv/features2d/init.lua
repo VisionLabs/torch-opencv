@@ -824,7 +824,7 @@ function cv.FAST(t)
         {"image", required = true},
         {"threshold", required = true},
         {"nonmaxSuppression", default = true},
-        {"_type", default = nil}
+        {"type", default = nil}
     }
     local image, threshold, nonmaxSuppression, _type = cv.argcheck(t, argRules)
 
@@ -860,7 +860,7 @@ do
         local argRules = {
             {"threshold", default = 10},
             {"nonmaxSuppression", default = true},
-            {"_type", default = cv.FAST_FEATURE_DETECTOR_TYPE_9_16}
+            {"type", default = cv.FAST_FEATURE_DETECTOR_TYPE_9_16}
         }
         local threshold, nonmaxSuppression, _type = cv.argcheck(t, argRules)
 
@@ -918,7 +918,7 @@ do
         local argRules = {
             {"threshold", default = 10},
             {"nonmaxSuppression", default = true},
-            {"_type", default = cv.AGAST_FEATURE_DETECTOR_OAST_9_16}
+            {"type", default = cv.AGAST_FEATURE_DETECTOR_OAST_9_16}
         }
         local threshold, nonmaxSuppression, _type = cv.argcheck(t, argRules)
 
