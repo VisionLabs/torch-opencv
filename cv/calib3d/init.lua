@@ -13,7 +13,7 @@ struct TensorWrapper calibrationMatrixValues(
 	struct SizeWrapper imageSize,
 	double apertureWidth, double apertureHeight);
 
-void composeRT(
+struct TensorArray composeRT(
 	struct TensorWrapper rvec1, struct TensorWrapper tvec1, struct TensorWrapper rvec2,
 	struct TensorWrapper tvec2, struct TensorWrapper rvec3, struct TensorWrapper tvec3,
 	struct TensorWrapper dr3dr1, struct TensorWrapper dr3dt1, struct TensorWrapper dr3dr2,
@@ -198,8 +198,9 @@ function cv.calibrateCamera(t)
         {"rvecs", default = nil},
         {"tvecs", default = nil},
         {"flag", default = 0},
-        {"criteria", default = cv.TermCriteria(TERM_CRITERIA_COUNT+TERM_CRITERIA_EPS),
-                               operator = cv.TermCriteria}}
+        {"criteria", default =
+		cv.TermCriteria(cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 30, DBL_EPSILON),
+		operator = cv.TermCriteria}}
     local objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs,
       		rvecs, tvecs, flag, criteria = cv.argcheck(t, argRules)
     local result = C.calibrateCamera(
@@ -231,8 +232,8 @@ function cv.composeRT(t)
         {"tvec1", required = true},
         {"rvec2", required = true},
         {"tvec2", required = true},
-        {"rvec3", required = true},
-        {"tvec3", required = true},
+        {"rvec3", default = nil},
+        {"tvec3", default = nil},
         {"dr3dr1", default = nil},
         {"dr3dt1", default = nil},
         {"dr3dr2", default = nil},
@@ -243,9 +244,10 @@ function cv.composeRT(t)
         {"dt3dt2", default = nil}}
     local rvec1, tvec1, rvec2, tvec2, rvec3, tvec3, dr3dr1, dr3dt1, dr3dr2,
 		dr3dt2, dt3dr1, dt3dt1, dt3dr2, dt3dt2 = cv.argcheck(t, argRules)
-    C.composeRT(
-	rvec1, tvec1, rvec2, tvec2, rvec3, tvec3, dr3dr1, dr3dt1,
-	dr3dr2, dr3dt2, dt3dr1, dt3dt1, dt3dr2, dt3dt2)
+    local result = C.composeRT(
+		rvec1, tvec1, rvec2, tvec2, rvec3, tvec3, dr3dr1, dr3dt1,
+		dr3dr2, dr3dt2, dt3dr1, dt3dt1, dt3dr2, dt3dt2)
+    return cv.unwrap_tensors(result)
 end   
 
 function cv.computeCorrespondEpilines(t)
@@ -376,7 +378,7 @@ function cv.findChessboardCorners(t)
     local argRules = {
         {"image", required = true},
         {"patternSize", required = true, operator = cv.Size},
-        {"flags", default = CALIB_CB_ADAPTIVE_THRESH+CALIB_CB_NORMALIZE_IMAGE}}
+        {"flags", default = cv.CALIB_CB_ADAPTIVE_THRESH+cv.CALIB_CB_NORMALIZE_IMAGE}}
     local image, patternSize, flags = cv.argcheck(t, argRules)
     return cv.unwrap_tensors(
 		C.findChessboardCorners(cv.wrap_tensor(image), patternSize, flags))
@@ -387,7 +389,7 @@ function cv.findCirclesGrid(t)
     local argRules = {
         {"image", required = true},
         {"patternSize", required = true, operator = cv.Size},
-        {"flags", default = CALIB_CB_SYMMETRIC_GRID}}
+        {"flags", default = cv.CALIB_CB_SYMMETRIC_GRID}}
     local image, patternSize, flags = cv.argcheck(t, argRules)
     local result = C.findCirclesGrid(cv.wrap_tensor(image), patternSize, flags)
     return result.val, cv.unwrap_tensors(result.tensor)
@@ -399,7 +401,7 @@ function cv.findEssentialMat(t)
         {"points2", required = true},
         {"focal", default = 1.0},
         {"pp", operator = cv.Point2d, default = cv.Point2d(0,0)},
-        {"method", default = RANSAC},
+        {"method", default = cv.RANSAC},
         {"prob", default = 0.999},
         {"threshold", default = 1.0},
         {"mask", default = nil}}
@@ -414,7 +416,7 @@ function cv.findFundamentalMat(t)
     local argRules = {
         {"points1", required = true},
         {"points2", required = true},
-        {"method", default = FM_RANSAC},
+        {"method", default = cv.FM_RANSAC},
         {"param1", default = 3.0},
         {"param2", default = 0.99},
         {"mask", default = nil}}
@@ -430,7 +432,7 @@ function cv.findFundamentalMat2(t)
 	{"points1", required = true},
    	{"points2", required = true},
 	{"mask", required = true},
-	{"method", default = FM_RANSAC},
+	{"method", default = cv.FM_RANSAC},
   	{"param1", default = 3.0},
 	{"param2", default = 0.99}}
     local points1, points2, mask, method, param1, param2 = cv.argcheck(t, argRules)
@@ -636,7 +638,7 @@ function cv.solvePnP(t)
         {"rvec", default = nil},
         {"tvec", default = nil},
         {"useExtrinsicGuess", default = false},
-        {"flags", default = SOLVEPNP_ITERATIVE}}
+        {"flags", default = cv.SOLVEPNP_ITERATIVE}}
     local objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec,
           tvec, useExtrinsicGuess, flags = cv.argcheck(t, argRules)
     local result = C.solvePnP(
@@ -660,7 +662,7 @@ function cv.solvePnPRansac(t)
         {"reprojectionError", default = 8.0},
         {"confidence", default = 0.99},
         {"inliers", default = nil},
-        {"flags", default = SOLVEPNP_ITERATIVE}}
+        {"flags", default = cv.SOLVEPNP_ITERATIVE}}
     local objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec,
           tvec, useExtrinsicGuess, iterationsCount,reprojectionError,
           confidence, inliers, flags = cv.argcheck(t, argRules)
@@ -677,22 +679,23 @@ function cv.stereoCalibrate(t)
         {"objectPoints", required = true},
         {"imagePoints1", required = true},
         {"imagePoints2", required = true},
-        {"cameraMatrix1", required = true},
-        {"distCoeffs1", required = true},
-        {"cameraMatrix2", required = true},
-        {"distCoeffs2", required = true},
+        {"cameraMatrix1", default = nil},
+        {"distCoeffs1", default = nil},
+        {"cameraMatrix2", default = nil},
+        {"distCoeffs2", default = nil},
         {"imageSize", required = true, operator = cv.Size},
-        {"R", required = true},
-        {"T", required = true},
-        {"E", required = true},
-        {"F", required = true},
-        {"flags", defauly = CALIB_FIX_INTRINSIC},
-        {"criteria", default = cv.TermCriteria(TERM_CRITERIA_COUNT+TERM_CRITERIA_EPS),
-                               operator = cv.TermCriteria}}
+        {"R", default = nil},
+        {"T", default = nil},
+        {"E", default = nil},
+        {"F", default = nil},
+        {"flags", defauly = cv.CALIB_FIX_INTRINSIC},
+        {"criteria", default =
+		cv.TermCriteria(cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 30, 1e-6),
+		operator = cv.TermCriteria}}
     local objectPoints, imagePoints1, imagePoints2, cameraMatrix1,
           distCoeffs1, cameraMatrix2, distCoeffs2, imageSize, R, T,
           E, F, flags, criteria = cv.argcheck(t, argRules)
-    local result C.stereoCalibrate(
+    local result = C.stereoCalibrate(
 			cv.wrap_tensor(objectPoints), cv.wrap_tensor(imagePoints1),
 			cv.wrap_tensor(imagePoints2), cv.wrap_tensor(cameraMatrix1),
 			cv.wrap_tensor(distCoeffs1), cv.wrap_tensor(cameraMatrix2),
@@ -716,7 +719,7 @@ function cv.stereoRectify(t)
         {"P1", required = true},
         {"P2", required = true},
         {"Q", required = true},
-        {"flags", default = CALIB_ZERO_DISPARITY},
+        {"flags", default = cv.CALIB_ZERO_DISPARITY},
         {"alpha", default = -1},
         {"newImageSize", default = cv.Size(), operator = cv.Size}}
     local cameraMatrix1, distCoeffs1, cameraMatrix2, distCoeffs2,
@@ -774,6 +777,221 @@ function cv.validateDisparity(t)
 		C.validateDisparity(
 			cv.wrap_tensor(disparity), cv.wrap_tensor(cost),
 			minDisparity, numberOfDisparities, disp12MaxDisp))
+end
+
+--******************Fisheye camera model***************
+
+fisheye = {}
+cv.fisheye = fisheye;
+
+cv.fisheye.CALIB_USE_INTRINSIC_GUESS = 1
+cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC = 2
+cv.fisheye.CALIB_CHECK_COND = 4
+cv.fisheye.CALIB_FIX_SKEW = 8
+cv.fisheye.CALIB_FIX_K1 = 16
+cv.fisheye.CALIB_FIX_K2 = 32
+cv.fisheye.CALIB_FIX_K3 = 64
+cv.fisheye.CALIB_FIX_K4 = 128
+cv.fisheye.CALIB_FIX_INTRINSIC = 256
+
+function cv.fisheye.calibrate(t)
+    local argRules = {
+        {"objectPoints", required = true},
+        {"imagePoints", required = true},
+        {"imageSize", required = true, operator = cv.Size},
+        {"K", default = nil}, 
+        {"D", default = nil},
+        {"rvecs", default = nil},
+        {"tvecs", default = nil},
+        {"flag", default = 0},
+        {"criteria", default =
+		cv.TermCriteria(cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 100, DBL_EPSILON),
+                operator = cv.TermCriteria}}
+    local objectPoints, imagePoints, imageSize, K, D,
+      		rvecs, tvecs, flag, criteria = cv.argcheck(t, argRules)
+    local result = C.fisheye_calibrate(
+			cv.wrap_tensors(objectPoints), cv.wrap_tensors(imagePoints),
+			imageSize, cv.wrap_tensor(K), cv.wrap_tensor(D),
+			cv.wrap_tensors(rvecs), cv.wrap_tensors(tvecs), flag, criteria)
+    return result.retval, cv.unwrap_tensors(result.intrinsics),
+           cv.unwrap_tensors(result.rvecs, true),
+           cv.unwrap_tensors(result.tvecs, true) 
+end 
+
+function cv.fisheye.distortPoints(t)
+    local argRules = {
+        {"undistorted", required = true},
+        {"distorted", default = nil},
+        {"K", required = true},
+        {"D", required = true},
+        {"alpha", default = 0}}
+    local undistorted, distorted, K, D, alpha = cv.argcheck(t, argRules)
+    return unwrap_tensors(
+		C.fisheye_distortPoints(
+			cv.wrap_tensor(undistorted), cv.wrap_tensor(distorted),
+			cv.wrap_tensor(K), cv.wrap_tensor(D), alpha))
+end
+
+function cv.fisheye.estimateNewCameraMatrixForUndistortRectify(t)
+    local argRules = {
+        {"K", required = true},
+        {"D", required = true},
+        {"image_size", required = true, operator = cv.Size},
+        {"R", required = true},
+        {"P", default = nil},
+        {"balance", default = 0.0},
+        {"new_size", default = cv.Size(), operator = cv.Size},
+        {"fov_scale", default = 1.0}}
+    local K, D, image_size, R, P, balance, new_size,
+          fov_scale = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+		C.fisheye_estimateNewCameraMatrixForUndistortRectify(
+			cv.wrap_tensor(K), cv.wrap_tensor(D), image_size,
+			cv.wrap_tensor(R), cv.wrap_tensor(P), balance,
+			new_size, fov_scale))
+end
+
+function cv.fisheye.initUndistortRectifyMap(t)
+    local argRules = {
+        {"K", required = true},
+        {"D", required = true},
+        {"R", required = true},
+        {"P", required = true},
+        {"size", required = true, operator = cv.Size},
+        {"m1type", required = true},
+        {"map1", default = nil},
+        {"map2", default = nil}}
+    local K, D, R, P, size, m1type, map1, map2 = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+		C.fisheye_initUndistortRectifyMap(
+			cv.wrap_tensor(K), cv.wrap_tensor(D), cv.wrap_tensor(R),
+			cv.wrap_tensor(P), size, m1type, cv.wrap_tensor(map1),
+			cv.wrap_tensor(map2)));
+end
+
+--TODO need to add cv::Affine3< T > Class
+function cv.fisheye.projectPoints(t)
+    local argRules = {
+        {"objectPoints", required = true},
+        {"imagePoints", default = nil},
+        {"affine", required = true},
+        {"K", required = true},
+        {"D", required = true},
+        {"alpha", default = 0},
+        {"jacobian", default = nil}}
+    local objectPoints, imagePoints, affine, K,
+          D, alpha, jacobian = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+		C.fisheye_projectPoints(
+			cv.wrap_tensor(objectPoints), cv.wrap_tensor(imagePoints),
+			affine, cv.wrap_tensor(K), cv.wrap_tensor(D), alpha, jacobian))
+end
+
+function cv.fisheye.projectPoints2(t)
+    local argRules = {
+        {"objectPoints", required = true},
+        {"imagePoints", default = nil},
+        {"rvec", required = true},
+        {"tvec", required = true},
+        {"K", required = true},
+        {"D", required = true},
+        {"alpha", default = 0},
+        {"jacobian", default = nil}}
+    local objectPoints, imagePoints, rvec, tvec, K,
+          D, alpha, jacobian = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+		C.fisheye_projectPoints2(
+			cv.wrap_tensor(objectPoints), cv.wrap_tensor(imagePoints),
+			cv.wrap_tensor(rvec), cv.wrap_tensor(tvec), cv.wrap_tensor(K),
+			cv.wrap_tensor(D), alpha, jacobian))
+end
+
+function cv.fisheye.stereoCalibrate(t)
+    local argRules = {
+        {"objectPoints", required = true},
+        {"imagePoints1", required = true},
+        {"imagePoints2", required = true},
+        {"K1", default = nil},
+        {"D1", default = nil},
+        {"K2", default = nil},
+        {"D2", default = nil},
+        {"imageSize", required = true, operator = cv.Size},
+        {"R", default = nil},
+        {"T", default = nil},
+        {"flags", defauly = cv.fisheye.CALIB_FIX_INTRINSIC},
+        {"criteria", default =
+		cv.TermCriteria(cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 100, DBL_EPSILON),
+		operator = cv.TermCriteria}}
+    local objectPoints, imagePoints1, imagePoints2, K1, D1, K2, D2,
+          imageSize, R, T, flags, criteria = cv.argcheck(t, argRules)
+    local result = C.fisheye_stereoCalibrate(
+			cv.wrap_tensor(objectPoints), cv.wrap_tensor(imagePoints1),
+			cv.wrap_tensor(imagePoints2), cv.wrap_tensor(K1),
+			cv.wrap_tensor(D1), cv.wrap_tensor(K2),
+			cv.wrap_tensor(D2), imageSize, cv.wrap_tensor(R),
+			cv.wrap_tensor(T), flags, criteria)
+    return result.val, cv.unwrap_tensors(result.tensors)
+end
+
+function cv.fisheye.stereoRectify(t)
+    local argRules = {
+        {"K1", required = true},
+        {"D1", required = true},
+        {"K2", required = true},
+        {"D2", required = true},
+        {"imageSize", required = true, operator = cv.Size},
+        {"R", required = true},
+        {"tvec", required = true},
+        {"R1", default = nil},
+        {"R2", default = nil},
+        {"P1", default = nil},
+        {"P2", default = nil},
+        {"Q", default = nil},
+        {"flags", required = true},
+        {"newImageSize", default = cv.Size(), operator = cv.Size},
+        {"balance", default = 0.0},
+        {"fov_scale", default = 1.0}}
+    local K1, D1, K2, D, imageSize, R, tvec, R1, R2, P1, P2, Q, flags,
+          newImageSize, balance, fov_scale = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+		C.fisheye_stereoRectify(
+			cv.wrap_tensor(K1), cv.wrap_tensor(D1),
+			cv.wrap_tensor(K2), cv.wrap_tensor(D2),
+			imageSize, cv.wrap_tensor(R), cv.wrap_tensor(tvec), cv.wrap_tensor(R1),
+			cv.wrap_tensor(R2), cv.wrap_tensor(P1), cv.wrap_tensor(P2),
+			cv.wrap_tensor(Q), flags, newImageSize, balance, fov_scale))
+end
+
+function cv.fisheye.undistortImage(t)
+    local argRules = {
+        {"distorted", required = true},
+        {"undistorted", default = nil},
+        {"K", required = true},
+        {"D", required = true},
+        {"Knew", default = nil},
+        {"new_size", default = cv.Size(), operator = cv.Size}}
+    local distorted, undistorted, K, D, Knew, new_size = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+		C.fisheye._ndistortImage(
+			cv.wrap_tensor(distorted), cv.wrap_tensor(undistorted),
+			cv.wrap_tensor(K), cv.wrap_tensor(D),
+			cv.wrap_tensor(Knew), new_size))
+end
+
+function cv.fisheye.undistortPoints(t)
+    local argRules = {
+        {"distorted", required = true},
+        {"undistorted", default = nil},
+        {"K", required = true},
+        {"D", required = true},
+        {"R", default = nil},
+        {"P", default = nil}}
+    local distorted, undistorted, K, D, R, P = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+		C.fisheye_undistortPoints(
+			cv.wrap_tensor(distorted), cv.wrap_tensor(undistorted),
+			cv.wrap_tensor(K), cv.wrap_tensor(D), cv.wrap_tensor(R),
+			cv.wrap_tensor(P)))
 end
 
 --- ***************** Classes *****************

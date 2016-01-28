@@ -45,19 +45,29 @@ struct TensorWrapper calibrationMatrixValues(
 }
 
 extern "C"
-void composeRT(
+struct TensorArray composeRT(
 	struct TensorWrapper rvec1, struct TensorWrapper tvec1, struct TensorWrapper rvec2,
 	struct TensorWrapper tvec2, struct TensorWrapper rvec3, struct TensorWrapper tvec3,
 	struct TensorWrapper dr3dr1, struct TensorWrapper dr3dt1, struct TensorWrapper dr3dr2,
 	struct TensorWrapper dr3dt2, struct TensorWrapper dt3dr1, struct TensorWrapper dt3dt1,
 	struct TensorWrapper dt3dr2, struct TensorWrapper dt3dt2)
 {
+    std::vector<cv::Mat> vec(10);
+    if(!rvec3.isNull()) vec[0] = rvec3.toMat();
+    if(!tvec3.isNull()) vec[1] = tvec3.toMat();
+    if(!dr3dr1.isNull()) vec[2] = dr3dr1.toMat();
+    if(!dr3dt1.isNull()) vec[3] = dr3dt1.toMat();
+    if(!dr3dr2.isNull()) vec[4] = dr3dr2.toMat();
+    if(!dr3dt2.isNull()) vec[5] = dr3dt2.toMat();
+    if(!dt3dr1.isNull()) vec[6] = dt3dr1.toMat();
+    if(!dt3dt1.isNull()) vec[7] = dt3dt1.toMat();
+    if(!dt3dr2.isNull()) vec[8] = dt3dr2.toMat();
+    if(!dt3dt2.isNull()) vec[9] = dt3dt2.toMat();
+
     cv::composeRT(rvec1.toMat(),tvec1.toMat(), rvec2.toMat(),
-		  tvec2.toMat(), rvec3.toMat(), tvec3.toMat(),
-		  TO_MAT_OR_NOARRAY(dr3dr1), TO_MAT_OR_NOARRAY(dr3dt1),
- 		  TO_MAT_OR_NOARRAY(dr3dr2), TO_MAT_OR_NOARRAY(dr3dt2),
-		  TO_MAT_OR_NOARRAY(dt3dr1), TO_MAT_OR_NOARRAY(dt3dt1),
-  		  TO_MAT_OR_NOARRAY(dt3dr2), TO_MAT_OR_NOARRAY(dt3dt2));
+		  tvec2.toMat(), vec[0], vec[1], vec[2], vec[3],
+ 		  vec[4], vec[5], vec[6], vec[7], vec[8], vec[9]);
+    return TensorArray(vec);
 }
 
 extern "C"
@@ -457,7 +467,7 @@ struct TensorArrayPlusDouble stereoCalibrate(
     if(!R.isNull()) vec[4] = R.toMat();
     if(!T.isNull()) vec[5] = T.toMat();
     if(!E.isNull()) vec[6] = E.toMat();
-    if(!F.isNull()) vec[6] = F.toMat();
+    if(!F.isNull()) vec[7] = F.toMat();
 
     result.val = cv::stereoCalibrate(
 			objectPoints.toMat(), imagePoints1.toMat(),
@@ -525,6 +535,188 @@ struct TensorWrapper validateDisparity(
 		disparity.toMat(), cost.toMat(), minDisparity,
 		numberOfDisparities, disp12MaxDisp);
     return disparity;
+}
+
+//******************Fisheye camera model***************
+
+extern "C"
+struct calibrateCameraRetval fisheye_calibrate(
+	struct TensorArray objectPoints, struct TensorArray imagePoints,
+	struct SizeWrapper imageSize, struct TensorWrapper K,
+	struct TensorWrapper D, struct TensorArray rvecs,
+	struct TensorArray tvecs, int flags, struct TermCriteriaWrapper criteria)
+{   
+    struct calibrateCameraRetval result;
+    std::vector<cv::Mat> intrinsics(2), rvecs_vec, tvecs_vec;
+
+    if(!K.isNull()) intrinsics[0] = K.toMat();
+    if(!D.isNull()) intrinsics[1] = D.toMat();
+    if(!rvecs.isNull()) rvecs_vec = rvecs.toMatList();
+    if(!tvecs.isNull()) tvecs_vec = tvecs.toMatList();
+
+    result.retval = fisheye::calibrate(
+				objectPoints.toMatList(), imagePoints.toMatList(),
+				imageSize, intrinsics[0], intrinsics[1],
+				rvecs_vec, tvecs_vec, flags, criteria);
+    new(&result.intrinsics) TensorArray(intrinsics);
+    new(&result.rvecs) TensorArray(rvecs_vec);
+    new(&result.tvecs) TensorArray(tvecs_vec);
+    return result;
+}
+
+extern "C"
+struct TensorWrapper fisheye_distortPoints(
+	struct TensorWrapper undistorted, struct TensorWrapper distorted,
+	struct TensorWrapper K, struct TensorWrapper D, double alpha)
+{
+    cv::Mat distorted_mat;
+    if(!distorted.isNull()) distorted_mat = distorted.toMat();
+    fisheye::distortPoints(
+			undistorted.toMat(), distorted_mat,
+			K.toMat(), D.toMat(), alpha);
+    return TensorWrapper(distorted_mat);
+}
+
+extern "C"
+struct TensorWrapper fisheye_estimateNewCameraMatrixForUndistortRectify(
+	struct TensorWrapper K, struct TensorWrapper D,
+	struct SizeWrapper image_size, struct TensorWrapper R,
+	struct TensorWrapper P, double balance,
+	struct SizeWrapper new_size, double fov_scale)
+{
+    cv::Mat P_mat;
+    if(!P.isNull()) P_mat = P.toMat();
+    fisheye::estimateNewCameraMatrixForUndistortRectify(
+			K.toMat(), D.toMat(), image_size, R.toMat(),
+			P_mat, balance, new_size, fov_scale);
+    return TensorWrapper(P_mat);
+}
+
+struct TensorArray fisheye_initUndistortRectifyMap(
+	struct TensorWrapper K, struct TensorWrapper D,
+	struct TensorWrapper R, struct TensorWrapper P,
+	struct SizeWrapper size, int m1type,
+	struct TensorWrapper map1, struct TensorWrapper map2)
+{
+    std::vector<cv::Mat> vec(2);
+    if(!map1.isNull()) vec[0] = map1.toMat();
+    if(!map2.isNull()) vec[1] = map2.toMat();
+    fisheye::initUndistortRectifyMap(
+		K.toMat(), D.toMat(), R.toMat(), P.toMat(),
+		size, m1type, vec[0], vec[1]);
+    return TensorArray(vec);
+}
+
+//TODO need to add cv::Affine3< T > Class
+extern "C"
+struct TensorArray fisheye_projectPoints(
+	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints,
+	/*struct Affine3dWrapper affine,*/ struct TensorWrapper K,
+	struct TensorWrapper D, double alpha, struct TensorWrapper jacobian)
+{
+    std::vector<cv::Mat> vec(2);
+    if(!imagePoints.isNull()) vec[0] = imagePoints.toMat();
+    if(!jacobian.isNull()) vec[1] = jacobian.toMat();
+//    fisheye::projectPoints(
+//		objectPoints.toMat(), vec[0], affine, K.toMat(),
+//		D.toMat(), alpha, jacobian.toMat());
+    return TensorArray(vec);
+}
+
+extern "C"
+struct TensorArray fisheye_projectPoints2(
+	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints,
+	struct TensorWrapper rvec, struct TensorWrapper tvec,
+	struct TensorWrapper K, struct TensorWrapper D, double alpha,
+	struct TensorWrapper jacobian)
+{
+    std::vector<cv::Mat> vec(2);
+    if(!imagePoints.isNull()) vec[0] = imagePoints.toMat();
+    if(!jacobian.isNull()) vec[1] = jacobian.toMat();
+    fisheye::projectPoints(
+		objectPoints.toMat(), vec[0], rvec.toMat(), tvec.toMat(),
+		K.toMat(), D.toMat(), alpha, vec[1]);
+    return TensorArray(vec);
+}
+
+extern "C"
+struct TensorArrayPlusDouble fisheye_stereoCalibrate(
+	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints1,
+	struct TensorWrapper imagePoints2, struct TensorWrapper K1,
+	struct TensorWrapper D1, struct TensorWrapper K2,
+	struct TensorWrapper D2, struct SizeWrapper imageSize,
+	struct TensorWrapper R, struct TensorWrapper T,
+	int flags, struct TermCriteriaWrapper criteria)
+{
+    struct TensorArrayPlusDouble result;
+    std::vector<cv::Mat> vec(6);
+    
+    if(!K1.isNull()) vec[0] = K1.toMat();
+    if(!D1.isNull()) vec[1] = D1.toMat();
+    if(!K2.isNull()) vec[2] = K2.toMat();
+    if(!D2.isNull()) vec[3] = D2.toMat();
+    if(!R.isNull()) vec[4] = R.toMat();
+    if(!T.isNull()) vec[5] = T.toMat();
+
+    result.val = fisheye::stereoCalibrate(
+			objectPoints.toMat(), imagePoints1.toMat(),
+			imagePoints2.toMat(), vec[0], vec[1], vec[2],
+			vec[3], imageSize, vec[4], vec[5], flags, criteria);
+    new(&result.tensors) TensorArray(vec);
+    return result;
+}
+
+extern "C"
+struct TensorArray fisheye_stereoRectify(
+	struct TensorWrapper K1, struct TensorWrapper D1,
+	struct TensorWrapper K2, struct TensorWrapper D2,
+	struct SizeWrapper imageSize, struct TensorWrapper R,
+	struct TensorWrapper tvec, struct TensorWrapper R1,
+	struct TensorWrapper R2, struct TensorWrapper P1,
+	struct TensorWrapper P2, struct TensorWrapper Q,
+	int flags, struct SizeWrapper newImageSize,
+	double balance, double fov_scale)
+{
+    std::vector<cv::Mat> vec(5);
+    if(!R1.isNull()) vec[0] = R1.toMat();
+    if(!R2.isNull()) vec[1] = R2.toMat();
+    if(!P1.isNull()) vec[2] = P1.toMat();
+    if(!P2.isNull()) vec[3] = P2.toMat();
+    if(!Q.isNull()) vec[4] = Q.toMat();
+
+    fisheye::stereoRectify(
+		K1.toMat(), D1.toMat(), K2.toMat(), D2.toMat(),
+		imageSize, R.toMat(), tvec.toMat(), vec[0],
+		vec[1], vec[2], vec[3], vec[4], flags,
+		newImageSize, balance, fov_scale);
+    return TensorArray(vec);
+}
+
+struct TensorWrapper fisheye_undistortImage(
+	struct TensorWrapper distorted, struct TensorWrapper undistorted,
+	struct TensorWrapper K, struct TensorWrapper D,
+	struct TensorWrapper Knew, struct SizeWrapper new_size)
+{
+    cv::Mat undistorted_mat;
+    if(!undistorted.isNull()) undistorted_mat = undistorted.toMat();
+    fisheye::undistortImage(
+		distorted.toMat(), undistorted_mat, K.toMat(),
+		D.toMat(), TO_MAT_OR_NOARRAY(Knew), new_size);
+    return TensorWrapper(undistorted_mat);
+}
+
+extern "C"
+struct TensorWrapper fisheye_undistortPoints(
+	struct TensorWrapper distorted, struct TensorWrapper undistorted,
+	struct TensorWrapper K, struct TensorWrapper D,
+	struct TensorWrapper R, struct TensorWrapper P)
+{
+    cv::Mat undistorted_mat;
+    if(!undistorted.isNull()) undistorted_mat = undistorted.toMat();
+    fisheye::undistortPoints(
+		distorted.toMat(), undistorted_mat, K.toMat(), D.toMat(),
+		TO_MAT_OR_NOARRAY(R), TO_MAT_OR_NOARRAY(P));
+    return TensorWrapper(undistorted_mat);
 }
 
 /****************** Classes ******************/

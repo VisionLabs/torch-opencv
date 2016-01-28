@@ -16,7 +16,7 @@ struct TensorWrapper calibrationMatrixValues(
 	double apertureWidth, double apertureHeight);
 
 extern "C"
-void composeRT(
+struct TensorArray composeRT(
 	struct TensorWrapper rvec1, struct TensorWrapper tvec1, struct TensorWrapper rvec2,
 	struct TensorWrapper tvec2, struct TensorWrapper rvec3, struct TensorWrapper tvec3,
 	struct TensorWrapper dr3dr1, struct TensorWrapper dr3dt1, struct TensorWrapper dr3dr2,
@@ -222,6 +222,82 @@ extern "C"
 struct TensorWrapper validateDisparity(
 	struct TensorWrapper disparity, struct TensorWrapper cost,
         int minDisparity, int numberOfDisparities, int disp12MaxDisp);
+
+//******************Fisheye camera model***************
+
+namespace fisheye = cv::fisheye;
+
+extern "C"
+struct calibrateCameraRetval fisheye_calibrate(
+	struct TensorArray objectPoints, struct TensorArray imagePoints,
+	struct SizeWrapper imageSize, struct TensorWrapper K,
+	struct TensorWrapper D, struct TensorArray rvecs,
+	struct TensorArray tvecs, int flags, struct TermCriteriaWrapper criteria);
+
+extern "C"
+struct TensorWrapper fisheye_distortPoints(
+	struct TensorWrapper undistorted, struct TensorWrapper distorted,
+	struct TensorWrapper K, struct TensorWrapper D, double alpha);
+
+extern "C"
+struct TensorWrapper fisheye_estimateNewCameraMatrixForUndistortRectify(
+	struct TensorWrapper K, struct TensorWrapper D,
+	struct SizeWrapper image_size, struct TensorWrapper R,
+	struct TensorWrapper P, double balance,
+	struct SizeWrapper new_size, double fov_scale);
+
+extern "C"
+struct TensorArray fisheye_initUndistortRectifyMap(
+	struct TensorWrapper K, struct TensorWrapper D,
+	struct TensorWrapper R, struct TensorWrapper P,
+	struct SizeWrapper size, int m1type,
+	struct TensorWrapper map1, struct TensorWrapper map2);
+
+//TODO need to add cv::Affine3< T > Class
+extern "C"
+struct TensorArray fisheye_projectPoints(
+	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints,
+	/*struct Affine3dWrapper affine,*/ struct TensorWrapper K,
+	struct TensorWrapper D, double alpha, struct TensorWrapper jacobian);
+
+extern "C"
+struct TensorArray fisheye_projectPoints2(
+	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints,
+	struct TensorWrapper rvec, struct TensorWrapper tvec,
+	struct TensorWrapper K, struct TensorWrapper D, double alpha,
+	struct TensorWrapper jacobian);
+
+extern "C"
+struct TensorArrayPlusDouble fisheye_stereoCalibrate(
+	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints1,
+	struct TensorWrapper imagePoints2, struct TensorWrapper K1,
+	struct TensorWrapper D1, struct TensorWrapper K2,
+	struct TensorWrapper D2, struct SizeWrapper imageSize,
+	struct TensorWrapper R, struct TensorWrapper T,
+	int flags, struct TermCriteriaWrapper criteria);
+
+extern "C"
+struct TensorArray fisheye_stereoRectify(
+	struct TensorWrapper K1, struct TensorWrapper D1,
+	struct TensorWrapper K2, struct TensorWrapper D2,
+	struct SizeWrapper imageSize, struct TensorWrapper R,
+	struct TensorWrapper tvec, struct TensorWrapper R1,
+	struct TensorWrapper R2, struct TensorWrapper P1,
+	struct TensorWrapper P2, struct TensorWrapper Q,
+	int flags, struct SizeWrapper newImageSize,
+	double balance, double fov_scale);
+
+extern "C"
+struct TensorWrapper fisheye_undistortImage(
+	struct TensorWrapper distorted, struct TensorWrapper undistorted,
+	struct TensorWrapper K, struct TensorWrapper D,
+	struct TensorWrapper Knew, struct SizeWrapper new_size);
+
+extern "C"
+struct TensorWrapper fisheye_undistortPoints(
+	struct TensorWrapper distorted, struct TensorWrapper undistorted,
+	struct TensorWrapper K, struct TensorWrapper D,
+	struct TensorWrapper R, struct TensorWrapper P);
 
 /****************** Classes ******************/
 
