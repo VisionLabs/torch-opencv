@@ -367,6 +367,11 @@ struct calibrateCameraRetval {
     struct TensorArray intrinsics, rvecs, tvecs;
 };
 
+struct decomposeHomographyMatRetval {
+   int val;
+   struct TensorArray rotations, translations, normals;
+};
+
 // Arrays of arrays
 
 struct FloatArrayOfArrays {

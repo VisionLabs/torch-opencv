@@ -25,11 +25,12 @@ struct TensorArray composeRT(
 
 extern "C"
 struct TensorWrapper computeCorrespondEpilines(
-	struct TensorWrapper points, int whichImage, struct TensorWrapper F);
+	struct TensorWrapper points, int whichImage, struct TensorWrapper F,
+	struct TensorWrapper lines);
 
 extern "C"
 struct TensorWrapper convertPointsFromHomogeneous(
-	struct TensorWrapper src);
+	struct TensorWrapper src, struct TensorWrapper dst);
 
 extern "C"
 struct TensorWrapper convertPointsHomogeneous(
@@ -37,26 +38,31 @@ struct TensorWrapper convertPointsHomogeneous(
 
 extern "C"
 struct TensorWrapper convertPointsToHomogeneous(
-	struct TensorWrapper src);
+	struct TensorWrapper src, struct TensorWrapper dst);
 
 extern "C"
 struct TensorArray correctMatches(
 	struct TensorWrapper F, struct TensorWrapper points1,
-	struct TensorWrapper points2);
+	struct TensorWrapper points2, struct TensorWrapper newPoints1,
+	struct TensorWrapper newPoints2);
 
 extern "C"
 struct TensorArray decomposeEssentialMat(
-	struct TensorWrapper E);
+	struct TensorWrapper E, struct TensorWrapper R1,
+	struct TensorWrapper R2, struct TensorWrapper t);
 
 extern "C"
-struct TensorArrayPlusInt decomposeHomographyMat(
-	struct TensorWrapper H, struct TensorWrapper K);
+struct decomposeHomographyMatRetval decomposeHomographyMat(
+	struct TensorWrapper H, struct TensorWrapper K,
+	struct TensorArray rotations, struct TensorArray translations,
+	struct TensorArray normals);
 
 extern "C"
 struct TensorArray decomposeProjectionMatrix(
-	struct TensorWrapper projMatrix, struct TensorWrapper rotMatrixX,
-	struct TensorWrapper rotMatrixY, struct TensorWrapper rotMatrixZ,
-	struct TensorWrapper eulerAngles);
+	struct TensorWrapper projMatrix, struct TensorWrapper cameraMatrix,
+	struct TensorWrapper rotMatrix, struct TensorWrapper transVect,
+	struct TensorWrapper rotMatrixX, struct TensorWrapper rotMatrixY,
+	struct TensorWrapper rotMatrixZ, struct TensorWrapper eulerAngles);
 
 extern "C"
 void drawChessboardCorners(
@@ -66,6 +72,7 @@ void drawChessboardCorners(
 extern "C"
 struct TensorArrayPlusInt estimateAffine3D(
 	struct TensorWrapper src, struct TensorWrapper dst,
+	struct TensorWrapper out, struct TensorWrapper inliers,
 	double ransacThreshold, double confidence);
 
 extern "C"
@@ -80,12 +87,13 @@ struct TensorWrapper find4QuadCornerSubpix(
 
 extern "C"
 struct TensorWrapper findChessboardCorners(
-	struct TensorWrapper image, struct SizeWrapper patternSize, int flags);
+	struct TensorWrapper image, struct SizeWrapper patternSize,
+	struct TensorWrapper corners, int flags);
 
-//TODO const Ptr<FeatureDetector>& blobDetector = SimpleBlobDetector::create()
 extern "C"
 struct TensorPlusBool findCirclesGrid(
-	struct TensorWrapper image, struct SizeWrapper patternSize, int flags);
+	struct TensorWrapper image, struct SizeWrapper patternSize,
+	struct TensorWrapper centers, int flags);
 
 extern "C"
 struct TensorWrapper findEssentialMat(
@@ -99,7 +107,7 @@ struct TensorWrapper findFundamentalMat(
 	double param1, double param2, struct TensorWrapper mask);
 
 extern "C"
-struct TensorWrapper findFundamentalMat2(
+struct TensorArray findFundamentalMat2(
 	struct TensorWrapper points1, struct TensorWrapper points2,
 	struct TensorWrapper mask, int method, double param1, double param2);
 
@@ -110,7 +118,7 @@ struct TensorWrapper findHomography(
 	const int maxIters, const double confidence);
 
 extern "C"
-struct TensorWrapper findHomography2(
+struct TensorArray findHomography2(
 	struct TensorWrapper srcPoints, struct TensorWrapper dstPoints,
 	struct TensorWrapper mask, int method, double ransacReprojThreshold);
 
@@ -132,7 +140,8 @@ struct TensorWrapper initCameraMatrix2D(
 
 extern "C"
 struct TensorArray matMulDeriv(
-	struct TensorWrapper A, struct TensorWrapper B);
+	struct TensorWrapper A, struct TensorWrapper B,
+	struct TensorWrapper dABdA, struct TensorWrapper dABdB);
 
 extern "C"
 struct TensorArray projectPoints(
@@ -144,7 +153,8 @@ struct TensorArray projectPoints(
 extern "C"
 struct TensorArrayPlusInt recoverPose(
 	struct TensorWrapper E, struct TensorWrapper points1,
-	struct TensorWrapper points2, double focal,
+	struct TensorWrapper points2, struct TensorWrapper R,
+	struct TensorWrapper t, double focal,
 	struct Point2dWrapper pp, struct TensorWrapper mask);
 
 extern "C"

@@ -21,31 +21,37 @@ struct TensorArray composeRT(
 	struct TensorWrapper dt3dr2, struct TensorWrapper dt3dt2);
 
 struct TensorWrapper computeCorrespondEpilines(
-	struct TensorWrapper points, int whichImage, struct TensorWrapper F);
+	struct TensorWrapper points, int whichImage, struct TensorWrapper F,
+	struct TensorWrapper lines);
 
 struct TensorWrapper convertPointsFromHomogeneous(
-	struct TensorWrapper src);
+	struct TensorWrapper src, struct TensorWrapper dst);
 
 struct TensorWrapper convertPointsHomogeneous(
 	struct TensorWrapper src, struct TensorWrapper dst);
 
 struct TensorWrapper convertPointsToHomogeneous(
-	struct TensorWrapper src);
+	struct TensorWrapper src, struct TensorWrapper dst);
 
 struct TensorArray correctMatches(
 	struct TensorWrapper F, struct TensorWrapper points1,
-	struct TensorWrapper points2);
+	struct TensorWrapper points2, struct TensorWrapper newPoints1,
+	struct TensorWrapper newPoints2);
 
 struct TensorArray decomposeEssentialMat(
-	struct TensorWrapper E);
+	struct TensorWrapper E, struct TensorWrapper R1,
+	struct TensorWrapper R2, struct TensorWrapper t);
 
-struct TensorArrayPlusInt decomposeHomographyMat(
-	struct TensorWrapper H, struct TensorWrapper K);
+struct decomposeHomographyMatRetval decomposeHomographyMat(
+	struct TensorWrapper H, struct TensorWrapper K,
+	struct TensorArray rotations, struct TensorArray translations,
+	struct TensorArray normals);
 
 struct TensorArray decomposeProjectionMatrix(
-	struct TensorWrapper projMatrix, struct TensorWrapper rotMatrixX,
-	struct TensorWrapper rotMatrixY, struct TensorWrapper rotMatrixZ,
-	struct TensorWrapper eulerAngles);
+	struct TensorWrapper projMatrix, struct TensorWrapper cameraMatrix,
+	struct TensorWrapper rotMatrix, struct TensorWrapper transVect,
+	struct TensorWrapper rotMatrixX, struct TensorWrapper rotMatrixY,
+	struct TensorWrapper rotMatrixZ, struct TensorWrapper eulerAngles);
 
 void drawChessboardCorners(
 	struct TensorWrapper image, struct SizeWrapper patternSize,
@@ -53,6 +59,7 @@ void drawChessboardCorners(
 
 struct TensorArrayPlusInt estimateAffine3D(
 	struct TensorWrapper src, struct TensorWrapper dst,
+	struct TensorWrapper out, struct TensorWrapper inliers,
 	double ransacThreshold, double confidence);
 
 void filterSpeckles(
@@ -64,11 +71,13 @@ void find4QuadCornerSubpix(
 	struct SizeWrapper region_size);
 
 struct TensorWrapper findChessboardCorners(
-	struct TensorWrapper image, struct SizeWrapper patternSize, int flags);
+	struct TensorWrapper image, struct SizeWrapper patternSize,
+	struct TensorWrapper corners, int flags);
 
-//TODO const Ptr<FeatureDetector>& blobDetector = SimpleBlobDetector::create()
 struct TensorPlusBool findCirclesGrid(
-	struct TensorWrapper image, struct SizeWrapper patternSize, int flags);
+	struct TensorWrapper image, struct SizeWrapper patternSize,
+	struct TensorWrapper centers, int flags,
+	struct SimpleBlobDetectorPtr blobDetector);
 
 struct TensorWrapper findEssentialMat(
 	struct TensorWrapper points1, struct TensorWrapper points2,
@@ -106,7 +115,8 @@ struct TensorWrapper initCameraMatrix2D(
    	struct SizeWrapper imageSize, double aspectRatio);
 
 struct TensorArray matMulDeriv(
-	struct TensorWrapper A, struct TensorWrapper B);
+	struct TensorWrapper A, struct TensorWrapper B,
+	struct TensorWrapper dABdA, struct TensorWrapper dABdB);
 
 struct TensorArray projectPoints(
 	struct TensorWrapper objectPoints, struct TensorWrapper rvec,
@@ -116,7 +126,8 @@ struct TensorArray projectPoints(
 
 struct TensorArrayPlusInt recoverPose(
 	struct TensorWrapper E, struct TensorWrapper points1,
-	struct TensorWrapper points2, double focal,
+	struct TensorWrapper points2, struct TensorWrapper R,
+	struct TensorWrapper t, double focal,
 	struct Point2dWrapper pp, struct TensorWrapper mask);
 
 struct TensorArrayPlusRectArrayPlusFloat rectify3Collinear(
@@ -309,18 +320,21 @@ function cv.computeCorrespondEpilines(t)
     local argRules = {
         {"points", required = true},
         {"whichImage", required = true},
-        {"F", required = true}}
-    local points, whichImage, F = cv.argcheck(t, argRules)
+        {"F", required = true},
+        {"lines", default = nil}}
+    local points, whichImage, F, lines = cv.argcheck(t, argRules)
     local result = C.computeCorrespondEpilines(
-				cv.wrap_tensor(points), whichImage, cv.wrap_tensor(F))
+				cv.wrap_tensor(points), whichImage,
+				cv.wrap_tensor(F), cv.wrap_tensor(lines))
     return cv.unwrap_tensors(result)
 end
 
 function cv.convertPointsFromHomogeneous(t)
     local argRules = {
-        {"src", required = true}}
-    local src = cv.argcheck(t, argRules)
-    local result = C.convertPointsFromHomogeneous(cv.wrap_tensor(src))
+        {"src", required = true},
+        {"dst", default = nil}}
+    local src, dst = cv.argcheck(t, argRules)
+    local result = C.convertPointsFromHomogeneous(cv.wrap_tensor(src), cv.wrap_tensor(dst))
     return cv.unwrap_tensors(result)
 end
 
@@ -334,52 +348,72 @@ end
 
 function cv.convertPointsToHomogeneous(t)
     local argRules = {
-        {"src", required = true}}
-    local src = cv.argcheck(t, argRules)
-    local result = C.convertPointsToHomogeneous(cv.wrap_tensor(src))
+        {"src", required = true},
+        {"dst", default = nil}}
+    local src , dst = cv.argcheck(t, argRules)
+    local result = C.convertPointsToHomogeneous(cv.wrap_tensor(src), cv.wrap_tensor(dst))
     return cv.unwrap_tensors(result)
 end
 
 function cv.correctMatches(t)
     local argRules = {
-        {"F",required = true},
+        {"F", required = true},
         {"points1", required = true},
-        {"points2", required = true}}
-    local F, points1, points2 = cv.argcheck(t, argRules)
+        {"points2", required = true},
+        {"newPoints1", default = nil},
+        {"newPoints2", default = nil}}
+    local F, points1, points2, newPoints1, newPoints2 = cv.argcheck(t, argRules)
     local result = C.correctMatches(
-			cv.wrap_tensor(F), cv.wrap_tensor(points1), cv.wrap_tensor(points2))
+			cv.wrap_tensor(F), cv.wrap_tensor(points1), cv.wrap_tensor(points2),
+			cv.wrap_tensor(newPoints1), cv.wrap_tensor(newPoints2))
     return unwrap_tensors(result)
 end
 
 function cv.decomposeEssentialMat(t)
     local argRules = {
-        {"E", required = true}}
-    local E = cv.argcheck(t, argRules)
-    local result = C.decomposeEssentialMat(E)
+        {"E", required = true},
+        {"R1", default = nil},
+        {"R2", default = nil},
+        {"t", default = nil}}
+    local E, R1, R2, t = cv.argcheck(t, argRules)
+    local result = C.decomposeEssentialMat(cv.wrap_tensor(E), cv.wrap_tensor(R1),
+					   cv.wrap_tensor(R2), cv.wrap_tensor(t))
     return unwrap_tensors(result)
 end
 
 function cv.decomposeHomographyMat(t)
     local argRules = {
        {"H", required = true},
-       {"K", required = true}}
-    local H, K = cv.argcheck(t, argRules)
-    local result = C.decomposeHomographyMat(cv.wrap_tensor(H), cv.wrap_tensor(K))
-    return unwrap_tensors(result)
+       {"K", required = true},
+       {"rotations", default = nil},
+       {"translations", default = nil},
+       {"normals", default = nil}}
+    local H, K, rotations, translations, normals = cv.argcheck(t, argRules)
+    local result = C.decomposeHomographyMat(
+				cv.wrap_tensor(H), cv.wrap_tensor(K),
+				cv.wrap_tensors(rotations), cv.wrap_tensors(translations),
+				cv.wrap_tensors(normals))
+    return result.val, unwrap_tensors(result.rotations, true),
+           unwrap_tensors(result.translations, true), unwrap_tensors(result.normals, true)
 end
 
 function cv.decomposeProjectionMatrix(t)
     local argRules = {
         {"projMatrix", required = true},
+        {"cameraMatrix", default = nil},
+        {"rotMatrix", default = nil},
+        {"transVect", default = nil},
         {"rotMatrixX", default = nil},
         {"rotMatrixY", default = nil},
         {"rotMatrixZ", default = nil},
         {"eulerAngles", default = nil}}
-    local projMatrix, rotMatrixX, rotMatrixY, rotMatrixZ, eulerAngles = cv.argcheck(t, argRules)
+    local projMatrix, cameraMatrix, rotMatrix, transVect, rotMatrixX,
+	  rotMatrixY, rotMatrixZ, eulerAngles = cv.argcheck(t, argRules)
     local result = C.decomposeProjectionMatrix(
-			cv.wrap_tensor(projMatrix), cv.wrap_tensor(rotMatrixX),
-			cv.wrap_tensor(rotMatrixY), cv.wrap_tensor(rotMatrixZ),
-			cv.wrap_tensor(eulerAngles))
+			cv.wrap_tensor(projMatrix), cv.wrap_tensor(cameraMatrix),
+			cv.wrap_tensor(rotMatrix), cv.wrap_tensor(transVect),
+			cv.wrap_tensor(rotMatrixX), cv.wrap_tensor(rotMatrixY),
+			cv.wrap_tensor(rotMatrixZ), cv.wrap_tensor(eulerAngles))
     return unwrap_tensors(result)
 end 
 
@@ -397,12 +431,14 @@ function cv.estimateAffine3D(t)
     local argRules = {
         {"src", required = true},
         {"dst", required = true},
+        {"out", default = nil},
+        {"inliers", default = nil},
         {"ransacThreshold", default = 3},
         {"confidence", default = 0.99}}
-    local src, dst, ransacThreshold, confidence = cv.argcheck(t, argRules)
+    local src, dst, out, inliers, ransacThreshold, confidence = cv.argcheck(t, argRules)
     local result = C.estimateAffine3D(
-				cv.wrap_tensor(src), cv.wrap_tensor(dst),
-				ransacThreshold, confidence)
+				cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(out),
+				cv.wrap_tensor(inliers), ransacThreshold, confidence)
     return unwrap_tensors(result)
 end 
 
@@ -433,10 +469,13 @@ function cv.findChessboardCorners(t)
     local argRules = {
         {"image", required = true},
         {"patternSize", required = true, operator = cv.Size},
+        {"corners", default = nil},
         {"flags", default = cv.CALIB_CB_ADAPTIVE_THRESH+cv.CALIB_CB_NORMALIZE_IMAGE}}
-    local image, patternSize, flags = cv.argcheck(t, argRules)
+    local image, patternSize, corners, flags = cv.argcheck(t, argRules)
     return cv.unwrap_tensors(
-		C.findChessboardCorners(cv.wrap_tensor(image), patternSize, flags))
+		C.findChessboardCorners(
+			cv.wrap_tensor(image), patternSize,
+			cv.wrap_tensor(corners), flags))
 end
 
 --TODO const Ptr<FeatureDetector>& blobDetector = SimpleBlobDetector::create()
@@ -486,7 +525,7 @@ function cv.findFundamentalMat2(t)
     local argRules = {
 	{"points1", required = true},
    	{"points2", required = true},
-	{"mask", required = true},
+	{"mask", default = nil},
 	{"method", default = cv.FM_RANSAC},
   	{"param1", default = 3.0},
 	{"param2", default = 0.99}}
@@ -571,9 +610,14 @@ end
 function matMulDeriv(t)
     local argRules = {
         {"A", required = true},
-        {"B", required = true}}
-    local A, B = cv.argcheck(t, argRules)
-    return cv.unwrap_tensors(C.matMulDeriv(A, B))
+        {"B", required = true},
+        {"dABdA", default = nil},
+        {"dABdB", default = nil}}
+    local A, B, dABdA, dABdB = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+		C.matMulDeriv(
+			cv.wrap_tensor(A), cv.wrap_tensor(B),
+			cv.wrap_tensor(dABdA), cv.wrap_tensor(dABdB)))
 end
 
 function cv.projectPoints(t)
@@ -601,13 +645,16 @@ function cv.recoverPose(t)
         {"E", required = true},
         {"points1", required = true},
         {"points2", required = true},
+        {"R", default = nil},
+        {"t", default = nil},
         {"focal", default = 1.0},
         {"Point2d", default = cv.Point2d(0,0), operator = cv.Point2d},
         {"mask", default = nil}}
-    local E, points1, points2, focal, Point2d, mask = cv.argcheck(t, argRules)
+    local E, points1, points2, R, t, focal, Point2d, mask = cv.argcheck(t, argRules)
     local result = C.recoverPose(
 			cv.wrap_tensor(E), cv.wrap_tensor(points1),
-			cv.wrap_tensor(points2), focal, Point2d, mask)
+			cv.wrap_tensor(points2), cv.wrap_tensor(R),
+			cv.wrap_tensor(t), focal, Point2d, mask)
     return result.val, cv.unwrap_tensors(result.tensors)
 end
 

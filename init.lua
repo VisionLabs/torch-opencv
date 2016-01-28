@@ -175,6 +175,11 @@ struct TensorArrayPlusRectArrayPlusFloat {
     float val;
 };
 
+struct decomposeHomographyMatRetval {
+   int val;
+   struct TensorArray rotations, translations, normals;
+};
+
 struct ScalarPlusBool {
     struct ScalarWrapper scalar;
     bool val;
