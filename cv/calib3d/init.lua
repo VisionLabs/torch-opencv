@@ -478,14 +478,17 @@ function cv.findChessboardCorners(t)
 			cv.wrap_tensor(corners), flags))
 end
 
---TODO const Ptr<FeatureDetector>& blobDetector = SimpleBlobDetector::create()
 function cv.findCirclesGrid(t)
     local argRules = {
         {"image", required = true},
         {"patternSize", required = true, operator = cv.Size},
-        {"flags", default = cv.CALIB_CB_SYMMETRIC_GRID}}
-    local image, patternSize, flags = cv.argcheck(t, argRules)
-    local result = C.findCirclesGrid(cv.wrap_tensor(image), patternSize, flags)
+        {"centers", default = nil},
+        {"flags", default = cv.CALIB_CB_SYMMETRIC_GRID},
+        {"blobDetector", default = SimpleBlobDetector()}}
+    local image, patternSize, centers, flags, blobDetector = cv.argcheck(t, argRules)
+    local result = C.findCirclesGrid(
+			cv.wrap_tensor(image), patternSize, cv.wrap_tensor(centers),
+			flags, blobDetector)
     return result.val, cv.unwrap_tensors(result.tensor)
 end 
 

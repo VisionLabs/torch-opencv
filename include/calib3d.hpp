@@ -1,5 +1,6 @@
 #include <Common.hpp>
 #include <Classes.hpp>
+#include <features2d.hpp>
 #include <opencv2/calib3d.hpp>
 
 extern "C"
@@ -93,7 +94,7 @@ struct TensorWrapper findChessboardCorners(
 extern "C"
 struct TensorPlusBool findCirclesGrid(
 	struct TensorWrapper image, struct SizeWrapper patternSize,
-	struct TensorWrapper centers, int flags);
+	struct TensorWrapper centers, int flags, struct SimpleBlobDetectorPtr blobDetector);
 
 extern "C"
 struct TensorWrapper findEssentialMat(

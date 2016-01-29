@@ -238,17 +238,20 @@ struct TensorWrapper findChessboardCorners(
     return TensorWrapper(corners_mat);
 }
 
-//TODO
 extern "C"
 struct TensorPlusBool findCirclesGrid(
 	struct TensorWrapper image, struct SizeWrapper patternSize,
-	struct TensorWrapper centers, int flags)
+	struct TensorWrapper centers, int flags, struct SimpleBlobDetectorPtr blobDetector)
 {
+    cv::Ptr<cv::FeatureDetector> blobDetectorPtr(static_cast<cv::SimpleBlobDetector *>(blobDetector.ptr));
+    rescueObjectFromPtr(blobDetectorPtr);
+
     struct TensorPlusBool result;
     cv::Mat centers_mat;
     if(!centers.isNull()) centers_mat = centers.toMat();
+
     result.val = cv::findCirclesGrid(
-		image.toMat(), patternSize, centers_mat, flags);
+		image.toMat(), patternSize, centers_mat, flags, blobDetectorPtr);
     new(&result.tensor) TensorWrapper(centers_mat);
     return result;
 }
