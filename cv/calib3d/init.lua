@@ -974,24 +974,6 @@ function cv.fisheye.initUndistortRectifyMap(t)
 			cv.wrap_tensor(map2)));
 end
 
---TODO need to add cv::Affine3< T > Class
-function cv.fisheye.projectPoints(t)
-    local argRules = {
-        {"objectPoints", required = true},
-        {"imagePoints", default = nil},
-        {"affine", required = true},
-        {"K", required = true},
-        {"D", required = true},
-        {"alpha", default = 0},
-        {"jacobian", default = nil}}
-    local objectPoints, imagePoints, affine, K,
-          D, alpha, jacobian = cv.argcheck(t, argRules)
-    return cv.unwrap_tensors(
-		C.fisheye_projectPoints(
-			cv.wrap_tensor(objectPoints), cv.wrap_tensor(imagePoints),
-			affine, cv.wrap_tensor(K), cv.wrap_tensor(D), alpha, jacobian))
-end
-
 function cv.fisheye.projectPoints2(t)
     local argRules = {
         {"objectPoints", required = true},

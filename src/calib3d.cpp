@@ -661,22 +661,6 @@ struct TensorArray fisheye_initUndistortRectifyMap(
     return TensorArray(vec);
 }
 
-//TODO need to add cv::Affine3< T > Class
-extern "C"
-struct TensorArray fisheye_projectPoints(
-	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints,
-	/*struct Affine3dWrapper affine,*/ struct TensorWrapper K,
-	struct TensorWrapper D, double alpha, struct TensorWrapper jacobian)
-{
-    std::vector<cv::Mat> vec(2);
-    if(!imagePoints.isNull()) vec[0] = imagePoints.toMat();
-    if(!jacobian.isNull()) vec[1] = jacobian.toMat();
-//    fisheye::projectPoints(
-//		objectPoints.toMat(), vec[0], affine, K.toMat(),
-//		D.toMat(), alpha, jacobian.toMat());
-    return TensorArray(vec);
-}
-
 extern "C"
 struct TensorArray fisheye_projectPoints2(
 	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints,

@@ -264,13 +264,6 @@ struct TensorArray fisheye_initUndistortRectifyMap(
 	struct SizeWrapper size, int m1type,
 	struct TensorWrapper map1, struct TensorWrapper map2);
 
-//TODO need to add cv::Affine3< T > Class
-extern "C"
-struct TensorArray fisheye_projectPoints(
-	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints,
-	/*struct Affine3dWrapper affine,*/ struct TensorWrapper K,
-	struct TensorWrapper D, double alpha, struct TensorWrapper jacobian);
-
 extern "C"
 struct TensorArray fisheye_projectPoints2(
 	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints,
