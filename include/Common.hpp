@@ -16,6 +16,7 @@ extern "C" {
 
 extern "C" int getIntMax() { return INT_MAX; }
 extern "C" float getFloatMax() { return FLT_MAX; }
+extern "C" double getDblEpsilon() { return DBL_EPSILON; }
 
 /***************** Tensor <=> Mat conversion *****************/
 
@@ -131,6 +132,10 @@ struct Vec2dWrapper {
 
 struct Vec3dWrapper {
     double v0, v1, v2;
+    inline operator cv::Vec3d() { return cv::Vec3d(v0, v1, v2); }
+    Vec3dWrapper & operator=(cv::Vec3d & other);
+    Vec3dWrapper (const cv::Vec3d & other);
+    inline Vec3dWrapper() {}
 };
 
 struct Vec3fWrapper {
@@ -167,6 +172,14 @@ struct Point2fWrapper {
     inline operator cv::Point2f() { return cv::Point2f(x, y); }
     Point2fWrapper(const cv::Point2f & other);
     inline Point2fWrapper() {}
+};
+
+struct Point2dWrapper {
+    double x, y;
+
+    inline operator cv::Point2d() { return cv::Point2d(x, y); }
+    Point2dWrapper(const cv::Point2d & other);
+    inline Point2dWrapper() {}
 };
 
 struct RotatedRectWrapper {
@@ -260,6 +273,11 @@ struct TensorPlusBool {
     bool val;
 };
 
+struct TensorPlusRect {
+    struct TensorWrapper tensor;
+    struct RectWrapper rect;
+};
+
 struct TensorArrayPlusFloat {
     struct TensorArray tensors;
     float val;
@@ -278,6 +296,11 @@ struct TensorArrayPlusInt {
 struct TensorArrayPlusBool {
     struct TensorArray tensors;
     bool val;
+};
+
+struct TensorArrayPlusVec3d {
+    struct TensorArray tensors;
+    struct Vec3dWrapper vec3d;
 };
 
 struct RectPlusInt {
@@ -352,6 +375,12 @@ struct TensorPlusRectArray {
 struct TensorArrayPlusRectArray {
     struct TensorArray tensors;
     struct RectArray rects;
+};
+
+struct TensorArrayPlusRectArrayPlusFloat {
+    struct TensorArray tensors;
+    struct RectArray rects;
+    float val;
 };
 
 struct TensorPlusPointArray {

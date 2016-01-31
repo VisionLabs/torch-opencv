@@ -213,6 +213,20 @@ KeyPointArray::operator std::vector<cv::KeyPoint>()
     return retval;
 }
 
+Vec3dWrapper & Vec3dWrapper::operator=(cv::Vec3d & other) {
+   this->v0 = other[0];
+   this->v1 = other[1];
+   this->v2 = other[2];
+   return *this;
+}
+
+Vec3dWrapper::Vec3dWrapper(const cv::Vec3d & other) {
+   this->v0 = other[0];
+   this->v1 = other[1];
+   this->v2 = other[2];
+}
+   
+
 RectWrapper & RectWrapper::operator=(cv::Rect & other) {
     this->x = other.x;
     this->y = other.y;
@@ -266,6 +280,11 @@ PointArray::operator std::vector<cv::Point>() {
 }
 
 Point2fWrapper::Point2fWrapper(const cv::Point2f & other) {
+    this->x = other.x;
+    this->y = other.y;
+}
+
+Point2dWrapper::Point2dWrapper(const cv::Point2d & other) {
     this->x = other.x;
     this->y = other.y;
 }

@@ -84,6 +84,10 @@ struct Point2fWrapper {
     float x, y;
 };
 
+struct Point2dWrapper {
+    double x, y;
+};
+
 struct RotatedRectWrapper {
     struct Point2fWrapper center;
     struct Size2fWrapper size;
@@ -118,6 +122,7 @@ struct DMatchArrayOfArrays {
     struct DMatchArray *data;
 };
 
+<<<<<<< HEAD
 struct KeyPointWrapper {
     struct Point2fWrapper pt;
     float size, angle, response;
@@ -149,6 +154,11 @@ struct TensorPlusBool {
     bool val;
 };
 
+struct TensorPlusRect {
+    struct TensorWrapper tensor;
+    struct RectWrapper rect;
+};
+
 struct TensorArrayPlusInt {
     struct TensorArray tensors;
     int val;
@@ -169,9 +179,20 @@ struct TensorArrayPlusBool {
     bool val;
 };
 
+struct TensorArrayPlusVec3d {
+    struct TensorArray tensors;
+    struct Vec3dWrapper vec3d;
+};
+
 struct RectPlusInt {
     struct RectWrapper rect;
     int val;
+};
+
+struct TensorArrayPlusRectArrayPlusFloat {
+    struct TensorArray tensors;
+    struct RectArray rects;
+    float val;
 };
 
 struct ScalarPlusBool {
@@ -217,6 +238,7 @@ struct FloatArrayOfArrays {
 
 int getIntMax();
 float getFloatMax();
+double getDblEpsilon();
 
 struct PointArrayOfArrays {
     struct PointWrapper **pointers;
@@ -234,6 +256,7 @@ require 'cv.constants'
 
 cv.INT_MAX = C.getIntMax()
 cv.FLT_MAT = C.getFloatMax()
+cv.DBL_EPSILON = C.getDblEpsilon();
 cv.NULLPTR = ffi.new('void *', nil)
 
 --- ***************** Argument checking & unpacking *****************
@@ -450,6 +473,10 @@ end
 
 function cv.Point2f(...)
     return ffi.new('struct Point2fWrapper', ...)
+end
+
+function cv.Point2d(...)
+    return ffi.new('struct Point2dWrapper', ...)
 end
 
 function cv.RotatedRect(...)
