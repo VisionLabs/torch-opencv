@@ -223,6 +223,7 @@ struct FloatArrayOfArrays {
 
 int getIntMax();
 float getFloatMax();
+double getDblEpsilon();
 
 struct PointArrayOfArrays {
     struct PointWrapper **pointers;
@@ -240,6 +241,7 @@ require 'cv.constants'
 
 cv.INT_MAX = C.getIntMax()
 cv.FLT_MAT = C.getFloatMax()
+cv.DBL_EPSILON = C.getDblEpsilon();
 cv.NULLPTR = ffi.new('void *', nil)
 
 --- ***************** Argument checking & unpacking *****************

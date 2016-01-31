@@ -16,6 +16,7 @@ extern "C" {
 
 extern "C" int getIntMax() { return INT_MAX; }
 extern "C" float getFloatMax() { return FLT_MAX; }
+extern "C" double getDblEpsilon() { return DBL_EPSILON; }
 
 /***************** Tensor <=> Mat conversion *****************/
 

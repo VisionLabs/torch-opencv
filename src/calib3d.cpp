@@ -95,8 +95,10 @@ extern "C"
 struct TensorWrapper convertPointsHomogeneous(
 	struct TensorWrapper src, struct TensorWrapper dst)
 {
-    cv::convertPointsHomogeneous(src.toMat(), dst.toMat());
-    return dst;
+    cv::Mat dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMat();
+    cv::convertPointsHomogeneous(src.toMat(), dst_mat);
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" 
@@ -321,13 +323,13 @@ struct TensorPlusRect getOptimalNewCameraMatrix(
 	bool centerPrincipalPoint)
 {
     struct TensorPlusRect result;
-    cv::Rect* validPixROI;
+    cv::Rect validPixROI;
     new(&result.tensor) TensorWrapper(
 				cv::getOptimalNewCameraMatrix(
 						cameraMatrix.toMat(), distCoeffs.toMat(),
 	                                        imageSize, alpha, newImgSize,
-                                                validPixROI, centerPrincipalPoint));
-    result.rect = *validPixROI;
+                                                &validPixROI, centerPrincipalPoint));
+    result.rect = validPixROI;
     return result;
 }
 

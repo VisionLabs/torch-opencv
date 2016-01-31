@@ -265,8 +265,9 @@ function cv.calibrateCamera(t)
         {"tvecs", default = nil},
         {"flag", default = 0},
         {"criteria", default =
-		cv.TermCriteria(cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 30, DBL_EPSILON),
-		operator = cv.TermCriteria}}
+			{cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 30, cv.DBL_EPSILON},
+			operator = cv.TermCriteria}
+	}
     local objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs,
       		rvecs, tvecs, flag, criteria = cv.argcheck(t, argRules)
     local result = C.calibrateCamera(
@@ -289,7 +290,7 @@ function cv.calibrationMatrixValues(t)
 			cv.wrap_tensor(cameraMatrix), imageSize, apertureWidth, apertureHeight)
     local retval = cv.unwrap_tensors(result)
     return retval[1][1], retval[2][1], retval[3][1],
-           cv.Point2d(retval[4][1], retval[5][1]),retval[6][1]
+           cv.Point2d(retval[4][1], retval[5][1]), retval[6][1]
 end
 
 function cv.composeRT(t)
@@ -343,7 +344,8 @@ function cv.convertPointsHomogeneous(t)
         {"src", required = true},
         {"dst", required = true}}
     local src, dst = cv.argcheck(t, argRules)
-    C.convertPointsHomogeneous(cv.wrap_tensor(src), cv.wrap_tensor(dst))
+    local result = C.convertPointsHomogeneous(cv.wrap_tensor(src), cv.wrap_tensor(dst))
+    return cv.unwrap_tensors()
 end
 
 function cv.convertPointsToHomogeneous(t)
@@ -910,7 +912,7 @@ function cv.fisheye.calibrate(t)
         {"tvecs", default = nil},
         {"flag", default = 0},
         {"criteria", default =
-		cv.TermCriteria(cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 100, DBL_EPSILON),
+		cv.TermCriteria(cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 100, cv.DBL_EPSILON),
                 operator = cv.TermCriteria}}
     local objectPoints, imagePoints, imageSize, K, D,
       		rvecs, tvecs, flag, criteria = cv.argcheck(t, argRules)
@@ -1007,7 +1009,7 @@ function cv.fisheye.stereoCalibrate(t)
         {"T", default = nil},
         {"flags", defauly = cv.fisheye.CALIB_FIX_INTRINSIC},
         {"criteria", default =
-		cv.TermCriteria(cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 100, DBL_EPSILON),
+		cv.TermCriteria(cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 100, cv.DBL_EPSILON),
 		operator = cv.TermCriteria}}
     local objectPoints, imagePoints1, imagePoints2, K1, D1, K2, D2,
           imageSize, R, T, flags, criteria = cv.argcheck(t, argRules)
@@ -1430,7 +1432,7 @@ do
 			C.StereoSGBM_ctor(
 				minDisparity, numDisparities, blockSize, P1, P2,
 				disp12MaxDiff, preFilterCap, uniquenessRatio,
-				speckleWindowSize, speckleRange, mode))
+				speckleWindowSize, speckleRange, mode), Classes.Algorithm_dtor)
     end
 
     function StereoSGBM:getMode()
