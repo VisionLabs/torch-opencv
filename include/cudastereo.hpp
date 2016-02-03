@@ -42,7 +42,7 @@ extern "C"
 struct StereoBMPtr createStereoBM(int numDisparities, int blockSize);
 
 extern "C"
-struct StereoBMPtr StereoBM_compute(struct cutorchInfo info, struct StereoBMPtr ptr,
+struct TensorWrapper StereoBM_compute(struct cutorchInfo info, struct StereoBMPtr ptr,
                                     struct TensorWrapper left, struct TensorWrapper right, struct TensorWrapper disparity);
 
 extern "C"

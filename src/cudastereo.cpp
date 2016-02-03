@@ -7,7 +7,7 @@ struct StereoBMPtr createStereoBM(int numDisparities, int blockSize)
 }
 
 extern "C"
-struct StereoBMPtr StereoBM_compute(struct cutorchInfo info, struct StereoBMPtr ptr,
+struct TensorWrapper StereoBM_compute(struct cutorchInfo info, struct StereoBMPtr ptr,
         struct TensorWrapper left, struct TensorWrapper right, struct TensorWrapper disparity)
 {
     cuda::GpuMat retval;
@@ -135,7 +135,7 @@ struct Vec3iWrapper StereoBeliefPropagation_estimateRecommendedParams(int width,
 {
     struct Vec3iWrapper retval;
     cuda::StereoBeliefPropagation::estimateRecommendedParams(
-            width, height, &retval.v0, &retval.v1, &retval.v2);
+            width, height, retval.v0, retval.v1, retval.v2);
     return retval;
 }
 
@@ -168,7 +168,7 @@ struct Vec4iWrapper StereoConstantSpaceBP_estimateRecommendedParams(int width, i
 {
     Vec4iWrapper retval;
     cuda::StereoConstantSpaceBP::estimateRecommendedParams(
-            width, height, &retval.v0, &retval.v1, &retval.v2, &retval.v3);
+            width, height, retval.v0, retval.v1, retval.v2, retval.v3);
     return retval;
 }
 
@@ -186,7 +186,7 @@ struct TensorWrapper reprojectImageTo3D(
         struct TensorWrapper xyzw, struct TensorWrapper Q, int dst_cn)
 {
     cuda::GpuMat retval;
-    if (!xyzw.isEmpty()) retval = xyzw.toGpuMat();
+    if (!xyzw.isNull()) retval = xyzw.toGpuMat();
     cuda::reprojectImageTo3D(disp.toGpuMat(), retval, Q.toGpuMat(), dst_cn, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -197,7 +197,7 @@ struct TensorWrapper drawColorDisp(
         struct TensorWrapper dst_disp, int ndisp)
 {
     cuda::GpuMat retval;
-    if (!dst_disp.isEmpty()) retval = dst_disp.toGpuMat();
+    if (!dst_disp.isNull()) retval = dst_disp.toGpuMat();
     cuda::drawColorDisp(src_disp.toGpuMat(), retval, ndisp, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
