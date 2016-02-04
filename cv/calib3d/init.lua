@@ -12,6 +12,12 @@ struct decomposeHomographyMatRetval {
    struct TensorArray rotations, translations, normals;
 };
 
+struct TensorArrayPlusRectArrayPlusFloat {
+    struct TensorArray tensors;
+    struct RectArray rects;
+    float val;
+};
+
 struct calibrateCameraRetval calibrateCamera(
 	struct TensorArray objectPoints, struct TensorArray imagePoints,
 	struct SizeWrapper imageSize, struct TensorWrapper cameraMatrix,

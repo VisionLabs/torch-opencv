@@ -1,5 +1,5 @@
 PROJECT(Torch_OpenCV)
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1.3 FATAL_ERROR)
 
 OPTION(BUILD_TESTS  "Build C tests"         OFF)
 OPTION(BUILD_CUDA   "Wrap CUDA packages"    ON)
@@ -19,9 +19,9 @@ ENDIF()
 # So let's invoke FIND_PACKAGE twice:
 
 # Once (error-throwing) to check if OpenCV is present
-FIND_PACKAGE(OpenCV 3 REQUIRED)
+FIND_PACKAGE(OpenCV 3.1 REQUIRED)
 # Once more (silently) to look for the installed modules
-FIND_PACKAGE(OpenCV 3 OPTIONAL_COMPONENTS ${OPENCV_MODULES_TO_WRAP})
+FIND_PACKAGE(OpenCV 3.1 OPTIONAL_COMPONENTS ${OPENCV_MODULES_TO_WRAP})
 
 IF(LUAROCKS_PREFIX)
     MESSAGE(STATUS "Installing Torch through Luarocks")
@@ -99,4 +99,3 @@ IF (BUILD_TESTS)
     ADD_LIBRARY(Tests SHARED ${Tests_SRC})
     TARGET_LINK_LIBRARIES(Tests Common)
 ENDIF()
-

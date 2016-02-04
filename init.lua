@@ -122,7 +122,6 @@ struct DMatchArrayOfArrays {
     struct DMatchArray *data;
 };
 
-<<<<<<< HEAD
 struct KeyPointWrapper {
     struct Point2fWrapper pt;
     float size, angle, response;
@@ -187,12 +186,6 @@ struct TensorArrayPlusVec3d {
 struct RectPlusInt {
     struct RectWrapper rect;
     int val;
-};
-
-struct TensorArrayPlusRectArrayPlusFloat {
-    struct TensorArray tensors;
-    struct RectArray rects;
-    float val;
 };
 
 struct ScalarPlusBool {
