@@ -1,14 +1,14 @@
 PROJECT(Torch_OpenCV)
 CMAKE_MINIMUM_REQUIRED(VERSION 3.1.3 FATAL_ERROR)
 
-OPTION(BUILD_TESTS  "Build C tests"         OFF)
-OPTION(BUILD_CUDA   "Wrap CUDA packages"    ON)
+OPTION(BUILD_TESTS   "Build C tests"                OFF)
+OPTION(BUILD_CUDA    "Wrap CUDA packages"           ON)
 
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 SET(OPENCV_MODULES_TO_WRAP
         imgcodecs highgui features2d flann imgproc ml optflow photo superres videoio video
-        objdetect calib3d)
+        objdetect calib3d ximgproc)
 
 IF (BUILD_CUDA)
     SET(OPENCV_MODULES_TO_WRAP ${OPENCV_MODULES_TO_WRAP} cudaarithm cudacodec cudawarping
