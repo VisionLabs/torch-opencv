@@ -189,6 +189,11 @@ struct RectPlusInt {
     int val;
 };
 
+struct RectPlusBool {
+    struct RectWrapper rect;
+    bool val;
+};
+
 struct TensorArrayPlusRectArrayPlusFloat {
     struct TensorArray tensors;
     struct RectArray rects;

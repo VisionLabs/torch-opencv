@@ -308,6 +308,11 @@ struct RectPlusInt {
     int val;
 };
 
+struct RectPlusBool {
+    struct RectWrapper rect;
+    bool val;
+};
+
 struct ScalarPlusBool {
     struct ScalarWrapper scalar;
     bool val;
@@ -330,6 +335,11 @@ struct Point2fPlusInt {
 struct IntArray {
     int *data;
     int size;
+    inline std::vector<int>& toIntList(std::vector<int>& res) {
+        for (int i = 0; i < size; ++i)
+            res.push_back(data[i]);
+        return res;
+    }
 };
 
 struct FloatArray {
@@ -364,6 +374,15 @@ struct RectArray {
     RectArray(const std::vector<cv::Rect> & vec);
     operator std::vector<cv::Rect>();
 };
+
+struct SizeArray {
+    struct SizeWrapper *data;
+    int size;
+
+    SizeArray() {}
+    SizeArray(const std::vector<cv::Size> & vec);
+    operator std::vector<cv::Size>();
+}; 
 
 struct TensorPlusRectArray {
     struct TensorWrapper tensor;

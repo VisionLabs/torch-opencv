@@ -308,3 +308,19 @@ RectArray::operator std::vector<cv::Rect>() {
     memcpy(retval.data(), this->data + 1, this->size * sizeof(RectWrapper));
     return retval;
 }
+
+SizeArray::SizeArray(const std::vector<cv::Size> & vec) {
+    this->data = static_cast<SizeWrapper *>(malloc((vec.size() + 1) * sizeof(SizeWrapper)));
+    this->size = vec.size();
+
+    for (int i = 0; i < vec.size(); ++i) {
+        this->data[i+1] = vec[i];
+    }
+}
+
+SizeArray::operator std::vector<cv::Size>() {
+    std::vector<cv::Size> retval(this->size);
+    memcpy(retval.data(), this->data+1, this->size * sizeof(SizeWrapper));
+    return retval;
+}
+    

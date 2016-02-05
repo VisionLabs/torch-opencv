@@ -8,7 +8,7 @@ SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 SET(OPENCV_MODULES_TO_WRAP
         imgcodecs highgui features2d flann imgproc ml optflow photo superres videoio video
-        objdetect calib3d)
+        objdetect calib3d stitching)
 
 IF (BUILD_CUDA)
     SET(OPENCV_MODULES_TO_WRAP ${OPENCV_MODULES_TO_WRAP} cudaarithm cudacodec cudawarping
