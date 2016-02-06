@@ -1,6 +1,62 @@
 #include <Common.hpp>
+using namespace std;
 
 /***************** Tensor <=> Mat conversion *****************/
+
+// https://github.com/torch/torch7/blob/master/lib/TH/THGeneral.c#L8
+#if (defined(__unix) || defined(_WIN32))
+#include <malloc.h>
+#elif defined(__APPLE__)
+#include <malloc/malloc.h>
+#endif
+
+static long getAllocSize(void *ptr) {
+#if defined(__unix)
+    return malloc_usable_size(ptr);
+#elif defined(__APPLE__)
+    return malloc_size(ptr);
+#elif defined(_WIN32)
+    return _msize(ptr);
+#else
+    return 0;
+#endif
+}
+
+static void *OpenCVMalloc(void */*allocatorContext*/, long size) {
+    return cv::fastMalloc(size);
+}
+
+static void *OpenCVRealloc(void */*allocatorContext*/, void *ptr, long size) {
+    // https://github.com/Itseez/opencv/blob/master/modules/core/src/alloc.cpp#L62
+    void *oldMem = ((unsigned char**)ptr)[-1];
+    void *newMem = cv::fastMalloc(size);
+    memcpy(newMem, oldMem, getAllocSize(oldMem));
+    return newMem;
+}
+
+static int c = 0;
+static void OpenCVFree(void */*allocatorContext*/, void *ptr) {
+    std::cout << "Free " << c++ << std::endl;
+    cv::fastFree(ptr);
+}
+
+static THAllocator OpenCVCompatibleAllocator;
+
+extern "C"
+void initAllocator() {
+    OpenCVCompatibleAllocator.malloc = OpenCVMalloc;
+    OpenCVCompatibleAllocator.realloc = OpenCVRealloc;
+    OpenCVCompatibleAllocator.free = OpenCVFree;
+}
+
+// for debugging
+
+extern "C"
+void refcount(THByteTensor * x) {
+    std::cout << "Tensor refcount: " << x->refcount << std::endl;
+    std::cout << "Storage address: " << x->storage << std::endl;
+    std::cout << "Storage refcount: " << x->storage->refcount << std::endl;
+}
 
 TensorWrapper::TensorWrapper(): tensorPtr(nullptr) {}
 
@@ -13,13 +69,16 @@ TensorWrapper::TensorWrapper(cv::Mat & mat) {
 
     this->typeCode = static_cast<char>(mat.depth());
 
-    THByteTensor *outputPtr = new THByteTensor;
+    THByteTensor *outputPtr = THByteTensor_new();
 
     // Build new storage on top of the Mat
-    outputPtr->storage = THByteStorage_newWithData(
-            mat.data,
-            mat.step[0] * mat.rows
-    );
+
+    outputPtr->storage = THByteStorage_newWithDataAndAllocator(
+                mat.data,
+                mat.step[0] * mat.rows,
+                &OpenCVCompatibleAllocator,
+                nullptr
+        );
 
     int sizeMultiplier;
     if (mat.channels() == 1) {
@@ -43,10 +102,10 @@ TensorWrapper::TensorWrapper(cv::Mat & mat) {
         outputPtr->stride[i] = mat.step[i] / sizeMultiplier;
     }
 
-    // Prevent OpenCV from deallocating Mat data
-    mat.addref();
-
-    outputPtr->refcount = 0;
+    // Prevent OpenCV from deallocating Mat memory
+    if (mat.u) {
+        mat.addref();
+    }
 
     this->tensorPtr = outputPtr;
 }
@@ -56,20 +115,78 @@ TensorWrapper::TensorWrapper(cv::Mat && mat) {
     new (this) TensorWrapper(mat);
 }
 
+TensorWrapper::TensorWrapper(MatT & matT) {
+
+    if (matT.mat.empty()) {
+        this->tensorPtr = nullptr;
+        return;
+    }
+
+    this->typeCode = static_cast<char>(matT.mat.depth());
+
+    if (matT.tensor != nullptr) {
+        // Mat is already constructed on another Tensor, so return that
+        this->tensorPtr = matT.tensor;
+        this->definedInLua = true;
+        THAtomicIncrementRef(&this->tensorPtr->storage->refcount);
+        return;
+    }
+
+    this->definedInLua = false;
+
+    cv::Mat & mat = matT.mat;
+
+    THByteTensor *outputPtr = THByteTensor_new();
+
+    // Build new Storage on top of the Mat
+    outputPtr->storage = THByteStorage_newWithDataAndAllocator(
+            mat.data,
+            mat.step[0] * mat.rows,
+            &OpenCVCompatibleAllocator,
+            nullptr);
+
+    int sizeMultiplier;
+    if (mat.channels() == 1) {
+        outputPtr->nDimension = mat.dims;
+        sizeMultiplier = cv::getElemSize(mat.depth());
+    } else {
+        outputPtr->nDimension = mat.dims + 1;
+        sizeMultiplier = mat.elemSize1();
+    }
+
+    outputPtr->size   = static_cast<long *>(THAlloc(sizeof(long) * outputPtr->nDimension));
+    outputPtr->stride = static_cast<long *>(THAlloc(sizeof(long) * outputPtr->nDimension));
+
+    if (mat.channels() > 1) {
+        outputPtr->size[outputPtr->nDimension - 1] = mat.channels();
+        outputPtr->stride[outputPtr->nDimension - 1] = 1; //cv::getElemSize(returnValue.typeCode);
+    }
+
+    for (int i = 0; i < mat.dims; ++i) {
+        outputPtr->size[i] = mat.size[i];
+        outputPtr->stride[i] = mat.step[i] / sizeMultiplier;
+    }
+
+    // Prevent OpenCV from deallocating Mat memory
+    if (mat.u) {
+        mat.addref();
+    }
+
+    this->tensorPtr = outputPtr;
+}
+
 TensorWrapper::operator cv::Mat() {
 
     if (this->tensorPtr == nullptr) {
         return cv::Mat();
     }
 
-    THByteTensor *tensorPtr = static_cast<THByteTensor *>(this->tensorPtr);
-
     int numberOfDims = tensorPtr->nDimension;
     // THTensor stores its dimensions sizes under long *.
     // In a constructor for cv::Mat, we need const int *.
     // We can't guarantee int and long to be equal.
     // So we somehow need to static_cast THTensor sizes.
-    // TODO: we should somehow get rid of array allocation
+    // TODO: get rid of array allocation
 
     std::array<int, 3> size;
     std::copy(tensorPtr->size, tensorPtr->size + tensorPtr->nDimension, size.begin());
@@ -107,6 +224,19 @@ TensorWrapper::operator cv::Mat() {
     );
 }
 
+MatT TensorWrapper::toMatT() {
+    MatT retval;
+
+    if (this->tensorPtr) {
+        retval.mat = this->toMat();
+        retval.tensor = tensorPtr;
+    } else {
+        retval.tensor = nullptr;
+    }
+
+    return retval;
+}
+
 TensorArray::TensorArray(): tensors(nullptr) {}
 
 TensorArray::TensorArray(std::vector<cv::Mat> & matList):
@@ -128,22 +258,32 @@ TensorArray::operator std::vector<cv::Mat>() {
     return retval;
 }
 
-// Kill "destination" and assign "source" data to it.
-// "destination" is always supposed to be an empty Tensor
+// Assign `src` data to `dst`.
+// `dst` is always supposed to be an empty Tensor
 extern "C"
-void transfer_tensor(THByteTensor *dst, THByteTensor *src) {
-    if (dst->storage)
-        THFree(dst->storage);
-    if (dst->size)
-        THFree(dst->size);
-    if (dst->stride)
-        THFree(dst->stride);
+void transfer_tensor(THByteTensor *dst, struct TensorWrapper srcWrapper) {
+
+    THByteTensor *src = srcWrapper.tensorPtr;
+
+    dst->nDimension = src->nDimension;
+    dst->refcount = src->refcount;
 
     dst->storage = src->storage;
-    dst->size = src->size;
-    dst->stride = src->stride;
-    dst->nDimension = src->nDimension;
-    ++dst->refcount;
+
+    if (!srcWrapper.definedInLua) {
+        // Don't let Torch deallocate size and stride arrays
+        dst->size = src->size;
+        dst->stride = src->stride;
+        src->size = nullptr;
+        src->stride = nullptr;
+        THAtomicIncrementRef(&src->storage->refcount);
+        THByteTensor_free(src);
+    } else {
+        dst->size   = static_cast<long *>(THAlloc(sizeof(long) * dst->nDimension));
+        dst->stride = static_cast<long *>(THAlloc(sizeof(long) * dst->nDimension));
+        memcpy(dst->size,   src->size,   src->nDimension * sizeof(long));
+        memcpy(dst->stride, src->stride, src->nDimension * sizeof(long));
+    }
 }
 
 /***************** Wrappers for small classes *****************/

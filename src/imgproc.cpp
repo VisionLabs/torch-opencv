@@ -63,21 +63,9 @@ struct TensorWrapper GaussianBlur(struct TensorWrapper src, struct TensorWrapper
                                   struct SizeWrapper ksize, double sigmaX,
                                   double sigmaY, int borderType)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::GaussianBlur(
-                src.toMat(), retval, ksize, sigmaX, sigmaY, borderType);
-        return TensorWrapper(retval);
-    } else if (dst.tensorPtr == src.tensorPtr) {
-        // in-place
-        cv::Mat source = src.toMat();
-        cv::GaussianBlur(
-                source, source, ksize, sigmaX, sigmaY, borderType);
-    } else {
-        cv::GaussianBlur(
-                src.toMat(), dst.toMat(), ksize, sigmaX, sigmaY, borderType);
-    }
-    return dst;
+    MatT dstMat = dst.toMatT();
+    cv::GaussianBlur(src.toMat(), dstMat, ksize, sigmaX, sigmaY, borderType);
+    return TensorWrapper(dstMat);
 }
 
 extern "C"
@@ -295,18 +283,9 @@ struct TensorWrapper Canny(
         struct TensorWrapper image, struct TensorWrapper edges,
         double threshold1, double threshold2, int apertureSize, bool L2gradient)
 {
-    if (edges.isNull()) {
-        cv::Mat retval;
-        cv::Canny(image.toMat(), retval, threshold1, threshold2, apertureSize, L2gradient);
-        return TensorWrapper(retval);
-    } else if (edges.tensorPtr == image.tensorPtr) {
-        // in-place
-        cv::Mat source = image.toMat();
-        cv::Canny(source, source, threshold1, threshold2, apertureSize, L2gradient);
-    } else {
-        cv::Canny(image.toMat(), edges.toMat(), threshold1, threshold2, apertureSize, L2gradient);
-    }
-    return edges;
+    MatT edgesMat = edges.toMatT();
+    cv::Canny(image.toMat(), edgesMat, threshold1, threshold2, apertureSize, L2gradient);
+    return TensorWrapper(edgesMat);
 }
 
 extern "C"
@@ -320,7 +299,6 @@ struct TensorWrapper cornerMinEigenVal(
         return TensorWrapper(retval);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
-        std::cout << "inplace" << std::endl;
         cv::Mat source = src.toMat();
         cv::cornerMinEigenVal(source, source, blockSize, ksize, borderType);
     } else {
@@ -1187,18 +1165,9 @@ extern "C" struct RectPlusInt floodFill(
 extern "C" struct TensorWrapper cvtColor(
         struct TensorWrapper src, struct TensorWrapper dst, int code, int dstCn)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::cvtColor(src.toMat(), retval, code, dstCn);
-        return TensorWrapper(retval);
-    } else if (dst.tensorPtr == src.tensorPtr) {
-        // in-place
-        cv::Mat source = src.toMat();
-        cv::cvtColor(source, source, code, dstCn);
-    } else {
-        cv::cvtColor(src.toMat(), dst.toMat(), code, dstCn);
-    }
-    return dst;
+    MatT dstMat = dst.toMatT();
+    cv::cvtColor(src.toMat(), dstMat, code, dstCn);
+    return TensorWrapper(dstMat);
 }
 
 extern "C"

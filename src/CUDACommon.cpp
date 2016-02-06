@@ -85,7 +85,7 @@ TensorWrapper::TensorWrapper(cuda::GpuMat && mat, THCState *state) {
 // Kill "destination" and assign "source" data to it.
 // "destination" is always supposed to be an empty Tensor
 extern "C"
-void transfer_tensor_CUDA(THCState *state, THCudaTensor *dst, THCudaTensor *src) {
+void transfer_tensor_CUDA(THCState *state, THCudaTensor *dst, struct TensorWrapper srcWrapper) {
     if (dst->storage)
         THCudaStorage_free(state, dst->storage);
     if (dst->size)

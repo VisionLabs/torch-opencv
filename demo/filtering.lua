@@ -30,7 +30,7 @@ cv.waitKey{0}
 
 -- output to another Tensor of same size & type...
 local image_A = image * 0
-cv.GaussianBlur{src=image, dst=image_A, ksize={7, 7}, sigmaX=3.5, sigmaY=3.5}
+local w = cv.GaussianBlur{src=image, dst=image_A, ksize={7, 7}, sigmaX=3.5, sigmaY=3.5}
 
 -- or to a return value...
 local image_B = cv.GaussianBlur{src=image, ksize={7, 7}, sigmaX=3.5, sigmaY=3.5}

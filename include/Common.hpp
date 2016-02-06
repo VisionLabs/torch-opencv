@@ -26,13 +26,27 @@ extern "C" double getDblEpsilon() { return DBL_EPSILON; }
 #define TO_MAT_LIST_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toMatList())
 #define TO_GPUMAT_LIST_OR_NOARRAY(mat) (mat.isNull() ? std::vector<cuda::GpuMat>() : mat.toGpuMatList())
 
+extern "C"
+void initAllocator();
+
+class MatT {
+public:
+    cv::Mat mat;
+    // The Tensor that `mat` was created from, or nullptr
+    THByteTensor *tensor;
+
+    inline operator cv::_OutputArray() { return this->mat; }
+};
+
 struct TensorWrapper {
-    void *tensorPtr;
+    THByteTensor *tensorPtr;
     char typeCode;
+    bool definedInLua;
 
     TensorWrapper();
     TensorWrapper(cv::Mat & mat);
     TensorWrapper(cv::Mat && mat);
+    TensorWrapper(MatT & mat);
     #ifdef WITH_CUDA
     TensorWrapper(cv::cuda::GpuMat & mat, THCState *state);
     TensorWrapper(cv::cuda::GpuMat && mat, THCState *state);
@@ -41,6 +55,7 @@ struct TensorWrapper {
     operator cv::Mat();
     // synonym for operator cv::Mat()
     inline cv::Mat toMat() { return *this; }
+    MatT toMatT();
 
     #ifdef WITH_CUDA
     cv::cuda::GpuMat toGpuMat();
