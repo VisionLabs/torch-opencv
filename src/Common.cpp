@@ -249,6 +249,16 @@ TensorArray::TensorArray(std::vector<cv::Mat> & matList):
     }
 }
 
+TensorArray::TensorArray(std::vector<MatT> & matList):
+        tensors(static_cast<TensorWrapper *>(malloc(matList.size() * sizeof(TensorWrapper)))),
+        size(matList.size())
+{
+    for (size_t i = 0; i < matList.size(); ++i) {
+        // invoke the constructor, memory is already allocated
+        new (tensors + i) TensorWrapper(matList[i]);
+    }
+}
+
 TensorArray::operator std::vector<cv::Mat>() {
     std::vector<cv::Mat> retval(this->size);
     for (int i = 0; i < this->size; ++i) {

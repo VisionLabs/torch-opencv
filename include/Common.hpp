@@ -70,6 +70,7 @@ struct TensorArray {
 
     TensorArray();
     TensorArray(std::vector<cv::Mat> & matList);
+    TensorArray(std::vector<MatT> & matList);
     explicit TensorArray(short size);
 
     #ifdef WITH_CUDA
@@ -79,7 +80,8 @@ struct TensorArray {
 
     operator std::vector<cv::Mat>();
     // synonym for operator std::vector<cv::Mat>()
-    inline std::vector<cv::Mat> toMatList() { return *this; }
+    inline std::vector<cv::Mat> toMatList()  { return *this; }
+    inline std::vector<MatT>    toMatTList() { return *this; }
 
     inline bool isNull() { return tensors == nullptr; }
 };
