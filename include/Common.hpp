@@ -79,7 +79,8 @@ struct TensorArray {
     #endif
 
     operator std::vector<cv::Mat>();
-    // synonym for operator std::vector<cv::Mat>()
+    operator std::vector<MatT>();
+    // synonyms for operators
     inline std::vector<cv::Mat> toMatList()  { return *this; }
     inline std::vector<MatT>    toMatTList() { return *this; }
 

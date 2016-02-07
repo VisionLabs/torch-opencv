@@ -263,7 +263,16 @@ TensorArray::operator std::vector<cv::Mat>() {
     std::vector<cv::Mat> retval(this->size);
     for (int i = 0; i < this->size; ++i) {
         // TODO: avoid temporary object
-        retval[i] = this->tensors[i];
+        retval[i] = this->tensors[i].toMat();
+    }
+    return retval;
+}
+
+TensorArray::operator std::vector<MatT>() {
+    std::vector<MatT> retval(this->size);
+    for (int i = 0; i < this->size; ++i) {
+        // TODO: avoid temporary object
+        retval[i] = this->tensors[i].toMatT();
     }
     return retval;
 }
