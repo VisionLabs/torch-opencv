@@ -266,9 +266,23 @@ struct TensorWrapper fisheye_undistortPoints(
 	struct TensorWrapper distorted, struct TensorWrapper undistorted,
 	struct TensorWrapper K, struct TensorWrapper D,
 	struct TensorWrapper R, struct TensorWrapper P);
+
+void test(
+	struct TensorArray imgs);
 ]]
 
 local C = ffi.load(cv.libPath('calib3d'))
+
+----------------------
+function cv.test(t)
+    local argRules = {
+        {"imgs", required =  true}}
+    local imgs = cv.argcheck(t, argRules)
+    cv.wrap_tensors(imgs)
+end
+
+
+----------------------
 
 function cv.calibrateCamera(t)
     local argRules = {
@@ -1184,10 +1198,10 @@ void StereoBM_setPreFilterType(
 	struct StereoBMPtr ptr, int preFilterType);
 
 void StereoBM_setROI1(
-	struct StereoBMPtr ptr, RectWrapper roi1);
+	struct StereoBMPtr ptr, struct RectWrapper roi1);
 
 void StereoBM_setROI2(
-	struct StereoBMPtr ptr, RectWrapper roi2);
+	struct StereoBMPtr ptr, struct RectWrapper roi2);
 
 void StereoBM_setSmallerBlockSize(
 	struct StereoBMPtr ptr, int blockSize);
