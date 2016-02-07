@@ -800,7 +800,7 @@ void DescriptorMatcher_clear(struct DescriptorMatcherPtr ptr)
 extern "C"
 bool DescriptorMatcher_empty(struct DescriptorMatcherPtr ptr)
 {
-    ptr->empty();
+    return ptr->empty();
 }
 
 extern "C"
