@@ -947,14 +947,14 @@ void StereoBM_setPreFilterType(
 
 extern "C"
 void StereoBM_setROI1(
-	struct StereoBMPtr ptr, RectWrapper roi1)
+	struct StereoBMPtr ptr, struct RectWrapper roi1)
 {
     ptr->setROI1(roi1);
 }
 
 extern "C"
 void StereoBM_setROI2(
-	struct StereoBMPtr ptr, RectWrapper roi2)
+	struct StereoBMPtr ptr, struct RectWrapper roi2)
 {
     ptr->setROI2(roi2);
 }

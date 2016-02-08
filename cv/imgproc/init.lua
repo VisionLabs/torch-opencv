@@ -6,8 +6,8 @@ ffi.cdef[[
 struct TensorWrapper getGaussianKernel(int ksize, double sigma, int ktype);
 
 struct TensorArray getDerivKernels(
-        int dx, int dy, int ksize,
-        bool normalize, int ktype);
+        int dx, int dy, int ksize, struct TensorWrapper kx,
+        struct TensorWrapper ky, bool normalize, int ktype);
 
 struct TensorWrapper getGaborKernel(struct SizeWrapper ksize, double sigma, double theta,
                                     double lambd, double gamma, double psi, int ktype);
@@ -15,15 +15,15 @@ struct TensorWrapper getGaborKernel(struct SizeWrapper ksize, double sigma, doub
 struct TensorWrapper getStructuringElement(int shape, struct SizeWrapper ksize,
                                            struct PointWrapper anchor);
 
-struct TensorWrapper medianBlur(struct TensorWrapper src, struct TensorWrapper dst, int ksize);
+struct TensorWrapper medianBlur(struct TensorWrapper src, int ksize, struct TensorWrapper dst);
 
-struct TensorWrapper GaussianBlur(struct TensorWrapper src, struct TensorWrapper dst,
-                                  struct SizeWrapper ksize, double sigmaX,
+struct TensorWrapper GaussianBlur(struct TensorWrapper src, struct SizeWrapper ksize,
+                                  double sigmaX, struct TensorWrapper dst,
                                   double sigmaY, int borderType);
 
-struct TensorWrapper bilateralFilter(struct TensorWrapper src, struct TensorWrapper dst, int d,
+struct TensorWrapper bilateralFilter(struct TensorWrapper src, int d,
                                      double sigmaColor, double sigmaSpace,
-                                     int borderType);
+                                     struct TensorWrapper dst, int borderType);
 
 struct TensorWrapper boxFilter(
         struct TensorWrapper src, struct TensorWrapper dst, int ddepth,
@@ -436,12 +436,17 @@ function cv.getDerivKernels(t)
         {"dx", required = true},
         {"dy", required = true},
         {"ksize", required = true},
+        {"kx", default = nil},
+        {"ky", default = nil},
         {"ktype", default = cv.CV_32F},
         {"normalize", default = false}
     }
-    local dx, dy, ksize, ktype, normalize = cv.argcheck(t, argRules)
+    local dx, dy, ksize, kx, ky, ktype, normalize = cv.argcheck(t, argRules)
 
-    return cv.unwrap_tensors(C.getDerivKernels(dx, dy, ksize, normalize, ktype))
+    return cv.unwrap_tensors(
+		C.getDerivKernels(
+			dx, dy, ksize, cv.wrap_tensor(kx),
+			cv.wrap_tensor(ky), normalize, ktype))
 end
 
 
@@ -477,10 +482,10 @@ end
 function cv.medianBlur(t)
     local argRules = {
         {"src", required = true},
-        {"dst", required = true},
-        {"ksize", required = true}
-    }
-    local src, dst, ksize = cv.argcheck(t, argRules)
+        {"ksize", required = true},
+        {"dst", default = nil}}
+        
+    local src, ksize, dst = cv.argcheck(t, argRules)
 
     local srcChannels = src:size()[3]
     assert(srcChannels == 1 or srcChannels == 3 or srcChannels == 4)
@@ -496,20 +501,20 @@ function cv.medianBlur(t)
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
     end
 
-    return cv.unwrap_tensors(C.medianBlur(cv.wrap_tensor(src), cv.wrap_tensor(dst), ksize))
+    return cv.unwrap_tensors(C.medianBlur(cv.wrap_tensor(src), ksize, cv.wrap_tensor(dst)))
 end
 
 
 function cv.GaussianBlur(t)
     local argRules = {
         {"src", required = true},
-        {"dst", default = nil},
         {"ksize", required = true, operator = cv.Size},
         {"sigmaX", required = true},
+        {"dst", default = nil},
         {"sigmaY", default = 0},
         {"borderType", default = cv.BORDER_DEFAULT}
     }
-    local src, dst, ksize, sigmaX, sigmaY, borderType = cv.argcheck(t, argRules)
+    local src, ksize, sigmaX, dst, sigmaY, borderType = cv.argcheck(t, argRules)
 
     assert(cv.tensorType(src) ~= cv.CV_8S and
            cv.tensorType(src) ~= cv.CV_32S)
@@ -519,20 +524,20 @@ function cv.GaussianBlur(t)
 
     return cv.unwrap_tensors(
         C.GaussianBlur(
-            cv.wrap_tensor(src), cv.wrap_tensor(dst), ksize, sigmaX, sigmaY, borderType))
+            cv.wrap_tensor(src), ksize, sigmaX, cv.wrap_tensor(dst), sigmaY, borderType))
 end
 
 
 function cv.bilateralFilter(t)
     local argRules = {
         {"src", required = true},
-        {"dst", default = nil},
         {"d", required = true},
         {"sigmaColor", required = true},
         {"sigmaSpace", required = true},
+        {"dst", default = nil},
         {"borderType", default = cv.BORDER_DEFAULT}
     }
-    local src, dst, d, sigmaColor, sigmaSpace, borderType = cv.argcheck(t, argRules)
+    local src, d, sigmaColor, sigmaSpace, dst, borderType = cv.argcheck(t, argRules)
 
     assert(src:nDimension() == 2 or src:size()[3] == 3)
 
@@ -545,7 +550,7 @@ function cv.bilateralFilter(t)
 
     return cv.unwrap_tensors(
         C.bilateralFilter(
-            cv.wrap_tensor(src), cv.wrap_tensor(dst), d, sigmaColor, sigmaSpace, borderType))
+            cv.wrap_tensor(src), d, sigmaColor, sigmaSpace, cv.wrap_tensor(dst), borderType))
 end
 
 

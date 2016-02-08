@@ -7,8 +7,8 @@ struct TensorWrapper getGaussianKernel(int ksize, double sigma, int ktype);
 
 extern "C"
 struct TensorArray getDerivKernels(
-        int dx, int dy, int ksize,
-        bool normalize, int ktype);
+        int dx, int dy, int ksize, struct TensorWrapper kx,
+        struct TensorWrapper ky, bool normalize, int ktype);
 
 extern "C"
 struct TensorWrapper getGaborKernel(struct SizeWrapper ksize, double sigma, double theta,
@@ -19,17 +19,17 @@ struct TensorWrapper getStructuringElement(int shape, struct SizeWrapper ksize,
                                                       struct PointWrapper anchor);
 
 extern "C"
-struct TensorWrapper medianBlur(struct TensorWrapper src, struct TensorWrapper dst, int ksize);
+struct TensorWrapper medianBlur(struct TensorWrapper src, int ksize, struct TensorWrapper dst);
 
 extern "C"
-struct TensorWrapper GaussianBlur(struct TensorWrapper src, struct TensorWrapper dst,
-                                             struct SizeWrapper ksize, double sigmaX,
-                                             double sigmaY, int borderType);
+struct TensorWrapper GaussianBlur(struct TensorWrapper src, struct SizeWrapper ksize,
+                                  double sigmaX, struct TensorWrapper dst,
+                                  double sigmaY, int borderType);
 
 extern "C"
-struct TensorWrapper bilateralFilter(struct TensorWrapper src, struct TensorWrapper dst, int d,
-                                                double sigmaColor, double sigmaSpace,
-                                                int borderType);
+struct TensorWrapper bilateralFilter(struct TensorWrapper src, int d,
+                                     double sigmaColor, double sigmaSpace,
+                                     struct TensorWrapper dst, int borderType);
 
 extern "C"
 struct TensorWrapper boxFilter(
