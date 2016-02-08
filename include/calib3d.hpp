@@ -524,13 +524,6 @@ extern "C"
 void StereoSGBM_setUniquenessRatio(
 	struct StereoSGBMPtr ptr, int uniquenessRatio);
 
-//___________________
-
-extern "C"
-void test(
-	struct TensorArray imgs){ std::cout<<"work"; }
-
-
 
 
 

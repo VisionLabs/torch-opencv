@@ -266,23 +266,9 @@ struct TensorWrapper fisheye_undistortPoints(
 	struct TensorWrapper distorted, struct TensorWrapper undistorted,
 	struct TensorWrapper K, struct TensorWrapper D,
 	struct TensorWrapper R, struct TensorWrapper P);
-
-void test(
-	struct TensorArray imgs);
 ]]
 
 local C = ffi.load(cv.libPath('calib3d'))
-
-----------------------
-function cv.test(t)
-    local argRules = {
-        {"imgs", required =  true}}
-    local imgs = cv.argcheck(t, argRules)
-    cv.wrap_tensors(imgs)
-end
-
-
-----------------------
 
 function cv.calibrateCamera(t)
     local argRules = {

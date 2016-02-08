@@ -1067,17 +1067,6 @@ void StereoSGBM_setUniquenessRatio(
     ptr->setUniquenessRatio(uniquenessRatio);
 }
 
-//_______________________________________
-/*
-extern "C"
-void test(
-	struct TensorArray imgs)
-{
-}
-
-*/
-
-
 
 
 
