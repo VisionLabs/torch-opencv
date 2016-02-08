@@ -1184,10 +1184,10 @@ void StereoBM_setPreFilterType(
 	struct StereoBMPtr ptr, int preFilterType);
 
 void StereoBM_setROI1(
-	struct StereoBMPtr ptr, RectWrapper roi1);
+	struct StereoBMPtr ptr, struct RectWrapper roi1);
 
 void StereoBM_setROI2(
-	struct StereoBMPtr ptr, RectWrapper roi2);
+	struct StereoBMPtr ptr, struct RectWrapper roi2);
 
 void StereoBM_setSmallerBlockSize(
 	struct StereoBMPtr ptr, int blockSize);

@@ -444,11 +444,11 @@ void StereoBM_setPreFilterType(
 
 extern "C"
 void StereoBM_setROI1(
-	struct StereoBMPtr ptr, RectWrapper roi1);
+	struct StereoBMPtr ptr, struct RectWrapper roi1);
 
 extern "C"
 void StereoBM_setROI2(
-	struct StereoBMPtr ptr, RectWrapper roi2);
+	struct StereoBMPtr ptr, struct RectWrapper roi2);
 
 extern "C"
 void StereoBM_setSmallerBlockSize(
@@ -523,8 +523,6 @@ void StereoSGBM_setPreFilterCap(
 extern "C"
 void StereoSGBM_setUniquenessRatio(
 	struct StereoSGBMPtr ptr, int uniquenessRatio);
-
-
 
 
 
