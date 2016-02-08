@@ -323,7 +323,7 @@ struct TensorWrapper equalizeHist(
         struct TensorWrapper src, struct TensorWrapper dst);
 
 extern "C"
-float EMD(
+struct TensorPlusFloat EMD(
         struct TensorWrapper signature1, struct TensorWrapper signature2,
         int distType, struct TensorWrapper cost,
         struct FloatArray lowerBound, struct TensorWrapper flow);
@@ -430,11 +430,13 @@ double matchShapes(
 
 extern "C"
 struct TensorWrapper convexHull(
-        struct TensorWrapper points, bool clockwise, bool returnPoints);
+        struct TensorWrapper points, struct TensorWrapper hull,
+        bool clockwise, bool returnPoints);
 
 extern "C"
 struct TensorWrapper convexityDefects(
-        struct TensorWrapper contour, struct TensorWrapper convexhull);
+        struct TensorWrapper contour, struct TensorWrapper convexhull,
+        struct TensorWrapper convexityDefects);
 
 extern "C"
 bool isContourConvex(
@@ -442,7 +444,8 @@ bool isContourConvex(
 
 extern "C"
 struct TensorPlusFloat intersectConvexConvex(
-        struct TensorWrapper _p1, struct TensorWrapper _p2, bool handleNested);
+        struct TensorWrapper _p1, struct TensorWrapper _p2,
+        struct TensorWrapper _p12, bool handleNested);
 
 extern "C"
 struct RotatedRectWrapper fitEllipse(
@@ -450,7 +453,8 @@ struct RotatedRectWrapper fitEllipse(
 
 extern "C"
 struct TensorWrapper fitLine(
-        struct TensorWrapper points, int distType, double param, double reps, double aeps);
+        struct TensorWrapper points, struct TensorWrapper line, int distType,
+        double param, double reps, double aeps);
 
 extern "C"
 double pointPolygonTest(
@@ -746,7 +750,8 @@ struct TensorWrapper LineSegmentDetector_drawSegments(
         struct LineSegmentDetectorPtr ptr, struct TensorWrapper image, struct TensorWrapper lines);
 
 extern "C"
-int compareSegments(struct LineSegmentDetectorPtr ptr, struct SizeWrapper size, struct TensorWrapper lines1,
+extern "C"
+int LineSegmentDetector_compareSegments(struct LineSegmentDetectorPtr ptr, struct SizeWrapper size, struct TensorWrapper lines1,
                     struct TensorWrapper lines2, struct TensorWrapper image);
 
 extern "C"
