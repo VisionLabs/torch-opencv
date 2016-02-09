@@ -58,6 +58,19 @@ void refcount(THByteTensor * x) {
     std::cout << "Storage refcount: " << x->storage->refcount << std::endl;
 }
 
+MatT::MatT(cv::Mat & mat) {
+    this->mat = mat;
+    this->tensor = nullptr;
+}
+
+MatT::MatT(cv::Mat && mat) {
+    new (this) MatT(mat);
+}
+
+MatT::MatT() {
+    this->tensor = nullptr;
+}
+
 TensorWrapper::TensorWrapper(): tensorPtr(nullptr) {}
 
 TensorWrapper::TensorWrapper(cv::Mat & mat) {
@@ -68,6 +81,8 @@ TensorWrapper::TensorWrapper(cv::Mat & mat) {
     }
 
     this->typeCode = static_cast<char>(mat.depth());
+
+    this->definedInLua = false;
 
     THByteTensor *outputPtr = THByteTensor_new();
 
@@ -173,6 +188,10 @@ TensorWrapper::TensorWrapper(MatT & matT) {
     }
 
     this->tensorPtr = outputPtr;
+}
+
+TensorWrapper::TensorWrapper(MatT && mat) {
+    new (this) TensorWrapper(mat);
 }
 
 TensorWrapper::operator cv::Mat() {
@@ -467,3 +486,12 @@ RectArray::operator std::vector<cv::Rect>() {
     memcpy(retval.data(), this->data + 1, this->size * sizeof(RectWrapper));
     return retval;
 }
+
+/***************** Helper functions *****************/
+
+std::vector<MatT> get_vec_MatT(std::vector<cv::Mat> vec_mat) {
+    std::vector<MatT> retval(vec_mat.size());
+    for(int i = 0; i < vec_mat.size(); i++) retval[i] = vec_mat[i];
+    return retval;
+}
+

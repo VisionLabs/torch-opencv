@@ -58,7 +58,7 @@ struct TensorPlusBool VideoCapture_retrieve(
 {
     TensorPlusBool retval;
     if (image.isNull()) {
-        cv::Mat result;
+        MatT result;
         retval.val = ptr->retrieve(result, flag);
         new (&retval.tensor) TensorWrapper(result);
     } else {
@@ -74,7 +74,7 @@ struct TensorPlusBool VideoCapture_read(
 {
     TensorPlusBool retval;
     if (image.isNull()) {
-        cv::Mat result;
+        MatT result;
         retval.val = ptr->read(result);
         new (&retval.tensor) TensorWrapper(result);
     } else {

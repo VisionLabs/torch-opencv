@@ -5,7 +5,7 @@
 extern "C"
 struct TensorWrapper getGaussianKernel(int ksize, double sigma, int ktype)
 {
-    return TensorWrapper(cv::getGaussianKernel(ksize, sigma, ktype));
+    return TensorWrapper(MatT(cv::getGaussianKernel(ksize, sigma, ktype)));
 }
 
 extern "C"
@@ -401,7 +401,7 @@ extern "C"
 struct TensorWrapper getRotationMatrix2D(
         struct Point2fWrapper center, double angle, double scale)
 {
-    return TensorWrapper(cv::getRotationMatrix2D(center, angle, scale));
+    return TensorWrapper(MatT(cv::getRotationMatrix2D(center, angle, scale)));
 }
 
 extern "C"
@@ -417,13 +417,13 @@ struct TensorWrapper invertAffineTransform(
 extern "C" struct TensorWrapper getPerspectiveTransform(
         struct TensorWrapper src, struct TensorWrapper dst)
 {
-    return TensorWrapper(cv::getPerspectiveTransform(src.toMat(), dst.toMat()));
+    return TensorWrapper(MatT(cv::getPerspectiveTransform(src.toMat(), dst.toMat())));
 }
 
 extern "C" struct TensorWrapper getAffineTransform(
         struct TensorWrapper src, struct TensorWrapper dst)
 {
-    return TensorWrapper(cv::getAffineTransform(src.toMat(), dst.toMat()));
+    return TensorWrapper(MatT(cv::getAffineTransform(src.toMat(), dst.toMat())));
 }
 
 extern "C" struct TensorWrapper getRectSubPix(
@@ -1118,8 +1118,8 @@ void rectangle2(
         struct TensorWrapper img, struct RectWrapper rec,
         struct ScalarWrapper color, int thickness, int lineType, int shift)
 {
-    MatT img_mat = img.toMatT();
-    cv::rectangle(img_mat.mat, rec, color, thickness, lineType, shift);
+    cv::Mat img_mat(img);
+    cv::rectangle(img_mat, rec, color, thickness, lineType, shift);
 }
 
 extern "C"
@@ -1153,8 +1153,8 @@ void fillConvexPoly(
         struct TensorWrapper img, struct TensorWrapper points,
         struct ScalarWrapper color, int lineType, int shift)
 {
-    MatT img_mat = img.toMatT();
-    cv::fillConvexPoly(img_mat.mat, points.toMat(), color, lineType, shift);
+    cv::Mat img_mat(img);
+    cv::fillConvexPoly(img_mat, points.toMat(), color, lineType, shift);
 }
 
 extern "C"
@@ -1218,7 +1218,7 @@ struct TensorWrapper ellipse2Poly(
 {
     std::vector<cv::Point> result;
     cv::ellipse2Poly(center, axes, angle, arcStart, arcEnd, delta, result);
-    return TensorWrapper(cv::Mat(result));
+    return TensorWrapper(MatT(cv::Mat(result)));
 }
 
 extern "C"
@@ -1570,22 +1570,24 @@ struct LineSegmentDetectorPtr LineSegmentDetector_ctor(
             refine, scale, sigma_scale, quant, ang_th, log_eps, density_th, n_bins));
 }
 
-//TODO need to remake
 extern "C"
 struct TensorArray LineSegmentDetector_detect(
         struct LineSegmentDetectorPtr ptr, struct TensorWrapper image,
         struct TensorWrapper lines, bool width, bool prec, bool nfa)
 {
     std::vector<cv::Mat> retval(1 + width + prec + nfa);
-    if (!lines.isNull()) retval[0] = lines;
+    if (!lines.isNull()) retval[0] = lines.toMat();
     ptr->detect(
             image.toMat(), retval[0],
             width ? retval[1] : cv::noArray(),
             prec  ? retval[1 + width] : cv::noArray(),
             nfa   ? retval[1 + width + prec] : cv::noArray());
-    TensorArray result(retval);
-    std::vector<MatT> res = result.toMatTList();
-    return TensorArray(res);
+    std::vector<MatT> result(1 + width + prec + nfa);
+    result[0] = MatT(retval[0]);
+    if(width) result[1] = MatT(retval[1]);
+    if(prec) result[1 + width] = MatT(retval[1 + width]);
+    if(nfa) result[1 + width + prec] = MatT(retval[1 + width + prec]);
+    return TensorArray(result);
 }
 
 extern "C"
@@ -1598,10 +1600,11 @@ struct TensorWrapper LineSegmentDetector_drawSegments(
     return TensorWrapper(retval);
 }
 
-//TODO 	InputOutputArray image
 extern "C"
-int LineSegmentDetector_compareSegments(struct LineSegmentDetectorPtr ptr, struct SizeWrapper size, struct TensorWrapper lines1,
-                    struct TensorWrapper lines2, struct TensorWrapper image)
+int LineSegmentDetector_compareSegments(
+	struct LineSegmentDetectorPtr ptr, struct SizeWrapper size,
+	struct TensorWrapper lines1, struct TensorWrapper lines2,
+	struct TensorWrapper image)
 {
     return ptr->compareSegments(size, lines1.toMat(), lines2.toMat(), TO_MAT_OR_NOARRAY(image));
 }
@@ -1659,25 +1662,22 @@ struct Point2fPlusInt Subdiv2D_findNearest(struct Subdiv2DPtr ptr, struct Point2
     return retval;
 }
 
-//TODO
 extern "C"
 struct TensorWrapper Subdiv2D_getEdgeList(struct Subdiv2DPtr ptr)
 {
     auto result = new std::vector<cv::Vec4f>;
     ptr->getEdgeList(*result);
-    return TensorWrapper(cv::Mat(*result, false));
+    return TensorWrapper(MatT(cv::Mat(*result, false)));
 }
 
-//TODO
 extern "C"
 struct TensorWrapper Subdiv2D_getTriangleList(struct Subdiv2DPtr ptr)
 {
     auto result = new std::vector<cv::Vec6f>;
     ptr->getTriangleList(*result);
-    return TensorWrapper(cv::Mat(*result, false));
+    return TensorWrapper(MatT(cv::Mat(*result, false)));
 }
 
-//TODO
 extern "C"
 struct TensorArray Subdiv2D_getVoronoiFacetList(struct Subdiv2DPtr ptr, struct TensorWrapper idx)
 {
@@ -1685,11 +1685,11 @@ struct TensorArray Subdiv2D_getVoronoiFacetList(struct Subdiv2DPtr ptr, struct T
     auto facetCenters = new std::vector<cv::Point2f>;
     ptr->getVoronoiFacetList(idx.toMat(), *facetList, *facetCenters);
 
-    std::vector<cv::Mat> retval(facetList->size() + 1);
+    std::vector<MatT> retval(facetList->size() + 1);
     for (int i = 0; i < facetList->size(); ++i) {
-        new (&retval[i + 1]) cv::Mat((*facetList)[i]);
+        new (&retval[i + 1]) MatT(cv::Mat((*facetList)[i]));
     }
-    new (&retval[retval.size() - 1]) cv::Mat(*facetCenters);
+    new (&retval[retval.size() - 1]) MatT(cv::Mat(*facetCenters));
 
     return TensorArray(retval);
 }

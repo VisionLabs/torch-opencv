@@ -35,7 +35,10 @@ public:
     // The Tensor that `mat` was created from, or nullptr
     THByteTensor *tensor;
 
-    inline operator cv::_OutputArray() { return this->mat; }
+    inline operator cv::_InputOutputArray() { return this->mat; }
+    MatT(cv::Mat && mat);
+    MatT(cv::Mat & mat);
+    MatT();
 };
 
 struct TensorWrapper {
@@ -47,6 +50,7 @@ struct TensorWrapper {
     TensorWrapper(cv::Mat & mat);
     TensorWrapper(cv::Mat && mat);
     TensorWrapper(MatT & mat);
+    TensorWrapper(MatT && mat);
     #ifdef WITH_CUDA
     TensorWrapper(cv::cuda::GpuMat & mat, THCState *state);
     TensorWrapper(cv::cuda::GpuMat && mat, THCState *state);
@@ -425,3 +429,8 @@ struct PointArrayOfArrays {
     int dims;
     int *sizes;
 };
+
+/***************** Helper functions *****************/
+
+std::vector<MatT> get_vec_MatT(std::vector<cv::Mat> vec_mat);
+
