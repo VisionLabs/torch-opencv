@@ -1,5 +1,6 @@
 local cv = require 'cv._env'
 local ffi = require 'ffi'
+require 'cv.features2d'
 
 ffi.cdef[[
 struct calibrateCameraRetval {
@@ -93,7 +94,7 @@ struct TensorWrapper findChessboardCorners(
 struct TensorPlusBool findCirclesGrid(
 	struct TensorWrapper image, struct SizeWrapper patternSize,
 	struct TensorWrapper centers, int flags,
-	struct SimpleBlobDetectorPtr blobDetector);
+	struct PtrWrapper blobDetector);
 
 struct TensorWrapper findEssentialMat(
 	struct TensorWrapper points1, struct TensorWrapper points2,
@@ -502,11 +503,11 @@ function cv.findCirclesGrid(t)
         {"patternSize", required = true, operator = cv.Size},
         {"centers", default = nil},
         {"flags", default = cv.CALIB_CB_SYMMETRIC_GRID},
-        {"blobDetector", default = SimpleBlobDetector()}}
+        {"blobDetector", default = cv.SimpleBlobDetector{}}}
     local image, patternSize, centers, flags, blobDetector = cv.argcheck(t, argRules)
     local result = C.findCirclesGrid(
 			cv.wrap_tensor(image), patternSize, cv.wrap_tensor(centers),
-			flags, blobDetector)
+			flags, blobDetector.ptr)
     return result.val, cv.unwrap_tensors(result.tensor)
 end 
 
@@ -581,7 +582,7 @@ function cv.findHomography2(t)
         {"mask", required = true},
         {"method", default = 0},
         {"ransacReprojThreshold", default = 3}}
-    local srcPoints, dstPoints, mask, method, ransacReprojThreshold = argcheck(t, argRules)
+    local srcPoints, dstPoints, mask, method, ransacReprojThreshold = cv.argcheck(t, argRules)
     return cv.unwrap_tensors(
 			C.findHomography(
 				cv.wrap_tensor(srcPoints), cv.wrap_tensor(dstPoints),
@@ -1108,131 +1109,131 @@ local Classes = ffi.load(cv.libPath('Classes'))
 ffi.cdef[[
 
 struct TensorWrapper StereoMatcher_compute(
-	struct StereoMatcherPtr ptr, struct TensorWrapper left,
+	struct PtrWrapper ptr, struct TensorWrapper left,
 	struct TensorWrapper right, struct TensorWrapper disparity);
 
 int StereoMatcher_getBlockSize(
-	struct StereoMatcherPtr ptr);
+	struct PtrWrapper ptr);
 
 int StereoMatcher_getDisp12MaxDiff(
-	struct StereoMatcherPtr ptr);
+	struct PtrWrapper ptr);
 
 int StereoMatcher_getMinDisparity(
-	struct StereoMatcherPtr ptr);
+	struct PtrWrapper ptr);
 
 int StereoMatcher_getNumDisparities(
-	struct StereoMatcherPtr ptr);
+	struct PtrWrapper ptr);
 
 int StereoMatcher_getSpeckleRange(
-	struct StereoMatcherPtr ptr);
+	struct PtrWrapper ptr);
 
 int StereoMatcher_getSpeckleWindowSize(
-	struct StereoMatcherPtr ptr);
+	struct PtrWrapper ptr);
 
 void StereoMatcher_setBlockSize(
-	struct StereoMatcherPtr ptr, int blockSize);
+	struct PtrWrapper ptr, int blockSize);
 
 void StereoMatcher_setDisp12MaxDiff(
-	struct StereoMatcherPtr ptr, int disp12MaxDiff);
+	struct PtrWrapper ptr, int disp12MaxDiff);
 
 void StereoMatcher_setMinDisparity(
-	struct StereoMatcherPtr ptr, int minDisparity);
+	struct PtrWrapper ptr, int minDisparity);
 
 void StereoMatcher_setNumDisparities(
-	struct StereoMatcherPtr ptr, int numDisparities);
+	struct PtrWrapper ptr, int numDisparities);
 
 void StereoMatcher_setSpeckleRange(
-	struct StereoMatcherPtr ptr, int speckleRange);
+	struct PtrWrapper ptr, int speckleRange);
 
 void StereoMatcher_setSpeckleWindowSize(
-	struct StereoMatcherPtr ptr, int speckleWindowSize);
+	struct PtrWrapper ptr, int speckleWindowSize);
 
-struct StereoBMPtr StereoBM_ctor(
+struct PtrWrapper StereoBM_ctor(
 	int numDisparities, int blockSize);
 
 int StereoBM_getPreFilterCap(
-	struct StereoBMPtr ptr);
+	struct PtrWrapper ptr);
 
 int StereoBM_getPreFilterSize(
-	struct StereoBMPtr ptr);
+	struct PtrWrapper ptr);
 
 int StereoBM_getPreFilterType(
-	struct StereoBMPtr ptr);
+	struct PtrWrapper ptr);
 
 struct RectWrapper StereoBM_getROI1(
-	struct StereoBMPtr ptr);
+	struct PtrWrapper ptr);
 
 struct RectWrapper StereoBM_getROI2(
-	struct StereoBMPtr ptr);
+	struct PtrWrapper ptr);
 
 int StereoBM_getSmallerBlockSize(
-	struct StereoBMPtr ptr);
+	struct PtrWrapper ptr);
 
 int StereoBM_getTextureThreshold(
-	struct StereoBMPtr ptr);
+	struct PtrWrapper ptr);
 
 int StereoBM_getUniquenessRatio(
-	struct StereoBMPtr ptr);
+	struct PtrWrapper ptr);
 
 void StereoBM_setPreFilterCap(
-	struct StereoBMPtr ptr, int preFilterCap);
+	struct PtrWrapper ptr, int preFilterCap);
 
 void StereoBM_setPreFilterSize(
-	struct StereoBMPtr ptr, int preFilterSize);
+	struct PtrWrapper ptr, int preFilterSize);
 
 void StereoBM_setPreFilterType(
-	struct StereoBMPtr ptr, int preFilterType);
+	struct PtrWrapper ptr, int preFilterType);
 
 void StereoBM_setROI1(
-	struct StereoBMPtr ptr, struct RectWrapper roi1);
+	struct PtrWrapper ptr, struct RectWrapper roi1);
 
 void StereoBM_setROI2(
-	struct StereoBMPtr ptr, struct RectWrapper roi2);
+	struct PtrWrapper ptr, struct RectWrapper roi2);
 
 void StereoBM_setSmallerBlockSize(
-	struct StereoBMPtr ptr, int blockSize);
+	struct PtrWrapper ptr, int blockSize);
 
 void StereoBM_setTextureThreshold(
-	struct StereoBMPtr ptr, int textureThreshold);
+	struct PtrWrapper ptr, int textureThreshold);
 
 void StereoBM_setUniquenessRatio(
-	struct StereoBMPtr ptr, int uniquenessRatio);
+	struct PtrWrapper ptr, int uniquenessRatio);
 
-struct StereoSGBMPtr StereoSGBM_ctor(
+struct PtrWrapper StereoSGBM_ctor(
 	int minDisparity, int numDisparities, int blockSize,
 	int P1, int P2, int disp12MaxDiff, int preFilterCap,
 	int uniquenessRatio, int speckleWindowSize,
 	int speckleRange, int mode);
 
 int StereoSGBM_getMode(
-	struct StereoSGBMPtr ptr);
+	struct PtrWrapper ptr);
 
 int StereoSGBM_getP1(
-	struct StereoSGBMPtr ptr);
+	struct PtrWrapper ptr);
 
 int StereoSGBM_getP2(
-	struct StereoSGBMPtr ptr);
+	struct PtrWrapper ptr);
 
 int StereoSGBM_getPreFilterCap(
-	struct StereoSGBMPtr ptr);
+	struct PtrWrapper ptr);
 
 int StereoSGBM_getUniquenessRatio(
-	struct StereoSGBMPtr ptr);
+	struct PtrWrapper ptr);
 
 void StereoSGBM_setMode(
-	struct StereoSGBMPtr ptr, int mode);
+	struct PtrWrapper ptr, int mode);
 
 void StereoSGBM_setP1(
-	struct StereoSGBMPtr ptr, int P1);
+	struct PtrWrapper ptr, int P1);
 
 void StereoSGBM_setP2(
-	struct StereoSGBMPtr ptr, int P2);
+	struct PtrWrapper ptr, int P2);
 
 void StereoSGBM_setPreFilterCap(
-	struct StereoSGBMPtr ptr, int preFilterCap);
+	struct PtrWrapper ptr, int preFilterCap);
 
 void StereoSGBM_setUniquenessRatio(
-	struct StereoSGBMPtr ptr, int uniquenessRatio);
+	struct PtrWrapper ptr, int uniquenessRatio);
 ]]
 
 --StereoMatcher
@@ -1508,13 +1509,4 @@ do
 end
 
 return cv
-
-
-
-
-
-
-
-
-
 

@@ -230,10 +230,6 @@ struct SimpleBlobDetector_Params SimpleBlobDetector_Params_default();
 
 struct PtrWrapper SimpleBlobDetector_ctor(struct SimpleBlobDetector_Params params);
 
-struct SimpleBlobDetector_Params SimpleBlobDetector_Params_default();
-
-struct PtrWrapper SimpleBlobDetector_ctor(struct SimpleBlobDetector_Params params);
-
 // KAZE
 
 struct PtrWrapper KAZE_ctor(
@@ -1080,6 +1076,7 @@ function cv.SimpleBlobDetector_Params(t)
     for k, v in pairs(params) do
         result[k] = v
     end
+    return result
 end
 
 
