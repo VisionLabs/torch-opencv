@@ -10,7 +10,7 @@ struct TensorPlusRectArray groupRectangles(struct RectArray rectList, int groupT
 
     struct TensorPlusRectArray retval;
     new (&retval.rects) RectArray(rectListVec);
-    new (&retval.tensor) TensorWrapper(cv::Mat(weights));
+    new (&retval.tensor) TensorWrapper(MatT(cv::Mat(weights)));
 
     return retval;
 }
@@ -98,7 +98,7 @@ struct TensorPlusRectArray CascadeClassifier_detectMultiScale2(struct CascadeCla
             minNeighbors, flags, minSize, maxSize);
 
     new (&retval.rects) RectArray(objects);
-    new (&retval.tensor) TensorWrapper(cv::Mat(numDetections));
+    new (&retval.tensor) TensorWrapper(MatT(cv::Mat(numDetections)));
 
     return retval;
 }
@@ -119,9 +119,9 @@ struct TensorArrayPlusRectArray CascadeClassifier_detectMultiScale3(
             scaleFactor, minNeighbors, flags, minSize, maxSize, outputRejectLevels);
 
     new (&retval.rects) RectArray(objects);
-    std::vector<cv::Mat> matArray(2);
-    matArray[0] = cv::Mat(rejectLevels);
-    matArray[1] = cv::Mat(levelWeights);
+    std::vector<MatT> matArray(2);
+    matArray[0] = MatT(cv::Mat(rejectLevels));
+    matArray[1] = MatT(cv::Mat(levelWeights));
     new (&retval.tensors) TensorArray(matArray);
 
     return retval;
@@ -197,7 +197,7 @@ struct TensorWrapper HOGDescriptor_compute(
 {
     std::vector<float> retval;
     ptr->compute(img.toMat(), retval, winStride, padding, locations);
-    return TensorWrapper(cv::Mat(retval));
+    return TensorWrapper(MatT(cv::Mat(retval)));
 }
 
 extern "C"
@@ -213,7 +213,7 @@ struct TensorPlusPointArray HOGDescriptor_detect(
                 hitThreshold, winStride, padding, searchLocations);
 
     new (&retval.points) PointArray(foundLocations);
-    new (&retval.tensor) TensorWrapper(cv::Mat(weights));
+    new (&retval.tensor) TensorWrapper(MatT(cv::Mat(weights)));
 
     return retval;
 }
@@ -232,7 +232,7 @@ struct TensorPlusRectArray HOGDescriptor_detectMultiScale(
                 hitThreshold, winStride, padding, scale, finalThreshold, useMeanshiftGrouping);
 
     new (&retval.rects) RectArray(foundLocations);
-    new (&retval.tensor) TensorWrapper(cv::Mat(foundWeights));
+    new (&retval.tensor) TensorWrapper(MatT(cv::Mat(foundWeights)));
 
     return retval;
 }
@@ -242,19 +242,20 @@ struct TensorArray HOGDescriptor_computeGradient(
         struct HOGDescriptorPtr ptr, struct TensorWrapper img,
         struct SizeWrapper paddingTL, struct SizeWrapper paddingBR)
 {
-    std::vector<cv::Mat> retval;
-    ptr->computeGradient(img.toMat(), retval[0], retval[1], paddingTL, paddingBR);
+    std::vector<cv::Mat> vec(2);
+    ptr->computeGradient(img.toMat(), vec[0], vec[1], paddingTL, paddingBR);
+    std::vector<MatT> retval = get_vec_MatT(vec);
     return TensorArray(retval);
 }
 
 extern "C"
 struct TensorWrapper HOGDescriptor_getDefaultPeopleDetector()
 {
-    return TensorWrapper(cv::Mat(cv::HOGDescriptor::getDefaultPeopleDetector()));
+    return TensorWrapper(MatT(cv::Mat(cv::HOGDescriptor::getDefaultPeopleDetector())));
 }
 
 extern "C"
 struct TensorWrapper HOGDescriptor_getDaimlerPeopleDetector()
 {
-    return TensorWrapper(cv::Mat(cv::HOGDescriptor::getDaimlerPeopleDetector()));
+    return TensorWrapper(MatT(cv::Mat(cv::HOGDescriptor::getDaimlerPeopleDetector())));
 }

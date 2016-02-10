@@ -57,7 +57,7 @@ struct TensorWrapper edgePreservingFilter(struct TensorWrapper src, struct Tenso
 struct TensorWrapper detailEnhance(struct TensorWrapper src, struct TensorWrapper dst,
                             float sigma_s, float sigma_r);
 
-struct TensorWrapper pencilSketch(struct TensorWrapper src, struct TensorWrapper dst1,
+struct TensorArray pencilSketch(struct TensorWrapper src, struct TensorWrapper dst1,
                             struct TensorWrapper dst2, float sigma_s, float sigma_r, float shade_factor);
 
 struct TensorWrapper stylization(struct TensorWrapper src, struct TensorWrapper dst,
@@ -241,7 +241,7 @@ function cv.decolor(t)
     local argRules = {
         {"src", required = true},
         {"grayscale", default = nil},
-        {"color_boost", required = true}
+        {"color_boost", default = nil}
     }
     local src, grayscale, color_boost = cv.argcheck(t, argRules)
 

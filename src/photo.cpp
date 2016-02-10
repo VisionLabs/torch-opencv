@@ -3,249 +3,171 @@
 extern "C" struct TensorWrapper inpaint(struct TensorWrapper src, struct TensorWrapper inpaintMask,
                                     struct TensorWrapper dst, double inpaintRadius, int flags)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::inpaint(src.toMat(), inpaintMask.toMat(), retval, inpaintRadius, flags);
-        return TensorWrapper(retval);
-    } else {
-        cv::inpaint(src.toMat(), inpaintMask.toMat(), dst.toMat(), inpaintRadius, flags);
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    cv::inpaint(src.toMat(), inpaintMask.toMat(), dst_mat, inpaintRadius, flags);
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" struct TensorWrapper fastNlMeansDenoising1(struct TensorWrapper src, struct TensorWrapper dst,
                                     float h, int templateWindowSize, int searchWindowSize)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::fastNlMeansDenoising(src.toMat(), retval, h, templateWindowSize, searchWindowSize);
-        return TensorWrapper(retval);
-    } else {
-        cv::fastNlMeansDenoising(src.toMat(), dst.toMat(), h, templateWindowSize, searchWindowSize);
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    cv::fastNlMeansDenoising(src.toMat(), dst_mat, h, templateWindowSize, searchWindowSize);
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" struct TensorWrapper fastNlMeansDenoising2(struct TensorWrapper src, struct TensorWrapper dst,
                                     struct TensorWrapper h, int templateWindowSize,
                                     int searchWindowSize, int normType)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::fastNlMeansDenoising(src.toMat(), retval, h.toMat(), templateWindowSize, searchWindowSize, normType);
-        return TensorWrapper(retval);
-    } else {
-        cv::fastNlMeansDenoising(src.toMat(), dst.toMat(), h.toMat(), templateWindowSize, searchWindowSize, normType);
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    cv::fastNlMeansDenoising(src.toMat(), dst_mat, h.toMat(), templateWindowSize, searchWindowSize, normType);
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" struct TensorWrapper fastNlMeansDenoisingColored(struct TensorWrapper src, struct TensorWrapper dst,
                                     float h, float hColor, int templateWindowSize, int searchWindowSize)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::fastNlMeansDenoisingColored(src.toMat(), retval, h, hColor, templateWindowSize, searchWindowSize);
-        return TensorWrapper(retval);
-    } else {
-        cv::fastNlMeansDenoisingColored(src.toMat(), dst.toMat(), h, hColor, templateWindowSize, searchWindowSize);
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    cv::fastNlMeansDenoisingColored(src.toMat(), dst_mat, h, hColor, templateWindowSize, searchWindowSize);
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" struct TensorWrapper fastNlMeansDenoisingMulti1(struct TensorArray srcImgs, struct TensorWrapper dst,
                                     int imgToDenoiseIndex, int temporalWindowSize, float h,
                                     int templateWindowSize, int searchWindowSize)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), retval, imgToDenoiseIndex, temporalWindowSize, h,
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), dst_mat, imgToDenoiseIndex, temporalWindowSize, h,
                                     templateWindowSize, searchWindowSize);
-
-        return TensorWrapper(retval);
-    } else {
-        cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), dst.toMat(), imgToDenoiseIndex, temporalWindowSize, h,
-                                    templateWindowSize, searchWindowSize);
-    }
-    return dst;
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" struct TensorWrapper fastNlMeansDenoisingMulti2(struct TensorArray srcImgs, struct TensorWrapper dst,
                                     int imgToDenoiseIndex, int temporalWindowSize, struct TensorWrapper h,
                                     int templateWindowSize, int searchWindowSize, int normType)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), retval, imgToDenoiseIndex, temporalWindowSize, h.toMat(),
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), dst_mat, imgToDenoiseIndex, temporalWindowSize, h.toMat(),
                                         templateWindowSize, searchWindowSize, normType);
-        return TensorWrapper(retval);
-    } else {
-        cv::fastNlMeansDenoisingMulti(srcImgs.toMatList(), dst.toMat(), imgToDenoiseIndex, temporalWindowSize, h.toMat(),
-                                        templateWindowSize, searchWindowSize, normType);
-    }
-    return dst;
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" struct TensorWrapper fastNlMeansDenoisingColoredMulti(struct TensorArray srcImgs, struct TensorWrapper dst,
                                     int imgToDenoiseIndex, int temporalWindowSize, float h,
                                     float hColor, int templateWindowSize, int searchWindowSize)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::fastNlMeansDenoisingColoredMulti(srcImgs.toMatList(), retval, imgToDenoiseIndex, temporalWindowSize, h,
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    cv::fastNlMeansDenoisingColoredMulti(srcImgs.toMatList(), dst_mat, imgToDenoiseIndex, temporalWindowSize, h,
                                     hColor, templateWindowSize, searchWindowSize);
-
-        return TensorWrapper(retval);
-    } else {
-        cv::fastNlMeansDenoisingColoredMulti(srcImgs.toMatList(), dst.toMat(), imgToDenoiseIndex, temporalWindowSize, h,
-                                    hColor, templateWindowSize, searchWindowSize);
-        return dst;
-    }
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" struct TensorWrapper denoise_TVL1(struct TensorArray observations, struct TensorWrapper result,
-                                    double lambda, int niters)
-{
+                                    double lambda, int niters) {
+    cv::Mat result_mat;
     if (result.isNull()) {
-        cv::Mat retval;
-        cv::denoise_TVL1(observations.toMatList(), retval, lambda, niters);
-        return TensorWrapper(retval);
+        cv::denoise_TVL1(observations.toMatList(), result_mat, lambda, niters);
+        return TensorWrapper(MatT(result_mat));
     } else {
-        cv::Mat retval = result.toMat();
-        cv::denoise_TVL1(observations.toMatList(), retval, lambda, niters);
+        result_mat = result.toMat();
+        cv::denoise_TVL1(observations.toMatList(), result_mat, lambda, niters);
     }
     return result;
 }
 
-extern "C" struct TensorWrapper decolor(struct TensorWrapper src, struct TensorWrapper grayscale,
+extern "C" struct TensorArray decolor(struct TensorWrapper src, struct TensorWrapper grayscale,
                                     struct TensorWrapper color_boost)
 {
-    if (grayscale.isNull()) {
-        cv::Mat retval;
-        cv::decolor(src.toMat(), retval, color_boost.toMat());
-        return TensorWrapper(retval);
-    } else {
-        cv::decolor(src.toMat(), grayscale.toMat(), color_boost.toMat());
-    }
-    return grayscale;
+    std::vector<MatT> retval(2);
+    if(grayscale.isNull()) retval[0] = grayscale.toMatT();
+    if(color_boost.isNull()) retval[1] = color_boost.toMatT();
+    cv::decolor(src.toMat(), retval[0], retval[1]);
+    return TensorArray(retval);
 }
 
 extern "C" struct TensorWrapper seamlessClone(struct TensorWrapper src, struct TensorWrapper dst,
                                     struct TensorWrapper mask, struct PointWrapper p,
                                     struct TensorWrapper blend, int flags)
 {
-    if (blend.isNull()) {
-        cv::Mat retval;
-        cv::seamlessClone(src.toMat(), dst.toMat(), mask.toMat(), p, retval, flags);
-        return TensorWrapper(retval);
-    } else {
-        cv::seamlessClone(src.toMat(), dst.toMat(), mask.toMat(), p, blend.toMat(), flags);
-    }
-    return dst;
+    MatT blend_mat;
+    if(!blend.isNull()) blend_mat = blend.toMatT();
+    cv::seamlessClone(src.toMat(), blend_mat, mask.toMat(), p, blend.toMat(), flags);
+    return TensorWrapper(blend_mat);
 }
 
 extern "C" struct TensorWrapper colorChange(struct TensorWrapper src, struct TensorWrapper mask,
                                     struct TensorWrapper dst, float red_mul,
                                     float green_mul, float blue_mul)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::colorChange(src.toMat(), mask.toMat(), retval, red_mul, green_mul, blue_mul);
-
-        return TensorWrapper(retval);
-    } else {
-        cv::colorChange(src.toMat(), mask.toMat(), dst.toMat(), red_mul, green_mul, blue_mul);
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    cv::colorChange(src.toMat(), mask.toMat(), dst_mat, red_mul, green_mul, blue_mul);
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" struct TensorWrapper illuminationChange(struct TensorWrapper src, struct TensorWrapper mask,
                                     struct TensorWrapper dst, float alpha, float beta)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::illuminationChange(src.toMat(), mask.toMat(), retval, alpha, beta);
-
-        return TensorWrapper(retval);
-    } else {
-        cv::illuminationChange(src.toMat(), mask.toMat(), dst.toMat(), alpha, beta);
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    cv::illuminationChange(src.toMat(), mask.toMat(), dst_mat, alpha, beta);
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" struct TensorWrapper textureFlattening(struct TensorWrapper src, struct TensorWrapper mask,
                                     struct TensorWrapper dst, float low_threshold, float high_threshold,
                                     int kernel_size)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::textureFlattening(src.toMat(), mask.toMat(), retval, low_threshold,
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    cv::textureFlattening(src.toMat(), mask.toMat(), dst_mat, low_threshold,
                             high_threshold, kernel_size);
-
-        return TensorWrapper(retval);
-    } else {
-        cv::textureFlattening(src.toMat(), mask.toMat(), dst.toMat(), low_threshold,
-                            high_threshold, kernel_size);
-    }
-    return dst;
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" struct TensorWrapper edgePreservingFilter(struct TensorWrapper src, struct TensorWrapper dst,
                                     int flags, float sigma_s, float sigma_r)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::edgePreservingFilter(src.toMat(), retval, flags, sigma_s, sigma_r);
-
-        return TensorWrapper(retval);
-    } else {
-        cv::edgePreservingFilter(src.toMat(), dst.toMat(), flags, sigma_s, sigma_r);
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    cv::edgePreservingFilter(src.toMat(), dst_mat, flags, sigma_s, sigma_r);
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" struct TensorWrapper detailEnhance(struct TensorWrapper src, struct TensorWrapper dst,
                                     float sigma_s, float sigma_r)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::detailEnhance(src.toMat(), retval, sigma_s, sigma_r);
-
-        return TensorWrapper(retval);
-    } else {
-        cv::detailEnhance(src.toMat(), dst.toMat(), sigma_s, sigma_r);
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    cv::detailEnhance(src.toMat(), dst_mat, sigma_s, sigma_r);
+    return TensorWrapper(dst_mat);
 }
 
-extern "C" struct TensorWrapper pencilSketch(struct TensorWrapper src, struct TensorWrapper dst1,
+extern "C" struct TensorArray pencilSketch(struct TensorWrapper src, struct TensorWrapper dst1,
                                     struct TensorWrapper dst2, float sigma_s, float sigma_r, float shade_factor)
 {
-    cv::Mat retval1;
-    cv::Mat retval2;
-
-    if (!dst1.isNull()) {
-        retval1 = dst1.toMat();
-    }
-    if (!dst2.isNull()) {
-        retval2 = dst2.toMat();
-    }
-    cv::pencilSketch(src.toMat(), retval1, retval2, sigma_s, sigma_r, shade_factor);
-    return TensorWrapper(retval2);
+    std::vector<MatT> retval(2);
+    if(!dst1.isNull()) retval[0] = dst1.toMatT();
+    if(!dst2.isNull()) retval[1] = dst2.toMatT();
+    cv::pencilSketch(src.toMat(), retval[1], retval[2], sigma_s, sigma_r, shade_factor);
+    return TensorArray(retval);
 }
 
 extern "C" struct TensorWrapper stylization(struct TensorWrapper src, struct TensorWrapper dst,
                                     float sigma_s, float sigma_r)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        cv::stylization(src.toMat(), retval, sigma_s, sigma_r);
-
-        return TensorWrapper(retval);
-    } else {
-        cv::stylization(src.toMat(), dst.toMat(), sigma_s, sigma_r);
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    cv::stylization(src.toMat(), dst_mat, sigma_s, sigma_r);
+    return TensorWrapper(dst_mat);
 }
 
 /****************** Classes ******************/
@@ -259,14 +181,10 @@ extern "C" struct TonemapPtr Tonemap_ctor(float gamma)
 
 extern "C" struct TensorWrapper Tonemap_process(struct TonemapPtr ptr, struct TensorArray src, struct TensorWrapper dst)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        ptr->process(src.toMatList(), retval);
-        return TensorWrapper(retval);
-    } else {
-        ptr->process(src.toMatList(), dst.toMat());
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    ptr->process(src.toMatList(), dst_mat);
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" float Tonemap_getGamma(struct TonemapPtr ptr)
@@ -416,17 +334,16 @@ extern "C" void TonemapMantiuk_setSaturation(struct TonemapMantiukPtr ptr, float
 struct TensorArray AlignExposures_process(struct AlignExposuresPtr ptr, struct TensorArray src, struct TensorArray dst,
                         struct TensorWrapper times, struct TensorWrapper response)
 {
-    if (dst.isNull()) {
-        auto retval = new std::vector<cv::Mat>(src);
-        ptr->process(src.toMatList(), *retval, times.toMat(), response.toMat());
-
-        return TensorArray(*retval);
+    std::vector<cv::Mat> dst_vec;
+    if(dst.isNull()) {
+        ptr->process(src.toMatList(), dst_vec, times.toMat(), response.toMat());
+        std::vector<MatT> result = get_vec_MatT(dst_vec);
+        return TensorArray(result);
     } else {
-        auto retval = new std::vector<cv::Mat>(dst);
-        ptr->process(src.toMatList(), *retval, times.toMat(), response.toMat());
-        dst = *retval;
+        dst_vec = dst.toMatList();
+        ptr->process(src.toMatList(), dst_vec, times.toMat(), response.toMat());
     }
-    return dst;
+    return dst_vec;
 }
 
 // AlignMTB
@@ -439,30 +356,28 @@ extern "C" struct AlignMTBPtr AlignMTB_ctor(int max_bits, int exclude_range, boo
 extern "C" struct TensorArray AlignMTB_process1(struct AlignMTBPtr ptr, struct TensorArray src, struct TensorArray dst,
                             struct TensorWrapper times, struct TensorWrapper response)
 {
+    std::vector<cv::Mat> dst_vec;
     if (dst.isNull()) {
-        auto retval = new std::vector<cv::Mat>(src);
-        ptr->process(src.toMatList(), *retval, times.toMat(), response.toMat());
-
-        return TensorArray(*retval);
+        ptr->process(src.toMatList(), dst_vec, times.toMat(), response.toMat());
+        std::vector<MatT> result = get_vec_MatT(dst_vec);
+        return TensorArray(result);
     } else {
-        auto retval = new std::vector<cv::Mat>(dst);
-        ptr->process(src.toMatList(), *retval, times.toMat(), response.toMat());
-        dst = *retval;
+        dst_vec = dst.toMatList();
+        ptr->process(src.toMatList(), dst_vec, times.toMat(), response.toMat());
     }
     return dst;
 }
 
 extern "C" struct TensorArray AlignMTB_process2(struct AlignMTBPtr ptr, struct TensorArray src, struct TensorArray dst)
 {
+    std::vector<cv::Mat> dst_vec;
     if (dst.isNull()) {
-        auto retval = new std::vector<cv::Mat>(src);
-        ptr->process(src.toMatList(), *retval);
-
-        return TensorArray(*retval);
+        ptr->process(src.toMatList(), dst_vec);
+        std::vector<MatT> result = get_vec_MatT(dst_vec);
+        return TensorArray(result);
     } else {
-        auto retval = new std::vector<cv::Mat>(dst);
-        ptr->process(src.toMatList(), *retval);
-        dst = *retval;
+        dst_vec = dst.toMatList();
+        ptr->process(src.toMatList(), dst_vec);
     }
     return dst;
 }
@@ -475,14 +390,10 @@ extern "C" struct PointWrapper AlignMTB_calculateShift(struct AlignMTBPtr ptr, s
 extern "C" struct TensorWrapper AlignMTB_shiftMat(struct AlignMTBPtr ptr, struct TensorWrapper src,
                             struct TensorWrapper dst, struct PointWrapper shift)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        ptr->shiftMat(src.toMat(), retval, shift);
-        return TensorWrapper(retval);
-    } else {
-        ptr->shiftMat(src.toMat(), dst.toMat(), shift);
-    }
-    return dst;
+    MatT dst_mat;
+    if(dst.isNull()) dst_mat = dst.toMatT();
+    ptr->shiftMat(src.toMat(), dst_mat, shift);
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" void AlignMTB_computeBitmaps(struct AlignMTBPtr ptr, struct TensorWrapper img,
@@ -524,15 +435,10 @@ extern "C" void AlignMTB_setCut(struct AlignMTBPtr ptr, bool cut)
 extern "C" struct TensorWrapper CalibrateCRF_process(struct CalibrateCRFPtr ptr, struct TensorArray src, struct TensorWrapper dst,
                             struct TensorWrapper times)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        ptr->process(src.toMatList(), retval, times.toMat());
-
-        return TensorWrapper(retval);
-    } else {
-        ptr->process(src.toMatList(), dst.toMat(), times.toMat());
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    ptr->process(src.toMatList(), dst_mat, times.toMat());
+    return TensorWrapper(dst_mat);
 }
 
 // CalibrateDebevec
@@ -598,22 +504,17 @@ extern "C" void CalibrateRobertson_setThreshold(struct CalibrateRobertsonPtr ptr
 
 extern "C" struct TensorWrapper CalibrateRobertson_getRadiance(struct CalibrateRobertsonPtr ptr)
 {
-    return TensorWrapper(ptr->getRadiance());
+    return TensorWrapper(MatT(ptr->getRadiance()));
 }
 
 // MergeExposures
 extern "C" struct TensorWrapper MergeExposures_process(struct MergeExposuresPtr ptr, struct TensorArray src, struct TensorWrapper dst,
                             struct TensorWrapper times, struct TensorWrapper response)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        ptr->process(src.toMatList(), retval, times.toMat(), response.toMat());
-
-        return TensorWrapper(retval);
-    } else {
-        ptr->process(src.toMatList(), dst.toMat(), times.toMat(), response.toMat());
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    ptr->process(src.toMatList(), dst_mat, times.toMat(), response.toMat());
+    return TensorWrapper(dst_mat);
 }
 
 // MergeDebevec
@@ -626,29 +527,19 @@ extern "C" struct MergeDebevecPtr MergeDebevec_ctor()
 extern "C" struct TensorWrapper MergeDebevec_process1(struct MergeDebevecPtr ptr, struct TensorArray src, struct TensorWrapper dst,
                             struct TensorWrapper times, TensorWrapper response)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        ptr->process(src.toMatList(), retval, times.toMat(), response.toMat());
-
-        return TensorWrapper(retval);
-    } else {
-        ptr->process(src.toMatList(), dst.toMat(), times.toMat(), response.toMat());
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    ptr->process(src.toMatList(), dst_mat, times.toMat(), response.toMat());
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" struct TensorWrapper MergeDebevec_process2(struct MergeDebevecPtr ptr, struct TensorArray src, struct TensorWrapper dst,
                             struct TensorWrapper times)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        ptr->process(src.toMatList(), retval, times.toMat());
-
-        return TensorWrapper(retval);
-    } else {
-        ptr->process(src.toMatList(), dst.toMat(), times.toMat());
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    ptr->process(src.toMatList(), dst_mat, times.toMat());
+    return TensorWrapper(dst_mat);
 }
 
 // MergeMertens
@@ -661,28 +552,18 @@ extern "C" struct MergeMertensPtr MergeMertens_ctor(float contrast_weight, float
 extern "C" struct TensorWrapper MergeMertens_process1(struct MergeMertensPtr ptr, struct TensorArray src, struct TensorWrapper dst,
                             struct TensorWrapper times, struct TensorWrapper response)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        ptr->process(src.toMatList(), retval, times.toMat(), response.toMat());
-
-        return TensorWrapper(retval);
-    } else {
-        ptr->process(src.toMatList(), dst.toMat(), times.toMat(), response.toMat());
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    ptr->process(src.toMatList(), dst_mat, times.toMat(), response.toMat());
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" struct TensorWrapper MergeMertens_process2(struct MergeMertensPtr ptr, struct TensorArray src, struct TensorWrapper dst)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        ptr->process(src.toMatList(), retval);
-
-        return TensorWrapper(retval);
-    } else {
-        ptr->process(src.toMatList(), dst.toMat());
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    ptr->process(src.toMatList(), dst_mat);
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" float MergeMertens_getContrastWeight(struct MergeMertensPtr ptr)
@@ -723,27 +604,17 @@ extern "C" struct MergeRobertsonPtr MergeRobertson_ctor()
 extern "C" struct TensorWrapper MergeRobertson_process1(struct MergeRobertsonPtr ptr, struct TensorArray src, struct TensorWrapper dst,
                             struct TensorWrapper times, struct TensorWrapper response)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        ptr->process(src.toMatList(), retval, times.toMat(), response.toMat());
-
-        return TensorWrapper(retval);
-    } else {
-        ptr->process(src.toMatList(), dst.toMat(), times.toMat(), response.toMat());
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+        ptr->process(src.toMatList(), dst_mat, times.toMat(), response.toMat());
+    return TensorWrapper(dst_mat);
 }
 
 extern "C" struct TensorWrapper MergeRobertson_process2(struct MergeRobertsonPtr ptr, struct TensorArray src,
                             struct TensorWrapper dst, struct TensorWrapper times)
 {
-    if (dst.isNull()) {
-        cv::Mat retval;
-        ptr->process(src.toMatList(), retval, times.toMat());
-
-        return TensorWrapper(retval);
-    } else {
-        ptr->process(src.toMatList(), dst.toMat(), times.toMat());
-    }
-    return dst;
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
+    ptr->process(src.toMatList(), dst_mat, times.toMat());
+    return TensorWrapper(dst_mat);
 }

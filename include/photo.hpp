@@ -31,7 +31,7 @@ extern "C" struct TensorWrapper fastNlMeansDenoisingColoredMulti(struct TensorAr
 extern "C" struct TensorWrapper denoise_TVL1(struct TensorArray observations, struct TensorWrapper result,
                                     double lambda, int niters);
 
-extern "C" struct TensorWrapper decolor(struct TensorWrapper src, struct TensorWrapper grayscale,
+extern "C" struct TensorArray decolor(struct TensorWrapper src, struct TensorWrapper grayscale,
                                     struct TensorWrapper color_boost);
 
 extern "C" struct TensorWrapper seamlessClone(struct TensorWrapper src, struct TensorWrapper dst,
@@ -55,7 +55,7 @@ extern "C" struct TensorWrapper edgePreservingFilter(struct TensorWrapper src, s
 extern "C" struct TensorWrapper detailEnhance(struct TensorWrapper src, struct TensorWrapper dst,
                                     float sigma_s, float sigma_r);
 
-extern "C" struct TensorWrapper pencilSketch(struct TensorWrapper src, struct TensorWrapper dst1,
+extern "C" struct TensorArray pencilSketch(struct TensorWrapper src, struct TensorWrapper dst1,
                                     struct TensorWrapper dst2, float sigma_s, float sigma_r, float shade_factor);
 
 extern "C" struct TensorWrapper stylization(struct TensorWrapper src, struct TensorWrapper dst,
