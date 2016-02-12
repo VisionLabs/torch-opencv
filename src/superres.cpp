@@ -35,14 +35,10 @@ void FrameSource_dtor(struct FrameSourcePtr ptr)
 extern "C"
 struct TensorWrapper FrameSource_nextFrame(struct FrameSourcePtr ptr, struct TensorWrapper frame)
 {
-    if (frame.isNull()) {
-        cv::Mat retval;
-        ptr->nextFrame(retval);
-        return TensorWrapper(retval);
-    } else {
-        ptr->nextFrame(frame.toMat());
-        return frame;
-    }
+    MatT frame_mat;
+    if(!frame.isNull()) frame_mat = frame.toMatT();
+    ptr->nextFrame(frame_mat);
+    return TensorWrapper(frame_mat);
 }
 
 extern "C"
@@ -68,14 +64,10 @@ struct SuperResolutionPtr createSuperResolution_BTVL1_CUDA()
 extern "C"
 struct TensorWrapper SuperResolution_nextFrame(struct SuperResolutionPtr ptr, struct TensorWrapper frame)
 {
-    if (frame.isNull()) {
-        cv::Mat retval;
-        ptr->nextFrame(retval);
-        return TensorWrapper(retval);
-    } else {
-        ptr->nextFrame(frame.toMat());
-        return frame;
-    }
+    MatT frame_mat;
+    if(!frame.isNull()) frame_mat = frame.toMatT();
+    ptr->nextFrame(frame_mat);
+    return TensorWrapper(frame_mat);
 }
 
 extern "C"
@@ -239,9 +231,9 @@ struct TensorArray DenseOpticalFlowExt_calc(
         struct DenseOpticalFlowExtPtr ptr, struct TensorWrapper frame0, struct TensorWrapper frame1,
         struct TensorWrapper flow1, struct TensorWrapper flow2)
 {
-    std::vector<cv::Mat> retval(2);
-    if (!flow1.isNull()) retval[0] = flow1;
-    if (!flow2.isNull()) retval[1] = flow2;
+    std::vector<MatT> retval(2);
+    if (!flow1.isNull()) retval[0] = flow1.toMatT();
+    if (!flow2.isNull()) retval[1] = flow2.toMatT();
     ptr->calc(frame0.toMat(), frame1.toMat(), retval[0], retval[1]);
     return TensorArray(retval);
 }
