@@ -30,7 +30,7 @@ cv.waitKey{0}
 
 -- output to another Tensor of same size & type...
 local image_A = image * 0
-cv.GaussianBlur{src=image, dst=image_A, ksize={7, 7}, sigmaX=3.5, sigmaY=3.5}
+local w = cv.GaussianBlur{src=image, dst=image_A, ksize={7, 7}, sigmaX=3.5, sigmaY=3.5}
 
 -- or to a return value...
 local image_B = cv.GaussianBlur{src=image, ksize={7, 7}, sigmaX=3.5, sigmaY=3.5}
@@ -38,7 +38,7 @@ local image_B = cv.GaussianBlur{src=image, ksize={7, 7}, sigmaX=3.5, sigmaY=3.5}
 -- or filter in-place.
 -- we can also specify ksize as a string-number table,
 -- and it's not necessary to use named agruments:
-cv.GaussianBlur{image, image, {width=7, height=7}, 3.5, 3.5}
+cv.GaussianBlur{src = image, dst = image, ksize = {7,7}, sigmaX = 3.5, sigmaY = 3.5}
 
 -- results are equal
 assert((image:eq(image_B) - 1):sum() == 0)

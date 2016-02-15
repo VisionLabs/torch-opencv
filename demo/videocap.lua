@@ -18,6 +18,7 @@ local _, frame = cap:read{}
 local edges = frame.new(frame:size()[1], frame:size()[2])
 
 while true do
+    
     cv.cvtColor{frame, edges, cv.COLOR_BGR2GRAY}
 
     cv.GaussianBlur{

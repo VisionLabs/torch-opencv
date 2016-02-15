@@ -2,8 +2,8 @@
 
 extern "C"
 struct RectPlusBool detail_overlapRoi(
-	struct PointWrapper tl1, struct PointWrapper tl2,
-	struct SizeWrapper sz1, struct SizeWrapper sz2)
+    struct PointWrapper tl1, struct PointWrapper tl2,
+    struct SizeWrapper sz1, struct SizeWrapper sz2)
 {
     struct RectPlusBool result;
     cv::Rect roi;
@@ -36,11 +36,12 @@ struct PointWrapper detail_resultTl(
 }
 
 extern "C"
-void detail_selectRandomSubset(
-	int count, int size, struct IntArray subset)
+struct IntArray detail_selectRandomSubset(
+	int count, int size)
 {
-    std::vector<int> subset_vec;
-    detail::selectRandomSubset(count, size, subset.toIntList(subset_vec));
+    std::vector<int> subset;
+    detail::selectRandomSubset(count, size, subset);
+    return IntArray(subset);
 }
 
 extern "C"
@@ -220,20 +221,94 @@ void TimelapserCrop_initialize(
 
 //FeaturesFinder
 
+extern "C"
 void FeaturesFinder_dtor(
 	struct FeaturesFinderPtr ptr)
 {
     ptr->~FeaturesFinder();
 }
 
+extern "C"
 void FeaturesFinder_collectGarbage(
 	struct FeaturesFinderPtr ptr)
 {
     ptr->collectGarbage();
 }
 
+extern "C"
+struct ImageFeaturesPtr FeaturesFinder_call(
+        struct FeaturesFinderPtr ptr, struct TensorWrapper image)
+{
+    detail::ImageFeatures *features = new cv::detail::ImageFeatures();
+    ptr->operator()(image.toMat(), *features);
+    return ImageFeaturesPtr(features);
+}
 
+extern "C"
+struct ImageFeaturesPtr FeaturesFinder_call2(
+        struct FeaturesFinderPtr ptr, struct TensorWrapper image,
+        struct RectArray rois)
+{
+    detail::ImageFeatures *features = new cv::detail::ImageFeatures();
+    ptr->operator()(image.toMat(), *features, rois);
+    return ImageFeaturesPtr(features);
+}
 
+//ImageFeatures
 
+extern "C"
+struct ImageFeaturesPtr ImageFeatures_ctor()
+{
+    return new cv::detail::ImageFeatures();
+}
 
+extern "C"
+struct ImageFeaturesPtr ImageFeatures_dtor(
+        struct ImageFeaturesPtr ptr)
+{
+    delete static_cast<cv::detail::ImageFeatures *>(ptr.ptr);
+}
+
+//FeaturesMatcher
+
+//TODO need to do constructor protected
+
+extern "C"
+void FeaturesMatcher_dtor(
+        struct FeaturesMatcherPtr ptr)
+{
+    ptr->~FeaturesMatcher();
+    delete static_cast<cv::detail::FeaturesMatcher *>(ptr.ptr);
+}
+
+extern "C"
+void FeaturesMatcher_FeaturesMatcher(
+        struct FeaturesMatcherPtr ptr)
+{
+    ptr->collectGarbage();
+}
+
+//BestOf2NearestMatcher
+
+extern "C"
+struct BestOf2NearestMatcherPtr BestOf2NearestMatcher_ctor(
+        bool try_use_gpu, float match_conf,
+        int num_matches_thresh1, int num_matches_thresh2)
+{
+    new cv::detail::BestOf2NearestMatcher();
+}
+
+extern "C"
+struct BestOf2NearestMatcherPtr BestOf2NearestMatcher_dtor(
+        struct BestOf2NearestMatcherPtr ptr)
+{
+    delete static_cast<cv::detail::BestOf2NearestMatcher *>(ptr.ptr);
+}
+
+extern "C"
+void BestOf2NearestMatcher_collectGarbage(
+        struct BestOf2NearestMatcherPtr ptr)
+{
+   ptr->collectGarbage();
+}
 

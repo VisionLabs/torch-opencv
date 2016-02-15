@@ -3,22 +3,18 @@
 struct TensorWrapper randMVNormal(
         struct TensorWrapper mean, struct TensorWrapper cov, int nsamples, struct TensorWrapper samples)
 {
-    if (samples.isNull()) {
-        cv::Mat retval;
-        ml::randMVNormal(mean.toMat(), cov.toMat(), nsamples, retval);
-        return TensorWrapper(retval);
-    } else {
-        ml::randMVNormal(mean.toMat(), cov.toMat(), nsamples, samples.toMat());
-        return samples;
-    }
+    MatT samples_mat;
+    if(!samples.isNull()) samples_mat = samples.toMatT();
+        ml::randMVNormal(mean.toMat(), cov.toMat(), nsamples, samples_mat);
+        return TensorWrapper(samples_mat);
 }
 
 struct TensorArray createConcentricSpheresTestSet(
         int nsamples, int nfeatures, int nclasses, struct TensorWrapper samples, struct TensorWrapper responses)
 {
-    std::vector<cv::Mat> retval(2);
-    if (!samples.isNull()) retval[0] = samples;
-    if (!responses.isNull()) retval[1] = responses;
+    std::vector<MatT> retval(2);
+    if (!samples.isNull()) retval[0] = samples.toMatT();
+    if (!responses.isNull()) retval[1] = responses.toMatT();
 
     ml::createConcentricSpheresTestSet(nsamples, nfeatures, nclasses, retval[0], retval[1]);
     return TensorArray(retval);
@@ -61,7 +57,7 @@ extern "C"
 struct TensorWrapper TrainData_getSubVector(
         struct TensorWrapper vec, struct TensorWrapper idx)
 {
-    return TensorWrapper(ml::TrainData::getSubVector(vec.toMat(), idx.toMat()));
+    return TensorWrapper(MatT(ml::TrainData::getSubVector(vec.toMat(), idx.toMat())));
 }
 
 extern "C"
@@ -103,79 +99,79 @@ int TrainData_getNAllVars(struct TrainDataPtr ptr)
 extern "C"
 struct TensorWrapper TrainData_getSamples(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getSamples());
+    return TensorWrapper(MatT(ptr->getSamples()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getMissing(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getMissing());
+    return TensorWrapper(MatT(ptr->getMissing()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getTrainResponses(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getTrainResponses());
+    return TensorWrapper(MatT(ptr->getTrainResponses()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getTrainNormCatResponses(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getTrainNormCatResponses());
+    return TensorWrapper(MatT(ptr->getTrainNormCatResponses()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getTestResponses(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getTestResponses());
+    return TensorWrapper(MatT(ptr->getTestResponses()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getTestNormCatResponses(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getTestNormCatResponses());
+    return TensorWrapper(MatT(ptr->getTestNormCatResponses()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getResponses(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getResponses());
+    return TensorWrapper(MatT(ptr->getResponses()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getNormCatResponses(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getNormCatResponses());
+    return TensorWrapper(MatT(ptr->getNormCatResponses()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getSampleWeights(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getSampleWeights());
+    return TensorWrapper(MatT(ptr->getSampleWeights()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getTrainSampleWeights(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getTrainSampleWeights());
+    return TensorWrapper(MatT(ptr->getTrainSampleWeights()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getTestSampleWeights(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getTestSampleWeights());
+    return TensorWrapper(MatT(ptr->getTestSampleWeights()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getVarIdx(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getVarIdx());
+    return TensorWrapper(MatT(ptr->getVarIdx()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getVarType(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getVarType());
+    return TensorWrapper(MatT(ptr->getVarType()));
 }
 
 extern "C"
@@ -187,37 +183,37 @@ int TrainData_getResponseType(struct TrainDataPtr ptr)
 extern "C"
 struct TensorWrapper TrainData_getTrainSampleIdx(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getTrainSampleIdx());
+    return TensorWrapper(MatT(ptr->getTrainSampleIdx()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getTestSampleIdx(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getTestSampleIdx());
+    return TensorWrapper(MatT(ptr->getTestSampleIdx()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getDefaultSubstValues(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getDefaultSubstValues());
+    return TensorWrapper(MatT(ptr->getDefaultSubstValues()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getClassLabels(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getClassLabels());
+    return TensorWrapper(MatT(ptr->getClassLabels()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getCatOfs(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getCatOfs());
+    return TensorWrapper(MatT(ptr->getCatOfs()));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getCatMap(struct TrainDataPtr ptr)
 {
-    return TensorWrapper(ptr->getCatMap());
+    return TensorWrapper(MatT(ptr->getCatMap()));
 }
 
 extern "C"
@@ -233,14 +229,14 @@ struct TensorWrapper TrainData_getSample(
     cv::Mat varIdxMat = varIdx;
     std::vector<float> output(varIdxMat.rows * varIdxMat.cols);
     ptr->getSample(varIdxMat, sidx, output.data());
-    return TensorWrapper(cv::Mat(output));
+    return TensorWrapper(MatT(cv::Mat(output)));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getTrainSamples(
         struct TrainDataPtr ptr, int layout, bool compressSamples, bool compressVars)
 {
-    return TensorWrapper(ptr->getTrainSamples(layout, compressSamples, compressVars));
+    return TensorWrapper(MatT(ptr->getTrainSamples(layout, compressSamples, compressVars)));
 }
 
 extern "C"
@@ -250,7 +246,7 @@ struct TensorWrapper TrainData_getValues(
     cv::Mat sidxMat = sidx;
     std::vector<float> output(sidxMat.rows * sidxMat.cols);
     ptr->getValues(vi, sidxMat, output.data());
-    return TensorWrapper(cv::Mat(output));
+    return TensorWrapper(MatT(cv::Mat(output)));
 }
 
 extern "C"
@@ -260,7 +256,7 @@ struct TensorWrapper TrainData_getNormCatValues(
     cv::Mat sidxMat = sidx;
     std::vector<int> output(sidxMat.rows * sidxMat.cols);
     ptr->getNormCatValues(vi, sidxMat, output.data());
-    return TensorWrapper(cv::Mat(output));
+    return TensorWrapper(MatT(cv::Mat(output)));
 }
 
 extern "C"
@@ -323,15 +319,10 @@ struct TensorPlusFloat StatModel_calcError(
     cv::Ptr<ml::TrainData> dataPtr(static_cast<ml::TrainData *>(data));
     TensorPlusFloat retval;
 
-    if (resp.isNull()) {
-        cv::Mat result;
-        retval.val = ptr->calcError(dataPtr, test, result);
-        new (&retval.tensor) TensorWrapper(result);
-    } else {
-        retval.val = ptr->calcError(dataPtr, test, resp.toMat());
-        retval.tensor = resp;
-    }
-
+    MatT resp_mat;
+    if(!resp.isNull()) resp_mat = resp.toMatT();
+    retval.val = ptr->calcError(dataPtr, test, resp_mat);
+    new(&retval.tensor) TensorWrapper(resp_mat);
     rescueObjectFromPtr(dataPtr);
     return retval;
 }
@@ -357,15 +348,12 @@ struct TensorArrayPlusFloat NormalBayesClassifier_predictProb(
         struct TensorWrapper outputs, struct TensorWrapper outputProbs, int flags)
 {
     TensorArrayPlusFloat retval;
-    std::vector<cv::Mat> result(2);
-    if (!outputs.isNull())      result[0] = outputs;
-    if (!outputProbs.isNull())  result[1] = outputProbs;
+    std::vector<MatT> result(2);
+    if (!outputs.isNull()) result[0] = outputs.toMatT();
+    if (!outputProbs.isNull())  result[1] = outputProbs.toMatT();
 
     retval.val = ptr->predictProb(
-            inputs.toMat(),
-            outputs.isNull() ? result[0] : outputs.toMat(),
-            outputProbs.isNull() ? result[1] : outputs.toMat(),
-            flags);
+            inputs.toMat(), result[0], result[1], flags);
 
     new (&retval.tensors) TensorArray(result);
 
@@ -599,14 +587,11 @@ struct TensorArrayPlusDouble SVM_getDecisionFunction(
         struct SVMPtr ptr, int i, struct TensorWrapper alpha, struct TensorWrapper svidx)
 {
     TensorArrayPlusDouble retval;
-    std::vector<cv::Mat> result;
-    if (!alpha.isNull()) result[0] = alpha;
-    if (!svidx.isNull()) result[1] = svidx;
+    std::vector<MatT> result;
+    if (!alpha.isNull()) result[0] = alpha.toMatT();
+    if (!svidx.isNull()) result[1] = svidx.toMatT();
 
-    retval.val = ptr->getDecisionFunction(
-            i,
-            alpha.isNull() ? result[0] : alpha.toMat(),
-            svidx.isNull() ? result[1] : svidx.toMat());
+    retval.val = ptr->getDecisionFunction(i, result[0], result[1]);
 
     new (&retval.tensors) TensorArray(result);
     return retval;
@@ -679,8 +664,9 @@ struct TensorWrapper EM_getMeans(struct EMPtr ptr)
 extern "C"
 struct TensorArray EM_getCovs(struct EMPtr ptr)
 {
-    std::vector<cv::Mat> retval;
-    ptr->getCovs(retval);
+    std::vector<cv::Mat> vec;
+    ptr->getCovs(vec);
+    std::vector<MatT> retval = get_vec_MatT(vec);
     return TensorArray(retval);
 }
 
@@ -847,7 +833,7 @@ struct TensorWrapper DTrees_getPriors(struct DTreesPtr ptr)
 extern "C"
 struct TensorWrapper DTrees_getRoots(struct DTreesPtr ptr)
 {
-    return TensorWrapper(cv::Mat(ptr->getRoots()));
+    return TensorWrapper(MatT(cv::Mat(ptr->getRoots())));
 }
 
 extern "C"
@@ -873,7 +859,7 @@ struct ConstSplitArray DTrees_getSplits(struct DTreesPtr ptr)
 extern "C"
 struct TensorWrapper DTrees_getSubsets(struct DTreesPtr ptr)
 {
-    return TensorWrapper(cv::Mat(ptr->getSubsets()));
+    return TensorWrapper(MatT(cv::Mat(ptr->getSubsets())));
 }
 
 // RTrees

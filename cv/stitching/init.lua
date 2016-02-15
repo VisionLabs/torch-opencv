@@ -18,7 +18,7 @@ struct PointWrapper detail_resultTl(
 	struct PointArray corners);
 
 void detail_selectRandomSubset(
-	int count, int size, struct IntArray subset);
+	int count, int size);
 
 int detail_stitchingLogLevel()
 ]]
@@ -65,10 +65,9 @@ end
 function cv.detail.selectRandomSubset(t)
     local argRules = {
         {"count", required = true},
-        {"size", required = true},
-        {"subset", required = true}}
-    local count, size, subset = cv.argcheck(t, argRules)
-    C.detail_selectRandomSubset(count, size, subset)
+        {"size", required = true}}
+    local count, size = cv.argcheck(t, argRules)
+    return cv.gcarray(C.detail_selectRandomSubset(count, size))
 end
 
 function cv.detail.stitchingLogLevel(t)
@@ -150,6 +149,34 @@ void TimelapserCrop_initialize(
 
 void FeaturesFinder_collectGarbage(
 	struct PtrWrapper ptr);
+
+struct ImageFeaturesPtr FeaturesFinder_call(
+	struct PtrWrapper ptr, struct TensorWrapper image);
+
+struct ImageFeaturesPtr FeaturesFinder_call2(
+	struct PtrWrapper ptr, struct TensorWrapper image,
+	struct RectArray);
+
+struct ImageFeaturesPtr ImageFeatures_ctor();
+
+struct ImageFeaturesPtr ImageFeatures_dtor(
+	struct PtrWrapper ptr);
+
+struct BestOf2NearestMatcherPtr BestOf2NearestMatcher_ctor(
+    bool try_use_gpu, float match_conf,
+    int num_matches_thresh1, int num_matches_thresh2);
+
+struct BestOf2NearestMatcherPtr BestOf2NearestMatcher_dtor(
+    struct PtrWrapper ptr);
+
+void BestOf2NearestMatcher_collectGarbage(
+    struct PtrWrapper ptr);
+
+void FeaturesMatcher_dtor(
+    struct PtrWrapper ptr);
+
+void FeaturesMatcher_FeaturesMatcher(
+    struct PtrWrapper ptr)
 ]]
 
 --CameraParams
@@ -166,7 +193,8 @@ do
         if other then 
             self.ptr = ffi.gc(C.CameraParams_ctor(), C.CameraParams_dtor)
         else
-            self.ptr = ffi.gc(С.CameraParams_ctor2(other.ptr), C.CameraParams_dtor)
+            self.ptr = ffi.gc(C.CameraParams_ctor2(other.ptr), C.CameraParams_dtor)
+        end
     end
 
     function CameraParams:K()
@@ -312,7 +340,6 @@ do
 end
 
 
-return cv
 
 --FeaturesFinder
 
@@ -323,6 +350,57 @@ do
         C.FeaturesFinder_collectGarbage(self.ptr)
     end
 
+    function FeaturesFinder:__call()
+        local argRules = {
+            {"image", required = true},
+            {"rois", default = nil}}
+        local image, features, rois = cv.argcheck(t, argRules)
+
+        if rois then
+            return ffi.gc(C.FeaturesFinder_call2(self.ptr, cv.wrap_tensor(image), rois), C.ImageFeatures_dtor)
+        else
+            return ffi.gc(C.FeaturesFinder_call(self.ptr, cv.wrap_tensor(image)), C.ImageFeatures_dtor)
+        end
+    end
+end
+
+--ImageFeatures
+
+do
+    local ImageFeatures = torch.class('cv.ImageFeatures', cv)
+
+    function ImageFeatures:__init()
+        self.ptr = ffi.gc(C.ImageFeatures_ctor(), C.ImageFeatures_dtor)
+    end
+end
+--FeaturesMatcher
 
 
 
+--BestOf2NearestMatcher
+
+do
+    local BestOf2NearestMatcher = torch.class('cv.BestOf2NearestMatcher', 'cv.FeaturesMatcher', cv)
+
+    function BestOf2NearestMatcher:__init(t)
+        local argRules = {
+            {"try_use_gpu", default = false},
+            {"match_conf", default = 0.3},
+            {"num_matches_thresh1", default = 6},
+            {"num_matches_thresh2", default = 6} }
+        local try_use_gpu, match_conf, num_matches_thresh1, num_matches_thresh2 = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(
+                C.BestOf2NearestMatcher_ctor(try_use_gpu, match_conf, num_matches_thresh1, num_matches_thresh2),
+                C.BestOf2NearestMatcher_dtor)
+    end
+
+    function BestOf2NearestMatcher:collectGarbage()
+        C.BestOf2NearestMatcher_collectGarbage(self.ptr)
+    end
+end
+
+
+
+
+
+return cv

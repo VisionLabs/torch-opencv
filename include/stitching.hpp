@@ -27,8 +27,8 @@ struct PointWrapper detail_resultTl(
 	struct PointArray corners);
 
 extern "C"
-void detail_selectRandomSubset(
-	int count, int size, struct IntArray subset);
+struct IntArray detail_selectRandomSubset(
+	int count, int size);
 
 extern "C"
 int detail_stitchingLogLevel();
@@ -45,9 +45,9 @@ extern "C"
 struct CameraParamsPtr {
     void *ptr;
 
-    inline cv::detail::CameraParams * operator->() {
-			return static_cast<cv::detail::CameraParams *>(ptr); }
-    inline CameraParamsPtr(cv::detail::CameraParams *ptr) { this->ptr = ptr; }
+    inline detail::CameraParams * operator->() {
+			return static_cast<detail::CameraParams *>(ptr); }
+    inline CameraParamsPtr(detail::CameraParams *ptr) { this->ptr = ptr; }
 };
 
 extern "C"
@@ -70,9 +70,9 @@ extern "C"
 struct DisjointSetsPtr {
     void *ptr;
 
-    inline cv::detail::DisjointSets * operator->() {
-			return static_cast<cv::detail::DisjointSets *>(ptr); }
-    inline DisjointSetsPtr(cv::detail::DisjointSets *ptr) { this->ptr = ptr; }
+    inline detail::DisjointSets * operator->() {
+			return static_cast<detail::DisjointSets *>(ptr); }
+    inline DisjointSetsPtr(detail::DisjointSets *ptr) { this->ptr = ptr; }
 };
 
 extern "C"
@@ -102,9 +102,9 @@ extern "C"
 struct GraphPtr {
     void *ptr;
 
-    inline cv::detail::Graph * operator->() {
-			return static_cast<cv::detail::Graph *>(ptr); }
-    inline GraphPtr(cv::detail::Graph *ptr) { this->ptr = ptr; }
+    inline detail::Graph * operator->() {
+			return static_cast<detail::Graph *>(ptr); }
+    inline GraphPtr(detail::Graph *ptr) { this->ptr = ptr; }
 };
 
 extern "C"
@@ -137,9 +137,9 @@ extern "C"
 struct GraphEdgePtr {
     void *ptr;
 
-    inline cv::detail::GraphEdge * operator->() {
-			return static_cast<cv::detail::GraphEdge *>(ptr); }
-    inline GraphEdgePtr(cv::detail::GraphEdge *ptr) { this->ptr = ptr; }
+    inline detail::GraphEdge * operator->() {
+			return static_cast<detail::GraphEdge *>(ptr); }
+    inline GraphEdgePtr(detail::GraphEdge *ptr) { this->ptr = ptr; }
 };
 
 extern "C"
@@ -156,9 +156,9 @@ extern "C"
 struct TimelapserPtr {
     void *ptr;
 
-    inline cv::detail::Timelapser * operator->() {
-			return static_cast<cv::detail::Timelapser *>(ptr); }
-    inline TimelapserPtr(cv::detail::Timelapser * ptr) { this->ptr = ptr; }
+    inline detail::Timelapser * operator->() {
+			return static_cast<detail::Timelapser *>(ptr); }
+    inline TimelapserPtr(detail::Timelapser * ptr) { this->ptr = ptr; }
 };
 
 extern "C"
@@ -187,9 +187,9 @@ extern "C"
 struct TimelapserCropPtr {
     void *ptr;
 
-    inline cv::detail::TimelapserCrop * operator->() {
-			return static_cast<cv::detail::TimelapserCrop *>(ptr); }
-    inline TimelapserCropPtr(cv::detail::TimelapserCrop *ptr) { this->ptr = ptr; }
+    inline detail::TimelapserCrop * operator->() {
+			return static_cast<detail::TimelapserCrop *>(ptr); }
+    inline TimelapserCropPtr(detail::TimelapserCrop *ptr) { this->ptr = ptr; }
 };
 
 extern "C"
@@ -205,15 +205,86 @@ extern "C"
 struct FeaturesFinderPtr {
     void *ptr;
 
-    inline cv::detail::FeaturesFinder * operator->() {
-			return static_cast<cv::detail::FeaturesFinder *>(ptr); }
-    inline FeaturesFinderPtr(cv::detail::FeaturesFinder *ptr) { this->ptr = ptr; }
+    inline detail::FeaturesFinder * operator->() {
+			return static_cast<detail::FeaturesFinder *>(ptr); }
+    inline FeaturesFinderPtr(detail::FeaturesFinder *ptr) { this->ptr = ptr; }
 };
 
+extern "C"
 void FeaturesFinder_dtor(
 	struct FeaturesFinderPtr ptr);
 
+extern "C"
 void FeaturesFinder_collectGarbage(
 	struct FeaturesFinderPtr ptr);
 
+extern "C"
+struct ImageFeaturesPtr FeaturesFinder_call(
+		struct FeaturesFinderPtr ptr, struct TensorWrapper image);
 
+extern "C"
+struct ImageFeaturesPtr FeaturesFinder_call2(
+		struct FeaturesFinderPtr ptr, struct TensorWrapper image,
+		struct RectArray);
+
+//ImageFeatures
+
+extern "C"
+struct ImageFeaturesPtr {
+	void *ptr;
+
+	inline detail::ImageFeatures * operator->() {
+		return static_cast<detail::ImageFeatures *>(ptr); }
+	inline ImageFeaturesPtr(detail::ImageFeatures *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+struct ImageFeaturesPtr ImageFeatures_ctor();
+
+extern "C"
+struct ImageFeaturesPtr ImageFeatures_dtor(
+		struct ImageFeaturesPtr ptr);
+
+//FeaturesMatcher
+
+extern "C"
+struct FeaturesMatcherPtr {
+	void *ptr;
+
+	inline detail::FeaturesMatcher * operator->() {
+		return static_cast<detail::FeaturesMatcher *>(ptr); }
+	inline FeaturesMatcherPtr(detail::FeaturesMatcher *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+void FeaturesMatcher_dtor(
+		struct FeaturesMatcherPtr ptr);
+
+extern "C"
+void FeaturesMatcher_FeaturesMatcher(
+		struct FeaturesMatcherPtr ptr);
+
+
+//BestOf2NearestMatcher
+
+extern "C"
+struct BestOf2NearestMatcherPtr {
+	void *ptr;
+
+	inline detail::BestOf2NearestMatcher * operator->() {
+		return static_cast<detail::BestOf2NearestMatcher *>(ptr); }
+	inline BestOf2NearestMatcherPtr(detail::BestOf2NearestMatcher *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+struct BestOf2NearestMatcherPtr BestOf2NearestMatcher_ctor(
+	bool try_use_gpu, float match_conf,
+	int num_matches_thresh1, int num_matches_thresh2);
+
+extern "C"
+struct BestOf2NearestMatcherPtr BestOf2NearestMatcher_dtor(
+	struct BestOf2NearestMatcherPtr ptr);
+
+extern "C"
+void BestOf2NearestMatcher_collectGarbage(
+	struct BestOf2NearestMatcherPtr ptr);

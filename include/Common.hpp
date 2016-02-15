@@ -26,13 +26,31 @@ extern "C" double getDblEpsilon() { return DBL_EPSILON; }
 #define TO_MAT_LIST_OR_NOARRAY(mat) (mat.isNull() ? cv::noArray() : mat.toMatList())
 #define TO_GPUMAT_LIST_OR_NOARRAY(mat) (mat.isNull() ? std::vector<cuda::GpuMat>() : mat.toGpuMatList())
 
+extern "C"
+void initAllocator();
+
+class MatT {
+public:
+    cv::Mat mat;
+    // The Tensor that `mat` was created from, or nullptr
+    THByteTensor *tensor;
+
+    inline operator cv::_InputOutputArray() { return this->mat; }
+    MatT(cv::Mat && mat);
+    MatT(cv::Mat & mat);
+    MatT();
+};
+
 struct TensorWrapper {
-    void *tensorPtr;
+    THByteTensor *tensorPtr;
     char typeCode;
+    bool definedInLua;
 
     TensorWrapper();
     TensorWrapper(cv::Mat & mat);
     TensorWrapper(cv::Mat && mat);
+    TensorWrapper(MatT & mat);
+    TensorWrapper(MatT && mat);
     #ifdef WITH_CUDA
     TensorWrapper(cv::cuda::GpuMat & mat, THCState *state);
     TensorWrapper(cv::cuda::GpuMat && mat, THCState *state);
@@ -41,6 +59,7 @@ struct TensorWrapper {
     operator cv::Mat();
     // synonym for operator cv::Mat()
     inline cv::Mat toMat() { return *this; }
+    MatT toMatT();
 
     #ifdef WITH_CUDA
     cv::cuda::GpuMat toGpuMat();
@@ -55,6 +74,7 @@ struct TensorArray {
 
     TensorArray();
     TensorArray(std::vector<cv::Mat> & matList);
+    TensorArray(std::vector<MatT> & matList);
     explicit TensorArray(short size);
 
     #ifdef WITH_CUDA
@@ -63,8 +83,10 @@ struct TensorArray {
     #endif
 
     operator std::vector<cv::Mat>();
-    // synonym for operator std::vector<cv::Mat>()
-    inline std::vector<cv::Mat> toMatList() { return *this; }
+    operator std::vector<MatT>();
+    // synonyms for operators
+    inline std::vector<cv::Mat> toMatList()  { return *this; }
+    inline std::vector<MatT>    toMatTList() { return *this; }
 
     inline bool isNull() { return tensors == nullptr; }
 };
@@ -335,6 +357,9 @@ struct Point2fPlusInt {
 struct IntArray {
     int *data;
     int size;
+
+    IntArray(const std::vector<int> vec);
+
     inline std::vector<int>& toIntList(std::vector<int>& res) {
         for (int i = 0; i < size; ++i)
             res.push_back(data[i]);
@@ -382,7 +407,7 @@ struct SizeArray {
     SizeArray() {}
     SizeArray(const std::vector<cv::Size> & vec);
     operator std::vector<cv::Size>();
-}; 
+};
 
 struct TensorPlusRectArray {
     struct TensorWrapper tensor;
@@ -426,3 +451,8 @@ struct PointArrayOfArrays {
     int dims;
     int *sizes;
 };
+
+/***************** Helper functions *****************/
+
+std::vector<MatT> get_vec_MatT(std::vector<cv::Mat> vec_mat);
+

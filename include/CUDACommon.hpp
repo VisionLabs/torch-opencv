@@ -8,7 +8,7 @@ namespace cuda = cv::cuda;
 // Kill "destination" and assign "source" data to it.
 // "destination" is always supposed to be an empty Tensor
 extern "C"
-void transfer_tensor_CUDA(THCState *state, THCudaTensor *dst, THCudaTensor *src);
+void transfer_tensor_CUDA(THCState *state, THCudaTensor *dst, struct TensorWrapper srcWrapper);
 
 struct cutorchInfo {
     int deviceID;
