@@ -349,7 +349,7 @@ function cv.wrap_tensors(...)
 
     local wrapper = ffi.new("struct TensorArray")
     wrapper.size = #args
-    wrapper.tensors = ffi.gc(C.malloc(#args * ffi.sizeof("struct TensorWrapper *")), C.free)
+    wrapper.tensors = ffi.gc(C.malloc(#args * ffi.sizeof("struct TensorWrapper")), C.free)
 
     for i, tensor in ipairs(args) do
         wrapper.tensors[i-1] = cv.wrap_tensor(tensor)

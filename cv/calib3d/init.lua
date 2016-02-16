@@ -5,7 +5,7 @@ require 'cv.features2d'
 ffi.cdef[[
 struct calibrateCameraRetval {
     double retval;
-    struct TensorArray rvecs, tvecs, intrinsics;
+    struct TensorArray intrinsics, rvecs, tvecs;
 };
 
 struct decomposeHomographyMatRetval {
@@ -291,7 +291,8 @@ function cv.calibrateCamera(t)
 			cv.wrap_tensors(objectPoints), cv.wrap_tensors(imagePoints),
 			imageSize, cv.wrap_tensor(cameraMatrix), cv.wrap_tensor(distCoeffs),
 			cv.wrap_tensors(rvecs), cv.wrap_tensors(tvecs), flag, criteria)
-    return result.retval, cv.unwrap_tensors(result.intrinsics),
+    local cameraMatrix_ret, distCoeffs_ret = cv.unwrap_tensors(result.intrinsics)
+    return result.retval, cameraMatrix_ret, distCoeffs_ret,
            cv.unwrap_tensors(result.rvecs, true),
            cv.unwrap_tensors(result.tvecs, true) 
 end 
