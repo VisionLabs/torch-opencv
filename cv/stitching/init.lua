@@ -129,7 +129,7 @@ struct PtrWrapper GraphEdge_ctor(
 void GraphEdge_dtor(
 	struct PtrWrapper ptr);
 
-struct TimelapserPtr Timelapser_ctor(
+struct PtrWrapper Timelapser_ctor(
 	int type)
 
 void Timelapser_dtor(
@@ -147,27 +147,27 @@ void TimelapserCrop_initialize(
 	struct PtrWrapper ptr, struct PointArray corners,
 	struct SizeArray sizes);
 
+void FeaturesFinder_dtor(
+	struct PtrWrapper ptr)
+
 void FeaturesFinder_collectGarbage(
 	struct PtrWrapper ptr);
 
-struct ImageFeaturesPtr FeaturesFinder_call(
+struct PtrWrapper FeaturesFinder_call(
 	struct PtrWrapper ptr, struct TensorWrapper image);
 
-struct ImageFeaturesPtr FeaturesFinder_call2(
+struct PtrWrapper FeaturesFinder_call2(
 	struct PtrWrapper ptr, struct TensorWrapper image,
 	struct RectArray);
 
-struct ImageFeaturesPtr ImageFeatures_ctor();
+struct PtrWrapper ImageFeatures_ctor();
 
-struct ImageFeaturesPtr ImageFeatures_dtor(
+struct PtrWrapper ImageFeatures_dtor(
 	struct PtrWrapper ptr);
 
-struct BestOf2NearestMatcherPtr BestOf2NearestMatcher_ctor(
+struct PtrWrapper BestOf2NearestMatcher_ctor(
     bool try_use_gpu, float match_conf,
     int num_matches_thresh1, int num_matches_thresh2);
-
-struct BestOf2NearestMatcherPtr BestOf2NearestMatcher_dtor(
-    struct PtrWrapper ptr);
 
 void BestOf2NearestMatcher_collectGarbage(
     struct PtrWrapper ptr);
@@ -175,12 +175,33 @@ void BestOf2NearestMatcher_collectGarbage(
 void FeaturesMatcher_dtor(
     struct PtrWrapper ptr);
 
-void FeaturesMatcher_FeaturesMatcher(
+void FeaturesMatcher_collectGarbage(
     struct PtrWrapper ptr)
+
+struct PtrWrapper FeaturesMatcher_call(
+        struct PtrWrapper ptr, struct PtrWrapper features1,
+        struct PtrWrapper features2);
+
+bool FeaturesMatcher_isThreadSafe(
+        struct PtrWrapper ptr);
+
+struct MatchesInfoPtr MatchesInfo_ctor();
+
+struct MatchesInfoPtr MatchesInfo_ctor2(
+        struct PtrWrapper other);
+
+struct PtrWrapper BestOf2NearestRangeMatcher_ctor(
+		int range_width, bool try_use_gpu, float match_conf,
+		int num_matches_thresh1, int num_matches_thresh2);
+
+struct OrbFeaturesFinderPtr OrbFeaturesFinder_ctor(
+        struct SizeWrapper _grid_size, int nfeatures, float scaleFactor, int nlevels);
+
+struct SurfFeaturesFinderPtr SurfFeaturesFinder_ctor(
+        double hess_thresh, int num_octaves, int num_layers, int num_octaves_descr, int num_layers_descr);
 ]]
 
 --CameraParams
-
 
 --TODO
 do
@@ -340,6 +361,27 @@ do
 end
 
 
+--*******************Features Finding and Images Matching*********************
+
+
+--MatchesInfo
+
+do
+    local MatchesInfo = torch.class('cv.MatchesInfo', cv)
+
+    function MatchesInfo:_init(t)
+        local argRules = {
+            {"other", default = nil} }
+        local other = cv.argcheck(t, argRules)
+        if other then
+            self.ptr = ffi.gc(C.MatchesInfo_ctor2(other.ptr), C.MatchesInfo_dtor);
+        else
+            self.ptr = ffi.gc(C.MatchesInfo_ctor(), C.MatchesInfo_dtor);
+        end
+    end
+
+    --TODO need to add operator=
+end
 
 --FeaturesFinder
 
@@ -354,13 +396,58 @@ do
         local argRules = {
             {"image", required = true},
             {"rois", default = nil}}
-        local image, features, rois = cv.argcheck(t, argRules)
+        local image, rois = cv.argcheck(t, argRules)
+
+        local imgFeat = cv.ImageFeatures{}
 
         if rois then
-            return ffi.gc(C.FeaturesFinder_call2(self.ptr, cv.wrap_tensor(image), rois), C.ImageFeatures_dtor)
+            local retval =  ffi.gc(C.FeaturesFinder_call2(self.ptr, cv.wrap_tensor(image), rois),
+                                   C.FeaturesFinder_dtor)
+            imgFeat.ptr = retval
+            return imgFeat
         else
-            return ffi.gc(C.FeaturesFinder_call(self.ptr, cv.wrap_tensor(image)), C.ImageFeatures_dtor)
+            local retval = ffi.gc(C.FeaturesFinder_call(self.ptr, cv.wrap_tensor(image)),
+                                  C.FeaturesFinder_dtor)
+            imgFeat.ptr = retval
+            return imgFeat
         end
+    end
+end
+
+--OrbFeaturesFinder
+
+do
+    local OrbFeaturesFinder = torch.class('cv.OrbFeaturesFinder', 'cv.FeaturesFinder', cv)
+
+    function OrbFeaturesFinder:__init(t)
+        local argRules = {
+            {"_grid_size", default = cv.Size(3,1), operator = cv.Size},
+            {"nfeatures", default = 1500},
+            {"scaleFactor", default = 1.3},
+            {"nlevels", default = 5}}
+        local _grid_size, nfeatures, scaleFactor, nlevels = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(C.OrbFeaturesFinder(_grid_size, nfeatures, scaleFactor, nlevels),
+                          C.FeaturesFinder_dtor)
+    end
+
+
+end
+
+--SurfFeaturesFinder
+
+do
+    local SurfFeaturesFinder = torch.class('cv.SurfFeaturesFinder', 'cv.FeaturesFinder', cv)
+
+    function SurfFeaturesFinder:__init(t)
+        local argRules = {
+            {"hess_thresh", default = 300},
+            {"num_octaves", default = 3},
+            {"num_layers", default = 4},
+            {"num_octaves_descr", default = 3},
+            {"num_layers_descr", default = 4} }
+        local hess_thresh, num_octaves, num_layers, num_octaves_descr, num_layers_descr = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(C.SurfFeaturesFinder_ctor(hess_thresh, num_octaves, num_layers, num_octaves_descr, num_layers_descr),
+                          C.FeaturesFinder_dtor)
     end
 end
 
@@ -373,9 +460,32 @@ do
         self.ptr = ffi.gc(C.ImageFeatures_ctor(), C.ImageFeatures_dtor)
     end
 end
+
 --FeaturesMatcher
 
+do
+    local FeaturesMatcher = torch.class('cv.FeaturesMatcher', cv)
 
+    function FeaturesMatcher:collectGarbage()
+        C.FeaturesMatcher_collectGarbage(self.ptr);
+    end
+
+    function FeaturesMatcher_isThreadSafe()
+        return C.FeaturesMatcher_isThreadSafe(self.ptr);
+    end
+
+    function FeaturesMatcher:__call(t)
+        local argRules = {
+            {"features1", required = true},
+            {"features2", required = true} }
+        local features1, features2 = cv.argcheck(t, argRules)
+        local result =  ffi.gc(C.FeaturesMatcher_call(features1.ptr, features2.ptr),
+                               C.MatchesInfo_dtor)
+        local retval = cv.MatchesInfo{}
+        retval.ptr = result
+        return retval;
+    end
+end
 
 --BestOf2NearestMatcher
 
@@ -391,7 +501,7 @@ do
         local try_use_gpu, match_conf, num_matches_thresh1, num_matches_thresh2 = cv.argcheck(t, argRules)
         self.ptr = ffi.gc(
                 C.BestOf2NearestMatcher_ctor(try_use_gpu, match_conf, num_matches_thresh1, num_matches_thresh2),
-                C.BestOf2NearestMatcher_dtor)
+                C.FeaturesMatcher_dtor)
     end
 
     function BestOf2NearestMatcher:collectGarbage()
@@ -399,8 +509,27 @@ do
     end
 end
 
+--BestOf2NearestRangeMatcher
 
+do
+    local BestOf2NearestRangeMatcher = torch.class('cv.BestOf2NearestRangeMatcher', 'cv.BestOf2NearestMatcher', cv)
 
+    function BestOf2NearestRangeMatcher:__init(t)
+        local argRules = {
+            {"range_width", default = 5},
+            {"try_use_gpu", default = false},
+            {"match_conf", default = 0.3},
+            {"num_matches_thresh1", default = 6},
+            {"num_matches_thresh2", default = 6} }
+        local range_width, try_use_gpu, match_conf,
+              num_matches_thresh1, num_matches_thresh2 = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(C.BestOf2NearestRangeMatcher_ctor(
+                                        range_width, try_use_gpu, match_conf,
+                                        num_matches_thresh1, num_matches_thresh2),
+                          C.FeaturesMatcher_dtor)
+    end
 
+--TODO need to make operator()
+end
 
 return cv

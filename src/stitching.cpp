@@ -219,6 +219,32 @@ void TimelapserCrop_initialize(
 
 //Features Finding and Images Matching
 
+//MatchesInfo
+
+extern "C"
+struct MatchesInfoPtr MatchesInfo_ctor()
+{
+    return new cv::detail::MatchesInfo();
+}
+
+extern "C"
+struct MatchesInfoPtr MatchesInfo_ctor2(
+        struct MatchesInfoPtr other)
+{
+    new cv::detail::MatchesInfo(*static_cast<cv::detail::MatchesInfo *>(other.ptr));
+}
+
+extern "C"
+struct MatchesInfoPtr MatchesInfo_dtor(
+        struct MatchesInfoPtr ptr)
+{
+    delete static_cast<cv::detail::MatchesInfo *>(ptr.ptr);
+}
+
+
+//****************Features Finding and Images Matching************
+
+
 //FeaturesFinder
 
 extern "C"
@@ -226,6 +252,7 @@ void FeaturesFinder_dtor(
 	struct FeaturesFinderPtr ptr)
 {
     ptr->~FeaturesFinder();
+    delete static_cast<cv::detail::FeaturesFinder *>(ptr.ptr);
 }
 
 extern "C"
@@ -252,6 +279,24 @@ struct ImageFeaturesPtr FeaturesFinder_call2(
     detail::ImageFeatures *features = new cv::detail::ImageFeatures();
     ptr->operator()(image.toMat(), *features, rois);
     return ImageFeaturesPtr(features);
+}
+
+//OrbFeaturesFinder
+
+extern "C"
+struct OrbFeaturesFinderPtr OrbFeaturesFinder_ctor(
+        struct SizeWrapper _grid_size, int nfeatures, float scaleFactor, int nlevels)
+{
+    new cv::detail::OrbFeaturesFinder(_grid_size, nfeatures, scaleFactor, nlevels);
+}
+
+//SurfFeaturesFinder
+
+extern "C"
+struct SurfFeaturesFinderPtr SurfFeaturesFinder_ctor(
+        double hess_thresh, int num_octaves, int num_layers, int num_octaves_descr, int num_layers_descr)
+{
+    new cv::detail::SurfFeaturesFinder(hess_thresh, num_octaves, num_layers, num_octaves_descr, num_layers_descr);
 }
 
 //ImageFeatures
@@ -282,10 +327,28 @@ void FeaturesMatcher_dtor(
 }
 
 extern "C"
-void FeaturesMatcher_FeaturesMatcher(
+void FeaturesMatcher_collectGarbage(
         struct FeaturesMatcherPtr ptr)
 {
     ptr->collectGarbage();
+}
+
+extern "C"
+bool FeaturesMatcher_isThreadSafe(
+        struct FeaturesMatcherPtr ptr)
+{
+    return ptr->isThreadSafe();
+}
+
+extern "C"
+struct MatchesInfoPtr FeaturesMatcher_call(
+        struct FeaturesMatcherPtr ptr, struct ImageFeaturesPtr features1,
+        struct ImageFeaturesPtr features2)
+{
+    cv::detail::MatchesInfo *Mat_inf = new cv::detail::MatchesInfo();
+    ptr->operator()(*static_cast<cv::detail::ImageFeatures *>(features1.ptr),
+                    *static_cast<cv::detail::ImageFeatures *>(features2.ptr), *Mat_inf);
+    return Mat_inf;
 }
 
 //BestOf2NearestMatcher
@@ -295,14 +358,7 @@ struct BestOf2NearestMatcherPtr BestOf2NearestMatcher_ctor(
         bool try_use_gpu, float match_conf,
         int num_matches_thresh1, int num_matches_thresh2)
 {
-    new cv::detail::BestOf2NearestMatcher();
-}
-
-extern "C"
-struct BestOf2NearestMatcherPtr BestOf2NearestMatcher_dtor(
-        struct BestOf2NearestMatcherPtr ptr)
-{
-    delete static_cast<cv::detail::BestOf2NearestMatcher *>(ptr.ptr);
+    new cv::detail::BestOf2NearestMatcher(try_use_gpu, match_conf, num_matches_thresh1, num_matches_thresh2);
 }
 
 extern "C"
@@ -310,5 +366,16 @@ void BestOf2NearestMatcher_collectGarbage(
         struct BestOf2NearestMatcherPtr ptr)
 {
    ptr->collectGarbage();
+}
+
+//BestOf2NearestRangeMatcher
+
+extern "C"
+struct BestOf2NearestRangeMatcherPtr BestOf2NearestRangeMatcher_ctor(
+        int range_width, bool try_use_gpu, float match_conf,
+        int num_matches_thresh1, int num_matches_thresh2)
+{
+    return new cv::detail::BestOf2NearestRangeMatcher(range_width, try_use_gpu, match_conf,
+                                                      num_matches_thresh1, num_matches_thresh2);
 }
 

@@ -197,7 +197,31 @@ void TimelapserCrop_initialize(
 	struct TimelapserCropPtr ptr, struct PointArray corners,
 	struct SizeArray sizes); 
 
-//Features Finding and Images Matching
+
+//*************Features Finding and Images Matching**************
+
+
+//MatchesInfo
+
+extern "C"
+struct MatchesInfoPtr {
+	void *ptr;
+
+	inline detail::MatchesInfo * operator->() {
+		return static_cast<detail::MatchesInfo *>(ptr); }
+	inline MatchesInfoPtr(detail::MatchesInfo *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+struct MatchesInfoPtr MatchesInfo_ctor();
+
+extern "C"
+struct MatchesInfoPtr MatchesInfo_ctor2(
+		struct MatchesInfoPtr other);
+
+extern "C"
+struct MatchesInfoPtr MatchesInfo_dtor(
+		struct MatchesInfoPtr ptr);
 
 //FeaturesFinder
 
@@ -226,6 +250,36 @@ extern "C"
 struct ImageFeaturesPtr FeaturesFinder_call2(
 		struct FeaturesFinderPtr ptr, struct TensorWrapper image,
 		struct RectArray);
+
+//OrbFeaturesFinder
+
+extern "C"
+struct OrbFeaturesFinderPtr {
+	void *ptr;
+
+	inline detail::OrbFeaturesFinder * operator->() {
+		return static_cast<detail::OrbFeaturesFinder *>(ptr); }
+	inline OrbFeaturesFinderPtr(detail::OrbFeaturesFinder *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+struct OrbFeaturesFinderPtr OrbFeaturesFinder_ctor(
+		struct SizeWrapper _grid_size, int nfeatures, float scaleFactor, int nlevels);
+
+//SurfFeaturesFinder
+
+extern "C"
+struct SurfFeaturesFinderPtr {
+	void *ptr;
+
+	inline detail::SurfFeaturesFinder * operator->() {
+		return static_cast<detail::SurfFeaturesFinder *>(ptr); }
+	inline SurfFeaturesFinderPtr(detail::SurfFeaturesFinder *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+struct SurfFeaturesFinderPtr SurfFeaturesFinder_ctor(
+		double hess_thresh, int num_octaves, int num_layers, int num_octaves_descr, int num_layers_descr);
 
 //ImageFeatures
 
@@ -261,9 +315,17 @@ void FeaturesMatcher_dtor(
 		struct FeaturesMatcherPtr ptr);
 
 extern "C"
-void FeaturesMatcher_FeaturesMatcher(
+void FeaturesMatcher_collectGarbage(
 		struct FeaturesMatcherPtr ptr);
 
+extern "C"
+bool FeaturesMatcher_isThreadSafe(
+		struct FeaturesMatcherPtr ptr);
+
+extern "C"
+struct MatchesInfoPtr FeaturesMatcher_call(
+		struct FeaturesMatcherPtr ptr, struct ImageFeaturesPtr features1,
+		struct ImageFeaturesPtr features2);
 
 //BestOf2NearestMatcher
 
@@ -282,9 +344,25 @@ struct BestOf2NearestMatcherPtr BestOf2NearestMatcher_ctor(
 	int num_matches_thresh1, int num_matches_thresh2);
 
 extern "C"
-struct BestOf2NearestMatcherPtr BestOf2NearestMatcher_dtor(
-	struct BestOf2NearestMatcherPtr ptr);
-
-extern "C"
 void BestOf2NearestMatcher_collectGarbage(
 	struct BestOf2NearestMatcherPtr ptr);
+
+//BestOf2NearestRangeMatcher
+
+extern "C"
+struct BestOf2NearestRangeMatcherPtr {
+	void *ptr;
+
+	inline detail::BestOf2NearestRangeMatcher * operator->() {
+		return static_cast<detail::BestOf2NearestRangeMatcher *>(ptr); }
+	inline BestOf2NearestRangeMatcherPtr(detail::BestOf2NearestRangeMatcher *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+struct BestOf2NearestRangeMatcherPtr BestOf2NearestRangeMatcher_ctor(
+		int range_width, bool try_use_gpu, float match_conf,
+		int num_matches_thresh1, int num_matches_thresh2);
+
+
+//**********************Rotation Estimation********************************
+
