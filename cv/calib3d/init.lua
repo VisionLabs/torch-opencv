@@ -1247,7 +1247,7 @@ do
             {"left", required = true},
             {"right", required = true},
             {"disparity", default = nil}}
-    local left, right, right = cv.argcheck(t, argRules)
+    local left, right, disparity = cv.argcheck(t, argRules)
     return cv.unwrap_tensors(
 			C.StereoMatcher_compute(
 				self.ptr, cv.wrap_tensor(left), cv.wrap_tensor(right),
@@ -1326,7 +1326,7 @@ end
 do
     local StereoBM = torch.class('cv.StereoBM', 'cv.StereoMatcher', cv)
 
-    function StereoBM:__init()
+    function StereoBM:__init(t)
         local argRules = {
             {"numDisparities", default = 0},
             {"blockSize", default = 21}}

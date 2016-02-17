@@ -764,7 +764,7 @@ struct TensorWrapper fisheye_undistortPoints(
 //StereoMatcher
 
 extern "C"
-struct TensorWrapper compute(
+struct TensorWrapper StereoMatcher_compute(
 	struct StereoMatcherPtr ptr, struct TensorWrapper left,
 	struct TensorWrapper right, struct TensorWrapper disparity)
 {
