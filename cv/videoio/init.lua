@@ -211,11 +211,23 @@ do
 
     function VideoWriter:get(t)
         local argRules = {
-            {"propId", required = true},
+            {"propId", required = true}
         }
         local propId = cv.argcheck(t, argRules)
 
         return C.VideoWriter_get(self.ptr, propId)
+    end
+
+    function VideoWriter:fourcc(t)
+        local argRules = {
+            {"c1", required = true},
+            {"c2", required = true},
+            {"c3", required = true},
+            {"c4", required = true}
+        }
+        local c1, c2, c3, c4 = cv.argcheck(t, argRules)
+
+        return C.VideoWriter_fourcc(self.ptr, c1, c2, c3, c4)
     end
 end
 
