@@ -505,8 +505,8 @@ struct TensorArrayPlusBool solvePnPRansac(
 
 extern "C"
 struct TensorArrayPlusDouble stereoCalibrate(
-	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints1,
-	struct TensorWrapper imagePoints2, struct TensorWrapper cameraMatrix1,
+	struct TensorArray objectPoints, struct TensorArray imagePoints1,
+	struct TensorArray imagePoints2, struct TensorWrapper cameraMatrix1,
 	struct TensorWrapper distCoeffs1, struct TensorWrapper cameraMatrix2,
 	struct TensorWrapper distCoeffs2, struct SizeWrapper imageSize,
 	struct TensorWrapper R, struct TensorWrapper T,
@@ -526,8 +526,8 @@ struct TensorArrayPlusDouble stereoCalibrate(
     if(!F.isNull()) vec[7] = F.toMat();
 
     result.val = cv::stereoCalibrate(
-			objectPoints.toMat(), imagePoints1.toMat(),
-			imagePoints2.toMat(), vec[0], vec[1], vec[2],
+			objectPoints.toMatList(), imagePoints1.toMatList(),
+			imagePoints2.toMatList(), vec[0], vec[1], vec[2],
 			vec[3], imageSize, vec[4], vec[5], vec[6],
 			vec[7], flags, criteria);
     new(&result.tensors) TensorArray(vec);
@@ -681,8 +681,8 @@ struct TensorArray fisheye_projectPoints2(
 
 extern "C"
 struct TensorArrayPlusDouble fisheye_stereoCalibrate(
-	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints1,
-	struct TensorWrapper imagePoints2, struct TensorWrapper K1,
+	struct TensorArray objectPoints, struct TensorArray imagePoints1,
+	struct TensorArray imagePoints2, struct TensorWrapper K1,
 	struct TensorWrapper D1, struct TensorWrapper K2,
 	struct TensorWrapper D2, struct SizeWrapper imageSize,
 	struct TensorWrapper R, struct TensorWrapper T,
@@ -699,8 +699,8 @@ struct TensorArrayPlusDouble fisheye_stereoCalibrate(
     if(!T.isNull()) vec[5] = T.toMat();
 
     result.val = fisheye::stereoCalibrate(
-			objectPoints.toMat(), imagePoints1.toMat(),
-			imagePoints2.toMat(), vec[0], vec[1], vec[2],
+			objectPoints.toMatList(), imagePoints1.toMatList(),
+			imagePoints2.toMatList(), vec[0], vec[1], vec[2],
 			vec[3], imageSize, vec[4], vec[5], flags, criteria);
     new(&result.tensors) TensorArray(vec);
     return result;

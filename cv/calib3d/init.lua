@@ -182,8 +182,8 @@ struct TensorArrayPlusBool solvePnPRansac(
 	double confidence, struct TensorWrapper inliers, int flags);
 
 struct TensorArrayPlusDouble stereoCalibrate(
-	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints1,
-	struct TensorWrapper imagePoints2, struct TensorWrapper cameraMatrix1,
+	struct TensorArray objectPoints, struct TensorArray imagePoints1,
+	struct TensorArray imagePoints2, struct TensorWrapper cameraMatrix1,
 	struct TensorWrapper distCoeffs1, struct TensorWrapper cameraMatrix2,
 	struct TensorWrapper distCoeffs2, struct SizeWrapper imageSize,
 	struct TensorWrapper R, struct TensorWrapper T,
@@ -241,8 +241,8 @@ struct TensorArray fisheye_projectPoints2(
 	struct TensorWrapper jacobian);
 
 struct TensorArrayPlusDouble fisheye_stereoCalibrate(
-	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints1,
-	struct TensorWrapper imagePoints2, struct TensorWrapper K1,
+	struct TensorArray objectPoints, struct TensorArray imagePoints1,
+	struct TensorArray imagePoints2, struct TensorWrapper K1,
 	struct TensorWrapper D1, struct TensorWrapper K2,
 	struct TensorWrapper D2, struct SizeWrapper imageSize,
 	struct TensorWrapper R, struct TensorWrapper T,
@@ -709,7 +709,7 @@ function cv.rectify3Collinear(t)
 			cv.wrap_tensor(imgpt1), cv.wrap_tensors(imgpt3), imageSize,
 			cv.wrap_tensor(R12), cv.wrap_tensor(T12), cv.wrap_tensor(R13),
 			cv.wrap_tensor(T13), alpha, newImgSize, flags)
-    return result.val, cv.unwrap_tensors(result.tensors), cv.gcarray(result.rects)
+    return result.val, cv.gcarray(result.rects), cv.unwrap_tensors(result.tensors)
 end
 
 function cv.reprojectImageTo3D(t)
@@ -813,7 +813,7 @@ function cv.stereoCalibrate(t)
         {"T", default = nil},
         {"E", default = nil},
         {"F", default = nil},
-        {"flags", defauly = cv.CALIB_FIX_INTRINSIC},
+        {"flags", default = cv.CALIB_FIX_INTRINSIC},
         {"criteria", default =
 		cv.TermCriteria(cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 30, 1e-6),
 		operator = cv.TermCriteria}}
@@ -821,8 +821,8 @@ function cv.stereoCalibrate(t)
           distCoeffs1, cameraMatrix2, distCoeffs2, imageSize, R, T,
           E, F, flags, criteria = cv.argcheck(t, argRules)
     local result = C.stereoCalibrate(
-			cv.wrap_tensor(objectPoints), cv.wrap_tensor(imagePoints1),
-			cv.wrap_tensor(imagePoints2), cv.wrap_tensor(cameraMatrix1),
+			cv.wrap_tensors(objectPoints), cv.wrap_tensors(imagePoints1),
+			cv.wrap_tensors(imagePoints2), cv.wrap_tensor(cameraMatrix1),
 			cv.wrap_tensor(distCoeffs1), cv.wrap_tensor(cameraMatrix2),
 			cv.wrap_tensor(distCoeffs2), imageSize, cv.wrap_tensor(R),
 			cv.wrap_tensor(T), cv.wrap_tensor(E), cv.wrap_tensor(F),
@@ -938,7 +938,8 @@ function cv.fisheye.calibrate(t)
 			cv.wrap_tensors(objectPoints), cv.wrap_tensors(imagePoints),
 			imageSize, cv.wrap_tensor(K), cv.wrap_tensor(D),
 			cv.wrap_tensors(rvecs), cv.wrap_tensors(tvecs), flag, criteria)
-    return result.retval, cv.unwrap_tensors(result.intrinsics),
+    local K, D = cv.unwrap_tensors(result.intrinsics)
+    return result.retval, K, D,
            cv.unwrap_tensors(result.rvecs, true),
            cv.unwrap_tensors(result.tvecs, true) 
 end 
@@ -1018,22 +1019,22 @@ function cv.fisheye.stereoCalibrate(t)
         {"objectPoints", required = true},
         {"imagePoints1", required = true},
         {"imagePoints2", required = true},
-        {"K1", default = nil},
-        {"D1", default = nil},
-        {"K2", default = nil},
-        {"D2", default = nil},
+        {"K1", required  = true},
+        {"D1", required = true},
+        {"K2", required = true},
+        {"D2", required = true},
         {"imageSize", required = true, operator = cv.Size},
         {"R", default = nil},
         {"T", default = nil},
-        {"flags", defauly = cv.fisheye.CALIB_FIX_INTRINSIC},
+        {"flags", default = cv.fisheye.CALIB_FIX_INTRINSIC},
         {"criteria", default =
 		cv.TermCriteria(cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 100, cv.DBL_EPSILON),
 		operator = cv.TermCriteria}}
     local objectPoints, imagePoints1, imagePoints2, K1, D1, K2, D2,
           imageSize, R, T, flags, criteria = cv.argcheck(t, argRules)
     local result = C.fisheye_stereoCalibrate(
-			cv.wrap_tensor(objectPoints), cv.wrap_tensor(imagePoints1),
-			cv.wrap_tensor(imagePoints2), cv.wrap_tensor(K1),
+			cv.wrap_tensors(objectPoints), cv.wrap_tensors(imagePoints1),
+			cv.wrap_tensors(imagePoints2), cv.wrap_tensor(K1),
 			cv.wrap_tensor(D1), cv.wrap_tensor(K2),
 			cv.wrap_tensor(D2), imageSize, cv.wrap_tensor(R),
 			cv.wrap_tensor(T), flags, criteria)

@@ -210,13 +210,13 @@ struct TensorArrayPlusBool solvePnPRansac(
 
 extern "C"
 struct TensorArrayPlusDouble stereoCalibrate(
-	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints1,
-	struct TensorWrapper imagePoints2, struct TensorWrapper cameraMatrix1,
-	struct TensorWrapper distCoeffs1, struct TensorWrapper cameraMatrix2,
-	struct TensorWrapper distCoeffs2, struct SizeWrapper imageSize,
-	struct TensorWrapper R, struct TensorWrapper T,
-	struct TensorWrapper E, struct TensorWrapper F,
-	int flags, struct TermCriteriaWrapper criteria);
+		struct TensorArray objectPoints, struct TensorArray imagePoints1,
+		struct TensorArray imagePoints2, struct TensorWrapper cameraMatrix1,
+		struct TensorWrapper distCoeffs1, struct TensorWrapper cameraMatrix2,
+		struct TensorWrapper distCoeffs2, struct SizeWrapper imageSize,
+		struct TensorWrapper R, struct TensorWrapper T,
+		struct TensorWrapper E, struct TensorWrapper F,
+		int flags, struct TermCriteriaWrapper criteria);
 
 extern "C"
 struct RectArray stereoRectify(
@@ -283,12 +283,12 @@ struct TensorArray fisheye_projectPoints2(
 
 extern "C"
 struct TensorArrayPlusDouble fisheye_stereoCalibrate(
-	struct TensorWrapper objectPoints, struct TensorWrapper imagePoints1,
-	struct TensorWrapper imagePoints2, struct TensorWrapper K1,
-	struct TensorWrapper D1, struct TensorWrapper K2,
-	struct TensorWrapper D2, struct SizeWrapper imageSize,
-	struct TensorWrapper R, struct TensorWrapper T,
-	int flags, struct TermCriteriaWrapper criteria);
+		struct TensorArray objectPoints, struct TensorArray imagePoints1,
+		struct TensorArray imagePoints2, struct TensorWrapper K1,
+		struct TensorWrapper D1, struct TensorWrapper K2,
+		struct TensorWrapper D2, struct SizeWrapper imageSize,
+		struct TensorWrapper R, struct TensorWrapper T,
+		int flags, struct TermCriteriaWrapper criteria);
 
 extern "C"
 struct TensorArray fisheye_stereoRectify(
