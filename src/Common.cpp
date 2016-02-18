@@ -1,5 +1,4 @@
 #include <Common.hpp>
-using namespace std;
 
 /***************** Tensor <=> Mat conversion *****************/
 
@@ -34,9 +33,7 @@ static void *OpenCVRealloc(void */*allocatorContext*/, void *ptr, long size) {
     return newMem;
 }
 
-static int c = 0;
 static void OpenCVFree(void */*allocatorContext*/, void *ptr) {
-    std::cout << "Free " << c++ << std::endl;
     cv::fastFree(ptr);
 }
 
@@ -73,6 +70,7 @@ MatT::MatT() {
 
 TensorWrapper::TensorWrapper(): tensorPtr(nullptr) {}
 
+// TODO replace completely with TensorWrapper(MatT &)
 TensorWrapper::TensorWrapper(cv::Mat & mat) {
 
     if (mat.empty()) {
