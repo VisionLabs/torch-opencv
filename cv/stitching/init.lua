@@ -20,7 +20,7 @@ struct PointWrapper detail_resultTl(
 void detail_selectRandomSubset(
 	int count, int size);
 
-int detail_stitchingLogLevel()
+int detail_stitchingLogLevel();
 ]]
 
 local C = ffi.load(cv.libPath('stitching'))
@@ -112,7 +112,7 @@ struct PtrWrapper Graph_ctor(
 	int num_vertices);
 
 void Graph_dtor(
-	struct PtrWrapper ptr)
+	struct PtrWrapper ptr);
 
 void Graph_addEdge(
 	struct PtrWrapper ptr, int from, int to, float weight);
@@ -130,7 +130,7 @@ void GraphEdge_dtor(
 	struct PtrWrapper ptr);
 
 struct PtrWrapper Timelapser_ctor(
-	int type)
+	int type);
 
 void Timelapser_dtor(
 	struct PtrWrapper ptr);
@@ -148,7 +148,7 @@ void TimelapserCrop_initialize(
 	struct SizeArray sizes);
 
 void FeaturesFinder_dtor(
-	struct PtrWrapper ptr)
+	struct PtrWrapper ptr);
 
 void FeaturesFinder_collectGarbage(
 	struct PtrWrapper ptr);
@@ -176,7 +176,7 @@ void FeaturesMatcher_dtor(
     struct PtrWrapper ptr);
 
 void FeaturesMatcher_collectGarbage(
-    struct PtrWrapper ptr)
+    struct PtrWrapper ptr);
 
 struct PtrWrapper FeaturesMatcher_call(
         struct PtrWrapper ptr, struct PtrWrapper features1,
@@ -185,21 +185,40 @@ struct PtrWrapper FeaturesMatcher_call(
 bool FeaturesMatcher_isThreadSafe(
         struct PtrWrapper ptr);
 
-struct MatchesInfoPtr MatchesInfo_ctor();
+struct PtrWrapper MatchesInfo_ctor();
 
-struct MatchesInfoPtr MatchesInfo_ctor2(
+struct PtrWrapper MatchesInfo_ctor2(
+        struct PtrWrapper other);
+
+void MatchesInfo_dtor(
         struct PtrWrapper other);
 
 struct PtrWrapper BestOf2NearestRangeMatcher_ctor(
 		int range_width, bool try_use_gpu, float match_conf,
 		int num_matches_thresh1, int num_matches_thresh2);
 
-struct OrbFeaturesFinderPtr OrbFeaturesFinder_ctor(
+struct PtrWrapper OrbFeaturesFinder_ctor(
         struct SizeWrapper _grid_size, int nfeatures, float scaleFactor, int nlevels);
 
-struct SurfFeaturesFinderPtr SurfFeaturesFinder_ctor(
+struct PtrWrapper SurfFeaturesFinder_ctor(
         double hess_thresh, int num_octaves, int num_layers, int num_octaves_descr, int num_layers_descr);
+
+struct ClassArray test(struct ClassArray val);
 ]]
+
+--********************************************************
+--*************************test***************************
+--********************************************************
+
+
+function cv.test(t)
+    return cv.gcarray(C.test(t), true, "MatchesInfo");
+end
+
+--********************************************************
+--*************************test***************************
+--********************************************************
+
 
 --CameraParams
 
@@ -369,7 +388,7 @@ end
 do
     local MatchesInfo = torch.class('cv.MatchesInfo', cv)
 
-    function MatchesInfo:_init(t)
+    function MatchesInfo:__init(t)
         local argRules = {
             {"other", default = nil} }
         local other = cv.argcheck(t, argRules)
@@ -479,7 +498,7 @@ do
             {"features1", required = true},
             {"features2", required = true} }
         local features1, features2 = cv.argcheck(t, argRules)
-        local result =  ffi.gc(C.FeaturesMatcher_call(features1.ptr, features2.ptr),
+        local result =  ffi.gc(C.FeaturesMatcher_call(self.ptr, features1.ptr, features2.ptr),
                                C.MatchesInfo_dtor)
         local retval = cv.MatchesInfo{}
         retval.ptr = result

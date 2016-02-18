@@ -235,9 +235,10 @@ struct MatchesInfoPtr MatchesInfo_ctor2(
 }
 
 extern "C"
-struct MatchesInfoPtr MatchesInfo_dtor(
+void MatchesInfo_dtor(
         struct MatchesInfoPtr ptr)
 {
+    std::cout<< "d_tor" << std::endl;
     delete static_cast<cv::detail::MatchesInfo *>(ptr.ptr);
 }
 
@@ -379,3 +380,24 @@ struct BestOf2NearestRangeMatcherPtr BestOf2NearestRangeMatcher_ctor(
                                                       num_matches_thresh1, num_matches_thresh2);
 }
 
+//********************************************************
+//*************************test***************************
+//********************************************************
+
+extern "C"
+struct ClassArray test(struct ClassArray val){
+
+    std::cout << "__C++__\n";
+    std::cout << "Size of input vector = "  << val.size << std::endl;
+
+    std::vector<cv::detail::MatchesInfo> temp = val;
+
+    temp.push_back(temp[0]);
+
+    return temp;
+
+ }
+
+//********************************************************
+//*************************test***************************
+//********************************************************

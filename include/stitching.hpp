@@ -207,6 +207,8 @@ extern "C"
 struct MatchesInfoPtr {
 	void *ptr;
 
+	MatchesInfoPtr() {};
+
 	inline detail::MatchesInfo * operator->() {
 		return static_cast<detail::MatchesInfo *>(ptr); }
 	inline MatchesInfoPtr(detail::MatchesInfo *ptr) { this->ptr = ptr; }
@@ -220,7 +222,7 @@ struct MatchesInfoPtr MatchesInfo_ctor2(
 		struct MatchesInfoPtr other);
 
 extern "C"
-struct MatchesInfoPtr MatchesInfo_dtor(
+void MatchesInfo_dtor(
 		struct MatchesInfoPtr ptr);
 
 //FeaturesFinder
@@ -366,3 +368,14 @@ struct BestOf2NearestRangeMatcherPtr BestOf2NearestRangeMatcher_ctor(
 
 //**********************Rotation Estimation********************************
 
+//********************************************************
+//*************************test***************************
+//********************************************************
+
+
+extern "C"
+struct ClassArray test(struct ClassArray val);
+
+//********************************************************
+//*************************test***************************
+//********************************************************

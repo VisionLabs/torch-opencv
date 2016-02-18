@@ -226,6 +226,11 @@ struct RectArray {
     int size;
 };
 
+struct ClassArray {
+    struct PtrWrapper *data;
+    int size;
+};
+
 struct TensorPlusRectArray {
     struct TensorWrapper tensor;
     struct RectArray rects;
@@ -512,6 +517,19 @@ function cv.newArray(elemType, data)
     local fullTypeName
     local shortTypeName
 
+    if elemType == "Class" then
+        -- create class array
+        local retval = ffi.new('struct ClassArray')
+
+        retval.data = ffi.gc(C.malloc(#data * ffi.sizeof('struct PtrWrapper')), C.free)
+        retval.size = #data
+
+        for i, value in ipairs(data) do
+            retval.data[i-1] = data[i].ptr
+        end
+        return retval
+    end
+
     if elemType:byte(3) == 46 then
         -- there's a period after 2 symbols: likely "cv.Something"
         shortTypeName = elemType:sub(4)
@@ -623,8 +641,31 @@ function cv.tableToDMatchArrayOfArrays(tbl)
 end
 
 -- make an array that has come from C++ garbage-collected
-function cv.gcarray(array)
+
+
+local C = ffi.load(cv.libPath('stitching'))
+
+ffi.cdef[[
+void MatchesInfo_dtor(
+struct PtrWrapper other);
+]]
+
+function cv.gcarray(array, isClass, name_class)
+
+--[[    if isClass then
+        assert( name_class ~= nil, "The name of class is needed")
+
+        if(name_class == 'MatchesInfo') then
+            for i = 1, array.size-1 do
+                array.data[i].ptr = ffi.gc(array.data[i], C.MatchesInfo_dtor)
+            end
+        end
+
+        --other classe
+    end   ]]              -- error free function
+
     array.data = ffi.gc(array.data, C.free)
+
     return array
 end
 

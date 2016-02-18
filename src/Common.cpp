@@ -1,4 +1,6 @@
 #include <Common.hpp>
+#include <stitching.hpp>
+
 using namespace std;
 
 /***************** Tensor <=> Mat conversion *****************/
@@ -496,9 +498,38 @@ SizeArray::SizeArray(const std::vector<cv::Size> & vec) {
     }
 }
 
-SizeArray::operator std::vector<cv::Size>() {
+SizeArray::operator std::vector<cv::Size>()
+{
     std::vector<cv::Size> retval(this->size);
     memcpy(retval.data(), this->data+1, this->size * sizeof(SizeWrapper));
+    return retval;
+}
+
+ClassArray::ClassArray(const std::vector<cv::detail::MatchesInfo> & vec)
+{
+    MatchesInfoPtr *temp = static_cast<MatchesInfoPtr *>(malloc(vec.size() * sizeof(MatchesInfoPtr)));
+
+    this->size = vec.size();
+
+    MatchesInfoPtr class_wrapped;
+
+    for (int i = 0; i < vec.size(); i++) {
+        class_wrapped.ptr = new cv::detail::MatchesInfo(vec[i]);;
+        temp[i] = class_wrapped;
+    }
+    this->data = temp;
+}
+
+ClassArray::operator std::vector<cv::detail::MatchesInfo>()
+{
+    MatchesInfoPtr *temp =
+            static_cast<MatchesInfoPtr *>(this->data);
+
+    std::vector<cv::detail::MatchesInfo> retval(this->size);
+
+    for(int i = 0; i < this->size; i++) {
+        retval[i] = *static_cast<cv::detail::MatchesInfo *>(temp[i].ptr);;
+    }
     return retval;
 }
 
