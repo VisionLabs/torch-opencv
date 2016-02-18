@@ -525,6 +525,7 @@ end
 function cv.buildOpticalFlowPyramid(t)
     local argRules = {
         {"img", required = true},
+        {"pyramid", default = nil},
         {"winSize", required = true, operator = cv.Size},
         {"maxLevel", required = true},
         {"pyramid", default = nil},
@@ -533,7 +534,8 @@ function cv.buildOpticalFlowPyramid(t)
         {"derivBorder", default = cv.BORDER_CONSTANT},
         {"tryReuseInputImage", default = true}
     }
-    local img, winSize, maxLevel, pyramid, withDerivatives, pyrBorder, derivBorder, tryReuseInputImage = cv.argcheck(t, argRules)
+    local img, pyramid, winSize, maxLevel, pyramid, withDerivatives, pyrBorder,
+          derivBorder, tryReuseInputImage = cv.argcheck(t, argRules)
 
     local result = C.buildOpticalFlowPyramid(cv.wrap_tensor(img), cv.wrap_tensors(pyramid), winSize, maxLevel,
         withDerivatives, pyrBorder, derivBorder, tryReuseInputImage)

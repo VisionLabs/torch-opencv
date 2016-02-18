@@ -69,20 +69,19 @@ struct KeyPointArray Feature2D_detect(
 }
 
 extern "C"
-struct TensorPlusKeyPointArray Feature2D_compute(struct Feature2DPtr ptr, struct TensorWrapper image,
-                                                 struct KeyPointArray keypoints, struct TensorWrapper descriptors)
+struct TensorPlusKeyPointArray Feature2D_compute(
+	struct Feature2DPtr ptr, struct TensorWrapper image,
+	struct KeyPointArray keypoints, struct TensorWrapper descriptors)
 {
     TensorPlusKeyPointArray retval;
 
     std::vector<cv::KeyPoint> keypointsVector(keypoints);
-    if (descriptors.isNull()) {
-        cv::Mat result;
-        ptr->compute(image.toMat(), keypointsVector, result);
-        new (&retval.tensor) TensorWrapper(result);
-    } else {
-        ptr->compute(image.toMat(), keypointsVector, descriptors.toMat());
-        retval.tensor = descriptors;
-    }
+
+    MatT descriptors_mat;
+    if(descriptors.isNull()) descriptors_mat = descriptors.toMatT();
+    ptr->compute(image.toMat(), keypointsVector, descriptors_mat);
+
+    new (&retval.tensor) TensorWrapper(descriptors_mat);
     new (&retval.keypoints) KeyPointArray(keypointsVector);
     return retval;
 }
@@ -94,18 +93,14 @@ struct TensorPlusKeyPointArray Feature2D_detectAndCompute(
 {
     struct TensorPlusKeyPointArray retval;
     std::vector<cv::KeyPoint> keypointsVector;
-    if (descriptors.isNull()) {
-        cv::Mat result;
-        ptr->detectAndCompute(
+
+    MatT descriptors_mat;
+    if(descriptors.isNull()) descriptors_mat = descriptors.toMatT();
+    ptr->detectAndCompute(
                 image.toMat(), mask.toMat(), keypointsVector,
-                result, useProvidedKeypoints);
-        new (&retval.tensor) TensorWrapper(result);
-    } else {
-        ptr->detectAndCompute(
-                image.toMat(), mask.toMat(), keypointsVector,
-                descriptors.toMat(), useProvidedKeypoints);
-        retval.tensor = descriptors;
-    }
+                descriptors_mat, useProvidedKeypoints);
+
+    new (&retval.tensor) TensorWrapper(descriptors_mat);
     new (&retval.keypoints) KeyPointArray(keypointsVector);
     return retval;
 }
@@ -313,7 +308,7 @@ struct TensorArray MSER_detectRegions(struct MSERPtr ptr,
     retval.tensors = static_cast<TensorWrapper *>(
             malloc(retval.size * sizeof(TensorWrapper)));
     for (int i = 0; i < result.size(); ++i) {
-        new (retval.tensors + i) TensorWrapper(cv::Mat(result[i]));
+        new (retval.tensors + i) TensorWrapper(MatT(cv::Mat(result[i])));
     }
     new (retval.tensors + retval.size - 1) TensorWrapper(bboxesMat);
 
@@ -395,7 +390,8 @@ struct KeyPointArray AGAST(struct TensorWrapper image, int threshold, bool nonma
 }
 
 extern "C"
-struct KeyPointArray AGAST_type(struct TensorWrapper image, int threshold, bool nonmaxSuppression, int type)
+struct KeyPointArray AGAST_type(
+	struct TensorWrapper image, int threshold, bool nonmaxSuppression, int type)
 {
     std::vector<cv::KeyPoint> retval;
     cv::AGAST(image.toMat(), retval, threshold, nonmaxSuppression, type);
@@ -787,7 +783,9 @@ void DescriptorMatcher_add(struct DescriptorMatcherPtr ptr, struct TensorArray d
 extern "C"
 struct TensorArray DescriptorMatcher_getTrainDescriptors(struct DescriptorMatcherPtr ptr)
 {
-    std::vector<cv::Mat> retval = ptr->getTrainDescriptors();
+    std::vector<cv::Mat> vec = ptr->getTrainDescriptors();
+    std::vector<MatT> retval(vec.size());
+    for(int i = 0; i < vec.size(); i++) retval[i] = MatT(vec[i]);
     return TensorArray(retval);
 }
 
@@ -890,14 +888,10 @@ struct TensorWrapper drawKeypoints(
         struct TensorWrapper image, struct KeyPointArray keypoints, struct TensorWrapper outImage,
         struct ScalarWrapper color, int flags)
 {
-    if (outImage.isNull()) {
-        cv::Mat result;
-        cv::drawKeypoints(image.toMat(), keypoints, result, color, flags);
-        return TensorWrapper(result);
-    } else {
-        cv::drawKeypoints(image.toMat(), keypoints, outImage.toMat(), color, flags);
-        return outImage;
-    }
+    MatT outImage_mat;
+    if(!outImage.isNull()) outImage_mat = outImage.toMatT();
+    cv::drawKeypoints(image.toMat(), keypoints, outImage_mat, color, flags);
+    return TensorWrapper(outImage_mat);
 }
 
 extern "C"
@@ -918,18 +912,12 @@ struct TensorWrapper drawMatches(
                 matchesMaskVec.begin());
     }
 
-    if (outImg.isNull()) {
-        cv::Mat result;
-        cv::drawMatches(
-                img1.toMat(), keypoints1, img2.toMat(), keypoints2, matches1to2, result,
-                matchColor, singlePointColor, matchesMaskVec, flags);
-        return TensorWrapper(result);
-    } else {
-        cv::drawMatches(
-                img1.toMat(), keypoints1, img2.toMat(), keypoints2, matches1to2, outImg.toMat(),
-                matchColor, singlePointColor, matchesMaskVec, flags);
-        return outImg;
-    }
+    MatT outImg_mat;
+    if(!outImg.isNull()) outImg_mat = outImg.toMatT();
+    cv::drawMatches(
+            img1.toMat(), keypoints1, img2.toMat(), keypoints2, matches1to2, outImg_mat,
+            matchColor, singlePointColor, matchesMaskVec, flags);
+    return TensorWrapper(outImg_mat);
 }
 
 extern "C"
@@ -953,18 +941,12 @@ struct TensorWrapper drawMatchesKnn(
         }
     }
 
-    if (outImg.isNull()) {
-        cv::Mat result;
-        cv::drawMatches(
-                img1.toMat(), keypoints1, img2.toMat(), keypoints2, matches1to2, result,
+    MatT outImg_mat;
+    if(!outImg.isNull()) outImg_mat = outImg.toMatT();
+    cv::drawMatches(
+                img1.toMat(), keypoints1, img2.toMat(), keypoints2, matches1to2, outImg_mat,
                 matchColor, singlePointColor, matchesMaskVec, flags);
-        return TensorWrapper(result);
-    } else {
-        cv::drawMatches(
-                img1.toMat(), keypoints1, img2.toMat(), keypoints2, matches1to2, outImg.toMat(),
-                matchColor, singlePointColor, matchesMaskVec, flags);
-        return outImg;
-    }
+    return TensorWrapper(outImg_mat);
 }
 
 extern "C"
@@ -1006,7 +988,7 @@ struct TensorWrapper computeRecallPrecisionCurve(
 
     std::vector<cv::Point2f> result;
     cv::computeRecallPrecisionCurve(matches1to2, correctMatches1to2MaskVec, result);
-    return TensorWrapper(cv::Mat(result));
+    return TensorWrapper(MatT(cv::Mat(result)));
 }
 
 extern "C"
@@ -1040,8 +1022,9 @@ void BOWTrainer_add(struct BOWTrainerPtr ptr, struct TensorWrapper descriptors)
 extern "C"
 struct TensorArray BOWTrainer_getDescriptors(struct BOWTrainerPtr ptr)
 {
-    std::vector<cv::Mat> result = ptr->getDescriptors();
-    return TensorArray(result);
+    std::vector<cv::Mat> vec = ptr->getDescriptors();
+    std::vector<MatT> retval = get_vec_MatT(vec);
+    return TensorArray(retval);
 }
 
 extern "C"
@@ -1059,13 +1042,13 @@ void BOWTrainer_clear(struct BOWTrainerPtr ptr)
 extern "C"
 struct TensorWrapper BOWTrainer_cluster(struct BOWTrainerPtr ptr)
 {
-    return TensorWrapper(ptr->cluster());
+    return TensorWrapper(MatT(ptr->cluster()));
 }
 
 extern "C"
 struct TensorWrapper BOWTrainer_cluster_descriptors(struct BOWTrainerPtr ptr, struct TensorWrapper descriptors)
 {
-    return TensorWrapper(ptr->cluster(descriptors.toMat()));
+    return TensorWrapper(MatT(ptr->cluster(descriptors.toMat())));
 }
 
 // BOWKMeansTrainer
@@ -1107,37 +1090,32 @@ void BOWImgDescriptorExtractor_setVocabulary(
 }
 
 extern "C"
-struct TensorWrapper getVocabulary(struct BOWImgDescriptorExtractorPtr ptr)
+struct TensorWrapper BOWImgDescriptorExtractor_getVocabulary(struct BOWImgDescriptorExtractorPtr ptr)
 {
-    return TensorWrapper(ptr->getVocabulary().clone());
+    return TensorWrapper(MatT(ptr->getVocabulary().clone()));
 }
 
 extern "C"
-struct TensorWrapper compute(
+struct TensorWrapper BOWImgDescriptorExtractor_compute(
         struct BOWImgDescriptorExtractorPtr ptr, struct TensorWrapper image,
         struct KeyPointArray keypoints, struct TensorWrapper imgDescriptor)
 {
     std::vector<cv::KeyPoint> keypointsVec = keypoints;
 
-    if (imgDescriptor.isNull()) {
-        cv::Mat retval;
-        ptr->compute2(image.toMat(), keypointsVec, retval);
-        return TensorWrapper(retval);
-    } else {
-        cv::Mat imgDescriptorMat = imgDescriptor;
-        ptr->compute2(image.toMat(), keypointsVec, imgDescriptorMat);
-        return imgDescriptor;
-    }
+    cv::Mat imgDescriptor_mat;
+    if(!imgDescriptor.isNull()) imgDescriptor_mat = imgDescriptor.toMat();
+    ptr->compute2(image.toMat(), keypointsVec, imgDescriptor_mat);
+    return TensorWrapper(MatT(imgDescriptor_mat));
 }
 
 extern "C"
-int descriptorSize(struct BOWImgDescriptorExtractorPtr ptr)
+int BOWImgDescriptorExtractor_descriptorSize(struct BOWImgDescriptorExtractorPtr ptr)
 {
     return ptr->descriptorSize();
 }
 
 extern "C"
-int descriptorType(struct BOWImgDescriptorExtractorPtr ptr)
+int BOWImgDescriptorExtractor_descriptorType(struct BOWImgDescriptorExtractorPtr ptr)
 {
     return ptr->descriptorType();
 }

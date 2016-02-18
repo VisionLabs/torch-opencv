@@ -8,12 +8,12 @@ struct calibrateCameraRetval calibrateCamera(
 	struct TensorArray tvecs, int flags, struct TermCriteriaWrapper criteria)
 {   
     struct calibrateCameraRetval result;
-    std::vector<cv::Mat> intrinsics(2), rvecs_vec, tvecs_vec;
+    std::vector<MatT> intrinsics(2), rvecs_vec, tvecs_vec;
 
-    if(!cameraMatrix.isNull()) intrinsics[0] = cameraMatrix.toMat();
-    if(!distCoeffs.isNull()) intrinsics[1] = distCoeffs.toMat();
-    if(!rvecs.isNull()) rvecs_vec = rvecs.toMatList();
-    if(!tvecs.isNull()) tvecs_vec = tvecs.toMatList();
+    if(!cameraMatrix.isNull()) intrinsics[0] = cameraMatrix.toMatT();
+    if(!distCoeffs.isNull()) intrinsics[1] = distCoeffs.toMatT();
+    if(!rvecs.isNull()) rvecs_vec = rvecs.toMatTList();
+    if(!tvecs.isNull()) tvecs_vec = tvecs.toMatTList();
 
     result.retval = cv::calibrateCamera(objectPoints.toMatList(), imagePoints.toMatList(),
 			       		imageSize, intrinsics[0], intrinsics[1],
@@ -41,7 +41,7 @@ struct TensorWrapper calibrationMatrixValues(
     retval.at<double>(3,0) = principalPoint_temp.x;
     retval.at<double>(4,0) = principalPoint_temp.y;
 
-    return TensorWrapper(retval);
+    return TensorWrapper(MatT(retval));
 }
 
 extern "C"
@@ -52,17 +52,17 @@ struct TensorArray composeRT(
 	struct TensorWrapper dr3dt2, struct TensorWrapper dt3dr1, struct TensorWrapper dt3dt1,
 	struct TensorWrapper dt3dr2, struct TensorWrapper dt3dt2)
 {
-    std::vector<cv::Mat> vec(10);
-    if(!rvec3.isNull()) vec[0] = rvec3.toMat();
-    if(!tvec3.isNull()) vec[1] = tvec3.toMat();
-    if(!dr3dr1.isNull()) vec[2] = dr3dr1.toMat();
-    if(!dr3dt1.isNull()) vec[3] = dr3dt1.toMat();
-    if(!dr3dr2.isNull()) vec[4] = dr3dr2.toMat();
-    if(!dr3dt2.isNull()) vec[5] = dr3dt2.toMat();
-    if(!dt3dr1.isNull()) vec[6] = dt3dr1.toMat();
-    if(!dt3dt1.isNull()) vec[7] = dt3dt1.toMat();
-    if(!dt3dr2.isNull()) vec[8] = dt3dr2.toMat();
-    if(!dt3dt2.isNull()) vec[9] = dt3dt2.toMat();
+    std::vector<MatT> vec(10);
+    if(!rvec3.isNull()) vec[0] = rvec3.toMatT();
+    if(!tvec3.isNull()) vec[1] = tvec3.toMatT();
+    if(!dr3dr1.isNull()) vec[2] = dr3dr1.toMatT();
+    if(!dr3dt1.isNull()) vec[3] = dr3dt1.toMatT();
+    if(!dr3dr2.isNull()) vec[4] = dr3dr2.toMatT();
+    if(!dr3dt2.isNull()) vec[5] = dr3dt2.toMatT();
+    if(!dt3dr1.isNull()) vec[6] = dt3dr1.toMatT();
+    if(!dt3dt1.isNull()) vec[7] = dt3dt1.toMatT();
+    if(!dt3dr2.isNull()) vec[8] = dt3dr2.toMatT();
+    if(!dt3dt2.isNull()) vec[9] = dt3dt2.toMatT();
 
     cv::composeRT(rvec1.toMat(),tvec1.toMat(), rvec2.toMat(),
 		  tvec2.toMat(), vec[0], vec[1], vec[2], vec[3],
@@ -75,8 +75,8 @@ struct TensorWrapper computeCorrespondEpilines(
 	struct TensorWrapper points, int whichImage, struct TensorWrapper F,
 	struct TensorWrapper lines)
 {
-    cv::Mat lines_mat;
-    if(!lines.isNull()) lines_mat = lines.toMat();
+    MatT lines_mat;
+    if(!lines.isNull()) lines_mat = lines.toMatT();
     cv::computeCorrespondEpilines(points.toMat(), whichImage, F.toMat(),lines_mat);
     return TensorWrapper(lines_mat);
 }
@@ -85,8 +85,8 @@ extern "C"
 struct TensorWrapper convertPointsFromHomogeneous(
 	struct TensorWrapper src, struct TensorWrapper dst)
 {
-    cv::Mat dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMat();
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
     cv::convertPointsFromHomogeneous(src.toMat(),dst_mat);
     return TensorWrapper(dst_mat);
 }  
@@ -95,8 +95,8 @@ extern "C"
 struct TensorWrapper convertPointsHomogeneous(
 	struct TensorWrapper src, struct TensorWrapper dst)
 {
-    cv::Mat dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMat();
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
     cv::convertPointsHomogeneous(src.toMat(), dst_mat);
     return TensorWrapper(dst_mat);
 }
@@ -105,8 +105,8 @@ extern "C"
 struct TensorWrapper convertPointsToHomogeneous(
 	struct TensorWrapper src, struct TensorWrapper dst)
 {
-    cv::Mat dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMat();
+    MatT dst_mat;
+    if(!dst.isNull()) dst_mat = dst.toMatT();
     cv::convertPointsToHomogeneous(src.toMat(),dst_mat);
     return TensorWrapper(dst_mat);
 }
@@ -117,11 +117,11 @@ struct TensorArray correctMatches(
 	struct TensorWrapper points2, struct TensorWrapper newPoints1,
 	struct TensorWrapper newPoints2)
 {
-    std::vector<cv::Mat> vec(2);
-    if(!newPoints1.isNull()) vec[0] = newPoints1.toMat();
-    if(!newPoints2.isNull()) vec[1] = newPoints2.toMat();
+    std::vector<MatT> vec(2);
+    if(!newPoints1.isNull()) vec[0] = newPoints1.toMatT();
+    if(!newPoints2.isNull()) vec[1] = newPoints2.toMatT();
     cv::correctMatches(F.toMat(), points1.toMat(), points2.toMat(),
-                       vec[0],vec[1]);
+                       vec[0], vec[1]);
     
     return TensorArray(vec);
 }
@@ -131,10 +131,10 @@ struct TensorArray decomposeEssentialMat(
 	struct TensorWrapper E, struct TensorWrapper R1,
 	struct TensorWrapper R2, struct TensorWrapper t)
 {
-    std::vector<cv::Mat> vec(3);
-    if(!R1.isNull()) vec[0] = R1.toMat();
-    if(!R2.isNull()) vec[1] = R2.toMat();
-    if(!t.isNull()) vec[2] = t.toMat();
+    std::vector<MatT> vec(3);
+    if(!R1.isNull()) vec[0] = R1.toMatT();
+    if(!R2.isNull()) vec[1] = R2.toMatT();
+    if(!t.isNull()) vec[2] = t.toMatT();
     cv::decomposeEssentialMat(E.toMat(), vec[0],  vec[1], vec[2]);  
     return TensorArray(vec);
 }
@@ -146,11 +146,11 @@ struct decomposeHomographyMatRetval decomposeHomographyMat(
 	struct TensorArray normals)
 {
     struct decomposeHomographyMatRetval result;
-    std::vector<cv::Mat> rotations_vec, translations_vec, normals_vec;
+    std::vector<MatT> rotations_vec, translations_vec, normals_vec;
 
-    if(!rotations.isNull()) rotations_vec = rotations.toMatList();
-    if(!translations.isNull()) translations_vec = translations.toMatList();
-    if(!normals.isNull()) normals_vec = normals.toMatList();
+    if(!rotations.isNull()) rotations_vec = rotations.toMatTList();
+    if(!translations.isNull()) translations_vec = translations.toMatTList();
+    if(!normals.isNull()) normals_vec = normals.toMatTList();
 
     result.val = cv::decomposeHomographyMat(H.toMat(), K.toMat(), rotations_vec,
 					    translations_vec, normals_vec);
@@ -168,15 +168,15 @@ struct TensorArray decomposeProjectionMatrix(
 	struct TensorWrapper rotMatrixX, struct TensorWrapper rotMatrixY,
 	struct TensorWrapper rotMatrixZ, struct TensorWrapper eulerAngles)
 {
-    std::vector<cv::Mat> vec(7);
+    std::vector<MatT> vec(7);
 
-    if(!cameraMatrix.isNull()) vec[0] = cameraMatrix.toMat();
-    if(!rotMatrix.isNull()) vec[1] = rotMatrix.toMat();
-    if(!transVect.isNull()) vec[2] = transVect.toMat();
-    if(!rotMatrixX.isNull()) vec[3] = rotMatrixX.toMat();
-    if(!rotMatrixY.isNull()) vec[4] = rotMatrixY.toMat();
-    if(!rotMatrixZ.isNull()) vec[5] = rotMatrixZ.toMat();
-    if(!eulerAngles.isNull()) vec[6] = eulerAngles.toMat();
+    if(!cameraMatrix.isNull()) vec[0] = cameraMatrix.toMatT();
+    if(!rotMatrix.isNull()) vec[1] = rotMatrix.toMatT();
+    if(!transVect.isNull()) vec[2] = transVect.toMatT();
+    if(!rotMatrixX.isNull()) vec[3] = rotMatrixX.toMatT();
+    if(!rotMatrixY.isNull()) vec[4] = rotMatrixY.toMatT();
+    if(!rotMatrixZ.isNull()) vec[5] = rotMatrixZ.toMatT();
+    if(!eulerAngles.isNull()) vec[6] = eulerAngles.toMatT();
 
     cv::decomposeProjectionMatrix(
 		projMatrix.toMat(), vec[0], vec[1], vec[2],
@@ -189,8 +189,7 @@ void drawChessboardCorners(
 	struct TensorWrapper image, struct SizeWrapper patternSize,
 	struct TensorWrapper corners, bool patternWasFound)
 {
-    cv::Mat imgMat(image);
-    cv::drawChessboardCorners(imgMat, patternSize, corners.toMat(), patternWasFound);
+    cv::drawChessboardCorners(image.toMat(), patternSize, corners.toMat(), patternWasFound);
 }
 
 extern "C"
@@ -200,9 +199,9 @@ struct TensorArrayPlusInt estimateAffine3D(
 	double ransacThreshold, double confidence)
 {
     struct TensorArrayPlusInt result;
-    std::vector<cv::Mat> vec(2);
-    if(!out.isNull()) vec[0] = out.toMat();
-    if(!inliers.isNull()) vec[1] = inliers.toMat();
+    std::vector<MatT> vec(2);
+    if(!out.isNull()) vec[0] = out.toMatT();
+    if(!inliers.isNull()) vec[1] = inliers.toMatT();
     result.val = cv::estimateAffine3D(src.toMat(), dst.toMat(), vec[0],
                                       vec[1], ransacThreshold, confidence);
     new(&result.tensors) TensorArray(vec);
@@ -214,19 +213,23 @@ void filterSpeckles(
 	struct TensorWrapper img, double newVal, int maxSpeckleSize,
 	double maxDiff, struct TensorWrapper buf)
 {
-    cv::filterSpeckles(img.toMat(), newVal, maxSpeckleSize,
-                       maxDiff, TO_MAT_OR_NOARRAY(buf));
+    if(buf.isNull()) {
+        cv::filterSpeckles(img.toMat(), newVal, maxSpeckleSize,
+                           maxDiff, cv::noArray());
+    } else {
+        cv::filterSpeckles(img.toMat(), newVal, maxSpeckleSize,
+                           maxDiff, buf.toMat());
+    }
 }
 
+//TODO InputOutputArray
 extern "C"
 struct TensorWrapper find4QuadCornerSubpix(
 	struct TensorWrapper img, struct TensorWrapper corners,
 	struct SizeWrapper region_size)
 {
-    cv::Mat corners_mat;
-    if(!corners.isNull()) corners_mat = corners.toMat();
-    cv::find4QuadCornerSubpix(img.toMat(), corners_mat, region_size);
-    return TensorWrapper(corners_mat);
+    cv::find4QuadCornerSubpix(img.toMat(), corners.toMat(), region_size);
+    return corners;
 }
 
 extern "C"
@@ -234,8 +237,8 @@ struct TensorWrapper findChessboardCorners(
 	struct TensorWrapper image, struct SizeWrapper patternSize,
 	struct TensorWrapper corners, int flags)
 {
-    cv::Mat corners_mat;
-    if(!corners.isNull()) corners_mat = corners.toMat();
+    MatT corners_mat;
+    if(!corners.isNull()) corners_mat = corners.toMatT();
     cv::findChessboardCorners(image.toMat(), patternSize, corners_mat, flags);
     return TensorWrapper(corners_mat);
 }
@@ -249,8 +252,8 @@ struct TensorPlusBool findCirclesGrid(
     rescueObjectFromPtr(blobDetectorPtr);
 
     struct TensorPlusBool result;
-    cv::Mat centers_mat;
-    if(!centers.isNull()) centers_mat = centers.toMat();
+    MatT centers_mat;
+    if(!centers.isNull()) centers_mat = centers.toMatT();
 
     result.val = cv::findCirclesGrid(
 		image.toMat(), patternSize, centers_mat, flags, blobDetectorPtr);
@@ -263,9 +266,9 @@ struct TensorWrapper findEssentialMat(
 	double focal, struct Point2dWrapper pp, int method, double prob,
 	double threshold, struct TensorWrapper mask)
 {
-    return TensorWrapper(cv::findEssentialMat(points1.toMat(), points2.toMat(),
+    return TensorWrapper(MatT(cv::findEssentialMat(points1.toMat(), points2.toMat(),
 					      focal, pp, method, prob, threshold,
-					      TO_MAT_OR_NOARRAY(mask)));
+					      TO_MAT_OR_NOARRAY(mask))));
 }
 
 extern "C"
@@ -273,9 +276,9 @@ struct TensorWrapper findFundamentalMat(
 	struct TensorWrapper points1, struct TensorWrapper points2, int method,
 	double param1, double param2, struct TensorWrapper mask)
 {
-    return TensorWrapper(cv::findFundamentalMat(points1.toMat(), points1.toMat(),
+    return TensorWrapper(MatT(cv::findFundamentalMat(points1.toMat(), points1.toMat(),
 						method, param1, param2,
-						TO_MAT_OR_NOARRAY(mask)));
+						TO_MAT_OR_NOARRAY(mask))));
 }
 
 extern "C"
@@ -283,11 +286,11 @@ struct TensorArray findFundamentalMat2(
 	struct TensorWrapper points1, struct TensorWrapper points2,
 	struct TensorWrapper mask, int method, double param1, double param2)
 {
-    std::vector<cv::Mat> vec(2);
-    if(!mask.isNull()) vec[1] = mask.toMat();
-    vec[0] = cv::findFundamentalMat(
+    std::vector<MatT> vec(2);
+    if(!mask.isNull()) vec[1] = mask.toMatT();
+    vec[0] = MatT(cv::findFundamentalMat(
 			points1.toMat(), points1.toMat(),
-			vec[1], method, param1, param2);
+			vec[1], method, param1, param2));
     return TensorArray(vec);
 }
  
@@ -297,10 +300,10 @@ struct TensorWrapper findHomography(
 	int method, double ransacReprojThreshold, struct TensorWrapper mask,
 	const int maxIters, const double confidence)
 {
-    return TensorWrapper(cv::findHomography(srcPoints.toMat(), dstPoints.toMat(),
+    return TensorWrapper(MatT(cv::findHomography(srcPoints.toMat(), dstPoints.toMat(),
 					    method, ransacReprojThreshold,
 					    TO_MAT_OR_NOARRAY(mask),
-					    maxIters, confidence));
+					    maxIters, confidence)));
 }
 
 extern "C"
@@ -308,11 +311,11 @@ struct TensorArray findHomography2(
 	struct TensorWrapper srcPoints, struct TensorWrapper dstPoints,
 	struct TensorWrapper mask, int method, double ransacReprojThreshold)
 {
-    std::vector<cv::Mat> vec(2);
-    if(!mask.isNull()) vec[1] = mask.toMat();
-    vec[0] = cv::findHomography(
+    std::vector<MatT> vec(2);
+    if(!mask.isNull()) vec[1] = mask.toMatT();
+    vec[0] = MatT(cv::findHomography(
 			srcPoints.toMat(), dstPoints.toMat(),
-			vec[1], method, ransacReprojThreshold);
+			vec[1], method, ransacReprojThreshold));
     return TensorArray(vec);
 }
 
@@ -325,10 +328,10 @@ struct TensorPlusRect getOptimalNewCameraMatrix(
     struct TensorPlusRect result;
     cv::Rect validPixROI;
     new(&result.tensor) TensorWrapper(
-				cv::getOptimalNewCameraMatrix(
+				MatT(cv::getOptimalNewCameraMatrix(
 						cameraMatrix.toMat(), distCoeffs.toMat(),
 	                                        imageSize, alpha, newImgSize,
-                                                &validPixROI, centerPrincipalPoint));
+                                                &validPixROI, centerPrincipalPoint)));
     result.rect = validPixROI;
     return result;
 }
@@ -347,9 +350,9 @@ struct TensorWrapper initCameraMatrix2D(
 	struct TensorArray objectPoints, struct TensorArray imagePoints,
    	struct SizeWrapper imageSize, double aspectRatio)
 {
-    return TensorWrapper(cv::initCameraMatrix2D(
+    return TensorWrapper(MatT(cv::initCameraMatrix2D(
 					objectPoints.toMatList(), imagePoints.toMatList(),
-					imageSize, aspectRatio));
+					imageSize, aspectRatio)));
 }
 
 extern "C"
@@ -357,9 +360,9 @@ struct TensorArray matMulDeriv(
 	struct TensorWrapper A, struct TensorWrapper B,
 	struct TensorWrapper dABdA, struct TensorWrapper dABdB)
 {
-    std::vector<cv::Mat> result(2);
-    if(!dABdA.isNull()) result[0] = dABdA.toMat();
-    if(!dABdB.isNull()) result[1] = dABdB.toMat();
+    std::vector<MatT> result(2);
+    if(!dABdA.isNull()) result[0] = dABdA.toMatT();
+    if(!dABdB.isNull()) result[1] = dABdB.toMatT();
     cv::matMulDeriv(A.toMat(), B.toMat(), result[0], result[1]);
     return TensorArray(result);
 }
@@ -371,9 +374,9 @@ struct TensorArray projectPoints(
 	struct TensorWrapper distCoeffs, struct TensorWrapper imagePoints,
 	struct TensorWrapper jacobian, double aspectRatio)
 {
-    std::vector<cv::Mat> result;
-    if(!imagePoints.isNull()) result[0] = imagePoints.toMat();
-    if(!jacobian.isNull()) result[1] = jacobian.toMat();
+    std::vector<MatT> result(2);
+    if(!imagePoints.isNull()) result[0] = imagePoints.toMatT();
+    if(!jacobian.isNull()) result[1] = jacobian.toMatT();
     cv::projectPoints(objectPoints.toMat(), rvec.toMat(), tvec.toMat(),
                       cameraMatrix.toMat(), distCoeffs.toMat(), result[0],
                       result[1], aspectRatio);
@@ -388,11 +391,17 @@ struct TensorArrayPlusInt recoverPose(
 	struct Point2dWrapper pp, struct TensorWrapper mask)
 {
     struct TensorArrayPlusInt result;
-    std::vector<cv::Mat> vec(2);
-    if(!R.isNull()) vec[0] = R;
-    if(!t.isNull()) vec[1] = t;
-    result.val = cv::recoverPose(E.toMat(), points1.toMat(), points2.toMat(), vec[0],
-                                 vec[1], focal, pp, TO_MAT_OR_NOARRAY(mask));
+    std::vector<MatT> vec(2);
+    if(!R.isNull()) vec[0] = R.toMatT();
+    if(!t.isNull()) vec[1] = t.toMatT();
+    if(mask.isNull()) {
+        result.val = cv::recoverPose(E.toMat(), points1.toMat(), points2.toMat(), vec[0],
+                                     vec[1], focal, pp, cv::noArray());
+    }
+    else {
+        result.val = cv::recoverPose(E.toMat(), points1.toMat(), points2.toMat(), vec[0],
+                                     vec[1], focal, pp, mask.toMat());
+    }
     new(&result.tensors) TensorArray(vec);
     return result;
 }
@@ -405,11 +414,23 @@ struct TensorArrayPlusRectArrayPlusFloat rectify3Collinear(
 	struct TensorArray imgpt1, struct TensorArray imgpt3,
 	struct SizeWrapper imageSize, struct TensorWrapper R12,
 	struct TensorWrapper T12, struct TensorWrapper R13,
-	struct TensorWrapper T13, double alpha,
-	struct SizeWrapper newImgSize, int flags)
+	struct TensorWrapper T13, struct TensorWrapper R1,
+    struct TensorWrapper R2, struct TensorWrapper R3,
+    struct TensorWrapper P1, struct TensorWrapper P2,
+    struct TensorWrapper P3, struct TensorWrapper Q,
+    double alpha, struct SizeWrapper newImgSize, int flags)
 {
     struct TensorArrayPlusRectArrayPlusFloat result;
-    std::vector<cv::Mat> vec(7);
+    std::vector<MatT> vec(7);
+
+    if(!R1.isNull()) vec[0] = R1.toMatT();
+    if(!R2.isNull()) vec[1] = R1.toMatT();
+    if(!R3.isNull()) vec[2] = R1.toMatT();
+    if(!P1.isNull()) vec[3] = R1.toMatT();
+    if(!P2.isNull()) vec[4] = R1.toMatT();
+    if(!P3.isNull()) vec[5] = R1.toMatT();
+    if(!Q.isNull()) vec[6] = R1.toMatT();
+
     std::vector<cv::Rect> rec(2);
     result.val = cv::rectify3Collinear(
 			cameraMatrix1.toMat(), distCoeffs1.toMat(), cameraMatrix2.toMat(),
@@ -428,8 +449,8 @@ struct TensorWrapper reprojectImageTo3D(
 	struct TensorWrapper disparity, struct TensorWrapper _3dImage,
 	struct TensorWrapper Q, bool handleMissingValues, int ddepth)
 {
-    cv::Mat _3dImage_mat;
-    if(!_3dImage.isNull()) _3dImage_mat = _3dImage.toMat();
+    MatT _3dImage_mat;
+    if(!_3dImage.isNull()) _3dImage_mat = _3dImage.toMatT();
     cv::reprojectImageTo3D(disparity.toMat(), _3dImage_mat, Q.toMat(), handleMissingValues, ddepth);
     return TensorWrapper(_3dImage_mat);
 }
@@ -438,9 +459,9 @@ extern "C"
 struct TensorArray Rodrigues(
 	struct TensorWrapper src, struct TensorWrapper dst, struct TensorWrapper jacobian)
 {
-    std::vector<cv::Mat> result;
-    if(!dst.isNull()) result[0] = dst.toMat();
-    if(!dst.isNull()) result[1] = jacobian.toMat();
+    std::vector<MatT> result;
+    if(!dst.isNull()) result[0] = dst.toMatT();
+    if(!jacobian.isNull()) result[1] = jacobian.toMatT();
     cv::Rodrigues(src.toMat(), result[0], result[1]);
     return TensorArray(result);
 }
@@ -451,12 +472,12 @@ struct TensorArrayPlusVec3d RQDecomp3x3(
 	struct TensorWrapper Qx, struct TensorWrapper Qy, struct TensorWrapper Qz)
 {
     struct TensorArrayPlusVec3d result;
-    std::vector<cv::Mat> vec(5);
-    if(!mtxR.isNull()) vec[0] = mtxR.toMat();
-    if(!mtxQ.isNull()) vec[1] = mtxQ.toMat();
-    if(!Qx.isNull()) vec[2] = Qx.toMat();
-    if(!Qy.isNull()) vec[3] = Qy.toMat();
-    if(!Qz.isNull()) vec[4] = Qz.toMat();
+    std::vector<MatT> vec(5);
+    if(!mtxR.isNull()) vec[0] = mtxR.toMatT();
+    if(!mtxQ.isNull()) vec[1] = mtxQ.toMatT();
+    if(!Qx.isNull()) vec[2] = Qx.toMatT();
+    if(!Qy.isNull()) vec[3] = Qy.toMatT();
+    if(!Qz.isNull()) vec[4] = Qz.toMatT();
     new(&result.vec3d) Vec3dWrapper(
 				cv::RQDecomp3x3(
 					src.toMat(), vec[0], vec[1],
@@ -473,9 +494,9 @@ struct TensorArrayPlusBool solvePnP(
 	bool useExtrinsicGuess, int flags)
 {
     struct TensorArrayPlusBool result;
-    std::vector<cv::Mat> vec(2);
-    if(!rvec.isNull()) vec[0] = rvec.toMat();
-    if(!tvec.isNull()) vec[1] = tvec.toMat();
+    std::vector<MatT> vec(2);
+    if(!rvec.isNull()) vec[0] = rvec.toMatT();
+    if(!tvec.isNull()) vec[1] = tvec.toMatT();
     result.val = cv::solvePnP(objectPoints.toMat(), imagePoints.toMat(), cameraMatrix.toMat(),
                               distCoeffs.toMat(), vec[0], vec[1], useExtrinsicGuess, flags);
     new(&result.tensors) TensorArray(vec);
@@ -491,10 +512,10 @@ struct TensorArrayPlusBool solvePnPRansac(
 	double confidence, struct TensorWrapper inliers, int flags)
 {
     struct TensorArrayPlusBool result;
-    std::vector<cv::Mat> vec(3);
-    if(!rvec.isNull()) vec[0] = rvec.toMat();
-    if(!tvec.isNull()) vec[1] = tvec.toMat();
-    if(!inliers.isNull()) vec[2] = inliers.toMat();
+    std::vector<MatT> vec(3);
+    if(!rvec.isNull()) vec[0] = rvec.toMatT();
+    if(!tvec.isNull()) vec[1] = tvec.toMatT();
+    if(!inliers.isNull()) vec[2] = inliers.toMatT();
     result.val = cv::solvePnPRansac(objectPoints.toMat(), imagePoints.toMat(),
                  cameraMatrix.toMat(), distCoeffs.toMat(), vec[0], vec[1],
                  useExtrinsicGuess, iterationsCount, reprojectionError,
@@ -514,16 +535,16 @@ struct TensorArrayPlusDouble stereoCalibrate(
 	int flags, struct TermCriteriaWrapper criteria)
 {
     struct TensorArrayPlusDouble result;
-    std::vector<cv::Mat> vec(8);
+    std::vector<MatT> vec(8);
     
-    if(!cameraMatrix1.isNull()) vec[0] = cameraMatrix1.toMat();
-    if(!distCoeffs1.isNull()) vec[1] = distCoeffs1.toMat();
-    if(!cameraMatrix2.isNull()) vec[2] = cameraMatrix2.toMat();
-    if(!distCoeffs2.isNull()) vec[3] = distCoeffs2.toMat();
-    if(!R.isNull()) vec[4] = R.toMat();
-    if(!T.isNull()) vec[5] = T.toMat();
-    if(!E.isNull()) vec[6] = E.toMat();
-    if(!F.isNull()) vec[7] = F.toMat();
+    if(!cameraMatrix1.isNull()) vec[0] = cameraMatrix1.toMatT();
+    if(!distCoeffs1.isNull()) vec[1] = distCoeffs1.toMatT();
+    if(!cameraMatrix2.isNull()) vec[2] = cameraMatrix2.toMatT();
+    if(!distCoeffs2.isNull()) vec[3] = distCoeffs2.toMatT();
+    if(!R.isNull()) vec[4] = R.toMatT();
+    if(!T.isNull()) vec[5] = T.toMatT();
+    if(!E.isNull()) vec[6] = E.toMatT();
+    if(!F.isNull()) vec[7] = F.toMatT();
 
     result.val = cv::stereoCalibrate(
 			objectPoints.toMatList(), imagePoints1.toMatList(),
@@ -535,7 +556,7 @@ struct TensorArrayPlusDouble stereoCalibrate(
 }
 
 extern "C"
-struct RectArray stereoRectify(
+struct TensorArrayPlusRectArray stereoRectify(
 	struct TensorWrapper cameraMatrix1, struct TensorWrapper distCoeffs1,
 	struct TensorWrapper cameraMatrix2, struct TensorWrapper distCoeffs2,
 	struct SizeWrapper imageSize, struct TensorWrapper R,
@@ -544,14 +565,23 @@ struct RectArray stereoRectify(
 	struct TensorWrapper P2, struct TensorWrapper Q,
 	int flags, double alpha,struct SizeWrapper newImageSize)
 {
+    TensorArrayPlusRectArray retval;
     std::vector<cv::Rect> rec(2);
+    std::vector<MatT> vec(5);
+    if(!R1.isNull()) vec[0] = R1.toMatT();
+    if(!R2.isNull()) vec[1] = R2.toMatT();
+    if(!P1.isNull()) vec[2] = P1.toMatT();
+    if(!P2.isNull()) vec[3] = P2.toMatT();
+    if(!Q.isNull()) vec[4] = Q.toMatT();
     cv::stereoRectify(
 		cameraMatrix1.toMat(), distCoeffs1.toMat(),
 		cameraMatrix2.toMat(), distCoeffs2.toMat(),
-		imageSize, R.toMat(), T.toMat(), R1.toMat(),
-		R2.toMat(), P1.toMat(), P2.toMat(), Q.toMat(),
+		imageSize, R.toMat(), T.toMat(), vec[0],
+        vec[1], vec[2], vec[3], vec[4],
 		flags, alpha, newImageSize, &rec[0], &rec[1]);
-    return RectArray(rec);
+    new(&retval.tensors) TensorArray(vec);
+    new(&retval.rects) RectArray(rec);
+    return retval;
 }
 
 extern "C"
@@ -561,9 +591,9 @@ struct TensorArrayPlusBool stereoRectifyUncalibrated(
 	struct TensorWrapper H1, struct TensorWrapper H2, double threshold)
 {
     struct TensorArrayPlusBool result;
-    std::vector<cv::Mat> vec(2);
-    if(!H1.isNull()) vec[0] = H1.toMat();
-    if(!H2.isNull()) vec[1] = H2.toMat();
+    std::vector<MatT> vec(2);
+    if(!H1.isNull()) vec[0] = H1.toMatT();
+    if(!H2.isNull()) vec[1] = H2.toMatT();
     cv::stereoRectifyUncalibrated(
 		points1.toMat(), points2.toMat(), F.toMat(),
 		imgSize, vec[0], vec[1], threshold);
@@ -574,12 +604,14 @@ struct TensorArrayPlusBool stereoRectifyUncalibrated(
 extern "C"
 struct TensorWrapper triangulatePoints(
 	struct TensorWrapper projMatr1, struct TensorWrapper projMatr2,
-	struct TensorWrapper projPoints1, struct TensorWrapper projPoints2)
+	struct TensorWrapper projPoints1, struct TensorWrapper projPoints2,
+    struct TensorWrapper points4D)
 {
-    cv::Mat points4D;
+    MatT points4D_mat;
+    if(!points4D.isNull()) points4D_mat = points4D.toMatT();
     cv::triangulatePoints(projMatr1.toMat(), projMatr2.toMat(),
-                          projPoints1.toMat(), projPoints2.toMat(), points4D);
-    return TensorWrapper(points4D);
+                          projPoints1.toMat(), projPoints2.toMat(), points4D_mat);
+    return TensorWrapper(points4D_mat);
 }
 
 extern "C"
@@ -603,12 +635,12 @@ struct calibrateCameraRetval fisheye_calibrate(
 	struct TensorArray tvecs, int flags, struct TermCriteriaWrapper criteria)
 {   
     struct calibrateCameraRetval result;
-    std::vector<cv::Mat> intrinsics(2), rvecs_vec, tvecs_vec;
+    std::vector<MatT> intrinsics(2), rvecs_vec, tvecs_vec;
 
-    if(!K.isNull()) intrinsics[0] = K.toMat();
-    if(!D.isNull()) intrinsics[1] = D.toMat();
-    if(!rvecs.isNull()) rvecs_vec = rvecs.toMatList();
-    if(!tvecs.isNull()) tvecs_vec = tvecs.toMatList();
+    if(!K.isNull()) intrinsics[0] = K.toMatT();
+    if(!D.isNull()) intrinsics[1] = D.toMatT();
+    if(!rvecs.isNull()) rvecs_vec = rvecs.toMatTList();
+    if(!tvecs.isNull()) tvecs_vec = tvecs.toMatTList();
 
     result.retval = fisheye::calibrate(
 				objectPoints.toMatList(), imagePoints.toMatList(),
@@ -625,8 +657,8 @@ struct TensorWrapper fisheye_distortPoints(
 	struct TensorWrapper undistorted, struct TensorWrapper distorted,
 	struct TensorWrapper K, struct TensorWrapper D, double alpha)
 {
-    cv::Mat distorted_mat;
-    if(!distorted.isNull()) distorted_mat = distorted.toMat();
+    MatT distorted_mat;
+    if(!distorted.isNull()) distorted_mat = distorted.toMatT();
     fisheye::distortPoints(
 			undistorted.toMat(), distorted_mat,
 			K.toMat(), D.toMat(), alpha);
@@ -640,8 +672,8 @@ struct TensorWrapper fisheye_estimateNewCameraMatrixForUndistortRectify(
 	struct TensorWrapper P, double balance,
 	struct SizeWrapper new_size, double fov_scale)
 {
-    cv::Mat P_mat;
-    if(!P.isNull()) P_mat = P.toMat();
+    MatT P_mat;
+    if(!P.isNull()) P_mat = P.toMatT();
     fisheye::estimateNewCameraMatrixForUndistortRectify(
 			K.toMat(), D.toMat(), image_size, R.toMat(),
 			P_mat, balance, new_size, fov_scale);
@@ -654,9 +686,9 @@ struct TensorArray fisheye_initUndistortRectifyMap(
 	struct SizeWrapper size, int m1type,
 	struct TensorWrapper map1, struct TensorWrapper map2)
 {
-    std::vector<cv::Mat> vec(2);
-    if(!map1.isNull()) vec[0] = map1.toMat();
-    if(!map2.isNull()) vec[1] = map2.toMat();
+    std::vector<MatT> vec(2);
+    if(!map1.isNull()) vec[0] = map1.toMatT();
+    if(!map2.isNull()) vec[1] = map2.toMatT();
     fisheye::initUndistortRectifyMap(
 		K.toMat(), D.toMat(), R.toMat(), P.toMat(),
 		size, m1type, vec[0], vec[1]);
@@ -670,9 +702,9 @@ struct TensorArray fisheye_projectPoints2(
 	struct TensorWrapper K, struct TensorWrapper D, double alpha,
 	struct TensorWrapper jacobian)
 {
-    std::vector<cv::Mat> vec(2);
-    if(!imagePoints.isNull()) vec[0] = imagePoints.toMat();
-    if(!jacobian.isNull()) vec[1] = jacobian.toMat();
+    std::vector<MatT> vec(2);
+    if(!imagePoints.isNull()) vec[0] = imagePoints.toMatT();
+    if(!jacobian.isNull()) vec[1] = jacobian.toMatT();
     fisheye::projectPoints(
 		objectPoints.toMat(), vec[0], rvec.toMat(), tvec.toMat(),
 		K.toMat(), D.toMat(), alpha, vec[1]);
@@ -689,14 +721,14 @@ struct TensorArrayPlusDouble fisheye_stereoCalibrate(
 	int flags, struct TermCriteriaWrapper criteria)
 {
     struct TensorArrayPlusDouble result;
-    std::vector<cv::Mat> vec(6);
+    std::vector<MatT> vec(6);
     
-    if(!K1.isNull()) vec[0] = K1.toMat();
-    if(!D1.isNull()) vec[1] = D1.toMat();
-    if(!K2.isNull()) vec[2] = K2.toMat();
-    if(!D2.isNull()) vec[3] = D2.toMat();
-    if(!R.isNull()) vec[4] = R.toMat();
-    if(!T.isNull()) vec[5] = T.toMat();
+    if(!K1.isNull()) vec[0] = K1.toMatT();
+    if(!D1.isNull()) vec[1] = D1.toMatT();
+    if(!K2.isNull()) vec[2] = K2.toMatT();
+    if(!D2.isNull()) vec[3] = D2.toMatT();
+    if(!R.isNull()) vec[4] = R.toMatT();
+    if(!T.isNull()) vec[5] = T.toMatT();
 
     result.val = fisheye::stereoCalibrate(
 			objectPoints.toMatList(), imagePoints1.toMatList(),
@@ -717,12 +749,12 @@ struct TensorArray fisheye_stereoRectify(
 	int flags, struct SizeWrapper newImageSize,
 	double balance, double fov_scale)
 {
-    std::vector<cv::Mat> vec(5);
-    if(!R1.isNull()) vec[0] = R1.toMat();
-    if(!R2.isNull()) vec[1] = R2.toMat();
-    if(!P1.isNull()) vec[2] = P1.toMat();
-    if(!P2.isNull()) vec[3] = P2.toMat();
-    if(!Q.isNull()) vec[4] = Q.toMat();
+    std::vector<MatT> vec(5);
+    if(!R1.isNull()) vec[0] = R1.toMatT();
+    if(!R2.isNull()) vec[1] = R2.toMatT();
+    if(!P1.isNull()) vec[2] = P1.toMatT();
+    if(!P2.isNull()) vec[3] = P2.toMatT();
+    if(!Q.isNull()) vec[4] = Q.toMatT();
 
     fisheye::stereoRectify(
 		K1.toMat(), D1.toMat(), K2.toMat(), D2.toMat(),
@@ -737,8 +769,8 @@ struct TensorWrapper fisheye_undistortImage(
 	struct TensorWrapper K, struct TensorWrapper D,
 	struct TensorWrapper Knew, struct SizeWrapper new_size)
 {
-    cv::Mat undistorted_mat;
-    if(!undistorted.isNull()) undistorted_mat = undistorted.toMat();
+    MatT undistorted_mat;
+    if(!undistorted.isNull()) undistorted_mat = undistorted.toMatT();
     fisheye::undistortImage(
 		distorted.toMat(), undistorted_mat, K.toMat(),
 		D.toMat(), TO_MAT_OR_NOARRAY(Knew), new_size);
@@ -751,8 +783,8 @@ struct TensorWrapper fisheye_undistortPoints(
 	struct TensorWrapper K, struct TensorWrapper D,
 	struct TensorWrapper R, struct TensorWrapper P)
 {
-    cv::Mat undistorted_mat;
-    if(!undistorted.isNull()) undistorted_mat = undistorted.toMat();
+    MatT undistorted_mat;
+    if(!undistorted.isNull()) undistorted_mat = undistorted.toMatT();
     fisheye::undistortPoints(
 		distorted.toMat(), undistorted_mat, K.toMat(), D.toMat(),
 		TO_MAT_OR_NOARRAY(R), TO_MAT_OR_NOARRAY(P));
@@ -768,8 +800,8 @@ struct TensorWrapper StereoMatcher_compute(
 	struct StereoMatcherPtr ptr, struct TensorWrapper left,
 	struct TensorWrapper right, struct TensorWrapper disparity)
 {
-    cv::Mat disparity_mat;
-    if(!disparity.isNull()) disparity_mat = disparity.toMat();
+    MatT disparity_mat;
+    if(!disparity.isNull()) disparity_mat = disparity.toMatT();
     ptr->compute(left.toMat(), right.toMat(), disparity_mat);
     return TensorWrapper(disparity_mat);
 }

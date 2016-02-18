@@ -148,14 +148,17 @@ struct TensorArrayPlusInt recoverPose(
 	struct Point2dWrapper pp, struct TensorWrapper mask);
 
 struct TensorArrayPlusRectArrayPlusFloat rectify3Collinear(
-	struct TensorWrapper cameraMatrix1, struct TensorWrapper distCoeffs1,
-	struct TensorWrapper cameraMatrix2, struct TensorWrapper distCoeffs2,
-	struct TensorWrapper cameraMatrix3, struct TensorWrapper distCoeffs3,
-	struct TensorArray imgpt1, struct TensorArray imgpt3,
-	struct SizeWrapper imageSize, struct TensorWrapper R12,
-	struct TensorWrapper T12, struct TensorWrapper R13,
-	struct TensorWrapper T13, double alpha,
-	struct SizeWrapper newImgSize, int flags);
+		struct TensorWrapper cameraMatrix1, struct TensorWrapper distCoeffs1,
+		struct TensorWrapper cameraMatrix2, struct TensorWrapper distCoeffs2,
+		struct TensorWrapper cameraMatrix3, struct TensorWrapper distCoeffs3,
+		struct TensorArray imgpt1, struct TensorArray imgpt3,
+		struct SizeWrapper imageSize, struct TensorWrapper R12,
+		struct TensorWrapper T12, struct TensorWrapper R13,
+		struct TensorWrapper T13, struct TensorWrapper R1,
+		struct TensorWrapper R2, struct TensorWrapper R3,
+		struct TensorWrapper P1, struct TensorWrapper P2,
+		struct TensorWrapper P3, struct TensorWrapper Q,
+		double alpha, struct SizeWrapper newImgSize, int flags);
 
 struct TensorWrapper reprojectImageTo3D(
 	struct TensorWrapper disparity, struct TensorWrapper _3dImage,
@@ -206,7 +209,8 @@ struct TensorArrayPlusBool stereoRectifyUncalibrated(
 
 struct TensorWrapper triangulatePoints(
 	struct TensorWrapper projMatr1, struct TensorWrapper projMatr2,
-	struct TensorWrapper projPoints1, struct TensorWrapper projPoints2);
+	struct TensorWrapper projPoints1, struct TensorWrapper projPoints2,
+	struct TensorWrapper points4D);
 
 struct TensorWrapper validateDisparity(
 	struct TensorWrapper disparity, struct TensorWrapper cost,
@@ -696,12 +700,19 @@ function cv.rectify3Collinear(t)
         {"T12", required = true},
         {"R13", required = true},
         {"T13", required = true},
+        {"R1", default = nil},
+        {"R2", default = nil},
+        {"R3", default = nil},
+        {"P1", default = nil},
+        {"P2", default = nil},
+        {"P3", default = nil},
+        {"Q", default = nil},
         {"alpha", required = true},
         {"newImgSize", required = true, operator = cv.Size},
         {"flags", required = true}}
     local cameraMatrix1, distCoeffs1, cameraMatrix2, distCoeffs2, cameraMatrix3,
-	  distCoeffs3, imgpt1, imgpt3, imageSize, R12, T12, R13, T13, alpha,
-          newImgSize, flags = cv.argcheck(t, argRules)
+	      distCoeffs3, imgpt1, imgpt3, imageSize, R12, T12, R13, T13, R1, R2, R3,
+          P1, P2, P3,  alpha, newImgSize, flags = cv.argcheck(t, argRules)
     local result = C.rectify3Collinear(
 			cv.wrap_tensor(cameraMatrix1), cv.wrap_tensor(distCoeffs1),
 			cv.wrap_tensor(cameraMatrix2), cv.wrap_tensor(distCoeffs2),
@@ -850,13 +861,13 @@ function cv.stereoRectify(t)
     local cameraMatrix1, distCoeffs1, cameraMatrix2, distCoeffs2,
           imageSize, R, T, R1, R2, P1, P2, Q, flags, alpha,
           newImageSize = cv.argcheck(t, argRules)
-    return cv.gcarray(
-		C.stereoRectify(
-			cv.wrap_tensor(cameraMatrix1), cv.wrap_tensor(distCoeffs1),
-			cv.wrap_tensor(cameraMatrix2), cv.wrap_tensor(distCoeffs2),
-			imageSize, cv.wrap_tensor(R), cv.wrap_tensor(T), cv.wrap_tensor(R1),
-			cv.wrap_tensor(R2), cv.wrap_tensor(P1), cv.wrap_tensor(P2),
-			cv.wrap_tensor(Q), flags, alpha, newImageSize))
+    local result = C.stereoRectify(
+        cv.wrap_tensor(cameraMatrix1), cv.wrap_tensor(distCoeffs1),
+        cv.wrap_tensor(cameraMatrix2), cv.wrap_tensor(distCoeffs2),
+        imageSize, cv.wrap_tensor(R), cv.wrap_tensor(T), cv.wrap_tensor(R1),
+        cv.wrap_tensor(R2), cv.wrap_tensor(P1), cv.wrap_tensor(P2),
+        cv.wrap_tensor(Q), flags, alpha, newImageSize)
+    return cv.unwrap_tensors(result.tensors), cv.gcarray(result.rects)
 end
 
 function cv.stereoRectifyUncalibrated(t)
@@ -881,12 +892,14 @@ function cv.triangulatePoints(t)
         {"projMatr1", required = true},
         {"projMatr2", required = true},
         {"projPoints1", required = true},
-        {"projPoints2", required = true}}
-    local projMatr1, projMatr2, projPoints1, projPoints2 = cv.argcheck(t, argRules)
+        {"projPoints2", required = true},
+        {"points4D", default = nil}}
+    local projMatr1, projMatr2, projPoints1, projPoints2, points4D = cv.argcheck(t, argRules)
     return cv.unwrap_tensors(
 			C.triangulatePoints(
 				cv.wrap_tensor(projMatr1), cv.wrap_tensor(projMatr2),
-				cv.wrap_tensor(projPoints1), cv.wrap_tensor(projPoints2))) 
+				cv.wrap_tensor(projPoints1), cv.wrap_tensor(projPoints2),
+                cv.wrap_tensor(points4D)))
 end
 
 function cv.validateDisparity(t)

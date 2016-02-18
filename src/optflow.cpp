@@ -5,16 +5,11 @@ struct TensorWrapper calcOpticalFlowSF(
         struct TensorWrapper from, struct TensorWrapper to, struct TensorWrapper flow,
         int layers, int averaging_block_size, int max_flow)
 {
-    if (flow.isNull()) {
-        cv::Mat retval;
-        optflow::calcOpticalFlowSF(
-                from.toMat(), to.toMat(), retval, layers, averaging_block_size, max_flow);
-        return TensorWrapper(retval);
-    } else {
-        optflow::calcOpticalFlowSF(
-                from.toMat(), to.toMat(), flow.toMat(), layers, averaging_block_size, max_flow);
-        return flow;
-    }
+    MatT flow_mat;
+    if(!flow.isNull()) flow_mat = flow.toMatT();
+    optflow::calcOpticalFlowSF(
+                from.toMat(), to.toMat(), flow_mat, layers, averaging_block_size, max_flow);
+    return TensorWrapper(flow_mat);
 }
 
 extern "C"
@@ -26,28 +21,20 @@ struct TensorWrapper calcOpticalFlowSF_expanded(
         int upscale_averaging_radius, double upscale_sigma_dist,
         double upscale_sigma_color, double speed_up_thr)
 {
-    if (flow.isNull()) {
-        cv::Mat retval;
-        optflow::calcOpticalFlowSF(
-                from.toMat(), to.toMat(), retval, layers, averaging_block_size,
+    MatT flow_mat;
+    if(!flow.isNull()) flow_mat = flow.toMatT();
+    optflow::calcOpticalFlowSF(
+                from.toMat(), to.toMat(), flow_mat, layers, averaging_block_size,
                 max_flow, sigma_dist, sigma_color, postprocess_window, sigma_dist_fix,
                 sigma_color_fix, occ_thr, upscale_averaging_radius,
                 upscale_sigma_dist, upscale_sigma_color, speed_up_thr);
-        return TensorWrapper(retval);
-    } else {
-        optflow::calcOpticalFlowSF(
-                from.toMat(), to.toMat(), flow.toMat(), layers, averaging_block_size,
-                max_flow, sigma_dist, sigma_color, postprocess_window, sigma_dist_fix,
-                sigma_color_fix, occ_thr, upscale_averaging_radius,
-                upscale_sigma_dist, upscale_sigma_color, speed_up_thr);
-        return flow;
-    }
+    return TensorWrapper(flow_mat);
 }
 
 extern "C"
 struct TensorWrapper readOpticalFlow(const char *path)
 {
-    return TensorWrapper(optflow::readOpticalFlow(path));
+    return TensorWrapper(MatT(optflow::readOpticalFlow(path)));
 }
 
 extern "C"
@@ -69,9 +56,9 @@ struct TensorArray calcMotionGradient(
         struct TensorWrapper mhi, struct TensorWrapper mask, struct TensorWrapper orientation,
         double delta1, double delta2, int apertureSize)
 {
-    std::vector<cv::Mat> retval(2);
-    if (!mask.isNull())        retval[0] = mask;
-    if (!orientation.isNull()) retval[1] = orientation;
+    std::vector<MatT> retval(2);
+    if (!mask.isNull()) retval[0] = mask.toMatT();
+    if (!orientation.isNull()) retval[1] = orientation.toMatT();
     motempl::calcMotionGradient(mhi.toMat(), retval[0], retval[1], delta1, delta2, apertureSize);
     return TensorArray(retval);
 }
@@ -93,15 +80,10 @@ struct TensorPlusRectArray segmentMotion(
     struct TensorPlusRectArray retval;
     std::vector<cv::Rect> rects;
 
-    if (segmask.isNull()) {
-        cv::Mat segMaskMat;
-        motempl::segmentMotion(mhi.toMat(), segMaskMat, rects, timestamp, segThresh);
-        new (&retval.tensor) TensorWrapper(segMaskMat);
-    } else {
-        motempl::segmentMotion(mhi.toMat(), segmask.toMat(), rects, timestamp, segThresh);
-        retval.tensor = segmask;
-    }
-
+    MatT segmask_mat;
+    if(!segmask.isNull()) segmask_mat = segmask.toMatT();
+    motempl::segmentMotion(mhi.toMat(), segmask_mat, rects, timestamp, segThresh);
+    new(&retval.tensor) TensorWrapper(segmask_mat);
     new (&retval.rects) RectArray(rects);
     return retval;
 }
@@ -133,18 +115,12 @@ struct TensorWrapper calcOpticalFlowSparseToDense(
         struct TensorWrapper from, struct TensorWrapper to, struct TensorWrapper flow,
         int grid_step, int k, float sigma, bool use_post_proc, float fgs_lambda, float fgs_sigma)
 {
-    if (flow.isNull()) {
-        cv::Mat retval;
-        optflow::calcOpticalFlowSparseToDense(
-                from.toMat(), to.toMat(), retval, grid_step, k,
+    MatT flow_mat;
+    if(!flow.isNull()) flow_mat = flow.toMatT();
+    optflow::calcOpticalFlowSparseToDense(
+                from.toMat(), to.toMat(), flow_mat, grid_step, k,
                 sigma, use_post_proc, fgs_lambda, fgs_sigma);
-        return TensorWrapper(retval);
-    } else {
-        optflow::calcOpticalFlowSparseToDense(
-                from.toMat(), to.toMat(), flow.toMat(), grid_step, k,
-                sigma, use_post_proc, fgs_lambda, fgs_sigma);
-        return flow;
-    }
+    return TensorWrapper(flow_mat);
 }
 
 extern "C"

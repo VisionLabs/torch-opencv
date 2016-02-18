@@ -170,14 +170,17 @@ struct TensorArrayPlusInt recoverPose(
 
 extern "C"
 struct TensorArrayPlusRectArrayPlusFloat rectify3Collinear(
-	struct TensorWrapper cameraMatrix1, struct TensorWrapper distCoeffs1,
-	struct TensorWrapper cameraMatrix2, struct TensorWrapper distCoeffs2,
-	struct TensorWrapper cameraMatrix3, struct TensorWrapper distCoeffs3,
-	struct TensorArray imgpt1, struct TensorArray imgpt3,
-	struct SizeWrapper imageSize, struct TensorWrapper R12,
-	struct TensorWrapper T12, struct TensorWrapper R13,
-	struct TensorWrapper T13, double alpha,
-	struct SizeWrapper newImgSize, int flags);
+		struct TensorWrapper cameraMatrix1, struct TensorWrapper distCoeffs1,
+		struct TensorWrapper cameraMatrix2, struct TensorWrapper distCoeffs2,
+		struct TensorWrapper cameraMatrix3, struct TensorWrapper distCoeffs3,
+		struct TensorArray imgpt1, struct TensorArray imgpt3,
+		struct SizeWrapper imageSize, struct TensorWrapper R12,
+		struct TensorWrapper T12, struct TensorWrapper R13,
+		struct TensorWrapper T13, struct TensorWrapper R1,
+		struct TensorWrapper R2, struct TensorWrapper R3,
+		struct TensorWrapper P1, struct TensorWrapper P2,
+		struct TensorWrapper P3, struct TensorWrapper Q,
+		double alpha, struct SizeWrapper newImgSize, int flags);
 
 extern "C"
 struct TensorWrapper reprojectImageTo3D(
@@ -219,7 +222,7 @@ struct TensorArrayPlusDouble stereoCalibrate(
 		int flags, struct TermCriteriaWrapper criteria);
 
 extern "C"
-struct RectArray stereoRectify(
+struct TensorArrayPlusRectArray stereoRectify(
 	struct TensorWrapper cameraMatrix1, struct TensorWrapper distCoeffs1,
 	struct TensorWrapper cameraMatrix2, struct TensorWrapper distCoeffs2,
 	struct SizeWrapper imageSize, struct TensorWrapper R,
@@ -237,7 +240,8 @@ struct TensorArrayPlusBool stereoRectifyUncalibrated(
 extern "C"
 struct TensorWrapper triangulatePoints(
 	struct TensorWrapper projMatr1, struct TensorWrapper projMatr2,
-	struct TensorWrapper projPoints1, struct TensorWrapper projPoints2);
+	struct TensorWrapper projPoints1, struct TensorWrapper projPoints2,
+	struct TensorWrapper points4D);
 
 extern "C"
 struct TensorWrapper validateDisparity(

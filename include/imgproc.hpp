@@ -7,8 +7,8 @@ struct TensorWrapper getGaussianKernel(int ksize, double sigma, int ktype);
 
 extern "C"
 struct TensorArray getDerivKernels(
-        int dx, int dy, int ksize,
-        bool normalize, int ktype);
+        int dx, int dy, int ksize, struct TensorWrapper kx,
+        struct TensorWrapper ky, bool normalize, int ktype);
 
 extern "C"
 struct TensorWrapper getGaborKernel(struct SizeWrapper ksize, double sigma, double theta,
@@ -19,17 +19,17 @@ struct TensorWrapper getStructuringElement(int shape, struct SizeWrapper ksize,
                                                       struct PointWrapper anchor);
 
 extern "C"
-struct TensorWrapper medianBlur(struct TensorWrapper src, struct TensorWrapper dst, int ksize);
+struct TensorWrapper medianBlur(struct TensorWrapper src, int ksize, struct TensorWrapper dst);
 
 extern "C"
-struct TensorWrapper GaussianBlur(struct TensorWrapper src, struct TensorWrapper dst,
-                                             struct SizeWrapper ksize, double sigmaX,
-                                             double sigmaY, int borderType);
+struct TensorWrapper GaussianBlur(struct TensorWrapper src, struct SizeWrapper ksize,
+                                  double sigmaX, struct TensorWrapper dst,
+                                  double sigmaY, int borderType);
 
 extern "C"
-struct TensorWrapper bilateralFilter(struct TensorWrapper src, struct TensorWrapper dst, int d,
-                                                double sigmaColor, double sigmaSpace,
-                                                int borderType);
+struct TensorWrapper bilateralFilter(struct TensorWrapper src, int d,
+                                     double sigmaColor, double sigmaSpace,
+                                     struct TensorWrapper dst, int borderType);
 
 extern "C"
 struct TensorWrapper boxFilter(
@@ -323,7 +323,7 @@ struct TensorWrapper equalizeHist(
         struct TensorWrapper src, struct TensorWrapper dst);
 
 extern "C"
-float EMD(
+struct TensorPlusFloat EMD(
         struct TensorWrapper signature1, struct TensorWrapper signature2,
         int distType, struct TensorWrapper cost,
         struct FloatArray lowerBound, struct TensorWrapper flow);
@@ -430,11 +430,13 @@ double matchShapes(
 
 extern "C"
 struct TensorWrapper convexHull(
-        struct TensorWrapper points, bool clockwise, bool returnPoints);
+        struct TensorWrapper points, struct TensorWrapper hull,
+        bool clockwise, bool returnPoints);
 
 extern "C"
 struct TensorWrapper convexityDefects(
-        struct TensorWrapper contour, struct TensorWrapper convexhull);
+        struct TensorWrapper contour, struct TensorWrapper convexhull,
+        struct TensorWrapper convexityDefects);
 
 extern "C"
 bool isContourConvex(
@@ -442,7 +444,8 @@ bool isContourConvex(
 
 extern "C"
 struct TensorPlusFloat intersectConvexConvex(
-        struct TensorWrapper _p1, struct TensorWrapper _p2, bool handleNested);
+        struct TensorWrapper _p1, struct TensorWrapper _p2,
+        struct TensorWrapper _p12, bool handleNested);
 
 extern "C"
 struct RotatedRectWrapper fitEllipse(
@@ -450,7 +453,8 @@ struct RotatedRectWrapper fitEllipse(
 
 extern "C"
 struct TensorWrapper fitLine(
-        struct TensorWrapper points, int distType, double param, double reps, double aeps);
+        struct TensorWrapper points, struct TensorWrapper line, int distType,
+        double param, double reps, double aeps);
 
 extern "C"
 double pointPolygonTest(
@@ -746,7 +750,8 @@ struct TensorWrapper LineSegmentDetector_drawSegments(
         struct LineSegmentDetectorPtr ptr, struct TensorWrapper image, struct TensorWrapper lines);
 
 extern "C"
-int compareSegments(struct LineSegmentDetectorPtr ptr, struct SizeWrapper size, struct TensorWrapper lines1,
+extern "C"
+int LineSegmentDetector_compareSegments(struct LineSegmentDetectorPtr ptr, struct SizeWrapper size, struct TensorWrapper lines1,
                     struct TensorWrapper lines2, struct TensorWrapper image);
 
 extern "C"

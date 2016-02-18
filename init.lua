@@ -22,6 +22,7 @@ ffi.cdef[[
 struct TensorWrapper {
     void *tensorPtr;
     char typeCode;
+    bool definedInLua;
 };
 
 struct TensorArray {
@@ -29,11 +30,13 @@ struct TensorArray {
     int size;
 };
 
+void initAllocator();
+
 void *malloc(size_t size);
 void free(void *ptr);
 
-void transfer_tensor(void *destination, void *source);
-void transfer_tensor_CUDA(void *state, void *destination, void *source);
+void transfer_tensor(void *destination, struct TensorWrapper source);
+void transfer_tensor_CUDA(void *state, void *destination, struct TensorWrapper source);
 
 struct SizeWrapper {
     int width, height;
@@ -240,6 +243,9 @@ struct PointArrayOfArrays {
     int *sizes;
 };
 
+// for debugging
+void refcount(void *x);
+
 ]]
 
 local C = ffi.load(cv.libPath('Common'))
@@ -278,6 +284,8 @@ function cv.argcheck(t, rules)
 end
 
 --- ***************** Tensor <=> Mat conversion *****************
+
+C.initAllocator()
 
 local tensor_CV_code_by_letter = {
     [ 66] = cv.CV_8U  , -- B : Byte
@@ -369,9 +377,9 @@ function cv.unwrap_tensors(wrapper, toTable)
         local retval = empty_tensor_of_type(wrapper.typeCode)
 
         if wrapper.typeCode == cv.CV_CUDA then
-            CUDACommon_C.transfer_tensor_CUDA(cutorch._state, retval:cdata(), wrapper.tensorPtr)
+            CUDACommon_C.transfer_tensor_CUDA(cutorch._state, retval:cdata(), wrapper)
         else
-            C.transfer_tensor(retval:cdata(), wrapper.tensorPtr)
+            C.transfer_tensor(retval:cdata(), wrapper)
         end
 
         return retval
@@ -385,7 +393,7 @@ function cv.unwrap_tensors(wrapper, toTable)
         local retval = {}
         for i = 0,wrapper.size-1 do
             local tempTensor = empty_tensor_of_type(wrapper.tensors[i].typeCode)
-            C.transfer_tensor(tempTensor:cdata(), wrapper.tensors[i].tensorPtr)
+            C.transfer_tensor(tempTensor:cdata(), wrapper.tensors[i])
             table.insert(retval, tempTensor)
         end
 
@@ -613,6 +621,11 @@ end
 function cv.gcarray(array)
     array.data = ffi.gc(array.data, C.free)
     return array
+end
+
+-- for debugging
+function cv.refcount(tensor)
+    C.refcount(tensor:cdata())
 end
 
 return cv

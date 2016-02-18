@@ -25,7 +25,8 @@ extern "C" struct TensorArrayPlusInt buildOpticalFlowPyramid(struct TensorWrappe
                         bool withDerivatives, int pyrBorder, int derivBorder,
                         bool tryReuseInputImage)
 {
-    std::vector<cv::Mat> output(pyramid);
+    std::vector<MatT> output;
+    if(!pyramid.isNull()) output = pyramid.toMatTList();
     TensorArrayPlusInt retval;
     retval.val = cv::buildOpticalFlowPyramid(img.toMat(), output, winSize, maxLevel,
                     withDerivatives, pyrBorder, derivBorder, tryReuseInputImage);
@@ -39,16 +40,15 @@ extern "C" struct TensorArray calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
                         struct TensorWrapper err, struct SizeWrapper winSize, int maxLevel,
                         struct TermCriteriaWrapper criteria, int flags, double minEigThreshold)
 {
-    std::vector<cv::Mat> retval(3);
-    if (!nextPts.isNull()) retval[0] = nextPts;
-    if (!status.isNull()) retval[1] = status;
-    if (!err.isNull()) retval[2] = err;
+    std::vector<MatT> retval(3);
+    if (!status.isNull()) retval[1] = status.toMatT();
+    if (!err.isNull()) retval[2] = err.toMatT();
 
-    cv::calcOpticalFlowPyrLK(prevImg.toMat(), nextImg.toMat(), prevPts.toMat(), retval[0], retval[1],
+    cv::calcOpticalFlowPyrLK(prevImg.toMat(), nextImg.toMat(), prevPts.toMat(), nextPts.toMat(), retval[1],
                 retval[2], winSize, maxLevel,
                 criteria.orDefault(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01)),
                 flags, minEigThreshold);
-
+    retval[0] = MatT(nextPts);
     return TensorArray(retval);
 }
 
@@ -57,17 +57,16 @@ extern "C" struct TensorWrapper calcOpticalFlowFarneback(struct TensorWrapper pr
                         int levels, int winsize, int iterations, int poly_n, double poly_sigma,
                         int flags)
 {
-    cv::calcOpticalFlowFarneback(prev.toMat(), next.toMat(), flow.toMat(), pyr_scale,
-                    levels, winsize, iterations, poly_n, poly_sigma, flags);
+    cv::calcOpticalFlowFarneback(
+		prev.toMat(), next.toMat(), flow.toMat(), pyr_scale,
+		levels, winsize, iterations, poly_n, poly_sigma, flags);
     return flow;
 }
 
 extern "C" struct TensorWrapper estimateRigidTransform(struct TensorWrapper src,
                         struct TensorWrapper dst, bool fullAffine)
 {
-    cv::Mat retval;
-    retval = cv::estimateRigidTransform(src.toMat(), dst.toMat(), fullAffine);
-    return TensorWrapper(retval);
+    return TensorWrapper(MatT(cv::estimateRigidTransform(src.toMat(), dst.toMat(), fullAffine)));
 }
 
 extern "C" struct TensorPlusDouble findTransformECC(struct TensorWrapper templateImage,
@@ -77,10 +76,10 @@ extern "C" struct TensorPlusDouble findTransformECC(struct TensorWrapper templat
 {
     struct TensorPlusDouble retval;
     retval.val = cv::findTransformECC(templateImage.toMat(), inputImage.toMat(), warpMatrix.toMat(),
-                    motionType,
-                    criteria.orDefault(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 50, 0.001)),
+                    motionType, criteria.orDefault(
+                                   cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 50, 0.001)),
                     TO_MAT_OR_NOARRAY(inputMask));
-    new (&retval.tensor) TensorWrapper(warpMatrix);
+    retval.tensor = warpMatrix;
     return retval;
 }
 
@@ -89,26 +88,20 @@ extern "C" struct TensorPlusDouble findTransformECC(struct TensorWrapper templat
 extern "C" struct TensorWrapper BackgroundSubtractor_apply(struct BackgroundSubtractorPtr ptr,
                         struct TensorWrapper image, struct TensorWrapper fgmast, double learningRate)
 {
-    if (fgmast.isNull()) {
-        cv::Mat retval;
-        ptr->apply(image.toMat(), retval, learningRate);
-        return TensorWrapper(retval);
-    } else {
-        ptr->apply(image.toMat(), fgmast.toMat(), learningRate);
-    }
-    return fgmast;
+    MatT fgmast_mat;
+    if(!fgmast.isNull()) fgmast_mat = fgmast.toMatT();
+    ptr->apply(image.toMat(), fgmast_mat, learningRate);
+    return TensorWrapper(fgmast_mat);
 }
 
-extern "C" struct TensorWrapper BackgroundSubtractor_getBackgroundImage(struct BackgroundSubtractorPtr ptr,
-                        struct TensorWrapper backgroundImage)
+extern "C" struct TensorWrapper BackgroundSubtractor_getBackgroundImage(
+		struct BackgroundSubtractorPtr ptr,
+		struct TensorWrapper backgroundImage)
 {
-    if (backgroundImage.isNull()) {
-        cv::Mat retval;
-        ptr->getBackgroundImage(retval);
-        return TensorWrapper(retval);
-    }
-    ptr->getBackgroundImage(backgroundImage.toMat());
-    return backgroundImage;
+    MatT backgroundImage_mat;
+    if(!backgroundImage.isNull()) backgroundImage_mat = backgroundImage.toMatT();
+    ptr->getBackgroundImage(backgroundImage_mat);
+    return TensorWrapper(backgroundImage_mat);
 }
 
 extern "C" struct BackgroundSubtractorMOG2Ptr BackgroundSubtractorMOG2_ctor(int history,
@@ -320,17 +313,17 @@ extern "C" void BackgroundSubtractorKNN_setDetectShadows(struct BackgroundSubtra
 extern "C"
 struct TensorArray KalmanFilter_getFields(struct KalmanFilterPtr ptr)
 {
-    std::vector<cv::Mat> retval(10);
-    retval[0] = ptr->statePre;
-    retval[1] = ptr->statePost;
-    retval[2] = ptr->transitionMatrix;
-    retval[3] = ptr->controlMatrix;
-    retval[4] = ptr->measurementMatrix;
-    retval[5] = ptr->processNoiseCov;
-    retval[6] = ptr->measurementNoiseCov;
-    retval[7] = ptr->errorCovPre;
-    retval[8] = ptr->gain;
-    retval[9] = ptr->errorCovPost;
+    std::vector<MatT> retval(10);
+    retval[0] = MatT(ptr->statePre);
+    retval[1] = MatT(ptr->statePost);
+    retval[2] = MatT(ptr->transitionMatrix);
+    retval[3] = MatT(ptr->controlMatrix);
+    retval[4] = MatT(ptr->measurementMatrix);
+    retval[5] = MatT(ptr->processNoiseCov);
+    retval[6] = MatT(ptr->measurementNoiseCov);
+    retval[7] = MatT(ptr->errorCovPre);
+    retval[8] = MatT(ptr->gain);
+    retval[9] = MatT(ptr->errorCovPost);
     return TensorArray(retval);
 }
 
@@ -360,17 +353,16 @@ extern "C" struct TensorWrapper KalmanFilter_predict(struct KalmanFilterPtr ptr,
                         struct TensorWrapper control)
 {
     cv::Mat retval;
-    if (!control.isNull())
-        retval = control.toMat();
-    cv::Mat res = ptr->predict(retval);
-    return TensorWrapper(res);
+    if (!control.isNull()) retval = control.toMat();
+    cv::Mat result = ptr->predict(retval);
+    return TensorWrapper(MatT(result));
 }
 
 extern "C" struct TensorWrapper KalmanFilter_correct(struct KalmanFilterPtr ptr,
                         struct TensorWrapper measurement)
 {
     cv::Mat res = ptr->correct(measurement.toMat());
-    return TensorWrapper(res);
+    return TensorWrapper(MatT(res));
 }
 
 extern "C" struct TensorWrapper DenseOpticalFlow_calc(struct DenseOpticalFlowPtr ptr,
@@ -379,7 +371,7 @@ extern "C" struct TensorWrapper DenseOpticalFlow_calc(struct DenseOpticalFlowPtr
     if (flow.isNull()) {
         cv::Mat retval;
         ptr->calc(I0.toMat(), I1.toMat(), retval);
-        return TensorWrapper(retval);
+        return TensorWrapper(MatT(retval));
     }
     ptr->calc(I0.toMat(), I1.toMat(), flow.toMat());
     return flow;

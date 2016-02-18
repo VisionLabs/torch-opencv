@@ -59,7 +59,7 @@ local C = ffi.load(cv.libPath('highgui'))
 
 function cv.imshow(t)
     local argRules = {
-        {"winname", default = "Window 1"},
+        {"winname", required = true},
         {"image", required = true}
     }
     local winname, image = cv.argcheck(t, argRules)
@@ -73,7 +73,7 @@ function cv.waitKey(t)
     }
     local delay = cv.argcheck(t, argRules)
 
-    return C.waitKey(delay or 0)
+    return C.waitKey(delay)
 end
 
 function cv.namedWindow(t)
