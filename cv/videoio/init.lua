@@ -196,7 +196,7 @@ do
             {"image", required = true}
         }
         local image = cv.argcheck(t, argRules)
-        C.VideoWriter_write(self.ptr, image)
+        C.VideoWriter_write(self.ptr, cv.wrap_tensor(image))
     end
 
     function VideoWriter:set(t)
@@ -227,7 +227,7 @@ do
         }
         local c1, c2, c3, c4 = cv.argcheck(t, argRules)
 
-        return C.VideoWriter_fourcc(self.ptr, c1, c2, c3, c4)
+        return C.VideoWriter_fourcc(string.byte(c1), string.byte(c2), string.byte(c3), string.byte(c4))
     end
 end
 
