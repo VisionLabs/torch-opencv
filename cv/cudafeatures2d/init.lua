@@ -65,40 +65,40 @@ struct DMatchArrayOfArrays DescriptorMatcher_radiusMatchConvert(
         struct PtrWrapper ptr,
         struct TensorWrapper gpu_matches, bool compactResult);
 
-void Feature2DAsync_dtor(struct Feature2DAsyncPtr ptr);
+void Feature2DAsync_dtor(struct PtrWrapper ptr);
 
 struct TensorWrapper Feature2DAsync_detectAsync(
-        struct cutorchInfo info, struct Feature2DAsyncPtr ptr, struct TensorWrapper image,
+        struct cutorchInfo info, struct PtrWrapper ptr, struct TensorWrapper image,
         struct TensorWrapper keypoints, struct TensorWrapper mask);
 
 struct TensorArray Feature2DAsync_computeAsync(
-        struct cutorchInfo info, struct Feature2DAsyncPtr ptr, struct TensorWrapper image,
+        struct cutorchInfo info, struct PtrWrapper ptr, struct TensorWrapper image,
         struct TensorWrapper keypoints, struct TensorWrapper descriptors);
 
 struct TensorArray Feature2DAsync_detectAndComputeAsync(
-        struct cutorchInfo info, struct Feature2DAsyncPtr ptr, struct TensorWrapper image,
+        struct cutorchInfo info, struct PtrWrapper ptr, struct TensorWrapper image,
         struct TensorWrapper mask, struct TensorWrapper keypoints,
         struct TensorWrapper descriptors, bool useProvidedKeypoints);
 
 struct KeyPointArray Feature2DAsync_convert(
-        struct Feature2DAsyncPtr ptr, struct TensorWrapper gpu_keypoints);
+        struct PtrWrapper ptr, struct TensorWrapper gpu_keypoints);
 
-struct FastFeatureDetectorPtr FastFeatureDetector_ctor(
+struct PtrWrapper FastFeatureDetector_ctor(
         int threshold, bool nonmaxSuppression, int type, int max_npoints);
 
-void FastFeatureDetector_dtor(struct FastFeatureDetectorPtr ptr);
+void FastFeatureDetector_dtor(struct PtrWrapper ptr);
 
-void FastFeatureDetector_setMaxNumPoints(struct FastFeatureDetectorPtr ptr, int val);
+void FastFeatureDetector_setMaxNumPoints(struct PtrWrapper ptr, int val);
 
-int FastFeatureDetector_getMaxNumPoints(struct FastFeatureDetectorPtr ptr);
+int FastFeatureDetector_getMaxNumPoints(struct PtrWrapper ptr);
 
-struct ORBPtr ORB_ctor(
+struct PtrWrapper ORB_ctor(
         int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, 
         int WTA_K, int scoreType, int patchSize, int fastThreshold, bool blurForDescriptor);
 
-void ORB_setBlurForDescriptor(struct ORBPtr ptr, bool val);
+void ORB_setBlurForDescriptor(struct PtrWrapper ptr, bool val);
 
-bool ORB_getBlurForDescriptor(struct ORBPtr ptr);
+bool ORB_getBlurForDescriptor(struct PtrWrapper ptr);
 ]]
 
 local C = ffi.load(cv.libPath('cudafeatures2d'))

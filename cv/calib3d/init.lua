@@ -148,17 +148,18 @@ struct TensorArrayPlusInt recoverPose(
 	struct Point2dWrapper pp, struct TensorWrapper mask);
 
 struct TensorArrayPlusRectArrayPlusFloat rectify3Collinear(
-		struct TensorWrapper cameraMatrix1, struct TensorWrapper distCoeffs1,
-		struct TensorWrapper cameraMatrix2, struct TensorWrapper distCoeffs2,
-		struct TensorWrapper cameraMatrix3, struct TensorWrapper distCoeffs3,
-		struct TensorArray imgpt1, struct TensorArray imgpt3,
-		struct SizeWrapper imageSize, struct TensorWrapper R12,
-		struct TensorWrapper T12, struct TensorWrapper R13,
-		struct TensorWrapper T13, struct TensorWrapper R1,
-		struct TensorWrapper R2, struct TensorWrapper R3,
-		struct TensorWrapper P1, struct TensorWrapper P2,
-		struct TensorWrapper P3, struct TensorWrapper Q,
-		double alpha, struct SizeWrapper newImgSize, int flags);
+	struct TensorWrapper cameraMatrix1, struct TensorWrapper distCoeffs1,
+    struct TensorWrapper cameraMatrix2, struct TensorWrapper distCoeffs2,
+    struct TensorWrapper cameraMatrix3, struct TensorWrapper distCoeffs3,
+    struct TensorArray imgpt1, struct TensorArray imgpt3,
+    struct SizeWrapper imageSize, struct TensorWrapper R12,
+    struct TensorWrapper T12, struct TensorWrapper R13,
+    struct TensorWrapper T13, struct TensorWrapper R1,
+    struct TensorWrapper R2, struct TensorWrapper R3,
+    struct TensorWrapper P1, struct TensorWrapper P2,
+    struct TensorWrapper P3, struct TensorWrapper Q,
+    double alpha, struct SizeWrapper newImgSize, int flags);
+
 
 struct TensorWrapper reprojectImageTo3D(
 	struct TensorWrapper disparity, struct TensorWrapper _3dImage,
@@ -193,7 +194,7 @@ struct TensorArrayPlusDouble stereoCalibrate(
 	struct TensorWrapper E, struct TensorWrapper F,
 	int flags, struct TermCriteriaWrapper criteria);
 
-struct RectArray stereoRectify(
+struct TensorArrayPlusRectArray stereoRectify(
 	struct TensorWrapper cameraMatrix1, struct TensorWrapper distCoeffs1,
 	struct TensorWrapper cameraMatrix2, struct TensorWrapper distCoeffs2,
 	struct SizeWrapper imageSize, struct TensorWrapper R,
@@ -711,8 +712,8 @@ function cv.rectify3Collinear(t)
         {"newImgSize", required = true, operator = cv.Size},
         {"flags", required = true}}
     local cameraMatrix1, distCoeffs1, cameraMatrix2, distCoeffs2, cameraMatrix3,
-	      distCoeffs3, imgpt1, imgpt3, imageSize, R12, T12, R13, T13, R1, R2, R3,
-          P1, P2, P3,  alpha, newImgSize, flags = cv.argcheck(t, argRules)
+        distCoeffs3, imgpt1, imgpt3, imageSize, R12, T12, R13, T13, R1, R2, R3,
+        P1, P2, P3,  alpha, newImgSize, flags = cv.argcheck(t, argRules)
     local result = C.rectify3Collinear(
 			cv.wrap_tensor(cameraMatrix1), cv.wrap_tensor(distCoeffs1),
 			cv.wrap_tensor(cameraMatrix2), cv.wrap_tensor(distCoeffs2),
@@ -868,6 +869,7 @@ function cv.stereoRectify(t)
         cv.wrap_tensor(R2), cv.wrap_tensor(P1), cv.wrap_tensor(P2),
         cv.wrap_tensor(Q), flags, alpha, newImageSize)
     return cv.unwrap_tensors(result.tensors), cv.gcarray(result.rects)
+
 end
 
 function cv.stereoRectifyUncalibrated(t)
@@ -895,11 +897,11 @@ function cv.triangulatePoints(t)
         {"projPoints2", required = true},
         {"points4D", default = nil}}
     local projMatr1, projMatr2, projPoints1, projPoints2, points4D = cv.argcheck(t, argRules)
-    return cv.unwrap_tensors(
-			C.triangulatePoints(
-				cv.wrap_tensor(projMatr1), cv.wrap_tensor(projMatr2),
-				cv.wrap_tensor(projPoints1), cv.wrap_tensor(projPoints2),
-                cv.wrap_tensor(points4D)))
+
+    return cv.unwrap_tensors(C.triangulatePoints(
+        cv.wrap_tensor(projMatr1), cv.wrap_tensor(projMatr2),
+		cv.wrap_tensor(projPoints1), cv.wrap_tensor(projPoints2),
+        cv.wrap_tensor(points4D)))
 end
 
 function cv.validateDisparity(t)
@@ -919,8 +921,7 @@ end
 
 --******************Fisheye camera model***************
 
-fisheye = {}
-cv.fisheye = fisheye;
+cv.fisheye = {}
 
 cv.fisheye.CALIB_USE_INTRINSIC_GUESS = 1
 cv.fisheye.CALIB_RECOMPUTE_EXTRINSIC = 2
@@ -943,8 +944,10 @@ function cv.fisheye.calibrate(t)
         {"tvecs", default = nil},
         {"flag", default = 0},
         {"criteria", default =
-		cv.TermCriteria(cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 100, cv.DBL_EPSILON),
-                operator = cv.TermCriteria}}
+			cv.TermCriteria(cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 100, cv.DBL_EPSILON),
+            operator = cv.TermCriteria
+        }
+    }
     local objectPoints, imagePoints, imageSize, K, D,
       		rvecs, tvecs, flag, criteria = cv.argcheck(t, argRules)
     local result = C.fisheye_calibrate(
@@ -1041,8 +1044,10 @@ function cv.fisheye.stereoCalibrate(t)
         {"T", default = nil},
         {"flags", default = cv.fisheye.CALIB_FIX_INTRINSIC},
         {"criteria", default =
-		cv.TermCriteria(cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 100, cv.DBL_EPSILON),
-		operator = cv.TermCriteria}}
+			cv.TermCriteria(cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 100, cv.DBL_EPSILON),
+			operator = cv.TermCriteria
+		}
+	}
     local objectPoints, imagePoints1, imagePoints2, K1, D1, K2, D2,
           imageSize, R, T, flags, criteria = cv.argcheck(t, argRules)
     local result = C.fisheye_stereoCalibrate(

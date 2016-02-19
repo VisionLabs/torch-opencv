@@ -304,7 +304,7 @@ void SVM_setKernel(struct PtrWrapper ptr, int val);
 //void SVM_setCustomKernel(struct PtrWrapper ptr, struct KernelPtr val);
 
 bool SVM_trainAuto(
-        struct PtrWrapper ptr, struct TrainDataPtr data, int kFold, struct PtrWrapper Cgrid,
+        struct PtrWrapper ptr, struct PtrWrapper data, int kFold, struct PtrWrapper Cgrid,
         struct PtrWrapper gammaGrid, struct PtrWrapper pGrid, struct PtrWrapper nuGrid,
         struct PtrWrapper coeffGrid, struct PtrWrapper degreeGrid, bool balanced);
 

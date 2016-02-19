@@ -1049,14 +1049,14 @@ end
 function cv.warpAffine(t)
     local argRules = {
         {"src", required = true},
-        {"dst", default = nil},
         {"M", required = true},
         {"dsize", default = {0, 0}, operator = cv.Size},
+        {"dst", default = nil},
         {"flags", default = cv.INTER_LINEAR},
         {"borderMode", default = cv.BORDER_CONSTANT},
         {"borderValue", default = {0,0,0,0} , operator = cv.Scalar}
     }
-    local src, dst, M, dsize, flags, borderMode, borderValue = cv.argcheck(t, argRules)
+    local src, M, dsize, dst, flags, borderMode, borderValue = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.warpAffine(
