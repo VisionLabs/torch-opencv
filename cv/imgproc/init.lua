@@ -936,9 +936,6 @@ function cv.cornerSubPix(t)
     }
     local image, corners, winSize, zeroZone, criteria = cv.argcheck(t, argRules)
 
-    assert(image:nDimension() == 2)
-    assert(corners:size()[2] == 2 and cv.tensorType(corners) == cv.CV_32F)
-
     C.cornerSubPix(
         cv.wrap_tensor(image), cv.wrap_tensor(corners), winSize,
         zeroZone, criteria)

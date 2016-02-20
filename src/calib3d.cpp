@@ -8,19 +8,22 @@ struct calibrateCameraRetval calibrateCamera(
 	struct TensorArray tvecs, int flags, struct TermCriteriaWrapper criteria)
 {   
     struct calibrateCameraRetval result;
-    std::vector<MatT> intrinsics(2), rvecs_vec, tvecs_vec;
+    std::vector<MatT> intrinsics(2);
+    std::vector<cv::Mat> rvecs_vec, tvecs_vec;
 
     if(!cameraMatrix.isNull()) intrinsics[0] = cameraMatrix.toMatT();
     if(!distCoeffs.isNull()) intrinsics[1] = distCoeffs.toMatT();
-    if(!rvecs.isNull()) rvecs_vec = rvecs.toMatTList();
-    if(!tvecs.isNull()) tvecs_vec = tvecs.toMatTList();
+    if(!rvecs.isNull()) rvecs_vec = rvecs.toMatList();
+    if(!tvecs.isNull()) tvecs_vec = tvecs.toMatList();
 
     result.retval = cv::calibrateCamera(objectPoints.toMatList(), imagePoints.toMatList(),
 			       		imageSize, intrinsics[0], intrinsics[1],
 			       		rvecs_vec, tvecs_vec, flags, criteria);
     new(&result.intrinsics) TensorArray(intrinsics);
-    new(&result.rvecs) TensorArray(rvecs_vec);
-    new(&result.tvecs) TensorArray(tvecs_vec);
+
+    std::vector<MatT> rvecs_vecT = get_vec_MatT(rvecs_vec), tvecs_vecT = get_vec_MatT(tvecs_vec);
+    new(&result.rvecs) TensorArray(rvecs_vecT);
+    new(&result.tvecs) TensorArray(tvecs_vecT);
     return result;
 }
 
@@ -233,14 +236,16 @@ struct TensorWrapper find4QuadCornerSubpix(
 }
 
 extern "C"
-struct TensorWrapper findChessboardCorners(
+struct TensorPlusBool findChessboardCorners(
 	struct TensorWrapper image, struct SizeWrapper patternSize,
 	struct TensorWrapper corners, int flags)
 {
+    struct TensorPlusBool result;
     MatT corners_mat;
     if(!corners.isNull()) corners_mat = corners.toMatT();
-    cv::findChessboardCorners(image.toMat(), patternSize, corners_mat, flags);
-    return TensorWrapper(corners_mat);
+    result.val = cv::findChessboardCorners(image.toMat(), patternSize, corners_mat, flags);
+    new(&result.tensor) TensorWrapper(corners_mat);
+    return result;
 }
 
 extern "C"

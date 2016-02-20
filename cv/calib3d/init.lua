@@ -87,7 +87,7 @@ void find4QuadCornerSubpix(
 	struct TensorWrapper img, struct TensorWrapper corners,
 	struct SizeWrapper region_size);
 
-struct TensorWrapper findChessboardCorners(
+struct TensorPlusBool findChessboardCorners(
 	struct TensorWrapper image, struct SizeWrapper patternSize,
 	struct TensorWrapper corners, int flags);
 
@@ -497,10 +497,10 @@ function cv.findChessboardCorners(t)
         {"corners", default = nil},
         {"flags", default = cv.CALIB_CB_ADAPTIVE_THRESH+cv.CALIB_CB_NORMALIZE_IMAGE}}
     local image, patternSize, corners, flags = cv.argcheck(t, argRules)
-    return cv.unwrap_tensors(
-		C.findChessboardCorners(
-			cv.wrap_tensor(image), patternSize,
-			cv.wrap_tensor(corners), flags))
+    local result = C.findChessboardCorners(
+        cv.wrap_tensor(image), patternSize,
+        cv.wrap_tensor(corners), flags)
+    return result.val, cv.unwrap_tensors(result.tensor)
 end
 
 function cv.findCirclesGrid(t)

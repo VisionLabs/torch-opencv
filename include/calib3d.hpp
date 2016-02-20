@@ -97,7 +97,7 @@ struct TensorWrapper find4QuadCornerSubpix(
 	struct SizeWrapper region_size);
 
 extern "C"
-struct TensorWrapper findChessboardCorners(
+struct TensorPlusBool findChessboardCorners(
 	struct TensorWrapper image, struct SizeWrapper patternSize,
 	struct TensorWrapper corners, int flags);
 
