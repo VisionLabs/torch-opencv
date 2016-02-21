@@ -1459,12 +1459,12 @@ end
 function cv.undistort(t)
     local argRules = {
         {"src", required = true},
-        {"dst", default = nil},
         {"cameraMatrix", required = true},
         {"distCoeffs", default = nil},
+        {"dst", default = nil},
         {"newCameraMatrix", default = nil}
     }
-    local src, dst, cameraMatrix, distCoeffs, newCameraMatrix = cv.argcheck(t, argRules)
+    local src, cameraMatrix, distCoeffs, dst, newCameraMatrix = cv.argcheck(t, argRules)
     if type(cameraMatrix) == "table" then
         cameraMatrix = torch.FloatTensor(cameraMatrix)
     end
