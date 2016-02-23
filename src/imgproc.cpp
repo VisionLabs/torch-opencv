@@ -550,7 +550,7 @@ struct TensorPlusDouble threshold(
     TensorPlusDouble retval;
     MatT dst_mat;
     if(!dst.isNull()) dst_mat = dst.toMatT();
-    retval.val = cv::threshold(src.toMat(), dst.toMat(), thresh, maxval, type);
+    retval.val = cv::threshold(src.toMat(), dst_mat, thresh, maxval, type);
     new(&retval.tensor) TensorWrapper(dst_mat);
     return retval;
 }

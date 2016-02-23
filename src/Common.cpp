@@ -236,7 +236,7 @@ TensorWrapper::operator cv::Mat() {
             numberOfDims,
             size.data(),
             CV_MAKE_TYPE(depth, numChannels),
-            tensorPtr->storage->data,
+            tensorPtr->storage->data + tensorPtr->storageOffset * CV_ELEM_SIZE(depth),
             stride.data()
     );
 }
