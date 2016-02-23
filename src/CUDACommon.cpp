@@ -6,7 +6,7 @@ cuda::GpuMat TensorWrapper::toGpuMat() {
         return cuda::GpuMat();
     }
 
-    THCudaTensor *tensorPtr = static_cast<THCudaTensor *>(this->tensorPtr);
+    THCudaTensor *tensorPtr = reinterpret_cast<THCudaTensor *>(this->tensorPtr);
 
     assert(this->typeCode == CV_CUDA);
     assert(tensorPtr->nDimension <= 3);
@@ -74,7 +74,7 @@ TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state) {
 
     outputPtr->refcount = 0;
 
-    this->tensorPtr = outputPtr;
+    this->tensorPtr = reinterpret_cast<THByteTensor *>(outputPtr);
 }
 
 TensorWrapper::TensorWrapper(cuda::GpuMat && mat, THCState *state) {
@@ -93,6 +93,9 @@ void transfer_tensor_CUDA(THCState *state, THCudaTensor *dst, struct TensorWrapp
     if (dst->stride)
         THFree(dst->stride);
 
+    THCudaTensor *src = reinterpret_cast<THCudaTensor *>(srcWrapper.tensorPtr);
+
+    // TODO !!! align changes with Common.cpp !!!
     dst->storage = src->storage;
     dst->size = src->size;
     dst->stride = src->stride;
