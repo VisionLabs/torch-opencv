@@ -1356,8 +1356,7 @@ function cv.threshold(t)
     local src, dst, thresh, maxval, type = cv.argcheck(t, argRules)
 
     if dst then
-        assert(cv.tensorType(dst) == type)
-        assert(dst:isSameSizeAs(src))
+        assert(dst:type() == src:type() and src:isSameSizeAs(dst))
     end
 
     local result = C.threshold(
