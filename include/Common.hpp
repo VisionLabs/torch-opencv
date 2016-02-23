@@ -354,12 +354,30 @@ struct Point2fPlusInt {
 
 /***************** Other helper structs *****************/
 
+//string
+
+struct StringWrapper {
+    const char *str;
+};
+
 // Arrays
+
+struct StringArray {
+    struct StringWrapper *data;
+    int size;
+
+    StringArray() {}
+    StringArray(const std::vector<cv::String> vec);
+
+    operator std::vector<cv::String>();
+
+};
 
 struct IntArray {
     int *data;
     int size;
 
+    IntArray() {}
     IntArray(const std::vector<int> vec);
 
     inline std::vector<int>& toIntList(std::vector<int>& res) {
@@ -416,7 +434,11 @@ struct ClassArray {
     int size;
 
     ClassArray() {}
+
+    ClassArray(const std::vector<cv::detail::ImageFeatures> & vec);
     ClassArray(const std::vector<cv::detail::MatchesInfo> & vec);
+
+    operator std::vector<cv::detail::ImageFeatures>();
     operator std::vector<cv::detail::MatchesInfo>();
 };
 

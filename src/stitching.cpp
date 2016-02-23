@@ -380,22 +380,75 @@ struct BestOf2NearestRangeMatcherPtr BestOf2NearestRangeMatcher_ctor(
                                                       num_matches_thresh1, num_matches_thresh2);
 }
 
+//**********************Rotation Estimation********************************
+
+extern "C"
+struct GraphPtrPlusIntArray detail_findMaxSpanningTree(
+        int num_images, struct ClassArray pairwise_matches)
+{
+    GraphPtrPlusIntArray result;
+    cv::detail::Graph *span_tree = new cv::detail::Graph();
+    std::vector<int> centers;
+    cv::detail::findMaxSpanningTree(num_images, pairwise_matches, *span_tree, centers);
+    result.graph = GraphPtr(span_tree);
+    result.array = IntArray(centers);
+    return result;
+}
+
+extern "C"
+struct IntArray detail_leaveBiggestComponent(
+        struct ClassArray features, struct ClassArray pairwise_matches, float conf_threshold)
+{
+    std::vector<cv::detail::ImageFeatures> features_vec = features;
+    std::vector<cv::detail::MatchesInfo> pairwise_matches_vec = pairwise_matches;
+
+    return IntArray(
+               cv::detail::leaveBiggestComponent(
+                       features_vec,
+                       pairwise_matches_vec,
+                       conf_threshold));
+}
+
+extern "C"
+struct StringWrapper detail_matchesGraphAsString(
+        struct StringArray pathes, struct ClassArray pairwise_matches, float conf_threshold)
+{
+    struct StringWrapper result;
+    std::vector<cv::String> pathes_vec = pathes;
+    std::vector<cv::detail::MatchesInfo> pairwise_matches_vec = pairwise_matches;
+    cv::String retval = cv::detail::matchesGraphAsString(pathes_vec, pairwise_matches_vec, conf_threshold);
+    result.str = retval.c_str();
+    return result;
+}
+
+extern "C"
+void detail_waveCorrect(
+        struct TensorArray rmats, int kind)
+{
+    cv::detail::WaveCorrectKind enum_kind;
+    if(kind == 0) enum_kind = cv::detail::WAVE_CORRECT_HORIZ;
+    else enum_kind = cv::detail::WAVE_CORRECT_VERT;
+    std::vector<cv::Mat> rmats_vec = rmats.toMatList();
+    cv::detail::waveCorrect(rmats_vec, enum_kind);
+}
+
 //********************************************************
 //*************************test***************************
 //********************************************************
 
 extern "C"
-struct ClassArray test(struct ClassArray val){
+struct StringArray test(struct StringArray str){
 
     std::cout << "__C++__\n";
-    std::cout << "Size of input vector = "  << val.size << std::endl;
 
-    std::vector<cv::detail::MatchesInfo> temp = val;
+    std::vector<cv::String> vec = str;
 
-    temp.push_back(temp[0]);
+    for(int i = 0; i < vec.size(); i++){
+        std::cout << vec[i];
+    }
+    std::cout << std::endl;
 
-    return temp;
-
+    return StringArray(vec);
  }
 
 //********************************************************

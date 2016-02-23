@@ -104,6 +104,7 @@ struct GraphPtr {
 
     inline detail::Graph * operator->() {
 			return static_cast<detail::Graph *>(ptr); }
+	GraphPtr() {}
     inline GraphPtr(detail::Graph *ptr) { this->ptr = ptr; }
 };
 
@@ -289,6 +290,8 @@ extern "C"
 struct ImageFeaturesPtr {
 	void *ptr;
 
+	ImageFeaturesPtr() {}
+
 	inline detail::ImageFeatures * operator->() {
 		return static_cast<detail::ImageFeatures *>(ptr); }
 	inline ImageFeaturesPtr(detail::ImageFeatures *ptr) { this->ptr = ptr; }
@@ -366,7 +369,29 @@ struct BestOf2NearestRangeMatcherPtr BestOf2NearestRangeMatcher_ctor(
 		int num_matches_thresh1, int num_matches_thresh2);
 
 
+extern "C"
+void detail_waveCorrect(
+		struct TensorArray rmats, int kind);
+
 //**********************Rotation Estimation********************************
+
+struct GraphPtrPlusIntArray {
+	struct GraphPtr graph;
+	struct IntArray array;
+};
+
+extern "C"
+struct GraphPtrPlusIntArray detail_findMaxSpanningTree(
+		int num_images, struct ClassArray pairwise_matches);
+
+extern "C"
+struct IntArray detail_leaveBiggestComponent(
+		struct ClassArray features, struct ClassArray pairwise_matches, float conf_threshold);
+
+extern "C"
+struct StringWrapper detail_matchesGraphAsString(
+		struct StringArray pathes, struct ClassArray pairwise_matches, float conf_threshold);
+
 
 //********************************************************
 //*************************test***************************
@@ -374,7 +399,7 @@ struct BestOf2NearestRangeMatcherPtr BestOf2NearestRangeMatcher_ctor(
 
 
 extern "C"
-struct ClassArray test(struct ClassArray val);
+struct StringArray test(struct StringArray str);
 
 //********************************************************
 //*************************test***************************

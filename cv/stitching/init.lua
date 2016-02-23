@@ -1,5 +1,6 @@
 local cv = require 'cv._env'
 local ffi = require 'ffi'
+require 'cv.Classes'
 
 ffi.cdef[[
 struct RectPlusBool detail_overlapRoi(
@@ -21,12 +22,28 @@ void detail_selectRandomSubset(
 	int count, int size);
 
 int detail_stitchingLogLevel();
+
+struct GraphPtrPlusIntArray {
+	struct IntArray array;
+	struct PtrWrapper graph;
+};
+
+struct GraphPtrPlusIntArray detail_findMaxSpanningTree(
+        int num_images, struct ClassArray pairwise_matches);
+
+struct IntArray detail_leaveBiggestComponent(
+        struct ClassArray features, struct ClassArray pairwise_matches, float conf_threshold);
+
+struct StringWrapper detail_matchesGraphAsString(
+        struct StringArray pathes, struct ClassArray pairwise_matches, float conf_threshold);
+
+void detail_waveCorrect(
+        struct TensorArray rmats, int kind);
 ]]
 
 local C = ffi.load(cv.libPath('stitching'))
 
-detail = {}
-cv.detail = detail;
+cv.detail = {};
 
 function cv.detail.overlapRoi(t)
     local argRules = {
@@ -74,9 +91,54 @@ function cv.detail.stitchingLogLevel(t)
     C.detail.stitchingLogLevel()
 end
 
---- ***************** Classes *****************
+--**********************Rotation Estimation********************************
 
-require 'cv.Classes'
+cv.detail.WAVE_CORRECT_HORIZ = 0;
+cv.detail.WAVE_CORRECT_VERT = 1;
+
+function cv.detail.findMaxSpanningTree(t)
+    local argRules = {
+        {"num_images", required = true},
+        {"pairwise_matches", required = true}}
+    local num_images, pairwise_matches = cv.argcheck(t, argRules)
+    local array = cv.newArray("Class", pairwise_matches)
+    local result = C.detail_findMaxSpanningTree(num_images, array)
+    local retval = cv.MatchesInfo
+    retval.ptr = result.graph
+    return retval, cv.gcarray(result.array)
+end
+
+function cv.detail.leaveBiggestComponent(t)
+    local argRules = {
+        {"features", required = true},
+        {"pairwise_matches", required  = true},
+        {"conf_threshold", required = true}}
+    local features, pairwise_matches, conf_threshold = cv.argcheck(t, argRules)
+    return cv.gcarray(
+                C.detail_leaveBiggestComponent(
+                    cv.newArray("Class", features), cv.newArray("Class", pairwise_matches), conf_threshold))
+end
+
+function cv.detail.matchesGraphAsString(t)
+    local argRules = {
+        {"pathes", required = true},
+        {"pairwise_matches", required = true},
+        {"conf_threshold", required = true}}
+    local pathes, pairwise_matches, conf_threshold = cv.argcheck(t, argRules)
+    return cv.unwrap_string(
+                C.detail_matchesGraphAsString(
+                    cv.newArray("cv.String", pathes), cv.newArray("Class", pairwise_matches), conf_threshold))
+end
+
+function cv.detail.waveCorrect(t)
+    local argRules = {
+        {"rmats", required = true},
+        {"kind", required = true} }
+    local rmats, kind = cv.argcheck(t, argRules)
+    C.detail_waveCorrect(cv.wrap_tensors(rmats), kind)
+end
+
+--- ***************** Classes *****************
 
 local Classes = ffi.load(cv.libPath('Classes'))
 
@@ -203,22 +265,8 @@ struct PtrWrapper OrbFeaturesFinder_ctor(
 struct PtrWrapper SurfFeaturesFinder_ctor(
         double hess_thresh, int num_octaves, int num_layers, int num_octaves_descr, int num_layers_descr);
 
-struct ClassArray test(struct ClassArray val);
+struct StringArray test(struct StringArray str);
 ]]
-
---********************************************************
---*************************test***************************
---********************************************************
-
-
-function cv.test(t)
-    return cv.gcarray(C.test(t), true, "MatchesInfo");
-end
-
---********************************************************
---*************************test***************************
---********************************************************
-
 
 --CameraParams
 
@@ -489,7 +537,7 @@ do
         C.FeaturesMatcher_collectGarbage(self.ptr);
     end
 
-    function FeaturesMatcher_isThreadSafe()
+    function FeaturesMatcher:isThreadSafe()
         return C.FeaturesMatcher_isThreadSafe(self.ptr);
     end
 
@@ -550,5 +598,18 @@ do
 
 --TODO need to make operator()
 end
+
+--********************************************************
+--*************************test***************************
+--********************************************************
+
+function cv.test(t)
+   local retval = cv.newArray('cv.String', t)
+   return cv.unwrap_string(C.test(retval))
+end
+
+--********************************************************
+--*************************test***************************
+--********************************************************
 
 return cv

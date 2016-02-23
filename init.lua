@@ -253,6 +253,15 @@ struct PointArrayOfArrays {
     int *sizes;
 };
 
+struct StringWrapper {
+    const char *str;
+};
+
+struct StringArray {
+    struct StringWrapper *data;
+    int size;
+};
+
 // for debugging
 void refcount(void *x);
 
@@ -494,6 +503,10 @@ function cv.RotatedRect(...)
     return ffi.new('struct RotatedRectWrapper', ...)
 end
 
+function cv.String(...)
+    return ffi.new('struct StringWrapper', ...)
+end
+
 --- ***************** Other helper structs *****************
 
 --[[
@@ -650,23 +663,55 @@ void MatchesInfo_dtor(
 struct PtrWrapper other);
 ]]
 
-function cv.gcarray(array, isClass, name_class)
+function cv.gcarray(array)
+    array.data = ffi.gc(array.data, C.free)
+    return array
+end
 
---[[    if isClass then
-        assert( name_class ~= nil, "The name of class is needed")
+function cv.unwrap_string(array)
 
-        if(name_class == 'MatchesInfo') then
-            for i = 1, array.size-1 do
-                array.data[i].ptr = ffi.gc(array.data[i], C.MatchesInfo_dtor)
-            end
-        end
 
-        --other classe
-    end   ]]              -- error free function
+    if ffi.istype('struct  StringWrapper', array) then
+        return ffi.string(array.str)
+    end
 
     array.data = ffi.gc(array.data, C.free)
 
-    return array
+    local string_array = {}
+    for i = 1,array.size do
+        string_array[i] = ffi.string(array.data[i-1].str)
+    end
+
+    return string_array
+end
+
+function cv.unwrap_class(array, name_class)
+
+    --need to add unwrapper for every class
+
+    if name_class == "MatchesInfo" then
+        local class_array = {}
+        for i = 1,array.size do
+            local temp = cv[name_class]
+            temp.ptr = ffi.gc(array.data[i-1], C.MatchesInfo_dtor)
+            class_array[i] = temp
+        end
+
+        return class_array
+    end
+
+    if name_class == "ImageFeatures" then
+        local class_array = {}
+        for i = 1,array.size do
+            local temp = cv[name_class]
+            temp.ptr = ffi.gc(array.data[i-1], C.ImageFeatures_dtor)
+            class_array[i] = temp
+        end
+
+        return class_array
+    end
+
+    return nil
 end
 
 -- for debugging

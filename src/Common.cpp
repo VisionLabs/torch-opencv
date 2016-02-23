@@ -520,6 +520,22 @@ ClassArray::ClassArray(const std::vector<cv::detail::MatchesInfo> & vec)
     this->data = temp;
 }
 
+ClassArray::ClassArray(const std::vector<cv::detail::ImageFeatures> & vec)
+{
+    ImageFeaturesPtr *temp = static_cast<ImageFeaturesPtr *>(malloc(vec.size() * sizeof(ImageFeaturesPtr)));
+
+    this->size = vec.size();
+
+    ImageFeaturesPtr class_wrapped;
+
+    for (int i = 0; i < vec.size(); i++) {
+        class_wrapped.ptr = new cv::detail::ImageFeatures(vec[i]);;
+        temp[i] = class_wrapped;
+    }
+    this->data = temp;
+}
+
+
 ClassArray::operator std::vector<cv::detail::MatchesInfo>()
 {
     MatchesInfoPtr *temp =
@@ -528,7 +544,42 @@ ClassArray::operator std::vector<cv::detail::MatchesInfo>()
     std::vector<cv::detail::MatchesInfo> retval(this->size);
 
     for(int i = 0; i < this->size; i++) {
-        retval[i] = *static_cast<cv::detail::MatchesInfo *>(temp[i].ptr);;
+        retval[i] = *static_cast<cv::detail::MatchesInfo *>(temp[i].ptr);
+        //memcpy(retval.data() + i, temp[i].ptr, sizeof(cv::detail::MatchesInfo));
+    }
+    return retval;
+}
+
+ClassArray::operator std::vector<cv::detail::ImageFeatures>()
+{
+    ImageFeaturesPtr *temp =
+            static_cast<ImageFeaturesPtr *>(this->data);
+
+    std::vector<cv::detail::ImageFeatures> retval(this->size);
+
+    for(int i = 0; i < this->size; i++) {
+        retval[i] = *static_cast<cv::detail::ImageFeatures *>(temp[i].ptr);
+        //memcpy(retval.data() + i, temp[i].ptr, sizeof(cv::detail::ImageFeatures));
+    }
+    return retval;
+}
+
+StringArray::StringArray(const std::vector<cv::String> vec)
+{
+    this->size = vec.size();
+
+    this->data = static_cast<struct StringWrapper *>(malloc(vec.size() * sizeof(struct StringWrapper)));
+
+    for(int i = 0; i < vec.size(); i++) {
+        this->data[i].str = vec[i].c_str();
+    }
+}
+
+StringArray::operator std::vector<cv::String>()
+{
+    std::vector<cv::String> retval(this->size);
+    for(int i = 0; i < this->size; i++){
+        retval[i] = this->data[i].str;
     }
     return retval;
 }
