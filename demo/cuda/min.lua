@@ -3,7 +3,7 @@ local cv = require "cv"
 require "cutorch"
 require "cv.cudaarithm"
 
-local n = 5
+local n = 20
 
 local a = (torch.rand(n, n) * 10):int():float():cuda()
 local b = (torch.rand(n, n) * 10):int():float():cuda()
