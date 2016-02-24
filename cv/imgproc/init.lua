@@ -418,6 +418,10 @@ struct ScalarPlusBool clipLineRect(
 
 void putText(
         struct TensorWrapper img, const char *text, struct PointWrapper org, int fontFace, double fontScale, struct ScalarWrapper color, int thickness, int lineType, bool bottomLeftOrigin);
+
+struct TensorWrapper addWeighted(
+        struct TensorWrapper src1, double alpha, struct TensorWrapper src2, double beta,
+        double gamma, struct TensorWrapper dst, int dtype);
 ]]
 
 
@@ -3065,6 +3069,23 @@ function cv.LineIterator(t)
     end
 
     return lineIter, nil, nil
+end
+
+function cv.addWeighted(t)
+    local argRules = {
+        {"src1", required = true},
+        {"alpha", required = true},
+        {"src2", required = true},
+        {"beta", required = true},
+        {"gamma", required = true},
+        {"dst", default = nil},
+        {"dtype", default = -1}
+    }
+    local src1, alpha, src2, beta, gamma, dst, dtype = cv.argcheck(t, argRules)
+
+    return cv.unwrap_tensors(C.addWeighted(
+        cv.wrap_tensor(src1), alpha, cv.wrap_tensor(src2), 
+        beta, gamma, cv.wrap_tensor(dst), dtype))
 end
 
 return cv

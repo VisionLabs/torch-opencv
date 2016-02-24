@@ -7,11 +7,12 @@ require 'cv.calib3d'
 local numImages = 7
 local patternSize = cv.Size(4, 3)
 local imageSize = cv.Size(640, 360)
+local imagesPathPrefix = 'demo/data/calibrateCamera/'
 
 local img = {}
 
 for i = 1, numImages do
-    img[i] = cv.imread{'demo/templates/template'..i..'.jpg'}
+    img[i] = cv.imread{imagesPathPrefix..'template'..i..'.jpg'}
 end
 
 local corners = {}
@@ -63,7 +64,7 @@ local error, cameraMatrix, distCoeffs, rvecs, tvecs =
 
 print('Final re-projection error: '..error)
 
-local src = cv.imread{'demo/templates/image.jpg'}
+local src = cv.imread{imagesPathPrefix..'image.jpg'}
 cv.imshow{"Photo to undistort", src}
 cv.waitKey{0}
 

@@ -1594,7 +1594,7 @@ extern "C"
 struct TensorWrapper LineSegmentDetector_drawSegments(
         struct LineSegmentDetectorPtr ptr, struct TensorWrapper image, struct TensorWrapper lines)
 {
-    // TODO are we able to not clone this?
+    // TODO are we able not to clone this?
     cv::Mat retval = image.toMat().clone();
     ptr->drawSegments(retval, lines.toMat());
     return TensorWrapper(retval);
@@ -1777,4 +1777,14 @@ extern "C"
 void LineIterator_incr(struct LineIteratorPtr ptr)
 {
     ++(*static_cast<cv::LineIterator *>(ptr.ptr));
+}
+
+extern "C"
+struct TensorWrapper addWeighted(
+        struct TensorWrapper src1, double alpha, struct TensorWrapper src2, double beta,
+        double gamma, struct TensorWrapper dst, int dtype)
+{
+    MatT dstMat = dst.toMatT();
+    cv::addWeighted(src1.toMat(), alpha, src2.toMat(), beta, gamma, dstMat, dtype);
+    return TensorWrapper(dstMat);
 }

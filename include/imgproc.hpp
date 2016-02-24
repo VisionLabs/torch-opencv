@@ -824,3 +824,8 @@ struct PointWrapper LineIterator_pos(struct LineIteratorPtr ptr);
 
 extern "C"
 void LineIterator_incr(struct LineIteratorPtr ptr);
+
+extern "C"
+struct TensorWrapper addWeighted(
+        struct TensorWrapper src1, double alpha, struct TensorWrapper src2, double beta,
+        double gamma, struct TensorWrapper dst, int dtype);

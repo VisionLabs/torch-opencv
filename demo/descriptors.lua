@@ -5,10 +5,10 @@ require 'cv.highgui'
 
 if not arg[1] then
     print('Usage: `th demo/descriptors.lua path-to-image`')
-    print('Now using demo/lena.jpg')
+    print('Now using demo/data/lena.jpg')
 end
 
-local image = cv.imread{arg[1] or 'demo/lena.jpg'}
+local image = cv.imread{arg[1] or 'demo/data/lena.jpg'}
 
 if not image then
     print("Problem loading image\n")

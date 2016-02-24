@@ -83,7 +83,7 @@ int createTrackbar(
         const char *trackbarname, const char *winname, int *value,
         int count, cv::TrackbarCallback onChange, void *userdata)
 {
-    return cv::createTrackbar(trackbarname, winname, nullptr, count, onChange, userdata);
+    return cv::createTrackbar(trackbarname, winname, value, count, onChange, userdata);
 }
 
 extern "C"

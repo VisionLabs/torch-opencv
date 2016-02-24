@@ -4,7 +4,7 @@ require 'cv.imgcodecs'
 require 'cv.highgui'
 require 'cv.calib3d'
 
-local img = cv.imread{arg[1] or 'demo/circles_pattern.png'}
+local img = cv.imread{arg[1] or 'demo/data/circles_pattern.png'}
 
 local flag , centers = cv.findCirclesGrid{image = img, patternSize = {4,11}, flags = cv.CALIB_CB_ASYMMETRIC_GRID}
 
