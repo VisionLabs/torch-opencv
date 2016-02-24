@@ -752,13 +752,13 @@ end
 function cv.Canny(t)
     local argRules = {
         {"image", required = true},
-        {"edges", default = nil},
         {"threshold1", required = true},
         {"threshold2", required = true},
+        {"edges", default = nil},
         {"apertureSize", default = 3},
         {"L2gradient", default = false}
     }
-    local image, edges, threshold1, threshold2, apertureSize, L2gradient = cv.argcheck(t, argRules)
+    local image, threshold1, threshold2, edges, apertureSize, L2gradient = cv.argcheck(t, argRules)
 
     assert(cv.tensorType(image) == cv.CV_8U)
 

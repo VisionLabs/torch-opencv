@@ -18,23 +18,22 @@ local _, frame = cap:read{}
 local edges = frame.new(frame:size()[1], frame:size()[2])
 
 while true do
-    
     cv.cvtColor{frame, edges, cv.COLOR_BGR2GRAY}
 
     cv.GaussianBlur{
         edges,
-        edges,
         ksize = {7,7},
         sigmaX = 1.5,
-        sigmaY = 1.5
+        sigmaY = 1.5,
+        dst = edges
     }
 
     cv.Canny{
-        edges,
-        edges,
+        image = edges,
         threshold1 = 0,
         threshold2 = 30,
-        apertureSize = 3
+        apertureSize = 3,
+        edges = edges
     }
 
     cv.imshow{"edges", edges}
