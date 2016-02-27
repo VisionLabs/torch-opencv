@@ -313,20 +313,23 @@ cv.EMPTY_MULTI_WRAPPER = ffi.new("struct TensorArray", nil)
 function cv.tensorType(tensor)
     -- get the first letter of Tensor type
     local typeString = tensor:type()
-    local letter1, letter2 = typeString:byte(7), typeString:byte(8)
+    local letter = typeString:byte(7)
 
-    if letter1 == 76 then
+    if letter == 76 then
+        -- L (ongTensor)
         error("Sorry, LongTensors aren't supported. Consider using IntTensor")
-    elseif letter1 == 67 then
-        letter1 = letter2
+    elseif letter == 67 then
+        -- C (harTensor or udaTensor; take second letter to clarify)
+        letter = typeString:byte(8)
     end
 
-    return tensor_CV_code_by_letter[letter1]
+    return tensor_CV_code_by_letter[letter]
 end
 
 local
 function empty_tensor_of_type(code)
-    assert(code ~= cv.CV_16U, "Sorry, cv::Mats of type CV_16U aren't supported.")
+    -- See #94
+    -- assert(code ~= cv.CV_16U, "Sorry, cv::Mats of type CV_16U aren't supported.")
     return torch[tensor_type_by_CV_code[code] .. "Tensor"]()
 end
 
@@ -366,7 +369,7 @@ function cv.wrap_tensors(...)
     return wrapper
 end
 
--- struct TensorWrapper(s) ---> torch.RealTensor
+-- struct TensorWrapper(s) ---> torch.<type>Tensor(s)
 function cv.unwrap_tensors(wrapper, toTable)
     if ffi.istype(ffi.typeof(wrapper), cv.EMPTY_WRAPPER) then
         -- handle single tensor

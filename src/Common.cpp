@@ -71,14 +71,27 @@ MatT::MatT() {
 TensorWrapper::TensorWrapper(): tensorPtr(nullptr) {}
 
 // TODO replace completely with TensorWrapper(MatT &)
-TensorWrapper::TensorWrapper(cv::Mat & mat) {
+TensorWrapper::TensorWrapper(cv::Mat & matArg) {
 
-    if (mat.empty()) {
+    if (matArg.empty()) {
         this->tensorPtr = nullptr;
         return;
     }
 
-    this->typeCode = static_cast<char>(mat.depth());
+    cv::Mat *matPtr;
+
+    // See #94
+    if (matArg.depth() == CV_16U) {
+        matPtr = new cv::Mat;
+        matArg.convertTo(*matPtr, CV_32F, 1.0 / 65535);
+        this->typeCode = CV_32F;
+    } else {
+        matPtr = &matArg;
+        this->typeCode = static_cast<char>(matArg.depth());
+    }
+
+    // For convenience
+    cv::Mat & mat = *matPtr;
 
     this->definedInLua = false;
 
@@ -135,7 +148,20 @@ TensorWrapper::TensorWrapper(MatT & matT) {
         return;
     }
 
-    this->typeCode = static_cast<char>(matT.mat.depth());
+    cv::Mat *matPtr;
+
+    // See #94
+    if (matT.mat.depth() == CV_16U) {
+        matPtr = new cv::Mat;
+        matT.mat.convertTo(*matPtr, CV_32F, 1.0 / 65535);
+        this->typeCode = CV_32F;
+    } else {
+        matPtr = &matT.mat;
+        this->typeCode = static_cast<char>(matT.mat.depth());
+    }
+
+    // For convenience
+    cv::Mat & mat = *matPtr;
 
     if (matT.tensor != nullptr) {
         // Mat is already constructed on another Tensor, so return that
@@ -143,11 +169,9 @@ TensorWrapper::TensorWrapper(MatT & matT) {
         this->definedInLua = true;
         THAtomicIncrementRef(&this->tensorPtr->storage->refcount);
         return;
+    } else {
+        this->definedInLua = false;
     }
-
-    this->definedInLua = false;
-
-    cv::Mat & mat = matT.mat;
 
     THByteTensor *outputPtr = THByteTensor_new();
 

@@ -30,7 +30,7 @@ local function onTrackbar()
     cv.imshow {"Linear Blend", dst}
 end
 
-cv.namedWindow{'Linear Blend', 1}
+cv.namedWindow{'Linear Blend', cv.WINDOW_AUTOSIZE}
 
 local trackbarName = 'Alpha x '..alphaSliderMax
 cv.createTrackbar{trackbarName, 'Linear Blend', alphaSlider, alphaSliderMax, onTrackbar}
