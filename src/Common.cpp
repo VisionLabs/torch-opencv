@@ -535,6 +535,20 @@ ClassArray::ClassArray(const std::vector<cv::detail::ImageFeatures> & vec)
     this->data = temp;
 }
 
+ClassArray::ClassArray(const std::vector<cv::detail::CameraParams> & vec)
+{
+    CameraParamsPtr *temp = static_cast<CameraParamsPtr *>(malloc(vec.size() * sizeof(CameraParamsPtr)));
+
+    this->size = vec.size();
+
+    CameraParamsPtr class_wrapped;
+
+    for (int i = 0; i < vec.size(); i++) {
+        class_wrapped.ptr = new cv::detail::CameraParams(vec[i]);;
+        temp[i] = class_wrapped;
+    }
+    this->data = temp;
+}
 
 ClassArray::operator std::vector<cv::detail::MatchesInfo>()
 {
@@ -564,6 +578,20 @@ ClassArray::operator std::vector<cv::detail::ImageFeatures>()
     return retval;
 }
 
+ClassArray::operator std::vector<cv::detail::CameraParams>()
+{
+    CameraParamsPtr *temp =
+            static_cast<CameraParamsPtr *>(this->data);
+
+    std::vector<cv::detail::CameraParams> retval(this->size);
+
+    for(int i = 0; i < this->size; i++) {
+        retval[i] = *static_cast<cv::detail::CameraParams *>(temp[i].ptr);
+        //memcpy(retval.data() + i, temp[i].ptr, sizeof(cv::detail::CameraParams));
+    }
+    return retval;
+}
+
 StringArray::StringArray(const std::vector<cv::String> vec)
 {
     this->size = vec.size();
@@ -571,6 +599,7 @@ StringArray::StringArray(const std::vector<cv::String> vec)
     this->data = static_cast<struct StringWrapper *>(malloc(vec.size() * sizeof(struct StringWrapper)));
 
     for(int i = 0; i < vec.size(); i++) {
+        this->data[i].str = static_cast<char *>(malloc((vec[i].length()+1) * sizeof(char)));
         this->data[i].str = vec[i].c_str();
     }
 }
@@ -587,6 +616,24 @@ StringArray::operator std::vector<cv::String>()
 IntArray::IntArray(const std::vector<int> vec):
         size(vec.size()),
         data(static_cast<int *>(malloc(vec.size() * sizeof(int))))
+{
+    for(int i = 0; i < vec.size(); i++){
+        data[i] = vec[i];
+    }
+}
+
+FloatArray::FloatArray(const std::vector<float> vec):
+        size(vec.size()),
+        data(static_cast<float *>(malloc(vec.size() * sizeof(float))))
+{
+    for(int i = 0; i < vec.size(); i++){
+        data[i] = vec[i];
+    }
+}
+
+DoubleArray::DoubleArray(const std::vector<double> vec):
+        size(vec.size()),
+        data(static_cast<double *>(malloc(vec.size() * sizeof(double))))
 {
     for(int i = 0; i < vec.size(); i++){
         data[i] = vec[i];

@@ -166,6 +166,11 @@ struct TensorArrayPlusInt {
     int val;
 };
 
+struct TensorArrayPlusRect {
+    struct TensorArray tensors;
+    struct RectWrapper rect;
+};
+
 struct TensorArrayPlusFloat {
     struct TensorArray tensors;
     float val;
@@ -234,6 +239,11 @@ struct ClassArray {
 struct TensorPlusRectArray {
     struct TensorWrapper tensor;
     struct RectArray rects;
+};
+
+struct TensorPlusPoint {
+    struct TensorWrapper tensor;
+    struct PointWrapper point;
 };
 
 struct FloatArrayOfArrays {
@@ -672,6 +682,7 @@ function cv.unwrap_string(array)
 
 
     if ffi.istype('struct  StringWrapper', array) then
+        array.str = ffi.gc(array.str, C.free)
         return ffi.string(array.str)
     end
 
@@ -679,6 +690,7 @@ function cv.unwrap_string(array)
 
     local string_array = {}
     for i = 1,array.size do
+        array.data[i-1].str = ffi.gc(array.data[i-1].str, C.free)
         string_array[i] = ffi.string(array.data[i-1].str)
     end
 
@@ -705,6 +717,17 @@ function cv.unwrap_class(array, name_class)
         for i = 1,array.size do
             local temp = cv[name_class]
             temp.ptr = ffi.gc(array.data[i-1], C.ImageFeatures_dtor)
+            class_array[i] = temp
+        end
+
+        return class_array
+    end
+
+    if name_class == "CameraParams" then
+        local class_array = {}
+        for i = 1,array.size do
+            local temp = cv[name_class]
+            temp.ptr = ffi.gc(array.data[i-1], C.CameraParams_dtor)
             class_array[i] = temp
         end
 

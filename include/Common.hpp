@@ -128,6 +128,8 @@ struct TermCriteriaWrapper {
     int type, maxCount;
     double epsilon;
 
+    TermCriteriaWrapper() {}
+
     inline operator cv::TermCriteria() { return cv::TermCriteria(type, maxCount, epsilon); }
     inline cv::TermCriteria orDefault(cv::TermCriteria defaultVal) {
         return (this->type == 0 ? defaultVal : *this);
@@ -187,6 +189,8 @@ struct PointWrapper {
     int x, y;
 
     inline operator cv::Point() { return cv::Point(x, y); }
+
+    PointWrapper() {}
     PointWrapper(const cv::Point & other);
 };
 
@@ -302,6 +306,11 @@ struct TensorPlusRect {
     struct RectWrapper rect;
 };
 
+struct TensorPlusPoint {
+    struct TensorWrapper tensor;
+    struct PointWrapper point;
+};
+
 struct TensorArrayPlusFloat {
     struct TensorArray tensors;
     float val;
@@ -325,6 +334,11 @@ struct TensorArrayPlusBool {
 struct TensorArrayPlusVec3d {
     struct TensorArray tensors;
     struct Vec3dWrapper vec3d;
+};
+
+struct TensorArrayPlusRect {
+    struct TensorArray tensors;
+    struct RectWrapper rect;
 };
 
 struct RectPlusInt {
@@ -390,6 +404,10 @@ struct IntArray {
 struct FloatArray {
     float *data;
     int size;
+
+    FloatArray() {}
+    FloatArray(const std::vector<float> vec);
+
     inline std::vector<float>& toFloatList(std::vector<float>& res) {
         for (int i = 0; i < size; ++i)
             res.push_back(data[i]);
@@ -400,6 +418,15 @@ struct FloatArray {
 struct DoubleArray {
     double *data;
     int size;
+
+    DoubleArray() {}
+    DoubleArray(const std::vector<double> vec);
+
+    inline std::vector<double>& toFloatList(std::vector<double>& res) {
+        for (int i = 0; i < size; ++i)
+            res.push_back(data[i]);
+        return res;
+    }
 };
 
 struct PointArray {
@@ -437,9 +464,11 @@ struct ClassArray {
 
     ClassArray(const std::vector<cv::detail::ImageFeatures> & vec);
     ClassArray(const std::vector<cv::detail::MatchesInfo> & vec);
+    ClassArray(const std::vector<cv::detail::CameraParams> & vec);
 
     operator std::vector<cv::detail::ImageFeatures>();
     operator std::vector<cv::detail::MatchesInfo>();
+    operator std::vector<cv::detail::CameraParams>();
 };
 
 struct TensorPlusRectArray {
