@@ -20,7 +20,7 @@ cuda::GpuMat TensorWrapper::toGpuMat() {
             tensorPtr->size[0],
             tensorPtr->size[1],
             CV_32FC(numChannels),
-            tensorPtr->storage->data,
+            tensorPtr->storage->data + tensorPtr->storageOffset * CV_ELEM_SIZE(CV_32F),
             tensorPtr->stride[0] * sizeof(float)
     );
 }
