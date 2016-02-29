@@ -7,7 +7,100 @@ cv.cuda = cv.cuda or require 'cv._env_cuda'
 local ffi = require 'ffi'
 
 ffi.cdef[[
+struct PtrWrapper HOG_ctor(
+        struct SizeWrapper win_size, struct SizeWrapper block_size,
+        struct SizeWrapper block_stride, struct SizeWrapper cell_size, int nbins);
 
+void HOG_setWinSigma(struct PtrWrapper ptr, double val);
+
+double HOG_getWinSigma(struct PtrWrapper ptr);
+
+void HOG_setL2HysThreshold(struct PtrWrapper ptr, double val);
+
+double HOG_getL2HysThreshold(struct PtrWrapper ptr);
+
+void HOG_setGammaCorrection(struct PtrWrapper ptr, bool val);
+
+bool HOG_getGammaCorrection(struct PtrWrapper ptr);
+
+void HOG_setNumLevels(struct PtrWrapper ptr, int val);
+
+int HOG_getNumLevels(struct PtrWrapper ptr);
+
+void HOG_setHitThreshold(struct PtrWrapper ptr, double val);
+
+double HOG_getHitThreshold(struct PtrWrapper ptr);
+
+void HOG_setWinStride(struct PtrWrapper ptr, struct SizeWrapper val);
+
+struct SizeWrapper HOG_getWinStride(struct PtrWrapper ptr);
+
+void HOG_setScaleFactor(struct PtrWrapper ptr, double val);
+
+double HOG_getScaleFactor(struct PtrWrapper ptr);
+
+void HOG_setGroupThreshold(struct PtrWrapper ptr, int val);
+
+int HOG_getGroupThreshold(struct PtrWrapper ptr);
+
+void HOG_setDescriptorFormat(struct PtrWrapper ptr, int val);
+
+int HOG_getDescriptorFormat(struct PtrWrapper ptr);
+
+size_t HOG_getDescriptorSize(struct PtrWrapper ptr);
+
+size_t HOG_getBlockHistogramSize(struct PtrWrapper ptr);
+
+void HOG_setSVMDetector(struct PtrWrapper ptr, struct TensorWrapper val);
+
+struct TensorWrapper HOG_getDefaultPeopleDetector(struct PtrWrapper ptr);
+
+struct TensorPlusPointArray HOG_detect(
+        struct cutorchInfo info, struct PtrWrapper ptr, struct TensorWrapper img);
+
+struct TensorPlusRectArray HOG_detectMultiScale(
+        struct cutorchInfo info, struct PtrWrapper ptr, struct TensorWrapper img);
+
+struct TensorWrapper HOG_compute(
+        struct cutorchInfo info, struct PtrWrapper ptr, struct TensorWrapper img,
+        struct TensorWrapper descriptors);
+
+struct PtrWrapper CascadeClassifier_ctor_filename(const char *filename);
+
+struct PtrWrapper CascadeClassifier_ctor_file(struct FileStoragePtr file);
+
+void CascadeClassifier_setMaxObjectSize(struct PtrWrapper ptr, struct SizeWrapper val);
+
+struct SizeWrapper CascadeClassifier_getMaxObjectSize(struct PtrWrapper ptr);
+
+void CascadeClassifier_setMinObjectSize(struct PtrWrapper ptr, struct SizeWrapper val);
+
+struct SizeWrapper CascadeClassifier_getMinObjectSize(struct PtrWrapper ptr);
+
+void CascadeClassifier_setScaleFactor(struct PtrWrapper ptr, double val);
+
+double CascadeClassifier_getScaleFactor(struct PtrWrapper ptr);
+
+void CascadeClassifier_setMinNeighbors(struct PtrWrapper ptr, int val);
+
+int CascadeClassifier_getMinNeighbors(struct PtrWrapper ptr);
+
+void CascadeClassifier_setFindLargestObject(struct PtrWrapper ptr, bool val);
+
+bool CascadeClassifier_getFindLargestObject(struct PtrWrapper ptr);
+
+void CascadeClassifier_setMaxNumObjects(struct PtrWrapper ptr, int val);
+
+int CascadeClassifier_getMaxNumObjects(struct PtrWrapper ptr);
+
+struct SizeWrapper CascadeClassifier_getClassifierSize(struct PtrWrapper ptr);
+
+struct TensorWrapper CascadeClassifier_detectMultiScale(
+        struct cutorchInfo info, struct PtrWrapper ptr,
+        struct TensorWrapper image, struct TensorWrapper objects);
+
+struct RectArray CascadeClassifier_convert(
+        struct PtrWrapper ptr, struct TensorWrapper gpu_objects);
 ]]
 
 local C = ffi.load(cv.libPath('cudaobjdetect'))
@@ -173,5 +266,107 @@ do
     end
 end
 
+
+do
+    local CascadeClassifier = torch.class('cuda.CascadeClassifier', 'cv.Algorithm', cv.cuda)
+
+    function CascadeClassifier:__init(t)
+        local argRules = {
+            {"file_or_filename", required = true}
+        }
+        local f = cv.argcheck(t, argRules)
+        if type(f) == 'string' then
+            self.ptr = ffi.gc(C.CascadeClassifier_ctor_filename(f, Classes.Algorithm_dtor))
+        else
+            self.ptr = ffi.gc(C.CascadeClassifier_ctor_file(f, Classes.Algorithm_dtor))
+        end
+    end
+
+    function CascadeClassifier:setMaxObjectSize(t)
+        local argRules = {
+            {"val", required = true, operator = cv.Size}
+        }
+        C.CascadeClassifier_setMaxObjectSize(self.ptr, cv.argcheck(t, argRules))
+    end
+
+    function CascadeClassifier:getMaxObjectSize()
+        return C.CascadeClassifier_getMaxObjectSize(self.ptr)
+    end
+
+    function CascadeClassifier:setMinObjectSize(t)
+        local argRules = {
+            {"val", required = true, operator = cv.Size}
+        }
+        C.CascadeClassifier_setMinObjectSize(self.ptr, cv.argcheck(t, argRules))
+    end
+
+    function CascadeClassifier:getMinObjectSize()
+        return C.CascadeClassifier_getMinObjectSize(self.ptr)
+    end
+
+    function CascadeClassifier:setScaleFactor(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        C.CascadeClassifier_setScaleFactor(self.ptr, cv.argcheck(t, argRules))
+    end
+
+    function CascadeClassifier:getScaleFactor()
+        return C.CascadeClassifier_getScaleFactor(self.ptr)
+    end
+
+    function CascadeClassifier:setMinNeighbors(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        C.CascadeClassifier_setMinNeighbors(self.ptr, cv.argcheck(t, argRules))
+    end
+
+    function CascadeClassifier:getMinNeighbors()
+        return C.CascadeClassifier_getMinNeighbors(self.ptr)
+    end
+
+    function CascadeClassifier:setFindLargestObject(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        C.CascadeClassifier_setFindLargestObject(self.ptr, cv.argcheck(t, argRules))
+    end
+
+    function CascadeClassifier:getFindLargestObject()
+        return C.CascadeClassifier_getFindLargestObject(self.ptr)
+    end
+
+    function CascadeClassifier:setMaxNumObjects(t)
+        local argRules = {
+            {"val", required = true}
+        }
+        C.CascadeClassifier_setMaxNumObjects(self.ptr, cv.argcheck(t, argRules))
+    end
+
+    function CascadeClassifier:getMaxNumObjects()
+        return C.CascadeClassifier_getMaxNumObjects(self.ptr)
+    end
+
+    function CascadeClassifier:getClassifierSize()
+        return C.CascadeClassifier_getClassifierSize(self.ptr)
+    end
+
+    function CascadeClassifier:detectMultiScale(t)
+        local argRules = {
+            {"image", required = true, operator = cv.wrap_tensor},
+            {"objects", default = nil, operator = cv.wrap_tensor}
+        }
+        return cv.unwrap_tensors(C.CascadeClassifier_detectMultiScale(
+            cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
+    end
+
+    function CascadeClassifier:convert(t)
+        local argRules = {
+            {"gpu_objects", required = true, operator = cv.wrap_tensor}
+        }
+        return C.CascadeClassifier_convert(self.ptr, cv.argcheck(t, argRules))
+    end
+end
 
 return cv.cuda

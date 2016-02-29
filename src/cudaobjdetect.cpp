@@ -142,7 +142,7 @@ struct TensorWrapper HOG_getDefaultPeopleDetector(struct HOGPtr ptr)
 
 extern "C"
 struct TensorPlusPointArray HOG_detect(
-        cutorchInfo info, struct HOGPtr ptr, struct TensorWrapper img)
+        struct cutorchInfo info, struct HOGPtr ptr, struct TensorWrapper img)
 {
     std::vector<cv::Point> found_locations;
     std::vector<double> confidences;
@@ -156,7 +156,7 @@ struct TensorPlusPointArray HOG_detect(
 
 extern "C"
 struct TensorPlusRectArray HOG_detectMultiScale(
-        cutorchInfo info, struct HOGPtr ptr, struct TensorWrapper img)
+        struct cutorchInfo info, struct HOGPtr ptr, struct TensorWrapper img)
 {
     std::vector<cv::Rect> found_locations;
     std::vector<double> confidences;
@@ -170,7 +170,7 @@ struct TensorPlusRectArray HOG_detectMultiScale(
 
 extern "C"
 struct TensorWrapper HOG_compute(
-        cutorchInfo info, struct HOGPtr ptr, struct TensorWrapper img,
+        struct cutorchInfo info, struct HOGPtr ptr, struct TensorWrapper img,
         struct TensorWrapper descriptors)
 {
     GpuMatT descriptorsMat = descriptors.toGpuMatT();
@@ -178,3 +178,111 @@ struct TensorWrapper HOG_compute(
     return TensorWrapper(descriptorsMat, info.state);
 }
 
+extern "C"
+struct CascadeClassifierPtr CascadeClassifier_ctor_filename(const char *filename)
+{
+    return rescueObjectFromPtr(cuda::CascadeClassifier::create(filename));
+}
+
+extern "C"
+struct CascadeClassifierPtr CascadeClassifier_ctor_file(struct FileStoragePtr file)
+{
+    return rescueObjectFromPtr(cuda::CascadeClassifier::create(*file));
+}
+
+extern "C"
+void CascadeClassifier_setMaxObjectSize(struct CascadeClassifierPtr ptr, struct SizeWrapper val)
+{
+    ptr->setMaxObjectSize(val);
+}
+
+extern "C"
+struct SizeWrapper CascadeClassifier_getMaxObjectSize(struct CascadeClassifierPtr ptr)
+{
+    return ptr->getMaxObjectSize();
+}
+
+extern "C"
+void CascadeClassifier_setMinObjectSize(struct CascadeClassifierPtr ptr, struct SizeWrapper val)
+{
+    ptr->setMinObjectSize(val);
+}
+
+extern "C"
+struct SizeWrapper CascadeClassifier_getMinObjectSize(struct CascadeClassifierPtr ptr)
+{
+    return ptr->getMinObjectSize();
+}
+
+extern "C"
+void CascadeClassifier_setScaleFactor(struct CascadeClassifierPtr ptr, double val)
+{
+    ptr->setScaleFactor(val);
+}
+
+extern "C"
+double CascadeClassifier_getScaleFactor(struct CascadeClassifierPtr ptr)
+{
+    return ptr->getScaleFactor();
+}
+
+extern "C"
+void CascadeClassifier_setMinNeighbors(struct CascadeClassifierPtr ptr, int val)
+{
+    ptr->setMinNeighbors(val);
+}
+
+extern "C"
+int CascadeClassifier_getMinNeighbors(struct CascadeClassifierPtr ptr)
+{
+    return ptr->getMinNeighbors();
+}
+
+extern "C"
+void CascadeClassifier_setFindLargestObject(struct CascadeClassifierPtr ptr, bool val)
+{
+    ptr->setFindLargestObject(val);
+}
+
+extern "C"
+bool CascadeClassifier_getFindLargestObject(struct CascadeClassifierPtr ptr)
+{
+    return ptr->getFindLargestObject();
+}
+
+extern "C"
+void CascadeClassifier_setMaxNumObjects(struct CascadeClassifierPtr ptr, int val)
+{
+    ptr->setMaxNumObjects(val);
+}
+
+extern "C"
+int CascadeClassifier_getMaxNumObjects(struct CascadeClassifierPtr ptr)
+{
+    return ptr->getMaxNumObjects();
+}
+
+extern "C"
+struct SizeWrapper CascadeClassifier_getClassifierSize(struct CascadeClassifierPtr ptr)
+{
+    return ptr->getClassifierSize();
+}
+
+extern "C"
+struct TensorWrapper CascadeClassifier_detectMultiScale(
+        struct cutorchInfo info, struct CascadeClassifierPtr ptr,
+        struct TensorWrapper image, struct TensorWrapper objects)
+{
+    GpuMatT objectsMat = objects.toGpuMatT();
+    ptr->detectMultiScale(image.toGpuMat(), objectsMat, prepareStream(info));
+    return TensorWrapper(objectsMat, info.state);
+}
+
+extern "C"
+struct RectArray CascadeClassifier_convert(
+        struct CascadeClassifierPtr ptr, struct TensorWrapper gpu_objects)
+{
+    std::vector<cv::Rect> objects;
+    ptr->convert(gpu_objects.toGpuMat(), objects);
+    return RectArray(objects);
+}
