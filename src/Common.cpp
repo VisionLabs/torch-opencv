@@ -213,7 +213,7 @@ MatT TensorWrapper::toMatT() {
         retval.tensor = nullptr;
     } else {
         retval.mat = this->toMat();
-        retval.tensor = tensorPtr;
+        retval.tensor = this->tensorPtr;
     }
 
     return retval;

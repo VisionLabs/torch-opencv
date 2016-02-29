@@ -57,6 +57,9 @@ cuda.ALPHA_XOR_PREMUL = 10
 cuda.ALPHA_PLUS_PREMUL = 11
 cuda.ALPHA_PREMUL = 12
 
+cuda.DESCR_FORMAT_ROW_BY_ROW = 0
+cuda.DESCR_FORMAT_COL_BY_COL = 1
+
 local ffi = require 'ffi'
 
 ffi.cdef[[

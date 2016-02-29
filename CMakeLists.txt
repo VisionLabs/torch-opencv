@@ -12,7 +12,7 @@ SET(OPENCV_MODULES_TO_WRAP
 
 IF (BUILD_CUDA)
     SET(OPENCV_MODULES_TO_WRAP ${OPENCV_MODULES_TO_WRAP} cudaarithm cudacodec cudawarping
-        cudafilters cudaoptflow cudabgsegm cudafeatures2d cudaimgproc cudastereo)
+        cudafilters cudaoptflow cudabgsegm cudafeatures2d cudaimgproc cudastereo cudaobjdetect)
 ENDIF()
 
 # Unfortunately, OpenCVConfig.cmake doesn't make use of FIND_PACKAGE's "OPTIONAL_COMPONENTS"

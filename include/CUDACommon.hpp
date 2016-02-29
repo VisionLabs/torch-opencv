@@ -30,6 +30,19 @@ public:
     GpuMatT();
 };
 
+GpuMatT TensorWrapper::toGpuMatT() {
+    GpuMatT retval;
+
+    if (this->isNull()) {
+        retval.tensor = nullptr;
+    } else {
+        retval.mat = this->toGpuMat();
+        retval.tensor = reinterpret_cast<THCudaTensor *>(this->tensorPtr);
+    }
+
+    return retval;
+}
+
 /************************ Fake OpenCV/CUDA classes *************************/
 
 class FakeMemoryPool;

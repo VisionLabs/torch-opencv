@@ -37,7 +37,7 @@ public:
     // The Tensor that `mat` was created from, or nullptr
     THByteTensor *tensor;
 
-    inline operator cv::_InputOutputArray() { return this->mat; }
+    operator cv::_InputOutputArray() { return this->mat; }
     MatT(cv::Mat && mat);
     MatT(cv::Mat & mat);
     MatT();
@@ -54,23 +54,22 @@ struct TensorWrapper {
     TensorWrapper(MatT & mat);
     TensorWrapper(MatT && mat);
 
+    operator cv::Mat();
+    // synonym for operator cv::Mat()
+    cv::Mat toMat() { return *this; }
+    MatT toMatT();
+
     #ifdef WITH_CUDA
     TensorWrapper(cv::cuda::GpuMat & mat, THCState *state);
     TensorWrapper(cv::cuda::GpuMat && mat, THCState *state);
     TensorWrapper(GpuMatT & mat, THCState *state);
     TensorWrapper(GpuMatT && mat, THCState *state);
-    #endif
 
-    operator cv::Mat();
-    // synonym for operator cv::Mat()
-    inline cv::Mat toMat() { return *this; }
-    MatT toMatT();
-
-    #ifdef WITH_CUDA
     cv::cuda::GpuMat toGpuMat();
+    GpuMatT toGpuMatT();
     #endif
 
-    inline bool isNull() { return tensorPtr == nullptr; }
+    bool isNull() { return tensorPtr == nullptr; }
 };
 
 struct TensorArray {
@@ -90,10 +89,10 @@ struct TensorArray {
     operator std::vector<cv::Mat>();
     operator std::vector<MatT>();
     // synonyms for operators
-    inline std::vector<cv::Mat> toMatList()  { return *this; }
-    inline std::vector<MatT>    toMatTList() { return *this; }
+    std::vector<cv::Mat> toMatList()  { return *this; }
+    std::vector<MatT>    toMatTList() { return *this; }
 
-    inline bool isNull() { return tensors == nullptr; }
+    bool isNull() { return tensors == nullptr; }
 };
 
 inline
