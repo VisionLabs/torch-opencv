@@ -9,6 +9,8 @@ extern "C" {
 #ifdef WITH_CUDA
 #include <THC/THC.h>
 #include <opencv2/core/cuda.hpp>
+
+class GpuMatT;
 #endif
 
 #include <iostream>
@@ -55,7 +57,6 @@ struct TensorWrapper {
     #ifdef WITH_CUDA
     TensorWrapper(cv::cuda::GpuMat & mat, THCState *state);
     TensorWrapper(cv::cuda::GpuMat && mat, THCState *state);
-    class GpuMatT;
     TensorWrapper(GpuMatT & mat, THCState *state);
     TensorWrapper(GpuMatT && mat, THCState *state);
     #endif

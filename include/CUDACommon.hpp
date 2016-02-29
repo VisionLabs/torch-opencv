@@ -22,8 +22,11 @@ public:
     THCudaTensor *tensor;
 
     inline operator cv::_InputOutputArray() { return this->mat; }
-    GpuMatT(cuda::GpuMat && mat);
-    GpuMatT(cuda::GpuMat & mat);
+
+    GpuMatT(cuda::GpuMat &&mat);
+
+    GpuMatT(cuda::GpuMat &mat);
+
     GpuMatT();
 };
 

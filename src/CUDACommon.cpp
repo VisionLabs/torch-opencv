@@ -1,7 +1,29 @@
 #include <CUDACommon.hpp>
 
-TensorWrapper::TensorWrapper(GpuMatT & mat, THCState *state) {
+GpuMatT::GpuMatT(cuda::GpuMat & mat) {
+    this->mat = mat;
+    this->tensor = nullptr;
+}
 
+GpuMatT::GpuMatT(cuda::GpuMat && mat) {
+    new (this) GpuMatT(mat);
+}
+
+GpuMatT::GpuMatT() {
+    this->tensor = nullptr;
+}
+
+TensorWrapper::TensorWrapper(GpuMatT & matT, THCState *state) {
+
+    if (matT.tensor != nullptr) {
+        // Mat is already constructed on another Tensor, so return that
+        this->tensorPtr = reinterpret_cast<THByteTensor *>(matT.tensor);
+        this->definedInLua = true;
+        this->typeCode = static_cast<char>(matT.mat.depth());
+        THAtomicIncrementRef(&this->tensorPtr->storage->refcount);
+    } else {
+        new (this) TensorWrapper(matT.mat, state);
+    }
 }
 
 TensorWrapper::TensorWrapper(GpuMatT && mat, THCState *state) {
@@ -35,12 +57,12 @@ cuda::GpuMat TensorWrapper::toGpuMat() {
 
 TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state) {
 
+    this->definedInLua = false;
+
     if (mat.empty()) {
         this->tensorPtr = nullptr;
         return;
     }
-
-    this->definedInLua = false;
 
     assert(mat.depth() == CV_32F);
     this->typeCode = CV_CUDA;

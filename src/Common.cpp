@@ -71,6 +71,8 @@ TensorWrapper::TensorWrapper(): tensorPtr(nullptr) {}
 
 TensorWrapper::TensorWrapper(cv::Mat & matArg) {
 
+    this->definedInLua = false;
+
     if (matArg.empty()) {
         this->tensorPtr = nullptr;
         return;
@@ -147,7 +149,6 @@ TensorWrapper::TensorWrapper(MatT & matT) {
         this->typeCode = static_cast<char>(matT.mat.depth());
         THAtomicIncrementRef(&this->tensorPtr->storage->refcount);
     } else {
-        this->definedInLua = false;
         new (this) TensorWrapper(matT.mat);
     }
 }
