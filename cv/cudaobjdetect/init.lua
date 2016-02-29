@@ -276,9 +276,9 @@ do
         }
         local f = cv.argcheck(t, argRules)
         if type(f) == 'string' then
-            self.ptr = ffi.gc(C.CascadeClassifier_ctor_filename(f, Classes.Algorithm_dtor))
+            self.ptr = ffi.gc(C.CascadeClassifier_ctor_filename(f), Classes.Algorithm_dtor)
         else
-            self.ptr = ffi.gc(C.CascadeClassifier_ctor_file(f, Classes.Algorithm_dtor))
+            self.ptr = ffi.gc(C.CascadeClassifier_ctor_file(f), Classes.Algorithm_dtor)
         end
     end
 
