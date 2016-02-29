@@ -20,7 +20,7 @@ cuda::GpuMat TensorWrapper::toGpuMat() {
             tensorPtr->size[0],
             tensorPtr->size[1],
             CV_32FC(numChannels),
-            tensorPtr->storage->data + tensorPtr->storageOffset * CV_ELEM_SIZE(CV_32F),
+            tensorPtr->storage->data + tensorPtr->storageOffset * cv::getElemSize(CV_32F),
             tensorPtr->stride[0] * sizeof(float)
     );
 }
@@ -32,10 +32,13 @@ TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state) {
         return;
     }
 
+    // TODO GpuMatT
+    this->definedInLua = false;
+
     assert(mat.depth() == CV_32F);
     this->typeCode = CV_CUDA;
 
-    THCudaTensor *outputPtr = new THCudaTensor;
+    THCudaTensor *outputPtr = THCudaTensor_new(state);
 
     // Build new storage on top of the Mat
     outputPtr->storage = THCudaStorage_newWithData(
@@ -58,7 +61,7 @@ TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state) {
 
     if (mat.channels() > 1) {
         outputPtr->size[2] = mat.channels();
-        outputPtr->stride[2] = 1; //cv::getElemSize(returnValue.typeCode);
+        outputPtr->stride[2] = 1;
     }
 
     outputPtr->size[0] = mat.rows;
@@ -72,8 +75,6 @@ TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state) {
     // Make OpenCV treat underlying data as user-allocated
     mat.refcount = nullptr;
 
-    outputPtr->refcount = 0;
-
     this->tensorPtr = reinterpret_cast<THByteTensor *>(outputPtr);
 }
 
@@ -83,24 +84,31 @@ TensorWrapper::TensorWrapper(cuda::GpuMat && mat, THCState *state) {
 }
 
 // Kill "destination" and assign "source" data to it.
-// "destination" is always supposed to be an empty Tensor
+// "destination" is always supposed to be an empty CudaTensor
 extern "C"
 void transfer_tensor_CUDA(THCState *state, THCudaTensor *dst, struct TensorWrapper srcWrapper) {
-    if (dst->storage)
-        THCudaStorage_free(state, dst->storage);
-    if (dst->size)
-        THFree(dst->size);
-    if (dst->stride)
-        THFree(dst->stride);
 
     THCudaTensor *src = reinterpret_cast<THCudaTensor *>(srcWrapper.tensorPtr);
 
-    // TODO !!! align changes with Common.cpp !!!
-    dst->storage = src->storage;
-    dst->size = src->size;
-    dst->stride = src->stride;
     dst->nDimension = src->nDimension;
-    ++dst->refcount;
+    dst->refcount = src->refcount;
+
+    dst->storage = src->storage;
+
+    if (!srcWrapper.definedInLua) {
+        // Don't let Torch deallocate size and stride arrays
+        dst->size = src->size;
+        dst->stride = src->stride;
+        src->size = nullptr;
+        src->stride = nullptr;
+        THAtomicIncrementRef(&src->storage->refcount);
+        THCudaTensor_free(state, src);
+    } else {
+        dst->size   = static_cast<long *>(THAlloc(sizeof(long) * dst->nDimension));
+        dst->stride = static_cast<long *>(THAlloc(sizeof(long) * dst->nDimension));
+        memcpy(dst->size,   src->size,   src->nDimension * sizeof(long));
+        memcpy(dst->stride, src->stride, src->nDimension * sizeof(long));
+    }
 }
 
 TensorArray::TensorArray(std::vector<cuda::GpuMat> & matList, THCState *state):

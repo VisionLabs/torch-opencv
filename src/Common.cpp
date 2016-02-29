@@ -49,7 +49,14 @@ void initAllocator() {
 // for debugging
 
 extern "C"
-void refcount(THByteTensor * x) {
+void refcount(THByteTensor *x, bool isCuda) {
+    if (isCuda) {
+        auto ptr = reinterpret_cast<THCudaTensor *>(x);
+        std::cout << "Tensor refcount: " << ptr->refcount << std::endl;
+        std::cout << "Storage address: " << ptr->storage << std::endl;
+        std::cout << "Storage refcount: " << ptr->storage->refcount << std::endl;
+        return;
+    }
     std::cout << "Tensor refcount: " << x->refcount << std::endl;
     std::cout << "Storage address: " << x->storage << std::endl;
     std::cout << "Storage refcount: " << x->storage->refcount << std::endl;
@@ -196,13 +203,15 @@ TensorWrapper::TensorWrapper(MatT & matT) {
 
     if (mat.channels() > 1) {
         outputPtr->size[outputPtr->nDimension - 1] = mat.channels();
-        outputPtr->stride[outputPtr->nDimension - 1] = 1; //cv::getElemSize(returnValue.typeCode);
+        outputPtr->stride[outputPtr->nDimension - 1] = 1;
     }
 
     for (int i = 0; i < mat.dims; ++i) {
         outputPtr->size[i] = mat.size[i];
         outputPtr->stride[i] = mat.step[i] / sizeMultiplier;
     }
+
+    outputPtr->storageOffset = 0;
 
     // Prevent OpenCV from deallocating Mat memory
     if (mat.u) {

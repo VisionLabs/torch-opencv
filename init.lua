@@ -244,7 +244,7 @@ struct PointArrayOfArrays {
 };
 
 // for debugging
-void refcount(void *x);
+void refcount(void *x, bool isCuda);
 
 ]]
 
@@ -628,7 +628,7 @@ end
 
 -- for debugging
 function cv.refcount(tensor)
-    C.refcount(tensor:cdata())
+    C.refcount(tensor:cdata(), tensor:type() == 'torch.CudaTensor')
 end
 
 return cv
