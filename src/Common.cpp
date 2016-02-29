@@ -47,16 +47,8 @@ void initAllocator() {
 }
 
 // for debugging
-
 extern "C"
-void refcount(THByteTensor *x, bool isCuda) {
-    if (isCuda) {
-        auto ptr = reinterpret_cast<THCudaTensor *>(x);
-        std::cout << "Tensor refcount: " << ptr->refcount << std::endl;
-        std::cout << "Storage address: " << ptr->storage << std::endl;
-        std::cout << "Storage refcount: " << ptr->storage->refcount << std::endl;
-        return;
-    }
+void refcount(THByteTensor *x) {
     std::cout << "Tensor refcount: " << x->refcount << std::endl;
     std::cout << "Storage address: " << x->storage << std::endl;
     std::cout << "Storage refcount: " << x->storage->refcount << std::endl;
@@ -77,7 +69,6 @@ MatT::MatT() {
 
 TensorWrapper::TensorWrapper(): tensorPtr(nullptr) {}
 
-// TODO replace completely with TensorWrapper(MatT &)
 TensorWrapper::TensorWrapper(cv::Mat & matArg) {
 
     if (matArg.empty()) {
@@ -100,94 +91,15 @@ TensorWrapper::TensorWrapper(cv::Mat & matArg) {
     // For convenience
     cv::Mat & mat = *matPtr;
 
-    this->definedInLua = false;
-
     THByteTensor *outputPtr = THByteTensor_new();
 
     // Build new storage on top of the Mat
-
     outputPtr->storage = THByteStorage_newWithDataAndAllocator(
                 mat.data,
                 mat.step[0] * mat.rows,
                 &OpenCVCompatibleAllocator,
                 nullptr
         );
-
-    int sizeMultiplier;
-    if (mat.channels() == 1) {
-        outputPtr->nDimension = mat.dims;
-        sizeMultiplier = cv::getElemSize(mat.depth());
-    } else {
-        outputPtr->nDimension = mat.dims + 1;
-        sizeMultiplier = mat.elemSize1();
-    }
-
-    outputPtr->size = static_cast<long *>(THAlloc(sizeof(long) * outputPtr->nDimension));
-    outputPtr->stride = static_cast<long *>(THAlloc(sizeof(long) * outputPtr->nDimension));
-
-    if (mat.channels() > 1) {
-        outputPtr->size[outputPtr->nDimension - 1] = mat.channels();
-        outputPtr->stride[outputPtr->nDimension - 1] = 1; //cv::getElemSize(returnValue.typeCode);
-    }
-
-    for (int i = 0; i < mat.dims; ++i) {
-        outputPtr->size[i] = mat.size[i];
-        outputPtr->stride[i] = mat.step[i] / sizeMultiplier;
-    }
-
-    // Prevent OpenCV from deallocating Mat memory
-    if (mat.u) {
-        mat.addref();
-    }
-
-    this->tensorPtr = outputPtr;
-}
-
-TensorWrapper::TensorWrapper(cv::Mat && mat) {
-    // invokes TensorWrapper(cv::Mat & mat)
-    new (this) TensorWrapper(mat);
-}
-
-TensorWrapper::TensorWrapper(MatT & matT) {
-
-    if (matT.mat.empty()) {
-        this->tensorPtr = nullptr;
-        return;
-    }
-
-    cv::Mat *matPtr;
-
-    // See #94
-    if (matT.mat.depth() == CV_16U) {
-        matPtr = new cv::Mat;
-        matT.mat.convertTo(*matPtr, CV_32F, 1.0 / 65535);
-        this->typeCode = CV_32F;
-    } else {
-        matPtr = &matT.mat;
-        this->typeCode = static_cast<char>(matT.mat.depth());
-    }
-
-    // For convenience
-    cv::Mat & mat = *matPtr;
-
-    if (matT.tensor != nullptr) {
-        // Mat is already constructed on another Tensor, so return that
-        this->tensorPtr = matT.tensor;
-        this->definedInLua = true;
-        THAtomicIncrementRef(&this->tensorPtr->storage->refcount);
-        return;
-    } else {
-        this->definedInLua = false;
-    }
-
-    THByteTensor *outputPtr = THByteTensor_new();
-
-    // Build new Storage on top of the Mat
-    outputPtr->storage = THByteStorage_newWithDataAndAllocator(
-            mat.data,
-            mat.step[0] * mat.rows,
-            &OpenCVCompatibleAllocator,
-            nullptr);
 
     int sizeMultiplier;
     if (mat.channels() == 1) {
@@ -219,6 +131,25 @@ TensorWrapper::TensorWrapper(MatT & matT) {
     }
 
     this->tensorPtr = outputPtr;
+}
+
+TensorWrapper::TensorWrapper(cv::Mat && mat) {
+    // invokes TensorWrapper(cv::Mat & mat)
+    new (this) TensorWrapper(mat);
+}
+
+TensorWrapper::TensorWrapper(MatT & matT) {
+
+    if (matT.tensor != nullptr) {
+        // Mat is already constructed on another Tensor, so return that
+        this->tensorPtr = matT.tensor;
+        this->definedInLua = true;
+        this->typeCode = static_cast<char>(matT.mat.depth());
+        THAtomicIncrementRef(&this->tensorPtr->storage->refcount);
+    } else {
+        this->definedInLua = false;
+        new (this) TensorWrapper(matT.mat);
+    }
 }
 
 TensorWrapper::TensorWrapper(MatT && mat) {
@@ -277,11 +208,11 @@ TensorWrapper::operator cv::Mat() {
 MatT TensorWrapper::toMatT() {
     MatT retval;
 
-    if (this->tensorPtr) {
+    if (this->isNull()) {
+        retval.tensor = nullptr;
+    } else {
         retval.mat = this->toMat();
         retval.tensor = tensorPtr;
-    } else {
-        retval.tensor = nullptr;
     }
 
     return retval;

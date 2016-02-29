@@ -5,7 +5,7 @@
 extern "C"
 struct TensorWrapper getGaussianKernel(int ksize, double sigma, int ktype)
 {
-    return TensorWrapper(MatT(cv::getGaussianKernel(ksize, sigma, ktype)));
+    return TensorWrapper(cv::getGaussianKernel(ksize, sigma, ktype));
 }
 
 extern "C"

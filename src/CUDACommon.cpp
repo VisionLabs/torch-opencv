@@ -1,5 +1,13 @@
 #include <CUDACommon.hpp>
 
+TensorWrapper::TensorWrapper(GpuMatT & mat, THCState *state) {
+
+}
+
+TensorWrapper::TensorWrapper(GpuMatT && mat, THCState *state) {
+    new (this) TensorWrapper(mat, state);
+}
+
 cuda::GpuMat TensorWrapper::toGpuMat() {
 
     if (this->tensorPtr == nullptr) {
@@ -32,7 +40,6 @@ TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state) {
         return;
     }
 
-    // TODO GpuMatT
     this->definedInLua = false;
 
     assert(mat.depth() == CV_32F);

@@ -51,9 +51,13 @@ struct TensorWrapper {
     TensorWrapper(cv::Mat && mat);
     TensorWrapper(MatT & mat);
     TensorWrapper(MatT && mat);
+
     #ifdef WITH_CUDA
     TensorWrapper(cv::cuda::GpuMat & mat, THCState *state);
     TensorWrapper(cv::cuda::GpuMat && mat, THCState *state);
+    class GpuMatT;
+    TensorWrapper(GpuMatT & mat, THCState *state);
+    TensorWrapper(GpuMatT && mat, THCState *state);
     #endif
 
     operator cv::Mat();

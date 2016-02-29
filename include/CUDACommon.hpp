@@ -15,6 +15,20 @@ struct cutorchInfo {
     THCState *state;
 };
 
+class GpuMatT {
+public:
+    cuda::GpuMat mat;
+    // The Tensor that `mat` was created from, or nullptr
+    THCudaTensor *tensor;
+
+    inline operator cv::_InputOutputArray() { return this->mat; }
+    GpuMatT(cuda::GpuMat && mat);
+    GpuMatT(cuda::GpuMat & mat);
+    GpuMatT();
+};
+
+/************************ Fake OpenCV/CUDA classes *************************/
+
 class FakeMemoryPool;
 class FakeMemoryStack;
 class FakeStackAllocator;
@@ -121,12 +135,13 @@ public:
 };
 
 /*  Whenever we call an OpenCV-CUDA function from Lua, it's necessary
- *  to tell OpenCV which device and stream currently in use by cutorch.
+ *  to tell OpenCV which device and stream are currently in use by cutorch.
  *  For this, a single `cv::cuda::Stream` (in form of `FakeStream`) object
- *  is stored. When invoking an OpenCV function, we must
- *  refresh that object and pass through a reference to it. */
+ *  is stored. When invoking an OpenCV function, we refresh that object
+ *  and pass through a reference to it. */
 
-// Create that object
+// Here that object is:
 FakeStream fakeStream;
 
+// Here is the function that updates and returns it:
 cuda::Stream & prepareStream(cutorchInfo info);

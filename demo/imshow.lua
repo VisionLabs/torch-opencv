@@ -7,6 +7,6 @@ if not arg[1] then
     print('Now using demo/data/lena.jpg')
 end
 
-local im = cv.imread {arg[1] or 'demo/data/lena.jpg'}--, cv.IMREAD_GRAYSCALE}
+local im = cv.imread {arg[1] or 'demo/data/lena.jpg', cv.IMREAD_GRAYSCALE}
 cv.imshow {"Hello, Lua!", im}
 cv.waitKey {0}
