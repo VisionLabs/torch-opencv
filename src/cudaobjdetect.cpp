@@ -274,7 +274,10 @@ struct TensorWrapper CascadeClassifier_detectMultiScale(
         struct TensorWrapper image, struct TensorWrapper objects)
 {
     GpuMatT objectsMat = objects.toGpuMatT();
-    ptr->detectMultiScale(image.toGpuMat(), objectsMat, prepareStream(info));
+    cuda::GpuMat imageMat = image.toGpuMat();
+    cuda::GpuMat imageByte;
+    imageMat.convertTo(imageByte, CV_8U, 255.0); // Sorry guys :(
+    ptr->detectMultiScale(imageByte, objectsMat, prepareStream(info));
     return TensorWrapper(objectsMat, info.state);
 }
 
@@ -282,7 +285,8 @@ extern "C"
 struct RectArray CascadeClassifier_convert(
         struct CascadeClassifierPtr ptr, struct TensorWrapper gpu_objects)
 {
+    auto mat = gpu_objects.toGpuMat(CV_32S);
     std::vector<cv::Rect> objects;
-    ptr->convert(gpu_objects.toGpuMat(), objects);
+    ptr->convert(mat, objects);
     return RectArray(objects);
 }

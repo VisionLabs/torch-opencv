@@ -374,7 +374,7 @@ function cv.unwrap_tensors(wrapper, toTable)
     if ffi.istype(ffi.typeof(wrapper), cv.EMPTY_WRAPPER) then
         -- handle single tensor
         if wrapper.tensorPtr == nil then
-            return
+            return empty_tensor_of_type(wrapper.typeCode)
         end
 
         local retval = empty_tensor_of_type(wrapper.typeCode)

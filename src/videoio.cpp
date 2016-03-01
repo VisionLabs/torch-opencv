@@ -57,14 +57,9 @@ struct TensorPlusBool VideoCapture_retrieve(
         VideoCapturePtr ptr, struct TensorWrapper image, int flag)
 {
     TensorPlusBool retval;
-    if (image.isNull()) {
-        MatT result;
-        retval.val = ptr->retrieve(result, flag);
-        new (&retval.tensor) TensorWrapper(result);
-    } else {
-        retval.val = ptr->retrieve(image.toMat(), flag);
-        retval.tensor.tensorPtr = nullptr;
-    }
+    MatT result = image.toMatT();
+    retval.val = ptr->retrieve(result, flag);
+    new (&retval.tensor) TensorWrapper(result);
     return retval;
 }
 
@@ -73,14 +68,9 @@ struct TensorPlusBool VideoCapture_read(
         VideoCapturePtr ptr, struct TensorWrapper image)
 {
     TensorPlusBool retval;
-    if (image.isNull()) {
-        MatT result;
-        retval.val = ptr->read(result);
-        new (&retval.tensor) TensorWrapper(result);
-    } else {
-        retval.val = ptr->read(image.toMat());
-        retval.tensor.tensorPtr = nullptr;
-    }
+    MatT result = image.toMatT();
+    retval.val = ptr->read(result);
+    new (&retval.tensor) TensorWrapper(result);
     return retval;
 }
 

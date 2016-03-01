@@ -52,6 +52,7 @@ void refcount(THByteTensor *x) {
     std::cout << "Tensor refcount: " << x->refcount << std::endl;
     std::cout << "Storage address: " << x->storage << std::endl;
     std::cout << "Storage refcount: " << x->storage->refcount << std::endl;
+    std::cout << "Data: " << ((THCudaStorage*)(x->storage))->data << std::endl;
 }
 
 MatT::MatT(cv::Mat & mat) {
@@ -74,6 +75,7 @@ TensorWrapper::TensorWrapper(cv::Mat & matArg) {
     this->definedInLua = false;
 
     if (matArg.empty()) {
+        this->typeCode = CV_32F;
         this->tensorPtr = nullptr;
         return;
     }
@@ -159,7 +161,7 @@ TensorWrapper::TensorWrapper(MatT && mat) {
 
 TensorWrapper::operator cv::Mat() {
 
-    if (this->tensorPtr == nullptr) {
+    if (this->tensorPtr == nullptr or this->tensorPtr->nDimension == 0) {
         return cv::Mat();
     }
 

@@ -30,15 +30,14 @@ TensorWrapper::TensorWrapper(GpuMatT && mat, THCState *state) {
     new (this) TensorWrapper(mat, state);
 }
 
-cuda::GpuMat TensorWrapper::toGpuMat() {
+cuda::GpuMat TensorWrapper::toGpuMat(int depth) {
 
-    if (this->tensorPtr == nullptr) {
+    if (this->tensorPtr == nullptr or this->tensorPtr->nDimension == 0) {
         return cuda::GpuMat();
     }
 
     THCudaTensor *tensorPtr = reinterpret_cast<THCudaTensor *>(this->tensorPtr);
 
-    assert(this->typeCode == CV_CUDA);
     assert(tensorPtr->nDimension <= 3);
 
     int numChannels = 1;
@@ -49,7 +48,7 @@ cuda::GpuMat TensorWrapper::toGpuMat() {
     return cuda::GpuMat(
             tensorPtr->size[0],
             tensorPtr->size[1],
-            CV_32FC(numChannels),
+            (depth == -1 ? CV_32FC(numChannels) : CV_MAKE_TYPE(depth, numChannels)),
             tensorPtr->storage->data + tensorPtr->storageOffset * cv::getElemSize(CV_32F),
             tensorPtr->stride[0] * sizeof(float)
     );
@@ -60,11 +59,11 @@ TensorWrapper::TensorWrapper(cuda::GpuMat & mat, THCState *state) {
     this->definedInLua = false;
 
     if (mat.empty()) {
+        this->typeCode = CV_CUDA;
         this->tensorPtr = nullptr;
         return;
     }
 
-    assert(mat.depth() == CV_32F);
     this->typeCode = CV_CUDA;
 
     THCudaTensor *outputPtr = THCudaTensor_new(state);

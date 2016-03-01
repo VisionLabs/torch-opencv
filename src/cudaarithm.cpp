@@ -5,14 +5,10 @@ extern "C"
 struct TensorWrapper min(
         struct cutorchInfo info, struct TensorWrapper src1, struct TensorWrapper src2, struct TensorWrapper dst)
 {
-    if (dst.isNull()) {
-        cuda::GpuMat result;
-        cuda::min(src1.toGpuMat(), src2.toGpuMat(), result, prepareStream(info));
-        return TensorWrapper(result, info.state);
-    } else {
-        cuda::min(src1.toGpuMat(), src2.toGpuMat(), dst.toGpuMat(), prepareStream(info));
-        return dst;
-    }
+    GpuMatT dstMat = dst.toGpuMatT();
+    cuda::GpuMat & mat = dstMat.mat;
+    cuda::min(src1.toGpuMat(), src2.toGpuMat(), dstMat, prepareStream(info));
+    return TensorWrapper(dstMat, info.state);
 }
 
 extern "C"

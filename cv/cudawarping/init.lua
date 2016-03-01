@@ -69,7 +69,7 @@ end
 function cv.cuda.resize(t)
     local argRules = {
         {"src", required = true},
-        {"dsize", required = true, operator = cv.Size},
+        {"dsize", default = {0, 0}, operator = cv.Size},
         {"dst", default = nil},
         {"fx", default = 0},
         {"fy", default = 0},

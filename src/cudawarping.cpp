@@ -29,10 +29,9 @@ struct TensorWrapper resize(struct cutorchInfo info,
         struct SizeWrapper dsize, double fx, double fy,
         int interpolation)
 {
-    cuda::GpuMat retval;
-    if (!dst.isNull()) retval = dst.toGpuMat();
-    cuda::resize(src.toGpuMat(), retval, dsize, fx, fy, interpolation, prepareStream(info));
-    return TensorWrapper(retval, info.state);
+    GpuMatT dstMat = dst.toGpuMatT();
+    cuda::resize(src.toGpuMat(), dstMat, dsize, fx, fy, interpolation, prepareStream(info));
+    return TensorWrapper(dstMat, info.state);
 }
 
 

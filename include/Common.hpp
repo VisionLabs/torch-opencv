@@ -65,7 +65,7 @@ struct TensorWrapper {
     TensorWrapper(GpuMatT & mat, THCState *state);
     TensorWrapper(GpuMatT && mat, THCState *state);
 
-    cv::cuda::GpuMat toGpuMat();
+    cv::cuda::GpuMat toGpuMat(int depth = -1);
     GpuMatT toGpuMatT();
     #endif
 

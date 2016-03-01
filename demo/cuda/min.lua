@@ -18,6 +18,7 @@ end
 print("CUDA context initialization in OpenCV may take up to a minute. Hang on...")
 
 local min_cv = cv.cuda.min{a, b}
+print(min_cv:type())
 
 if n <= 20 then
     print("Matrix of minimums by Torch:")

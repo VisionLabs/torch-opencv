@@ -4,10 +4,9 @@ extern "C"
 struct TensorWrapper cvtColor(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst, int code, int dstCn)
 {
-    cuda::GpuMat retval;
-    if (!dst.isNull()) retval = dst.toGpuMat();
-    cuda::cvtColor(src.toGpuMat(), retval, code, dstCn, prepareStream(info));
-    return TensorWrapper(retval, info.state);
+    GpuMatT dstMat = dst.toGpuMatT();
+    cuda::cvtColor(src.toGpuMat(), dstMat, code, dstCn, prepareStream(info));
+    return TensorWrapper(dstMat, info.state);
 }
 
 extern "C"
