@@ -36,28 +36,28 @@ struct FormatInfo {
     int height;
 };
 
-struct EncoderParams EncoderParams_ctor_default();
+struct EncoderParams EncoderParams_ctor_defaultCuda();
 
-struct EncoderParams EncoderParams_ctor(const char *configFile);
+struct EncoderParams EncoderParams_ctorCuda(const char *configFile);
 
-void EncoderParams_save(struct EncoderParams params, const char *configFile);
+void EncoderParams_saveCuda(struct EncoderParams params, const char *configFile);
 
-struct PtrWrapper VideoWriter_ctor();
+struct PtrWrapper VideoWriter_ctorCuda();
 
-void VideoWriter_dtor(struct PtrWrapper ptr);
+void VideoWriter_dtorCuda(struct PtrWrapper ptr);
 
-void VideoWriter_write(struct PtrWrapper ptr, struct TensorWrapper frame, bool lastFrame);
+void VideoWriter_writeCuda(struct PtrWrapper ptr, struct TensorWrapper frame, bool lastFrame);
 
-struct EncoderParams VideoWriter_getEncoderParams(struct PtrWrapper ptr);
+struct EncoderParams VideoWriter_getEncoderParamsCuda(struct PtrWrapper ptr);
 
-struct PtrWrapper VideoReader_ctor(const char *filename);
+struct PtrWrapper VideoReader_ctorCuda(const char *filename);
 
-void VideoReader_dtor(struct PtrWrapper ptr);
+void VideoReader_dtorCuda(struct PtrWrapper ptr);
 
-struct TensorWrapper VideoReader_nextFrame(
+struct TensorWrapper VideoReader_nextFrameCuda(
         struct cutorchInfo info, struct PtrWrapper ptr, struct TensorWrapper frame);
 
-struct FormatInfo VideoReader_format(struct PtrWrapper ptr);
+struct FormatInfo VideoReader_formatCuda(struct PtrWrapper ptr);
 ]]
 
 local C = ffi.load(cv.libPath('cudacodec'))
@@ -98,9 +98,9 @@ do
         local configFile = cv.argcheck(t, argRules)
 
         if configFile then
-            self.object = C.EncoderParams_ctor(configFile)
+            self.object = C.EncoderParams_ctorCuda(configFile)
         else
-            self.object = C.EncoderParams_ctor_default()
+            self.object = C.EncoderParams_ctor_defaultCuda()
         end
     end
 
@@ -118,7 +118,7 @@ do
         }
         local configFile = cv.argcheck(t, argRules)
 
-        self.object = C.EncoderParams_ctor(configFile)
+        self.object = C.EncoderParams_ctorCuda(configFile)
     end
 
     function EncoderParams:save(t)
@@ -127,7 +127,7 @@ do
         }
         local configFile = cv.argcheck(t, argRules)
 
-        C.EncoderParams_save(self.object, configFile)
+        C.EncoderParams_saveCuda(self.object, configFile)
     end
 end
 
@@ -146,8 +146,8 @@ do
 
         assert(torch.type(params) == 'cuda.EncoderParams')
 
-        self.ptr = ffi.gc(C.VideoWriter_ctor(
-            fileName, frameSize, fps, params, format), C.VideoWriter_dtor)
+        self.ptr = ffi.gc(C.VideoWriter_ctorCuda(
+            fileName, frameSize, fps, params, format), C.VideoWriter_dtorCuda)
     end
 
     function VideoWriter:write(t)
@@ -157,12 +157,12 @@ do
         }
         local frame, lastFrame = cv.argcheck(t, argRules)
 
-        C.VideoWriter_write(self.ptr, cv.wrap_tensor(frame), lastFrame)
+        C.VideoWriter_writeCuda(self.ptr, cv.wrap_tensor(frame), lastFrame)
     end
 
     function VideoWriter:getEncoderParams()
         local retval = cv.cuda.EncoderParams{}
-        retval.object = C.VideoWriter_getEncoderParams(self.ptr)
+        retval.object = C.VideoWriter_getEncoderParamsCuda(self.ptr)
         return retval
     end
 end
@@ -176,7 +176,7 @@ do
         }
         local filename = cv.argcheck(t, argRules)
 
-        self.ptr = ffi.gc(C.VideoReader_ctor(filename), C.VideoReader_dtor)
+        self.ptr = ffi.gc(C.VideoReader_ctorCuda(filename), C.VideoReader_dtorCuda)
     end
 
     function VideoReader:nextFrame(t)
@@ -185,12 +185,12 @@ do
         }
         local frame = cv.argcheck(t, argRules)
 
-        return cv.unwrap_tensors(C.VideoReader_nextFrame(cv.cuda._info(),
+        return cv.unwrap_tensors(C.VideoReader_nextFrameCuda(cv.cuda._info(),
             self.ptr, cv.wrap_tensor(frame)))
     end
 
     function VideoReader:format()
-        return C.VideoReader_format(self.ptr)
+        return C.VideoReader_formatCuda(self.ptr)
     end
 end
 

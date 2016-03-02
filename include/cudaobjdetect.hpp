@@ -25,134 +25,134 @@ struct HOGPtr HOG_ctor(
         struct SizeWrapper block_stride, struct SizeWrapper cell_size, int nbins);
 
 extern "C"
-void HOG_setWinSigma(struct HOGPtr ptr, double val);
+void HOG_setWinSigmaCuda(struct HOGPtr ptr, double val);
 
 extern "C"
-double HOG_getWinSigma(struct HOGPtr ptr);
+double HOG_getWinSigmaCuda(struct HOGPtr ptr);
 
 extern "C"
-void HOG_setL2HysThreshold(struct HOGPtr ptr, double val);
+void HOG_setL2HysThresholdCuda(struct HOGPtr ptr, double val);
 
 extern "C"
-double HOG_getL2HysThreshold(struct HOGPtr ptr);
+double HOG_getL2HysThresholdCuda(struct HOGPtr ptr);
 
 extern "C"
-void HOG_setGammaCorrection(struct HOGPtr ptr, bool val);
+void HOG_setGammaCorrectionCuda(struct HOGPtr ptr, bool val);
 
 extern "C"
-bool HOG_getGammaCorrection(struct HOGPtr ptr);
+bool HOG_getGammaCorrectionCuda(struct HOGPtr ptr);
 
 extern "C"
-void HOG_setNumLevels(struct HOGPtr ptr, int val);
+void HOG_setNumLevelsCuda(struct HOGPtr ptr, int val);
 
 extern "C"
-int HOG_getNumLevels(struct HOGPtr ptr);
+int HOG_getNumLevelsCuda(struct HOGPtr ptr);
 
 extern "C"
-void HOG_setHitThreshold(struct HOGPtr ptr, double val);
+void HOG_setHitThresholdCuda(struct HOGPtr ptr, double val);
 
 extern "C"
-double HOG_getHitThreshold(struct HOGPtr ptr);
+double HOG_getHitThresholdCuda(struct HOGPtr ptr);
 
 extern "C"
-void HOG_setWinStride(struct HOGPtr ptr, struct SizeWrapper val);
+void HOG_setWinStrideCuda(struct HOGPtr ptr, struct SizeWrapper val);
 
 extern "C"
-struct SizeWrapper HOG_getWinStride(struct HOGPtr ptr);
+struct SizeWrapper HOG_getWinStrideCuda(struct HOGPtr ptr);
 
 extern "C"
-void HOG_setScaleFactor(struct HOGPtr ptr, double val);
+void HOG_setScaleFactorCuda(struct HOGPtr ptr, double val);
 
 extern "C"
-double HOG_getScaleFactor(struct HOGPtr ptr);
+double HOG_getScaleFactorCuda(struct HOGPtr ptr);
 
 extern "C"
-void HOG_setGroupThreshold(struct HOGPtr ptr, int val);
+void HOG_setGroupThresholdCuda(struct HOGPtr ptr, int val);
 
 extern "C"
-int HOG_getGroupThreshold(struct HOGPtr ptr);
+int HOG_getGroupThresholdCuda(struct HOGPtr ptr);
 
 extern "C"
-void HOG_setDescriptorFormat(struct HOGPtr ptr, int val);
+void HOG_setDescriptorFormatCuda(struct HOGPtr ptr, int val);
 
 extern "C"
-int HOG_getDescriptorFormat(struct HOGPtr ptr);
+int HOG_getDescriptorFormatCuda(struct HOGPtr ptr);
 
 extern "C"
-size_t HOG_getDescriptorSize(struct HOGPtr ptr);
+size_t HOG_getDescriptorSizeCuda(struct HOGPtr ptr);
 
 extern "C"
-size_t HOG_getBlockHistogramSize(struct HOGPtr ptr);
+size_t HOG_getBlockHistogramSizeCuda(struct HOGPtr ptr);
 
 extern "C"
-void HOG_setSVMDetector(struct HOGPtr ptr, struct TensorWrapper val);
+void HOG_setSVMDetectorCuda(struct HOGPtr ptr, struct TensorWrapper val);
 
 extern "C"
-struct TensorWrapper HOG_getDefaultPeopleDetector(struct HOGPtr ptr);
+struct TensorWrapper HOG_getDefaultPeopleDetectorCuda(struct HOGPtr ptr);
 
 extern "C"
-struct TensorPlusPointArray HOG_detect(
+struct TensorPlusPointArray HOG_detectCuda(
         struct cutorchInfo info, struct HOGPtr ptr, struct TensorWrapper img);
 
 extern "C"
-struct TensorPlusRectArray HOG_detectMultiScale(
+struct TensorPlusRectArray HOG_detectMultiScaleCuda(
         struct cutorchInfo info, struct HOGPtr ptr, struct TensorWrapper img);
 
 extern "C"
-struct TensorWrapper HOG_compute(
+struct TensorWrapper HOG_computeCuda(
         struct cutorchInfo info, struct HOGPtr ptr, struct TensorWrapper img,
         struct TensorWrapper descriptors);
 
 extern "C"
-struct CascadeClassifierPtr CascadeClassifier_ctor_filename(const char *filename);
+struct CascadeClassifierPtr CascadeClassifier_ctor_filenameCuda(const char *filename);
 
 extern "C"
-struct CascadeClassifierPtr CascadeClassifier_ctor_file(struct FileStoragePtr file);
+struct CascadeClassifierPtr CascadeClassifier_ctor_fileCuda(struct FileStoragePtr file);
 
 extern "C"
-void CascadeClassifier_setMaxObjectSize(struct CascadeClassifierPtr ptr, struct SizeWrapper val);
+void CascadeClassifier_setMaxObjectSizeCuda(struct CascadeClassifierPtr ptr, struct SizeWrapper val);
 
 extern "C"
-struct SizeWrapper CascadeClassifier_getMaxObjectSize(struct CascadeClassifierPtr ptr);
+struct SizeWrapper CascadeClassifier_getMaxObjectSizeCuda(struct CascadeClassifierPtr ptr);
 
 extern "C"
-void CascadeClassifier_setMinObjectSize(struct CascadeClassifierPtr ptr, struct SizeWrapper val);
+void CascadeClassifier_setMinObjectSizeCuda(struct CascadeClassifierPtr ptr, struct SizeWrapper val);
 
 extern "C"
-struct SizeWrapper CascadeClassifier_getMinObjectSize(struct CascadeClassifierPtr ptr);
+struct SizeWrapper CascadeClassifier_getMinObjectSizeCuda(struct CascadeClassifierPtr ptr);
 
 extern "C"
-void CascadeClassifier_setScaleFactor(struct CascadeClassifierPtr ptr, double val);
+void CascadeClassifier_setScaleFactorCuda(struct CascadeClassifierPtr ptr, double val);
 
 extern "C"
-double CascadeClassifier_getScaleFactor(struct CascadeClassifierPtr ptr);
+double CascadeClassifier_getScaleFactorCuda(struct CascadeClassifierPtr ptr);
 
 extern "C"
-void CascadeClassifier_setMinNeighbors(struct CascadeClassifierPtr ptr, int val);
+void CascadeClassifier_setMinNeighborsCuda(struct CascadeClassifierPtr ptr, int val);
 
 extern "C"
-int CascadeClassifier_getMinNeighbors(struct CascadeClassifierPtr ptr);
+int CascadeClassifier_getMinNeighborsCuda(struct CascadeClassifierPtr ptr);
 
 extern "C"
-void CascadeClassifier_setFindLargestObject(struct CascadeClassifierPtr ptr, bool val);
+void CascadeClassifier_setFindLargestObjectCuda(struct CascadeClassifierPtr ptr, bool val);
 
 extern "C"
-bool CascadeClassifier_getFindLargestObject(struct CascadeClassifierPtr ptr);
+bool CascadeClassifier_getFindLargestObjectCuda(struct CascadeClassifierPtr ptr);
 
 extern "C"
-void CascadeClassifier_setMaxNumObjects(struct CascadeClassifierPtr ptr, int val);
+void CascadeClassifier_setMaxNumObjectsCuda(struct CascadeClassifierPtr ptr, int val);
 
 extern "C"
-int CascadeClassifier_getMaxNumObjects(struct CascadeClassifierPtr ptr);
+int CascadeClassifier_getMaxNumObjectsCuda(struct CascadeClassifierPtr ptr);
 
 extern "C"
-struct SizeWrapper CascadeClassifier_getClassifierSize(struct CascadeClassifierPtr ptr);
+struct SizeWrapper CascadeClassifier_getClassifierSizeCuda(struct CascadeClassifierPtr ptr);
 
 extern "C"
-struct TensorWrapper CascadeClassifier_detectMultiScale(
+struct TensorWrapper CascadeClassifier_detectMultiScaleCuda(
         struct cutorchInfo info, struct CascadeClassifierPtr ptr,
         struct TensorWrapper image, struct TensorWrapper objects);
 
 extern "C"
-struct RectArray CascadeClassifier_convert(
+struct RectArray CascadeClassifier_convertCuda(
         struct CascadeClassifierPtr ptr, struct TensorWrapper gpu_objects);

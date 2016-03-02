@@ -8,97 +8,97 @@ cv.cuda = cv.cuda or require 'cv._env_cuda'
 local ffi = require 'ffi'
 
 ffi.cdef[[
-struct PtrWrapper createBFMatcher(int normType);
+struct PtrWrapper createBFMatcherCuda(int normType);
 
-bool DescriptorMatcher_isMaskSupported(struct PtrWrapper ptr);
+bool DescriptorMatcher_isMaskSupportedCuda(struct PtrWrapper ptr);
 
-void DescriptorMatcher_add(
+void DescriptorMatcher_addCuda(
         struct PtrWrapper ptr, struct TensorArray descriptors);
 
-struct TensorArray DescriptorMatcher_getTrainDescriptors(
+struct TensorArray DescriptorMatcher_getTrainDescriptorsCuda(
         struct cutorchInfo info, struct PtrWrapper ptr);
 
-void DescriptorMatcher_clear(struct PtrWrapper ptr);
+void DescriptorMatcher_clearCuda(struct PtrWrapper ptr);
 
-bool DescriptorMatcher_empty(struct PtrWrapper ptr);
+bool DescriptorMatcher_emptyCuda(struct PtrWrapper ptr);
 
-void DescriptorMatcher_train(struct PtrWrapper ptr);
+void DescriptorMatcher_trainCuda(struct PtrWrapper ptr);
 
-struct TensorWrapper DescriptorMatcher_match(
+struct TensorWrapper DescriptorMatcher_matchCuda(
         struct cutorchInfo info, struct PtrWrapper ptr,
         struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
         struct TensorWrapper matches, struct TensorWrapper mask);
 
-struct TensorWrapper DescriptorMatcher_match_masks(
+struct TensorWrapper DescriptorMatcher_match_masksCuda(
         struct cutorchInfo info, struct PtrWrapper ptr,
         struct TensorWrapper queryDescriptors, struct TensorWrapper matches,
         struct TensorArray masks);
 
-struct DMatchArray DescriptorMatcher_matchConvert(
+struct DMatchArray DescriptorMatcher_matchConvertCuda(
          struct PtrWrapper ptr, struct TensorWrapper gpu_matches);
 
-struct TensorWrapper DescriptorMatcher_knnMatch(
+struct TensorWrapper DescriptorMatcher_knnMatchCuda(
         struct cutorchInfo info, struct PtrWrapper ptr,
         struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
         struct TensorWrapper matches, int k, struct TensorWrapper mask);
 
-struct TensorWrapper DescriptorMatcher_knnMatch_masks(
+struct TensorWrapper DescriptorMatcher_knnMatch_masksCuda(
         struct cutorchInfo info, struct PtrWrapper ptr,
         struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
         struct TensorWrapper matches, int k, struct TensorArray masks);
 
-struct DMatchArrayOfArrays DescriptorMatcher_knnMatchConvert(
+struct DMatchArrayOfArrays DescriptorMatcher_knnMatchConvertCuda(
         struct PtrWrapper ptr,
         struct TensorWrapper gpu_matches, bool compactResult);
 
-struct TensorWrapper DescriptorMatcher_radiusMatch(
+struct TensorWrapper DescriptorMatcher_radiusMatchCuda(
         struct cutorchInfo info, struct PtrWrapper ptr,
         struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
         struct TensorWrapper matches, float maxDistance, struct TensorWrapper mask);
 
-struct TensorWrapper DescriptorMatcher_radiusMatch_masks(
+struct TensorWrapper DescriptorMatcher_radiusMatch_masksCuda(
         struct cutorchInfo info, struct PtrWrapper ptr,
         struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
         struct TensorWrapper matches, float maxDistance, struct TensorArray masks);
 
-struct DMatchArrayOfArrays DescriptorMatcher_radiusMatchConvert(
+struct DMatchArrayOfArrays DescriptorMatcher_radiusMatchConvertCuda(
         struct PtrWrapper ptr,
         struct TensorWrapper gpu_matches, bool compactResult);
 
-void Feature2DAsync_dtor(struct PtrWrapper ptr);
+void Feature2DAsync_dtorCuda(struct PtrWrapper ptr);
 
-struct TensorWrapper Feature2DAsync_detectAsync(
+struct TensorWrapper Feature2DAsync_detectAsyncCuda(
         struct cutorchInfo info, struct PtrWrapper ptr, struct TensorWrapper image,
         struct TensorWrapper keypoints, struct TensorWrapper mask);
 
-struct TensorArray Feature2DAsync_computeAsync(
+struct TensorArray Feature2DAsync_computeAsyncCuda(
         struct cutorchInfo info, struct PtrWrapper ptr, struct TensorWrapper image,
         struct TensorWrapper keypoints, struct TensorWrapper descriptors);
 
-struct TensorArray Feature2DAsync_detectAndComputeAsync(
+struct TensorArray Feature2DAsync_detectAndComputeAsyncCuda(
         struct cutorchInfo info, struct PtrWrapper ptr, struct TensorWrapper image,
         struct TensorWrapper mask, struct TensorWrapper keypoints,
         struct TensorWrapper descriptors, bool useProvidedKeypoints);
 
-struct KeyPointArray Feature2DAsync_convert(
+struct KeyPointArray Feature2DAsync_convertCuda(
         struct PtrWrapper ptr, struct TensorWrapper gpu_keypoints);
 
-struct PtrWrapper FastFeatureDetector_ctor(
+struct PtrWrapper FastFeatureDetector_ctorCuda(
         int threshold, bool nonmaxSuppression, int type, int max_npoints);
 
-void FastFeatureDetector_dtor(struct PtrWrapper ptr);
+void FastFeatureDetector_dtorCuda(struct PtrWrapper ptr);
 
-void FastFeatureDetector_setMaxNumPoints(struct PtrWrapper ptr, int val);
+void FastFeatureDetector_setMaxNumPointsCuda(struct PtrWrapper ptr, int val);
 
-int FastFeatureDetector_getMaxNumPoints(struct PtrWrapper ptr);
+int FastFeatureDetector_getMaxNumPointsCuda(struct PtrWrapper ptr);
 
-struct PtrWrapper ORB_ctor(
+struct PtrWrapper ORB_ctorCuda(
         int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, 
         int WTA_K, int scoreType, int patchSize, int fastThreshold, bool blurForDescriptor);
 
-void ORB_setBlurForDescriptor(struct PtrWrapper ptr, bool val);
+void ORB_setBlurForDescriptorCuda(struct PtrWrapper ptr, bool val);
 
-bool ORB_getBlurForDescriptor(struct PtrWrapper ptr);
+bool ORB_getBlurForDescriptorCuda(struct PtrWrapper ptr);
 ]]
 
 local C = ffi.load(cv.libPath('cudafeatures2d'))
@@ -114,36 +114,36 @@ do
             {"normType", default = cv.NORM_L2}
         }
         local retval = torch.factory('cuda.DescriptorMatcher')()
-        retval.ptr = ffi.gc(C.createBFMatcher(cv.argcheck(t, argRules)), Classes.Algorithm_dtor)
+        retval.ptr = ffi.gc(C.createBFMatcherCuda(cv.argcheck(t, argRules)), Classes.Algorithm_dtor)
         return retval
     end
 
     function DescriptorMatcher:isMaskSupported()
-        return C.DescriptorMatcher_isMaskSupported(self.ptr)
+        return C.DescriptorMatcher_isMaskSupportedCuda(self.ptr)
     end
 
     function DescriptorMatcher:add(t)
         local argRules = {
             {"descriptors", required = true}
         }
-        C.DescriptorMatcher_add(self.ptr, cv.wrap_tensors(descriptors))
+        C.DescriptorMatcher_addCuda(self.ptr, cv.wrap_tensors(descriptors))
     end
 
     function DescriptorMatcher:getTrainDescriptors()
-        return cv.unwrap_tensors(C.DescriptorMatcher_getTrainDescriptors(
+        return cv.unwrap_tensors(C.DescriptorMatcher_getTrainDescriptorsCuda(
             cv.cuda._info(), self.ptr) , true)
     end
 
     function DescriptorMatcher:clear()
-        C.DescriptorMatcher_clear(self.ptr)
+        C.DescriptorMatcher_clearCuda(self.ptr)
     end
 
     function DescriptorMatcher:empty()
-        return C.DescriptorMatcher_empty(self.ptr)
+        return C.DescriptorMatcher_emptyCuda(self.ptr)
     end
 
     function DescriptorMatcher:train()
-        C.DescriptorMatcher_train(self.ptr)
+        C.DescriptorMatcher_trainCuda(self.ptr)
     end
 
     function DescriptorMatcher:match(t)
@@ -158,10 +158,10 @@ do
         assert(not (t.mask and t.masks) and not (t[4] and t[5]))
 
         if t.masks or t[5] then
-            return cv.unwrap_tensors(C.DescriptorMatcher_match_masks(
+            return cv.unwrap_tensors(C.DescriptorMatcher_match_masksCuda(
                 cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
         else
-            return cv.unwrap_tensors(C.DescriptorMatcher_match(
+            return cv.unwrap_tensors(C.DescriptorMatcher_matchCuda(
                 cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
         end
     end
@@ -170,7 +170,7 @@ do
         local argRules = {
             {"gpu_matches", required = true, operator = cv.wrap_tensor}
         }
-        return cv.gcarray(C.DescriptorMatcher_matchConvert(self.ptr, cv.argcheck(t, argRules)))
+        return cv.gcarray(C.DescriptorMatcher_matchConvertCuda(self.ptr, cv.argcheck(t, argRules)))
     end
 
     function DescriptorMatcher:knnMatch(t)
@@ -186,10 +186,10 @@ do
         assert(not (t.mask and t.masks) and not (t[5] and t[6]))
 
         if t.masks or t[6] then
-            return cv.unwrap_tensors(C.DescriptorMatcher_knnMatch_masks(
+            return cv.unwrap_tensors(C.DescriptorMatcher_knnMatch_masksCuda(
                 cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
         else
-            return cv.unwrap_tensors(C.DescriptorMatcher_knnMatch(
+            return cv.unwrap_tensors(C.DescriptorMatcher_knnMatchCuda(
                 cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
         end
     end
@@ -201,7 +201,7 @@ do
         }
 
         local result = 
-            cv.gcarray(C.DescriptorMatcher_knnMatchConvert(self.ptr, cv.argcheck(t, argRules)))
+            cv.gcarray(C.DescriptorMatcher_knnMatchConvertCuda(self.ptr, cv.argcheck(t, argRules)))
 
         local retval = {}
         for i = 0, result.size-1 do
@@ -224,10 +224,10 @@ do
         assert(not (t.mask and t.masks) and not (t[5] and t[6]))
 
         if t.masks or t[6] then
-            return cv.unwrap_tensors(C.DescriptorMatcher_radiusMatch_masks(
+            return cv.unwrap_tensors(C.DescriptorMatcher_radiusMatch_masksCuda(
                 cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
         else
-            return cv.unwrap_tensors(C.DescriptorMatcher_radiusMatch(
+            return cv.unwrap_tensors(C.DescriptorMatcher_radiusMatchCuda(
                 cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
         end
     end
@@ -239,7 +239,7 @@ do
         }
 
         local result = 
-            cv.gcarray(C.DescriptorMatcher_radiusMatchConvert(self.ptr, cv.argcheck(t, argRules)))
+            cv.gcarray(C.DescriptorMatcher_radiusMatchConvertCuda(self.ptr, cv.argcheck(t, argRules)))
 
         local retval = {}
         for i = 0, result.size-1 do
@@ -259,7 +259,7 @@ do
             {"keypoints", default = nil, operator = cv.wrap_tensor},
             {"mask", default = nil, operator = cv.wrap_tensor}
         }
-        return cv.unwrap_tensors(C.Feature2DAsync_detectAsync(
+        return cv.unwrap_tensors(C.Feature2DAsync_detectAsyncCuda(
             cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
     end
 
@@ -269,7 +269,7 @@ do
             {"keypoints", default = nil, operator = cv.wrap_tensor},
             {"descriptors", default = nil, operator = cv.wrap_tensor}
         }
-        return cv.unwrap_tensors(C.Feature2DAsync_computeAsync(
+        return cv.unwrap_tensors(C.Feature2DAsync_computeAsyncCuda(
             cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
     end
 
@@ -281,7 +281,7 @@ do
             {"descriptors", default = nil, operator = cv.wrap_tensor},
             {"useProvidedKeypoints", default = false}
         }
-        return cv.unwrap_tensors(C.Feature2DAsync_detectAndComputeAsync(
+        return cv.unwrap_tensors(C.Feature2DAsync_detectAndComputeAsyncCuda(
             cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
     end
 
@@ -289,7 +289,7 @@ do
         local argRules = {
             {"gpu_keypoints", required = true, operator = cv.wrap_tensor}
         }
-        return cv.gcarray(C.Feature2DAsync_convert(self.ptr, cv.argcheck(t, argRules)))
+        return cv.gcarray(C.Feature2DAsync_convertCuda(self.ptr, cv.argcheck(t, argRules)))
     end
 end
 
@@ -304,19 +304,19 @@ do
             {"type", default = cv.FastFeatureDetector_TYPE_9_16},
             {"max_npoints", default = 5000}
         }
-        self.ptr = ffi.gc(C.FastFeatureDetector_ctor(
-            cv.argcheck(t, argRules), C.Feature2DAsync_dtor))
+        self.ptr = ffi.gc(C.FastFeatureDetector_ctorCuda(
+            cv.argcheck(t, argRules), C.Feature2DAsync_dtorCuda))
     end
 
     function FastFeatureDetector:setMaxNumPoints(t)
         local argRules = {
             {"val", required = true}
         }
-        C.FastFeatureDetector_setMaxNumPoints(self.ptr, cv.argcheck(t, argRules))
+        C.FastFeatureDetector_setMaxNumPointsCuda(self.ptr, cv.argcheck(t, argRules))
     end
 
     function FastFeatureDetector:getMaxNumPoints()
-        return C.FastFeatureDetector_getMaxNumPoints(self.ptr)
+        return C.FastFeatureDetector_getMaxNumPointsCuda(self.ptr)
     end
 end
 
@@ -336,19 +336,19 @@ do
             {"fastThreshold", default = 20},
             {"blurForDescriptor", default = false}
         }
-        self.ptr = ffi.gc(C.ORB_ctor(
-            cv.argcheck(t, argRules), C.Feature2DAsync_dtor))
+        self.ptr = ffi.gc(C.ORB_ctorCuda(
+            cv.argcheck(t, argRules), C.Feature2DAsync_dtorCuda))
     end
 
     function ORB:setsetBlurForDescriptorMaxNumPoints(t)
         local argRules = {
             {"val", required = true}
         }
-        C.ORB_setBlurForDescriptor(self.ptr, cv.argcheck(t, argRules))
+        C.ORB_setBlurForDescriptorCuda(self.ptr, cv.argcheck(t, argRules))
     end
 
     function ORB:getBlurForDescriptor()
-        return C.ORB_getBlurForDescriptor(self.ptr)
+        return C.ORB_getBlurForDescriptorCuda(self.ptr)
     end
 end
 

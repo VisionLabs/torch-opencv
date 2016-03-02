@@ -27,7 +27,7 @@ struct TensorArray SparseOpticalFlow_calc(struct cutorchInfo info,
 }
 
 extern "C"
-struct BroxOpticalFlowPtr BroxOpticalFlow_ctor(
+struct BroxOpticalFlowPtr BroxOpticalFlow_ctorCuda(
         double alpha, double gamma, double scale_factor, int inner_iterations,
         int outer_iterations, int solver_iterations)
 {
@@ -36,79 +36,79 @@ struct BroxOpticalFlowPtr BroxOpticalFlow_ctor(
 }
 
 extern "C"
-void BroxOpticalFlow_setFlowSmoothness(struct BroxOpticalFlowPtr ptr, double val)
+void BroxOpticalFlow_setFlowSmoothnessCuda(struct BroxOpticalFlowPtr ptr, double val)
 {
     ptr->setFlowSmoothness(val);
 }
 
 extern "C"
-double BroxOpticalFlow_getFlowSmoothness(struct BroxOpticalFlowPtr ptr)
+double BroxOpticalFlow_getFlowSmoothnessCuda(struct BroxOpticalFlowPtr ptr)
 {
     return ptr->getFlowSmoothness();
 }
 
 extern "C"
-void BroxOpticalFlow_setGradientConstancyImportance(struct BroxOpticalFlowPtr ptr, double val)
+void BroxOpticalFlow_setGradientConstancyImportanceCuda(struct BroxOpticalFlowPtr ptr, double val)
 {
     ptr->setGradientConstancyImportance(val);
 }
 
 extern "C"
-double BroxOpticalFlow_getGradientConstancyImportance(struct BroxOpticalFlowPtr ptr)
+double BroxOpticalFlow_getGradientConstancyImportanceCuda(struct BroxOpticalFlowPtr ptr)
 {
     return ptr->getGradientConstancyImportance();
 }
 
 extern "C"
-void BroxOpticalFlow_setPyramidScaleFactor(struct BroxOpticalFlowPtr ptr, double val)
+void BroxOpticalFlow_setPyramidScaleFactorCuda(struct BroxOpticalFlowPtr ptr, double val)
 {
     ptr->setPyramidScaleFactor(val);
 }
 
 extern "C"
-double BroxOpticalFlow_getPyramidScaleFactor(struct BroxOpticalFlowPtr ptr)
+double BroxOpticalFlow_getPyramidScaleFactorCuda(struct BroxOpticalFlowPtr ptr)
 {
     return ptr->getPyramidScaleFactor();
 }
 
 extern "C"
-void BroxOpticalFlow_setInnerIterations(struct BroxOpticalFlowPtr ptr, int val)
+void BroxOpticalFlow_setInnerIterationsCuda(struct BroxOpticalFlowPtr ptr, int val)
 {
     ptr->setInnerIterations(val);
 }
 
 extern "C"
-int BroxOpticalFlow_getInnerIterations(struct BroxOpticalFlowPtr ptr)
+int BroxOpticalFlow_getInnerIterationsCuda(struct BroxOpticalFlowPtr ptr)
 {
     return ptr->getInnerIterations();
 }
 
 extern "C"
-void BroxOpticalFlow_setOuterIterations(struct BroxOpticalFlowPtr ptr, int val)
+void BroxOpticalFlow_setOuterIterationsCuda(struct BroxOpticalFlowPtr ptr, int val)
 {
     ptr->setOuterIterations(val);
 }
 
 extern "C"
-int BroxOpticalFlow_getOuterIterations(struct BroxOpticalFlowPtr ptr)
+int BroxOpticalFlow_getOuterIterationsCuda(struct BroxOpticalFlowPtr ptr)
 {
     return ptr->getOuterIterations();
 }
 
 extern "C"
-void BroxOpticalFlow_setSolverIterations(struct BroxOpticalFlowPtr ptr, int val)
+void BroxOpticalFlow_setSolverIterationsCuda(struct BroxOpticalFlowPtr ptr, int val)
 {
     ptr->setSolverIterations(val);
 }
 
 extern "C"
-int BroxOpticalFlow_getSolverIterations(struct BroxOpticalFlowPtr ptr)
+int BroxOpticalFlow_getSolverIterationsCuda(struct BroxOpticalFlowPtr ptr)
 {
     return ptr->getSolverIterations();
 }
 
 extern "C"
-struct SparsePyrLKOpticalFlowPtr SparsePyrLKOpticalFlow_ctor(
+struct SparsePyrLKOpticalFlowPtr SparsePyrLKOpticalFlow_ctorCuda(
         struct SizeWrapper winSize, int maxLevel, int iters, bool useInitialFlow)
 {
     return rescueObjectFromPtr(cuda::SparsePyrLKOpticalFlow::create(
@@ -116,55 +116,55 @@ struct SparsePyrLKOpticalFlowPtr SparsePyrLKOpticalFlow_ctor(
 }
 
 extern "C"
-void SparsePyrLKOpticalFlow_setWinSize(struct SparsePyrLKOpticalFlowPtr ptr, struct SizeWrapper val)
+void SparsePyrLKOpticalFlow_setWinSizeCuda(struct SparsePyrLKOpticalFlowPtr ptr, struct SizeWrapper val)
 {
     ptr->setWinSize(val);
 }
 
 extern "C"
-struct SizeWrapper SparsePyrLKOpticalFlow_getWinSize(struct SparsePyrLKOpticalFlowPtr ptr)
+struct SizeWrapper SparsePyrLKOpticalFlow_getWinSizeCuda(struct SparsePyrLKOpticalFlowPtr ptr)
 {
     return ptr->getWinSize();
 }
 
 extern "C"
-void SparsePyrLKOpticalFlow_setMaxLevel(struct SparsePyrLKOpticalFlowPtr ptr, int val)
+void SparsePyrLKOpticalFlow_setMaxLevelCuda(struct SparsePyrLKOpticalFlowPtr ptr, int val)
 {
     ptr->setMaxLevel(val);
 }
 
 extern "C"
-int SparsePyrLKOpticalFlow_getMaxLevel(struct SparsePyrLKOpticalFlowPtr ptr)
+int SparsePyrLKOpticalFlow_getMaxLevelCuda(struct SparsePyrLKOpticalFlowPtr ptr)
 {
     return ptr->getMaxLevel();
 }
 
 extern "C"
-void SparsePyrLKOpticalFlow_setNumIters(struct SparsePyrLKOpticalFlowPtr ptr, int val)
+void SparsePyrLKOpticalFlow_setNumItersCuda(struct SparsePyrLKOpticalFlowPtr ptr, int val)
 {
     ptr->setNumIters(val);
 }
 
 extern "C"
-int SparsePyrLKOpticalFlow_getNumIters(struct SparsePyrLKOpticalFlowPtr ptr)
+int SparsePyrLKOpticalFlow_getNumItersCuda(struct SparsePyrLKOpticalFlowPtr ptr)
 {
     return ptr->getNumIters();
 }
 
 extern "C"
-void SparsePyrLKOpticalFlow_setUseInitialFlow(struct SparsePyrLKOpticalFlowPtr ptr, bool val)
+void SparsePyrLKOpticalFlow_setUseInitialFlowCuda(struct SparsePyrLKOpticalFlowPtr ptr, bool val)
 {
     ptr->setUseInitialFlow(val);
 }
 
 extern "C"
-bool SparsePyrLKOpticalFlow_getUseInitialFlow(struct SparsePyrLKOpticalFlowPtr ptr)
+bool SparsePyrLKOpticalFlow_getUseInitialFlowCuda(struct SparsePyrLKOpticalFlowPtr ptr)
 {
     return ptr->getUseInitialFlow();
 }
 
 extern "C"
-struct DensePyrLKOpticalFlowPtr DensePyrLKOpticalFlow_ctor(
+struct DensePyrLKOpticalFlowPtr DensePyrLKOpticalFlow_ctorCuda(
         struct SizeWrapper winSize, int maxLevel, int iters, bool useInitialFlow)
 {
     return rescueObjectFromPtr(cuda::DensePyrLKOpticalFlow::create(
@@ -172,55 +172,55 @@ struct DensePyrLKOpticalFlowPtr DensePyrLKOpticalFlow_ctor(
 }
 
 extern "C"
-void DensePyrLKOpticalFlow_setWinSize(struct DensePyrLKOpticalFlowPtr ptr, struct SizeWrapper val)
+void DensePyrLKOpticalFlow_setWinSizeCuda(struct DensePyrLKOpticalFlowPtr ptr, struct SizeWrapper val)
 {
     ptr->setWinSize(val);
 }
 
 extern "C"
-struct SizeWrapper DensePyrLKOpticalFlow_getWinSize(struct DensePyrLKOpticalFlowPtr ptr)
+struct SizeWrapper DensePyrLKOpticalFlow_getWinSizeCuda(struct DensePyrLKOpticalFlowPtr ptr)
 {
     return ptr->getWinSize();
 }
 
 extern "C"
-void DensePyrLKOpticalFlow_setMaxLevel(struct DensePyrLKOpticalFlowPtr ptr, int val)
+void DensePyrLKOpticalFlow_setMaxLevelCuda(struct DensePyrLKOpticalFlowPtr ptr, int val)
 {
     ptr->setMaxLevel(val);
 }
 
 extern "C"
-int DensePyrLKOpticalFlow_getMaxLevel(struct DensePyrLKOpticalFlowPtr ptr)
+int DensePyrLKOpticalFlow_getMaxLevelCuda(struct DensePyrLKOpticalFlowPtr ptr)
 {
     return ptr->getMaxLevel();
 }
 
 extern "C"
-void DensePyrLKOpticalFlow_setNumIters(struct DensePyrLKOpticalFlowPtr ptr, int val)
+void DensePyrLKOpticalFlow_setNumItersCuda(struct DensePyrLKOpticalFlowPtr ptr, int val)
 {
     ptr->setNumIters(val);
 }
 
 extern "C"
-int DensePyrLKOpticalFlow_getNumIters(struct DensePyrLKOpticalFlowPtr ptr)
+int DensePyrLKOpticalFlow_getNumItersCuda(struct DensePyrLKOpticalFlowPtr ptr)
 {
     return ptr->getNumIters();
 }
 
 extern "C"
-void DensePyrLKOpticalFlow_setUseInitialFlow(struct DensePyrLKOpticalFlowPtr ptr, bool val)
+void DensePyrLKOpticalFlow_setUseInitialFlowCuda(struct DensePyrLKOpticalFlowPtr ptr, bool val)
 {
     ptr->setUseInitialFlow(val);
 }
 
 extern "C"
-bool DensePyrLKOpticalFlow_getUseInitialFlow(struct DensePyrLKOpticalFlowPtr ptr)
+bool DensePyrLKOpticalFlow_getUseInitialFlowCuda(struct DensePyrLKOpticalFlowPtr ptr)
 {
     return ptr->getUseInitialFlow();
 }
 
 extern "C"
-struct FarnebackOpticalFlowPtr FarnebackOpticalFlow_ctor(
+struct FarnebackOpticalFlowPtr FarnebackOpticalFlow_ctorCuda(
         int NumLevels, double PyrScale, bool FastPyramids, int WinSize,
         int NumIters, int PolyN, double PolySigma, int Flags)
 {
@@ -230,103 +230,103 @@ struct FarnebackOpticalFlowPtr FarnebackOpticalFlow_ctor(
 }
 
 extern "C"
-void FarnebackOpticalFlow_setNumLevels(struct FarnebackOpticalFlowPtr ptr, int val)
+void FarnebackOpticalFlow_setNumLevelsCuda(struct FarnebackOpticalFlowPtr ptr, int val)
 {
     ptr->setNumLevels(val);
 }
 
 extern "C"
-int FarnebackOpticalFlow_getNumLevels(struct FarnebackOpticalFlowPtr ptr)
+int FarnebackOpticalFlow_getNumLevelsCuda(struct FarnebackOpticalFlowPtr ptr)
 {
     return ptr->getNumLevels();
 }
 
 extern "C"
-void FarnebackOpticalFlow_setPyrScale(struct FarnebackOpticalFlowPtr ptr, double val)
+void FarnebackOpticalFlow_setPyrScaleCuda(struct FarnebackOpticalFlowPtr ptr, double val)
 {
     ptr->setPyrScale(val);
 }
 
 extern "C"
-double FarnebackOpticalFlow_getPyrScale(struct FarnebackOpticalFlowPtr ptr)
+double FarnebackOpticalFlow_getPyrScaleCuda(struct FarnebackOpticalFlowPtr ptr)
 {
     return ptr->getPyrScale();
 }
 
 extern "C"
-void FarnebackOpticalFlow_setFastPyramids(struct FarnebackOpticalFlowPtr ptr, bool val)
+void FarnebackOpticalFlow_setFastPyramidsCuda(struct FarnebackOpticalFlowPtr ptr, bool val)
 {
     ptr->setFastPyramids(val);
 }
 
 extern "C"
-bool FarnebackOpticalFlow_getFastPyramids(struct FarnebackOpticalFlowPtr ptr)
+bool FarnebackOpticalFlow_getFastPyramidsCuda(struct FarnebackOpticalFlowPtr ptr)
 {
     return ptr->getFastPyramids();
 }
 
 extern "C"
-void FarnebackOpticalFlow_setWinSize(struct FarnebackOpticalFlowPtr ptr, int val)
+void FarnebackOpticalFlow_setWinSizeCuda(struct FarnebackOpticalFlowPtr ptr, int val)
 {
     ptr->setWinSize(val);
 }
 
 extern "C"
-int FarnebackOpticalFlow_getWinSize(struct FarnebackOpticalFlowPtr ptr)
+int FarnebackOpticalFlow_getWinSizeCuda(struct FarnebackOpticalFlowPtr ptr)
 {
     return ptr->getWinSize();
 }
 
 extern "C"
-void FarnebackOpticalFlow_setNumIters(struct FarnebackOpticalFlowPtr ptr, int val)
+void FarnebackOpticalFlow_setNumItersCuda(struct FarnebackOpticalFlowPtr ptr, int val)
 {
     ptr->setNumIters(val);
 }
 
 extern "C"
-int FarnebackOpticalFlow_getNumIters(struct FarnebackOpticalFlowPtr ptr)
+int FarnebackOpticalFlow_getNumItersCuda(struct FarnebackOpticalFlowPtr ptr)
 {
     return ptr->getNumIters();
 }
 
 extern "C"
-void FarnebackOpticalFlow_setPolyN(struct FarnebackOpticalFlowPtr ptr, int val)
+void FarnebackOpticalFlow_setPolyNCuda(struct FarnebackOpticalFlowPtr ptr, int val)
 {
     ptr->setPolyN(val);
 }
 
 extern "C"
-int FarnebackOpticalFlow_getPolyN(struct FarnebackOpticalFlowPtr ptr)
+int FarnebackOpticalFlow_getPolyNCuda(struct FarnebackOpticalFlowPtr ptr)
 {
     return ptr->getPolyN();
 }
 
 extern "C"
-void FarnebackOpticalFlow_setPolySigma(struct FarnebackOpticalFlowPtr ptr, double val)
+void FarnebackOpticalFlow_setPolySigmaCuda(struct FarnebackOpticalFlowPtr ptr, double val)
 {
     ptr->setPolySigma(val);
 }
 
 extern "C"
-double FarnebackOpticalFlow_getPolySigma(struct FarnebackOpticalFlowPtr ptr)
+double FarnebackOpticalFlow_getPolySigmaCuda(struct FarnebackOpticalFlowPtr ptr)
 {
     return ptr->getPolySigma();
 }
 
 extern "C"
-void FarnebackOpticalFlow_setFlags(struct FarnebackOpticalFlowPtr ptr, int val)
+void FarnebackOpticalFlow_setFlagsCuda(struct FarnebackOpticalFlowPtr ptr, int val)
 {
     ptr->setFlags(val);
 }
 
 extern "C"
-int FarnebackOpticalFlow_getFlags(struct FarnebackOpticalFlowPtr ptr)
+int FarnebackOpticalFlow_getFlagsCuda(struct FarnebackOpticalFlowPtr ptr)
 {
     return ptr->getFlags();
 }
 
 extern "C"
-struct OpticalFlowDual_TVL1Ptr OpticalFlowDual_TVL1_ctor(
+struct OpticalFlowDual_TVL1Ptr OpticalFlowDual_TVL1_ctorCuda(
         double tau, double lambda, double theta, int nscales, int warps, double epsilon, 
         int iterations, double scaleStep, double gamma, bool useInitialFlow)
 {
@@ -336,121 +336,121 @@ struct OpticalFlowDual_TVL1Ptr OpticalFlowDual_TVL1_ctor(
 }
 
 extern "C"
-void OpticalFlowDual_TVL1_setTau(struct OpticalFlowDual_TVL1Ptr ptr, double val)
+void OpticalFlowDual_TVL1_setTauCuda(struct OpticalFlowDual_TVL1Ptr ptr, double val)
 {
     ptr->setTau(val);
 }
 
 extern "C"
-double OpticalFlowDual_TVL1_getTau(struct OpticalFlowDual_TVL1Ptr ptr)
+double OpticalFlowDual_TVL1_getTauCuda(struct OpticalFlowDual_TVL1Ptr ptr)
 {
     return ptr->getTau();
 }
 
 extern "C"
-void OpticalFlowDual_TVL1_setLambda(struct OpticalFlowDual_TVL1Ptr ptr, double val)
+void OpticalFlowDual_TVL1_setLambdaCuda(struct OpticalFlowDual_TVL1Ptr ptr, double val)
 {
     ptr->setLambda(val);
 }
 
 extern "C"
-double OpticalFlowDual_TVL1_getLambda(struct OpticalFlowDual_TVL1Ptr ptr)
+double OpticalFlowDual_TVL1_getLambdaCuda(struct OpticalFlowDual_TVL1Ptr ptr)
 {
     return ptr->getLambda();
 }
 
 extern "C"
-void OpticalFlowDual_TVL1_setGamma(struct OpticalFlowDual_TVL1Ptr ptr, double val)
+void OpticalFlowDual_TVL1_setGammaCuda(struct OpticalFlowDual_TVL1Ptr ptr, double val)
 {
     ptr->setGamma(val);
 }
 
 extern "C"
-double OpticalFlowDual_TVL1_getGamma(struct OpticalFlowDual_TVL1Ptr ptr)
+double OpticalFlowDual_TVL1_getGammaCuda(struct OpticalFlowDual_TVL1Ptr ptr)
 {
     return ptr->getGamma();
 }
 
 extern "C"
-void OpticalFlowDual_TVL1_setTheta(struct OpticalFlowDual_TVL1Ptr ptr, double val)
+void OpticalFlowDual_TVL1_setThetaCuda(struct OpticalFlowDual_TVL1Ptr ptr, double val)
 {
     ptr->setTheta(val);
 }
 
 extern "C"
-double OpticalFlowDual_TVL1_getTheta(struct OpticalFlowDual_TVL1Ptr ptr)
+double OpticalFlowDual_TVL1_getThetaCuda(struct OpticalFlowDual_TVL1Ptr ptr)
 {
     return ptr->getTheta();
 }
 
 extern "C"
-void OpticalFlowDual_TVL1_setNumScales(struct OpticalFlowDual_TVL1Ptr ptr, int val)
+void OpticalFlowDual_TVL1_setNumScalesCuda(struct OpticalFlowDual_TVL1Ptr ptr, int val)
 {
     ptr->setNumScales(val);
 }
 
 extern "C"
-int OpticalFlowDual_TVL1_getNumScales(struct OpticalFlowDual_TVL1Ptr ptr)
+int OpticalFlowDual_TVL1_getNumScalesCuda(struct OpticalFlowDual_TVL1Ptr ptr)
 {
     return ptr->getNumScales();
 }
 
 extern "C"
-void OpticalFlowDual_TVL1_setNumWarps(struct OpticalFlowDual_TVL1Ptr ptr, int val)
+void OpticalFlowDual_TVL1_setNumWarpsCuda(struct OpticalFlowDual_TVL1Ptr ptr, int val)
 {
     ptr->setNumWarps(val);
 }
 
 extern "C"
-int OpticalFlowDual_TVL1_getNumWarps(struct OpticalFlowDual_TVL1Ptr ptr)
+int OpticalFlowDual_TVL1_getNumWarpsCuda(struct OpticalFlowDual_TVL1Ptr ptr)
 {
     return ptr->getNumWarps();
 }
 
 extern "C"
-void OpticalFlowDual_TVL1_setEpsilon(struct OpticalFlowDual_TVL1Ptr ptr, double val)
+void OpticalFlowDual_TVL1_setEpsilonCuda(struct OpticalFlowDual_TVL1Ptr ptr, double val)
 {
     ptr->setEpsilon(val);
 }
 
 extern "C"
-double OpticalFlowDual_TVL1_getEpsilon(struct OpticalFlowDual_TVL1Ptr ptr)
+double OpticalFlowDual_TVL1_getEpsilonCuda(struct OpticalFlowDual_TVL1Ptr ptr)
 {
     return ptr->getEpsilon();
 }
 
 extern "C"
-void OpticalFlowDual_TVL1_setNumIterations(struct OpticalFlowDual_TVL1Ptr ptr, int val)
+void OpticalFlowDual_TVL1_setNumIterationsCuda(struct OpticalFlowDual_TVL1Ptr ptr, int val)
 {
     ptr->setNumIterations(val);
 }
 
 extern "C"
-int OpticalFlowDual_TVL1_getNumIterations(struct OpticalFlowDual_TVL1Ptr ptr)
+int OpticalFlowDual_TVL1_getNumIterationsCuda(struct OpticalFlowDual_TVL1Ptr ptr)
 {
     return ptr->getNumIterations();
 }
 
 extern "C"
-void OpticalFlowDual_TVL1_setScaleStep(struct OpticalFlowDual_TVL1Ptr ptr, double val)
+void OpticalFlowDual_TVL1_setScaleStepCuda(struct OpticalFlowDual_TVL1Ptr ptr, double val)
 {
     ptr->setScaleStep(val);
 }
 
 extern "C"
-double OpticalFlowDual_TVL1_getScaleStep(struct OpticalFlowDual_TVL1Ptr ptr)
+double OpticalFlowDual_TVL1_getScaleStepCuda(struct OpticalFlowDual_TVL1Ptr ptr)
 {
     return ptr->getScaleStep();
 }
 
 extern "C"
-void OpticalFlowDual_TVL1_setUseInitialFlow(struct OpticalFlowDual_TVL1Ptr ptr, bool val)
+void OpticalFlowDual_TVL1_setUseInitialFlowCuda(struct OpticalFlowDual_TVL1Ptr ptr, bool val)
 {
     ptr->setUseInitialFlow(val);
 }
 
 extern "C"
-bool OpticalFlowDual_TVL1_getUseInitialFlow(struct OpticalFlowDual_TVL1Ptr ptr)
+bool OpticalFlowDual_TVL1_getUseInitialFlowCuda(struct OpticalFlowDual_TVL1Ptr ptr)
 {
     return ptr->getUseInitialFlow();
 }

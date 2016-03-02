@@ -1,7 +1,7 @@
 #include <cudafilters.hpp>
 
 extern "C"
-struct TensorWrapper Filter_apply(cutorchInfo info,
+struct TensorWrapper Filter_applyCuda(cutorchInfo info,
     struct FilterPtr ptr, struct TensorWrapper src, struct TensorWrapper dst)
 {
     cuda::GpuMat retval;
@@ -11,7 +11,7 @@ struct TensorWrapper Filter_apply(cutorchInfo info,
 }
 
 extern "C"
-struct FilterPtr createBoxFilter(
+struct FilterPtr createBoxFilterCuda(
         int srcType, int dstType, struct SizeWrapper ksize, struct PointWrapper anchor,
         int borderMode, struct ScalarWrapper borderVal)
 {
@@ -20,7 +20,7 @@ struct FilterPtr createBoxFilter(
 }
 
 extern "C"
-struct FilterPtr createLinearFilter(
+struct FilterPtr createLinearFilterCuda(
         int srcType, int dstType, struct TensorWrapper kernel, struct PointWrapper anchor,
         int borderMode, struct ScalarWrapper borderVal)
 {
@@ -29,7 +29,7 @@ struct FilterPtr createLinearFilter(
 }
 
 extern "C"
-struct FilterPtr createLaplacianFilter(
+struct FilterPtr createLaplacianFilterCuda(
         int srcType, int dstType, int ksize, double scale,
         int borderMode, struct ScalarWrapper borderVal)
 {
@@ -38,7 +38,7 @@ struct FilterPtr createLaplacianFilter(
 }
 
 extern "C"
-struct FilterPtr createSeparableLinearFilter(
+struct FilterPtr createSeparableLinearFilterCuda(
         int srcType, int dstType, struct TensorWrapper rowKernel,
         struct TensorWrapper columnKernel, struct PointWrapper anchor,
         int rowBorderMode, int columnBorderMode)
@@ -49,7 +49,7 @@ struct FilterPtr createSeparableLinearFilter(
 }
 
 extern "C"
-struct FilterPtr createDerivFilter(
+struct FilterPtr createDerivFilterCuda(
         int srcType, int dstType, int dx, int dy, int ksize, bool normalize,
         double scale, int rowBorderMode, int columnBorderMode)
 {
@@ -58,7 +58,7 @@ struct FilterPtr createDerivFilter(
 }
 
 extern "C"
-struct FilterPtr createSobelFilter(
+struct FilterPtr createSobelFilterCuda(
         int srcType, int dstType, int dx, int dy, int ksize,
         double scale, int rowBorderMode, int columnBorderMode)
 {
@@ -67,7 +67,7 @@ struct FilterPtr createSobelFilter(
 }
 
 extern "C"
-struct FilterPtr createScharrFilter(
+struct FilterPtr createScharrFilterCuda(
         int srcType, int dstType, int dx, int dy,
         double scale, int rowBorderMode, int columnBorderMode)
 {
@@ -76,7 +76,7 @@ struct FilterPtr createScharrFilter(
 }
 
 extern "C"
-struct FilterPtr createGaussianFilter(
+struct FilterPtr createGaussianFilterCuda(
         int srcType, int dstType, struct SizeWrapper ksize,
         double sigma1, double sigma2, int rowBorderMode, int columnBorderMode)
 {
@@ -85,7 +85,7 @@ struct FilterPtr createGaussianFilter(
 }
 
 extern "C"
-struct FilterPtr createMorphologyFilter(
+struct FilterPtr createMorphologyFilterCuda(
         int op, int srcType, struct TensorWrapper kernel,
         struct PointWrapper anchor, int iterations)
 {
@@ -94,7 +94,7 @@ struct FilterPtr createMorphologyFilter(
 }
 
 extern "C"
-struct FilterPtr createBoxMaxFilter(
+struct FilterPtr createBoxMaxFilterCuda(
         int srcType, struct SizeWrapper ksize, struct PointWrapper anchor,
         int borderMode, struct ScalarWrapper borderVal)
 {
@@ -103,7 +103,7 @@ struct FilterPtr createBoxMaxFilter(
 }
 
 extern "C"
-struct FilterPtr createBoxMinFilter(
+struct FilterPtr createBoxMinFilterCuda(
         int srcType, struct SizeWrapper ksize, struct PointWrapper anchor,
         int borderMode, struct ScalarWrapper borderVal)
 {
@@ -112,7 +112,7 @@ struct FilterPtr createBoxMinFilter(
 }
 
 extern "C"
-struct FilterPtr createRowSumFilter(
+struct FilterPtr createRowSumFilterCuda(
         int srcType, int dstType, int ksize, int anchor,
         int borderMode, struct ScalarWrapper borderVal)
 {
@@ -121,7 +121,7 @@ struct FilterPtr createRowSumFilter(
 }
 
 extern "C"
-struct FilterPtr createColumnSumFilter(
+struct FilterPtr createColumnSumFilterCuda(
         int srcType, int dstType, int ksize, int anchor,
         int borderMode, struct ScalarWrapper borderVal)
 {

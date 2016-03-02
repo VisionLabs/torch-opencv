@@ -2,7 +2,7 @@
 #include <opencv2/highgui.hpp>
 
 extern "C"
-struct TensorWrapper min(
+struct TensorWrapper minCuda(
         struct cutorchInfo info, struct TensorWrapper src1, struct TensorWrapper src2, struct TensorWrapper dst)
 {
     GpuMatT dstMat = dst.toGpuMatT();
@@ -12,7 +12,7 @@ struct TensorWrapper min(
 }
 
 extern "C"
-struct TensorWrapper max(
+struct TensorWrapper maxCuda(
         struct cutorchInfo info, struct TensorWrapper src1, struct TensorWrapper src2, struct TensorWrapper dst)
 {
     if (dst.isNull()) {
@@ -26,7 +26,7 @@ struct TensorWrapper max(
 }
 
 extern "C"
-struct TensorPlusDouble threshold(
+struct TensorPlusDouble thresholdCuda(
         struct cutorchInfo info, struct TensorWrapper src,
         struct TensorWrapper dst, double thresh, double maxval, int type)
 {
@@ -44,7 +44,7 @@ struct TensorPlusDouble threshold(
 }
 
 extern "C"
-struct TensorWrapper magnitude(
+struct TensorWrapper magnitudeCuda(
         struct cutorchInfo info, struct TensorWrapper xy, struct TensorWrapper magnitude)
 {
     if (magnitude.isNull()) {
@@ -58,7 +58,7 @@ struct TensorWrapper magnitude(
 }
 
 extern "C"
-struct TensorWrapper magnitudeSqr(
+struct TensorWrapper magnitudeSqrCuda(
         struct cutorchInfo info, struct TensorWrapper xy, struct TensorWrapper magnitude)
 {
     if (magnitude.isNull()) {
@@ -72,7 +72,7 @@ struct TensorWrapper magnitudeSqr(
 }
 
 extern "C"
-struct TensorWrapper magnitude2(
+struct TensorWrapper magnitude2Cuda(
         struct cutorchInfo info, struct TensorWrapper x, struct TensorWrapper y, struct TensorWrapper magnitude)
 {
     if (magnitude.isNull()) {
@@ -86,7 +86,7 @@ struct TensorWrapper magnitude2(
 }
 
 extern "C"
-struct TensorWrapper magnitudeSqr2(
+struct TensorWrapper magnitudeSqr2Cuda(
         struct cutorchInfo info, struct TensorWrapper x, struct TensorWrapper y, struct TensorWrapper magnitudeSqr)
 {
     if (magnitudeSqr.isNull()) {
@@ -100,7 +100,7 @@ struct TensorWrapper magnitudeSqr2(
 }
 
 extern "C"
-struct TensorWrapper phase(
+struct TensorWrapper phaseCuda(
         struct cutorchInfo info, struct TensorWrapper x, struct TensorWrapper y,
         struct TensorWrapper angle, bool angleInDegrees)
 {
@@ -115,7 +115,7 @@ struct TensorWrapper phase(
 }
 
 extern "C"
-struct TensorArray cartToPolar(
+struct TensorArray cartToPolarCuda(
         struct cutorchInfo info, struct TensorWrapper x, struct TensorWrapper y,
         struct TensorWrapper magnitude, struct TensorWrapper angle, bool angleInDegrees)
 {
@@ -129,7 +129,7 @@ struct TensorArray cartToPolar(
 }
 
 extern "C"
-struct TensorArray polarToCart(
+struct TensorArray polarToCartCuda(
         struct cutorchInfo info, struct TensorWrapper magnitude, struct TensorWrapper angle,
         struct TensorWrapper x, struct TensorWrapper y, bool angleInDegrees)
 {
@@ -143,14 +143,14 @@ struct TensorArray polarToCart(
 }
 
 extern "C"
-struct LookUpTablePtr LookUpTable_ctor(
+struct LookUpTablePtr LookUpTable_ctorCuda(
         struct cutorchInfo info, struct TensorWrapper lut)
 {
     return rescueObjectFromPtr(cuda::createLookUpTable(lut.toGpuMat()));
 }
 
 extern "C"
-struct TensorWrapper LookUpTable_transform(
+struct TensorWrapper LookUpTable_transformCuda(
         struct cutorchInfo info, struct LookUpTablePtr ptr,
         struct TensorWrapper src, struct TensorWrapper dst)
 {
@@ -165,7 +165,7 @@ struct TensorWrapper LookUpTable_transform(
 }
 
 extern "C"
-struct TensorWrapper rectStdDev(
+struct TensorWrapper rectStdDevCuda(
         struct cutorchInfo info, struct TensorWrapper src, struct TensorWrapper sqr,
         struct TensorWrapper dst, struct RectWrapper rect)
 {
@@ -180,7 +180,7 @@ struct TensorWrapper rectStdDev(
 }
 
 extern "C"
-struct TensorWrapper normalize(
+struct TensorWrapper normalizeCuda(
         struct cutorchInfo info, struct TensorWrapper src, struct TensorWrapper dst,
         double alpha, double beta, int norm_type, int dtype, struct TensorWrapper mask)
 {
@@ -197,7 +197,7 @@ struct TensorWrapper normalize(
 }
 
 extern "C"
-struct TensorWrapper integral(
+struct TensorWrapper integralCuda(
         struct cutorchInfo info, struct TensorWrapper src, struct TensorWrapper sum)
 {
     if (sum.isNull()) {
@@ -211,7 +211,7 @@ struct TensorWrapper integral(
 }
 
 extern "C"
-struct TensorWrapper sqrIntegral(
+struct TensorWrapper sqrIntegralCuda(
         struct cutorchInfo info, struct TensorWrapper src, struct TensorWrapper sum)
 {
     if (sum.isNull()) {
@@ -225,7 +225,7 @@ struct TensorWrapper sqrIntegral(
 }
 
 extern "C"
-struct TensorWrapper mulSpectrums(
+struct TensorWrapper mulSpectrumsCuda(
         struct cutorchInfo info, struct TensorWrapper src1, struct TensorWrapper src2,
         struct TensorWrapper dst, int flags, bool conjB)
 {
@@ -240,7 +240,7 @@ struct TensorWrapper mulSpectrums(
 }
 
 extern "C"
-struct TensorWrapper mulAndScaleSpectrums(
+struct TensorWrapper mulAndScaleSpectrumsCuda(
         struct cutorchInfo info, struct TensorWrapper src1, struct TensorWrapper src2,
         struct TensorWrapper dst, int flags, float scale, bool conjB)
 {
@@ -255,7 +255,7 @@ struct TensorWrapper mulAndScaleSpectrums(
 }
 
 extern "C"
-struct TensorWrapper dft(
+struct TensorWrapper dftCuda(
         struct cutorchInfo info, struct TensorWrapper src,
         struct TensorWrapper dst, struct SizeWrapper dft_size, int flags)
 {
@@ -270,14 +270,14 @@ struct TensorWrapper dft(
 }
 
 extern "C"
-struct ConvolutionPtr Convolution_ctor(
+struct ConvolutionPtr Convolution_ctorCuda(
         struct cutorchInfo info, struct SizeWrapper user_block_size)
 {
     return rescueObjectFromPtr(cuda::createConvolution(user_block_size));
 }
 
 extern "C"
-struct TensorWrapper Convolution_convolve(
+struct TensorWrapper Convolution_convolveCuda(
         struct cutorchInfo info, struct ConvolutionPtr ptr, struct TensorWrapper image,
         struct TensorWrapper templ, struct TensorWrapper result, bool ccor)
 {

@@ -11,7 +11,7 @@ extern "C"
 struct cudacodec::EncoderParams EncoderParams_ctor(const char *configFile);
 
 extern "C"
-void EncoderParams_save(struct cudacodec::EncoderParams params, const char *configFile);
+void EncoderParams_saveCuda(struct cudacodec::EncoderParams params, const char *configFile);
 
 struct VideoWriterPtr {
     void *ptr;
@@ -30,27 +30,27 @@ struct VideoReaderPtr {
 };
 
 extern "C"
-struct VideoWriterPtr VideoWriter_ctor(
+struct VideoWriterPtr VideoWriter_ctorCuda(
         const char *filename, struct SizeWrapper frameSize,
         double fps, struct cudacodec::EncoderParams params, int format);
 
 extern "C"
-void VideoWriter_dtor(struct VideoWriterPtr ptr);
+void VideoWriter_dtorCuda(struct VideoWriterPtr ptr);
 
 extern "C"
-void VideoWriter_write(struct VideoWriterPtr ptr, struct TensorWrapper frame, bool lastFrame);
+void VideoWriter_writeCuda(struct VideoWriterPtr ptr, struct TensorWrapper frame, bool lastFrame);
 
 extern "C"
 struct cudacodec::EncoderParams VideoWriter_getEncoderParams(struct VideoWriterPtr ptr);
 
 extern "C"
-struct VideoReaderPtr VideoReader_ctor(const char *filename);
+struct VideoReaderPtr VideoReader_ctorCuda(const char *filename);
 
 extern "C"
-void VideoReader_dtor(struct VideoReaderPtr ptr);
+void VideoReader_dtorCuda(struct VideoReaderPtr ptr);
 
 extern "C"
-struct TensorWrapper VideoReader_nextFrame(
+struct TensorWrapper VideoReader_nextFrameCuda(
         struct cutorchInfo info, struct VideoReaderPtr ptr, struct TensorWrapper frame);
 
 extern "C"

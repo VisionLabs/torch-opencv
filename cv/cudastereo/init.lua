@@ -8,70 +8,70 @@ cv.cuda = cv.cuda or require 'cv._env_cuda'
 local ffi = require 'ffi'
 
 ffi.cdef[[
-struct PtrWrapper createStereoBM(int numDisparities, int blockSize);
+struct PtrWrapper createStereoBMCuda(int numDisparities, int blockSize);
 
-struct PtrWrapper StereoBM_compute(struct cutorchInfo info, struct PtrWrapper ptr,
+struct PtrWrapper StereoBM_computeCuda(struct cutorchInfo info, struct PtrWrapper ptr,
         struct TensorWrapper left, struct TensorWrapper right, struct TensorWrapper disparity);
 
-struct PtrWrapper createStereoBeliefPropagation(
+struct PtrWrapper createStereoBeliefPropagationCuda(
         int ndisp, int iters, int levels, int msg_type);
 
-struct TensorWrapper StereoBeliefPropagation_compute(struct cutorchInfo info,
+struct TensorWrapper StereoBeliefPropagation_computeCuda(struct cutorchInfo info,
         struct PtrWrapper ptr, struct TensorWrapper left,
         struct TensorWrapper right, struct TensorWrapper disparity);
 
-struct TensorWrapper StereoBeliefPropagation_compute2(struct cutorchInfo info,
+struct TensorWrapper StereoBeliefPropagation_compute2Cuda(struct cutorchInfo info,
         struct PtrWrapper ptr, struct TensorWrapper data,
         struct TensorWrapper disparity);
 
-void StereoBeliefPropagation_setNumIters(struct PtrWrapper ptr, int val);
+void StereoBeliefPropagation_setNumItersCuda(struct PtrWrapper ptr, int val);
 
-int StereoBeliefPropagation_getNumIters(struct PtrWrapper ptr);
+int StereoBeliefPropagation_getNumItersCuda(struct PtrWrapper ptr);
 
-void StereoBeliefPropagation_setNumLevels(struct PtrWrapper ptr, int val);
+void StereoBeliefPropagation_setNumLevelsCuda(struct PtrWrapper ptr, int val);
 
-int StereoBeliefPropagation_getNumLevels(struct PtrWrapper ptr);
+int StereoBeliefPropagation_getNumLevelsCuda(struct PtrWrapper ptr);
 
-void StereoBeliefPropagation_setMaxDataTerm(struct PtrWrapper ptr, double val);
+void StereoBeliefPropagation_setMaxDataTermCuda(struct PtrWrapper ptr, double val);
 
-double StereoBeliefPropagation_getMaxDataTerm(struct PtrWrapper ptr);
+double StereoBeliefPropagation_getMaxDataTermCuda(struct PtrWrapper ptr);
 
-void StereoBeliefPropagation_setDataWeight(struct PtrWrapper ptr, double val);
+void StereoBeliefPropagation_setDataWeightCuda(struct PtrWrapper ptr, double val);
 
-double StereoBeliefPropagation_getDataWeight(struct PtrWrapper ptr);
+double StereoBeliefPropagation_getDataWeightCuda(struct PtrWrapper ptr);
 
-void StereoBeliefPropagation_setMaxDiscTerm(struct PtrWrapper ptr, double val);
+void StereoBeliefPropagation_setMaxDiscTermCuda(struct PtrWrapper ptr, double val);
 
-double StereoBeliefPropagation_getMaxDiscTerm(struct PtrWrapper ptr);
+double StereoBeliefPropagation_getMaxDiscTermCuda(struct PtrWrapper ptr);
 
-void StereoBeliefPropagation_setDiscSingleJump(struct PtrWrapper ptr, double val);
+void StereoBeliefPropagation_setDiscSingleJumpCuda(struct PtrWrapper ptr, double val);
 
-double StereoBeliefPropagation_getDiscSingleJump(struct PtrWrapper ptr);
+double StereoBeliefPropagation_getDiscSingleJumpCuda(struct PtrWrapper ptr);
 
-void StereoBeliefPropagation_setMsgType(struct PtrWrapper ptr, int val);
+void StereoBeliefPropagation_setMsgTypeCuda(struct PtrWrapper ptr, int val);
 
-int StereoBeliefPropagation_getMsgType(struct PtrWrapper ptr);
+int StereoBeliefPropagation_getMsgTypeCuda(struct PtrWrapper ptr);
 
-struct Vec3iWrapper StereoBeliefPropagation_estimateRecommendedParams(int width, int height);
+struct Vec3iWrapper StereoBeliefPropagation_estimateRecommendedParamsCuda(int width, int height);
 
-int StereoConstantSpaceBP_getNrPlane(struct PtrWrapper ptr);
+int StereoConstantSpaceBP_getNrPlaneCuda(struct PtrWrapper ptr);
 
-void StereoConstantSpaceBP_setNrPlane(struct PtrWrapper ptr, int val);
+void StereoConstantSpaceBP_setNrPlaneCuda(struct PtrWrapper ptr, int val);
 
-bool StereoConstantSpaceBP_getUseLocalInitDataCost(struct PtrWrapper ptr);
+bool StereoConstantSpaceBP_getUseLocalInitDataCostCuda(struct PtrWrapper ptr);
 
-void StereoConstantSpaceBP_setUseLocalInitDataCost(struct PtrWrapper ptr, bool val);
+void StereoConstantSpaceBP_setUseLocalInitDataCostCuda(struct PtrWrapper ptr, bool val);
 
-struct Vec4iWrapper StereoConstantSpaceBP_estimateRecommendedParams(int width, int height);
+struct Vec4iWrapper StereoConstantSpaceBP_estimateRecommendedParamsCuda(int width, int height);
 
-struct PtrWrapper createStereoConstantSpaceBP(
+struct PtrWrapper createStereoConstantSpaceBPCuda(
         int ndisp, int iters, int levels, int nr_plane, int msg_type);
 
-struct TensorWrapper reprojectImageTo3D(
+struct TensorWrapper reprojectImageTo3DCuda(
         struct cutorchInfo info, struct TensorWrapper disp,
         struct TensorWrapper xyzw, struct TensorWrapper Q, int dst_cn);
 
-struct TensorWrapper drawColorDisp(
+struct TensorWrapper drawColorDispCuda(
         struct cutorchInfo info, struct TensorWrapper src_disp,
         struct TensorWrapper dst_disp, int ndisp);
 ]]
@@ -92,7 +92,7 @@ do
 			{"right", required = true, operator = cv.wrap_tensor},
 			{"disparity", default = nil, operator = cv.wrap_tensor}
 		}
-		return cv.unwrap_tensors(C.StereoBM_compute(cv.cuda._info(), self.ptr,
+		return cv.unwrap_tensors(C.StereoBM_computeCuda(cv.cuda._info(), self.ptr,
 			cv.argcheck(t, argRules)))
 	end
 end
@@ -103,7 +103,7 @@ function cv.cuda.createStereoBM(t)
 		{"blockSize", default = 19}
 	}
 	local retval = torch.factory('cuda.StereoBM')()
-	retval.ptr = C.createStereoBM(cv.argcheck(t, argRules))
+	retval.ptr = C.createStereoBMCuda(cv.argcheck(t, argRules))
 	return retval
 end
 
@@ -119,7 +119,7 @@ do
 			{"right", required = true, operator = cv.wrap_tensor},
 			{"disparity", default = nil, operator = cv.wrap_tensor}
 		}
-		return cv.unwrap_tensors(C.StereoBeliefPropagation_compute(
+		return cv.unwrap_tensors(C.StereoBeliefPropagation_computeCuda(
 			cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
 	end
 
@@ -128,7 +128,7 @@ do
 			{"data", required = true, operator = cv.wrap_tensor},
 			{"disparity", default = nil, operator = cv.wrap_tensor}
 		}
-		return cv.unwrap_tensors(C.StereoBeliefPropagation_compute2(
+		return cv.unwrap_tensors(C.StereoBeliefPropagation_compute2Cuda(
 			cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
 	end
 
@@ -138,11 +138,11 @@ do
 	    }
 	    local val = cv.argcheck(t, argRules)
 	    
-	    C.StereoBeliefPropagation_setNumIters(self.ptr, val)
+	    C.StereoBeliefPropagation_setNumItersCuda(self.ptr, val)
 	end
 
 	function StereoBeliefPropagation:getNumIters()
-	    return C.StereoBeliefPropagation_getNumIters(self.ptr)
+	    return C.StereoBeliefPropagation_getNumItersCuda(self.ptr)
 	end
 
 	function StereoBeliefPropagation:setNumLevels(t)
@@ -151,11 +151,11 @@ do
 	    }
 	    local val = cv.argcheck(t, argRules)
 	    
-	    C.StereoBeliefPropagation_setNumLevels(self.ptr, val)
+	    C.StereoBeliefPropagation_setNumLevelsCuda(self.ptr, val)
 	end
 
 	function StereoBeliefPropagation:getNumLevels()
-	    return C.StereoBeliefPropagation_getNumLevels(self.ptr)
+	    return C.StereoBeliefPropagation_getNumLevelsCuda(self.ptr)
 	end
 
 	function StereoBeliefPropagation:setMaxDataTerm(t)
@@ -164,11 +164,11 @@ do
 	    }
 	    local val = cv.argcheck(t, argRules)
 	    
-	    C.StereoBeliefPropagation_setMaxDataTerm(self.ptr, val)
+	    C.StereoBeliefPropagation_setMaxDataTermCuda(self.ptr, val)
 	end
 
 	function StereoBeliefPropagation:getMaxDataTerm()
-	    return C.StereoBeliefPropagation_getMaxDataTerm(self.ptr)
+	    return C.StereoBeliefPropagation_getMaxDataTermCuda(self.ptr)
 	end
 
 	function StereoBeliefPropagation:setDataWeight(t)
@@ -177,11 +177,11 @@ do
 	    }
 	    local val = cv.argcheck(t, argRules)
 	    
-	    C.StereoBeliefPropagation_setDataWeight(self.ptr, val)
+	    C.StereoBeliefPropagation_setDataWeightCuda(self.ptr, val)
 	end
 
 	function StereoBeliefPropagation:getDataWeight()
-	    return C.StereoBeliefPropagation_getDataWeight(self.ptr)
+	    return C.StereoBeliefPropagation_getDataWeightCuda(self.ptr)
 	end
 
 	function StereoBeliefPropagation:setMaxDiscTerm(t)
@@ -190,11 +190,11 @@ do
 	    }
 	    local val = cv.argcheck(t, argRules)
 	    
-	    C.StereoBeliefPropagation_setMaxDiscTerm(self.ptr, val)
+	    C.StereoBeliefPropagation_setMaxDiscTermCuda(self.ptr, val)
 	end
 
 	function StereoBeliefPropagation:getMaxDiscTerm()
-	    return C.StereoBeliefPropagation_getMaxDiscTerm(self.ptr)
+	    return C.StereoBeliefPropagation_getMaxDiscTermCuda(self.ptr)
 	end
 
 	function StereoBeliefPropagation:setDiscSingleJump(t)
@@ -203,11 +203,11 @@ do
 	    }
 	    local val = cv.argcheck(t, argRules)
 	    
-	    C.StereoBeliefPropagation_setDiscSingleJump(self.ptr, val)
+	    C.StereoBeliefPropagation_setDiscSingleJumpCuda(self.ptr, val)
 	end
 
 	function StereoBeliefPropagation:getDiscSingleJump()
-	    return C.StereoBeliefPropagation_getDiscSingleJump(self.ptr)
+	    return C.StereoBeliefPropagation_getDiscSingleJumpCuda(self.ptr)
 	end
 
 	function StereoBeliefPropagation:setMsgType(t)
@@ -216,11 +216,11 @@ do
 	    }
 	    local val = cv.argcheck(t, argRules)
 	    
-	    C.StereoBeliefPropagation_setMsgType(self.ptr, val)
+	    C.StereoBeliefPropagation_setMsgTypeCuda(self.ptr, val)
 	end
 
 	function StereoBeliefPropagation:getMsgType()
-	    return C.StereoBeliefPropagation_getMsgType(self.ptr)
+	    return C.StereoBeliefPropagation_getMsgTypeCuda(self.ptr)
 	end
 
 	function StereoBeliefPropagation.estimateRecommendedParams(t)
@@ -229,7 +229,7 @@ do
 			{"height", required = true}
 		}
 		local retval = 
-			C.StereoBeliefPropagation_estimateRecommendedParams(cv.argcheck(t, argRules))
+			C.StereoBeliefPropagation_estimateRecommendedParamsCuda(cv.argcheck(t, argRules))
 		return retval.v0, retval.v1, retval.v2
 	end
 end
@@ -242,7 +242,7 @@ function cv.cuda.createStereoBeliefPropagation(t)
 		{"msg_type", default = cv.CV_32F}
 	}
 	local retval = torch.factory('cuda.StereoBeliefPropagation')()
-	retval.ptr = C.createStereoBeliefPropagation(cv.argcheck(t, argRules))
+	retval.ptr = C.createStereoBeliefPropagationCuda(cv.argcheck(t, argRules))
 	return retval
 end
 
@@ -251,25 +251,25 @@ do
 		torch.class('cuda.StereoConstantSpaceBP', 'cuda.StereoBeliefPropagation', cv.cuda)
 
 	function StereoConstantSpaceBP:getNrPlane(t)
-		return C.StereoConstantSpaceBP_getNrPlane(self.ptr)
+		return C.StereoConstantSpaceBP_getNrPlaneCuda(self.ptr)
 	end
 
 	function StereoConstantSpaceBP_setNrPlane(t)
 		local argRules = {
 			{"val", required = true}
 		}
-		C.StereoConstantSpaceBP_setNrPlane(self.ptr, cv.argcheck(t, argRules))
+		C.StereoConstantSpaceBP_setNrPlaneCuda(self.ptr, cv.argcheck(t, argRules))
 	end
 
 	function StereoConstantSpaceBP:getUseLocalInitDataCost(t)
-		return C.StereoConstantSpaceBP_getUseLocalInitDataCost(self.ptr)
+		return C.StereoConstantSpaceBP_getUseLocalInitDataCostCuda(self.ptr)
 	end
 
 	function StereoConstantSpaceBP_setUseLocalInitDataCost(t)
 		local argRules = {
 			{"val", required = true}
 		}
-		C.StereoConstantSpaceBP_setUseLocalInitDataCost(self.ptr, cv.argcheck(t, argRules))
+		C.StereoConstantSpaceBP_setUseLocalInitDataCostCuda(self.ptr, cv.argcheck(t, argRules))
 	end
 
 	function StereoConstantSpaceBP.estimateRecommendedParams(t)
@@ -278,7 +278,7 @@ do
 			{"height", required = true}
 		}
 		local retval = 
-			C.StereoConstantSpaceBP_estimateRecommendedParams(cv.argcheck(t, argRules))
+			C.StereoConstantSpaceBP_estimateRecommendedParamsCuda(cv.argcheck(t, argRules))
 		return retval.v0, retval.v1, retval.v2, retval.v3
 	end
 end
@@ -292,7 +292,7 @@ function cv.cuda.createStereoConstantSpaceBP(t)
 		{"msg_type", default = cv.CV_32F}
 	}
 	local retval = torch.factory('cuda.StereoConstantSpaceBP')()
-	retval.ptr = C.createStereoConstantSpaceBP(cv.argcheck(t, argRules))
+	retval.ptr = C.createStereoConstantSpaceBPCuda(cv.argcheck(t, argRules))
 	return retval
 end
 
@@ -303,7 +303,7 @@ function cv.cuda.reprojectImageTo3D(t)
 		{"Q", required = true, operator = cv.wrap_tensor},
 		{"dst_cn", default = 4}
 	}
-	return cv.unwrap_tensors(C.reprojectImageTo3D(cv.cuda._info(), cv.argcheck(t, argRules)))
+	return cv.unwrap_tensors(C.reprojectImageTo3DCuda(cv.cuda._info(), cv.argcheck(t, argRules)))
 end
 
 function cv.cuda.drawColorDisp(t)
@@ -312,7 +312,7 @@ function cv.cuda.drawColorDisp(t)
 		{"dst_disp", default = nil, operator = cv.wrap_tensor},
 		{"ndisp", required = true}
 	}
-	return cv.unwrap_tensors(C.drawColorDisp(cv.cuda._info(), cv.argcheck(t, argRules)))
+	return cv.unwrap_tensors(C.drawColorDispCuda(cv.cuda._info(), cv.argcheck(t, argRules)))
 end
 
 return cv.cuda

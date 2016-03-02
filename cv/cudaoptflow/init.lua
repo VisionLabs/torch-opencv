@@ -7,155 +7,155 @@ cv.cuda = cv.cuda or require 'cv._env_cuda'
 local ffi = require 'ffi'
 
 ffi.cdef[[
-struct TensorWrapper DenseOpticalFlow_calc(struct cutorchInfo info,
+struct TensorWrapper DenseOpticalFlow_calcCuda(struct cutorchInfo info,
     struct PtrWrapper ptr, struct TensorWrapper I0, struct TensorWrapper I1,
     struct TensorWrapper flow);
 
-struct PtrWrapper BroxOpticalFlow_ctor(
+struct PtrWrapper BroxOpticalFlow_ctorCuda(
         double alpha, double gamma, double scale_factor, int inner_iterations,
         int outer_iterations, int solver_iterations);
 
-void BroxOpticalFlow_setFlowSmoothness(struct PtrWrapper ptr, double val);
+void BroxOpticalFlow_setFlowSmoothnessCuda(struct PtrWrapper ptr, double val);
 
-double BroxOpticalFlow_getFlowSmoothness(struct PtrWrapper ptr);
+double BroxOpticalFlow_getFlowSmoothnessCuda(struct PtrWrapper ptr);
 
-void BroxOpticalFlow_setGradientConstancyImportance(struct PtrWrapper ptr, double val);
+void BroxOpticalFlow_setGradientConstancyImportanceCuda(struct PtrWrapper ptr, double val);
 
-double BroxOpticalFlow_getGradientConstancyImportance(struct PtrWrapper ptr);
+double BroxOpticalFlow_getGradientConstancyImportanceCuda(struct PtrWrapper ptr);
 
-void BroxOpticalFlow_setPyramidScaleFactor(struct PtrWrapper ptr, double val);
+void BroxOpticalFlow_setPyramidScaleFactorCuda(struct PtrWrapper ptr, double val);
 
-double BroxOpticalFlow_getPyramidScaleFactor(struct PtrWrapper ptr);
+double BroxOpticalFlow_getPyramidScaleFactorCuda(struct PtrWrapper ptr);
 
-void BroxOpticalFlow_setInnerIterations(struct PtrWrapper ptr, int val);
+void BroxOpticalFlow_setInnerIterationsCuda(struct PtrWrapper ptr, int val);
 
-int BroxOpticalFlow_getInnerIterations(struct PtrWrapper ptr);
+int BroxOpticalFlow_getInnerIterationsCuda(struct PtrWrapper ptr);
 
-void BroxOpticalFlow_setOuterIterations(struct PtrWrapper ptr, int val);
+void BroxOpticalFlow_setOuterIterationsCuda(struct PtrWrapper ptr, int val);
 
-int BroxOpticalFlow_getOuterIterations(struct PtrWrapper ptr);
+int BroxOpticalFlow_getOuterIterationsCuda(struct PtrWrapper ptr);
 
-void BroxOpticalFlow_setSolverIterations(struct PtrWrapper ptr, int val);
+void BroxOpticalFlow_setSolverIterationsCuda(struct PtrWrapper ptr, int val);
 
-int BroxOpticalFlow_getSolverIterations(struct PtrWrapper ptr);
+int BroxOpticalFlow_getSolverIterationsCuda(struct PtrWrapper ptr);
 
-struct PtrWrapper SparsePyrLKOpticalFlow_ctor(
+struct PtrWrapper SparsePyrLKOpticalFlow_ctorCuda(
         struct SizeWrapper winSize, int maxLevel, int iters, bool useInitialFlow);
 
-void SparsePyrLKOpticalFlow_setWinSize(struct PtrWrapper ptr, struct SizeWrapper val);
+void SparsePyrLKOpticalFlow_setWinSizeCuda(struct PtrWrapper ptr, struct SizeWrapper val);
 
-struct SizeWrapper SparsePyrLKOpticalFlow_getWinSize(struct PtrWrapper ptr);
+struct SizeWrapper SparsePyrLKOpticalFlow_getWinSizeCuda(struct PtrWrapper ptr);
 
-void SparsePyrLKOpticalFlow_setMaxLevel(struct PtrWrapper ptr, int val);
+void SparsePyrLKOpticalFlow_setMaxLevelCuda(struct PtrWrapper ptr, int val);
 
-int SparsePyrLKOpticalFlow_getMaxLevel(struct PtrWrapper ptr);
+int SparsePyrLKOpticalFlow_getMaxLevelCuda(struct PtrWrapper ptr);
 
-void SparsePyrLKOpticalFlow_setNumIters(struct PtrWrapper ptr, int val);
+void SparsePyrLKOpticalFlow_setNumItersCuda(struct PtrWrapper ptr, int val);
 
-int SparsePyrLKOpticalFlow_getNumIters(struct PtrWrapper ptr);
+int SparsePyrLKOpticalFlow_getNumItersCuda(struct PtrWrapper ptr);
 
-void SparsePyrLKOpticalFlow_setUseInitialFlow(struct PtrWrapper ptr, bool val);
+void SparsePyrLKOpticalFlow_setUseInitialFlowCuda(struct PtrWrapper ptr, bool val);
 
-bool SparsePyrLKOpticalFlow_getUseInitialFlow(struct PtrWrapper ptr);
+bool SparsePyrLKOpticalFlow_getUseInitialFlowCuda(struct PtrWrapper ptr);
 
-struct PtrWrapper DensePyrLKOpticalFlow_ctor(
+struct PtrWrapper DensePyrLKOpticalFlow_ctorCuda(
         struct SizeWrapper winSize, int maxLevel, int iters, bool useInitialFlow);
 
-void DensePyrLKOpticalFlow_setWinSize(struct PtrWrapper ptr, struct SizeWrapper val);
+void DensePyrLKOpticalFlow_setWinSizeCuda(struct PtrWrapper ptr, struct SizeWrapper val);
 
-struct SizeWrapper DensePyrLKOpticalFlow_getWinSize(struct PtrWrapper ptr);
+struct SizeWrapper DensePyrLKOpticalFlow_getWinSizeCuda(struct PtrWrapper ptr);
 
-void DensePyrLKOpticalFlow_setMaxLevel(struct PtrWrapper ptr, int val);
+void DensePyrLKOpticalFlow_setMaxLevelCuda(struct PtrWrapper ptr, int val);
 
-int DensePyrLKOpticalFlow_getMaxLevel(struct PtrWrapper ptr);
+int DensePyrLKOpticalFlow_getMaxLevelCuda(struct PtrWrapper ptr);
 
-void DensePyrLKOpticalFlow_setNumIters(struct PtrWrapper ptr, int val);
+void DensePyrLKOpticalFlow_setNumItersCuda(struct PtrWrapper ptr, int val);
 
-int DensePyrLKOpticalFlow_getNumIters(struct PtrWrapper ptr);
+int DensePyrLKOpticalFlow_getNumItersCuda(struct PtrWrapper ptr);
 
-void DensePyrLKOpticalFlow_setUseInitialFlow(struct PtrWrapper ptr, bool val);
+void DensePyrLKOpticalFlow_setUseInitialFlowCuda(struct PtrWrapper ptr, bool val);
 
-bool DensePyrLKOpticalFlow_getUseInitialFlow(struct PtrWrapper ptr);
+bool DensePyrLKOpticalFlow_getUseInitialFlowCuda(struct PtrWrapper ptr);
 
-struct PtrWrapper FarnebackOpticalFlow_ctor(
+struct PtrWrapper FarnebackOpticalFlow_ctorCuda(
         int NumLevels, double PyrScale, bool FastPyramids, int WinSize,
         int NumIters, int PolyN, double PolySigma, int Flags);
 
-void FarnebackOpticalFlow_setNumLevels(struct PtrWrapper ptr, int val);
+void FarnebackOpticalFlow_setNumLevelsCuda(struct PtrWrapper ptr, int val);
 
-int FarnebackOpticalFlow_getNumLevels(struct PtrWrapper ptr);
+int FarnebackOpticalFlow_getNumLevelsCuda(struct PtrWrapper ptr);
 
-void FarnebackOpticalFlow_setPyrScale(struct PtrWrapper ptr, double val);
+void FarnebackOpticalFlow_setPyrScaleCuda(struct PtrWrapper ptr, double val);
 
-double FarnebackOpticalFlow_getPyrScale(struct PtrWrapper ptr);
+double FarnebackOpticalFlow_getPyrScaleCuda(struct PtrWrapper ptr);
 
-void FarnebackOpticalFlow_setFastPyramids(struct PtrWrapper ptr, bool val);
+void FarnebackOpticalFlow_setFastPyramidsCuda(struct PtrWrapper ptr, bool val);
 
-bool FarnebackOpticalFlow_getFastPyramids(struct PtrWrapper ptr);
+bool FarnebackOpticalFlow_getFastPyramidsCuda(struct PtrWrapper ptr);
 
-void FarnebackOpticalFlow_setWinSize(struct PtrWrapper ptr, int val);
+void FarnebackOpticalFlow_setWinSizeCuda(struct PtrWrapper ptr, int val);
 
-int FarnebackOpticalFlow_getWinSize(struct PtrWrapper ptr);
+int FarnebackOpticalFlow_getWinSizeCuda(struct PtrWrapper ptr);
 
-void FarnebackOpticalFlow_setNumIters(struct PtrWrapper ptr, int val);
+void FarnebackOpticalFlow_setNumItersCuda(struct PtrWrapper ptr, int val);
 
-int FarnebackOpticalFlow_getNumIters(struct PtrWrapper ptr);
+int FarnebackOpticalFlow_getNumItersCuda(struct PtrWrapper ptr);
 
-void FarnebackOpticalFlow_setPolyN(struct PtrWrapper ptr, int val);
+void FarnebackOpticalFlow_setPolyNCuda(struct PtrWrapper ptr, int val);
 
-int FarnebackOpticalFlow_getPolyN(struct PtrWrapper ptr);
+int FarnebackOpticalFlow_getPolyNCuda(struct PtrWrapper ptr);
 
-void FarnebackOpticalFlow_setPolySigma(struct PtrWrapper ptr, double val);
+void FarnebackOpticalFlow_setPolySigmaCuda(struct PtrWrapper ptr, double val);
 
-double FarnebackOpticalFlow_getPolySigma(struct PtrWrapper ptr);
+double FarnebackOpticalFlow_getPolySigmaCuda(struct PtrWrapper ptr);
 
-void FarnebackOpticalFlow_setFlags(struct PtrWrapper ptr, int val);
+void FarnebackOpticalFlow_setFlagsCuda(struct PtrWrapper ptr, int val);
 
-int FarnebackOpticalFlow_getFlags(struct PtrWrapper ptr);
+int FarnebackOpticalFlow_getFlagsCuda(struct PtrWrapper ptr);
 
-struct PtrWrapper OpticalFlowDual_TVL1_ctor(
+struct PtrWrapper OpticalFlowDual_TVL1_ctorCuda(
         double tau, double lambda, double theta, int nscales, int warps, double epsilon, 
         int iterations, double scaleStep, double gamma, bool useInitialFlow);
 
-void OpticalFlowDual_TVL1_setTau(struct PtrWrapper ptr, double val);
+void OpticalFlowDual_TVL1_setTauCuda(struct PtrWrapper ptr, double val);
 
-double OpticalFlowDual_TVL1_getTau(struct PtrWrapper ptr);
+double OpticalFlowDual_TVL1_getTauCuda(struct PtrWrapper ptr);
 
-void OpticalFlowDual_TVL1_setLambda(struct PtrWrapper ptr, double val);
+void OpticalFlowDual_TVL1_setLambdaCuda(struct PtrWrapper ptr, double val);
 
-double OpticalFlowDual_TVL1_getLambda(struct PtrWrapper ptr);
+double OpticalFlowDual_TVL1_getLambdaCuda(struct PtrWrapper ptr);
 
-void OpticalFlowDual_TVL1_setGamma(struct PtrWrapper ptr, double val);
+void OpticalFlowDual_TVL1_setGammaCuda(struct PtrWrapper ptr, double val);
 
-double OpticalFlowDual_TVL1_getGamma(struct PtrWrapper ptr);
+double OpticalFlowDual_TVL1_getGammaCuda(struct PtrWrapper ptr);
 
-void OpticalFlowDual_TVL1_setTheta(struct PtrWrapper ptr, double val);
+void OpticalFlowDual_TVL1_setThetaCuda(struct PtrWrapper ptr, double val);
 
-double OpticalFlowDual_TVL1_getTheta(struct PtrWrapper ptr);
+double OpticalFlowDual_TVL1_getThetaCuda(struct PtrWrapper ptr);
 
-void OpticalFlowDual_TVL1_setNumScales(struct PtrWrapper ptr, int val);
+void OpticalFlowDual_TVL1_setNumScalesCuda(struct PtrWrapper ptr, int val);
 
-int OpticalFlowDual_TVL1_getNumScales(struct PtrWrapper ptr);
+int OpticalFlowDual_TVL1_getNumScalesCuda(struct PtrWrapper ptr);
 
-void OpticalFlowDual_TVL1_setNumWarps(struct PtrWrapper ptr, int val);
+void OpticalFlowDual_TVL1_setNumWarpsCuda(struct PtrWrapper ptr, int val);
 
-int OpticalFlowDual_TVL1_getNumWarps(struct PtrWrapper ptr);
+int OpticalFlowDual_TVL1_getNumWarpsCuda(struct PtrWrapper ptr);
 
-void OpticalFlowDual_TVL1_setEpsilon(struct PtrWrapper ptr, double val);
+void OpticalFlowDual_TVL1_setEpsilonCuda(struct PtrWrapper ptr, double val);
 
-double OpticalFlowDual_TVL1_getEpsilon(struct PtrWrapper ptr);
+double OpticalFlowDual_TVL1_getEpsilonCuda(struct PtrWrapper ptr);
 
-void OpticalFlowDual_TVL1_setNumIterations(struct PtrWrapper ptr, int val);
+void OpticalFlowDual_TVL1_setNumIterationsCuda(struct PtrWrapper ptr, int val);
 
-int OpticalFlowDual_TVL1_getNumIterations(struct PtrWrapper ptr);
+int OpticalFlowDual_TVL1_getNumIterationsCuda(struct PtrWrapper ptr);
 
-void OpticalFlowDual_TVL1_setScaleStep(struct PtrWrapper ptr, double val);
+void OpticalFlowDual_TVL1_setScaleStepCuda(struct PtrWrapper ptr, double val);
 
-double OpticalFlowDual_TVL1_getScaleStep(struct PtrWrapper ptr);
+double OpticalFlowDual_TVL1_getScaleStepCuda(struct PtrWrapper ptr);
 
-void OpticalFlowDual_TVL1_setUseInitialFlow(struct PtrWrapper ptr, bool val);
+void OpticalFlowDual_TVL1_setUseInitialFlowCuda(struct PtrWrapper ptr, bool val);
 
-bool OpticalFlowDual_TVL1_getUseInitialFlow(struct PtrWrapper ptr);
+bool OpticalFlowDual_TVL1_getUseInitialFlowCuda(struct PtrWrapper ptr);
 ]]
 
 local C = ffi.load(cv.libPath('cudaoptflow'))
@@ -173,7 +173,7 @@ do
             {"flow", default = nil, operator = cv.wrap_tensor}
         }
 
-        return cv.unwrap_tensors(C.DenseOpticalFlow_calc(
+        return cv.unwrap_tensors(C.DenseOpticalFlow_calcCuda(
             cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
     end
 end
@@ -190,7 +190,7 @@ do
             {"err", default = nil, operator = cv.wrap_tensor}
         }
 
-        return cv.unwrap_tensors(C.SparseOpticalFlow_calc(
+        return cv.unwrap_tensors(C.SparseOpticalFlow_calcCuda(
             cv.cuda._info(), self.ptr, cv.argcheck(t, argRules)))
     end
 end
@@ -208,7 +208,7 @@ do
             {"solver_iterations", default = 10}
         }
         
-        self.ptr = ffi.gc(C.BroxOpticalFlow_ctor(cv.argcheck(t, argRules)), Classes.Algorithm_dtor)
+        self.ptr = ffi.gc(C.BroxOpticalFlow_ctorCuda(cv.argcheck(t, argRules)), Classes.Algorithm_dtor)
     end
 
     function BroxOpticalFlow:setFlowSmoothness(t)
@@ -217,11 +217,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.BroxOpticalFlow_setFlowSmoothness(self.ptr, val)
+        C.BroxOpticalFlow_setFlowSmoothnessCuda(self.ptr, val)
     end
 
     function BroxOpticalFlow:getFlowSmoothness()
-        return C.BroxOpticalFlow_getFlowSmoothness(self.ptr)
+        return C.BroxOpticalFlow_getFlowSmoothnessCuda(self.ptr)
     end
 
     function BroxOpticalFlow:setGradientConstancyImportance(t)
@@ -230,11 +230,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.BroxOpticalFlow_setGradientConstancyImportance(self.ptr, val)
+        C.BroxOpticalFlow_setGradientConstancyImportanceCuda(self.ptr, val)
     end
 
     function BroxOpticalFlow:getGradientConstancyImportance()
-        return C.BroxOpticalFlow_getGradientConstancyImportance(self.ptr)
+        return C.BroxOpticalFlow_getGradientConstancyImportanceCuda(self.ptr)
     end
 
     function BroxOpticalFlow:setPyramidScaleFactor(t)
@@ -243,11 +243,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.BroxOpticalFlow_setPyramidScaleFactor(self.ptr, val)
+        C.BroxOpticalFlow_setPyramidScaleFactorCuda(self.ptr, val)
     end
 
     function BroxOpticalFlow:getPyramidScaleFactor()
-        return C.BroxOpticalFlow_getPyramidScaleFactor(self.ptr)
+        return C.BroxOpticalFlow_getPyramidScaleFactorCuda(self.ptr)
     end
 
     function BroxOpticalFlow:setInnerIterations(t)
@@ -256,11 +256,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.BroxOpticalFlow_setInnerIterations(self.ptr, val)
+        C.BroxOpticalFlow_setInnerIterationsCuda(self.ptr, val)
     end
 
     function BroxOpticalFlow:getInnerIterations()
-        return C.BroxOpticalFlow_getInnerIterations(self.ptr)
+        return C.BroxOpticalFlow_getInnerIterationsCuda(self.ptr)
     end
 
     function BroxOpticalFlow:setOuterIterations(t)
@@ -269,11 +269,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.BroxOpticalFlow_setOuterIterations(self.ptr, val)
+        C.BroxOpticalFlow_setOuterIterationsCuda(self.ptr, val)
     end
 
     function BroxOpticalFlow:getOuterIterations()
-        return C.BroxOpticalFlow_getOuterIterations(self.ptr)
+        return C.BroxOpticalFlow_getOuterIterationsCuda(self.ptr)
     end
 
     function BroxOpticalFlow:setSolverIterations(t)
@@ -282,11 +282,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.BroxOpticalFlow_setSolverIterations(self.ptr, val)
+        C.BroxOpticalFlow_setSolverIterationsCuda(self.ptr, val)
     end
 
     function BroxOpticalFlow:getSolverIterations()
-        return C.BroxOpticalFlow_getSolverIterations(self.ptr)
+        return C.BroxOpticalFlow_getSolverIterationsCuda(self.ptr)
     end
 end
 
@@ -303,7 +303,7 @@ do
         }
 
         self.ptr = ffi.gc(
-            C.SparsePyrLKOpticalFlow_ctor(cv.argcheck(t, argRules)), 
+            C.SparsePyrLKOpticalFlow_ctorCuda(cv.argcheck(t, argRules)),
             Classes.Algorithm_dtor)
     end
 
@@ -313,11 +313,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.SparsePyrLKOpticalFlow_setWinSize(self.ptr, val)
+        C.SparsePyrLKOpticalFlow_setWinSizeCuda(self.ptr, val)
     end
 
     function SparsePyrLKOpticalFlow:getWinSize()
-        return C.SparsePyrLKOpticalFlow_getWinSize(self.ptr)
+        return C.SparsePyrLKOpticalFlow_getWinSizeCuda(self.ptr)
     end
 
     function SparsePyrLKOpticalFlow:setMaxLevel(t)
@@ -326,11 +326,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.SparsePyrLKOpticalFlow_setMaxLevel(self.ptr, val)
+        C.SparsePyrLKOpticalFlow_setMaxLevelCuda(self.ptr, val)
     end
 
     function SparsePyrLKOpticalFlow:getMaxLevel()
-        return C.SparsePyrLKOpticalFlow_getMaxLevel(self.ptr)
+        return C.SparsePyrLKOpticalFlow_getMaxLevelCuda(self.ptr)
     end
 
     function SparsePyrLKOpticalFlow:setNumIters(t)
@@ -339,11 +339,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.SparsePyrLKOpticalFlow_setNumIters(self.ptr, val)
+        C.SparsePyrLKOpticalFlow_setNumItersCuda(self.ptr, val)
     end
 
     function SparsePyrLKOpticalFlow:getNumIters()
-        return C.SparsePyrLKOpticalFlow_getNumIters(self.ptr)
+        return C.SparsePyrLKOpticalFlow_getNumItersCuda(self.ptr)
     end
 
     function SparsePyrLKOpticalFlow:setUseInitialFlow(t)
@@ -352,11 +352,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.SparsePyrLKOpticalFlow_setUseInitialFlow(self.ptr, val)
+        C.SparsePyrLKOpticalFlow_setUseInitialFlowCuda(self.ptr, val)
     end
 
     function SparsePyrLKOpticalFlow:getUseInitialFlow()
-        return C.SparsePyrLKOpticalFlow_getUseInitialFlow(self.ptr)
+        return C.SparsePyrLKOpticalFlow_getUseInitialFlowCuda(self.ptr)
     end
 end
 
@@ -373,7 +373,7 @@ do
         }
 
         self.ptr = ffi.gc(
-            C.DensePyrLKOpticalFlow_ctor(cv.argcheck(t, argRules)), 
+            C.DensePyrLKOpticalFlow_ctorCuda(cv.argcheck(t, argRules)),
             Classes.Algorithm_dtor)
     end
 
@@ -383,11 +383,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.DensePyrLKOpticalFlow_setWinSize(self.ptr, val)
+        C.DensePyrLKOpticalFlow_setWinSizeCuda(self.ptr, val)
     end
 
     function DensePyrLKOpticalFlow:getWinSize()
-        return C.DensePyrLKOpticalFlow_getWinSize(self.ptr)
+        return C.DensePyrLKOpticalFlow_getWinSizeCuda(self.ptr)
     end
 
     function DensePyrLKOpticalFlow:setMaxLevel(t)
@@ -396,11 +396,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.DensePyrLKOpticalFlow_setMaxLevel(self.ptr, val)
+        C.DensePyrLKOpticalFlow_setMaxLevelCuda(self.ptr, val)
     end
 
     function DensePyrLKOpticalFlow:getMaxLevel()
-        return C.DensePyrLKOpticalFlow_getMaxLevel(self.ptr)
+        return C.DensePyrLKOpticalFlow_getMaxLevelCuda(self.ptr)
     end
 
     function DensePyrLKOpticalFlow:setNumIters(t)
@@ -409,11 +409,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.DensePyrLKOpticalFlow_setNumIters(self.ptr, val)
+        C.DensePyrLKOpticalFlow_setNumItersCuda(self.ptr, val)
     end
 
     function DensePyrLKOpticalFlow:getNumIters()
-        return C.DensePyrLKOpticalFlow_getNumIters(self.ptr)
+        return C.DensePyrLKOpticalFlow_getNumItersCuda(self.ptr)
     end
 
     function DensePyrLKOpticalFlow:setUseInitialFlow(t)
@@ -422,11 +422,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.DensePyrLKOpticalFlow_setUseInitialFlow(self.ptr, val)
+        C.DensePyrLKOpticalFlow_setUseInitialFlowCuda(self.ptr, val)
     end
 
     function DensePyrLKOpticalFlow:getUseInitialFlow()
-        return C.DensePyrLKOpticalFlow_getUseInitialFlow(self.ptr)
+        return C.DensePyrLKOpticalFlow_getUseInitialFlowCuda(self.ptr)
     end
 end
 
@@ -445,7 +445,7 @@ do
             {"flags", default = 0},
         }
 
-        self.ptr = ffi.gc(C.FarnebackOpticalFlow_ctor(cv.argcheck(t, argRules)), Classes.Algorithm_dtor)
+        self.ptr = ffi.gc(C.FarnebackOpticalFlow_ctorCuda(cv.argcheck(t, argRules)), Classes.Algorithm_dtor)
     end
 
     function FarnebackOpticalFlow:setNumLevels(t)
@@ -454,11 +454,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.FarnebackOpticalFlow_setNumLevels(self.ptr, val)
+        C.FarnebackOpticalFlow_setNumLevelsCuda(self.ptr, val)
     end
 
     function FarnebackOpticalFlow:getNumLevels()
-        return C.FarnebackOpticalFlow_getNumLevels(self.ptr)
+        return C.FarnebackOpticalFlow_getNumLevelsCuda(self.ptr)
     end
 
     function FarnebackOpticalFlow:setPyrScale(t)
@@ -467,11 +467,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.FarnebackOpticalFlow_setPyrScale(self.ptr, val)
+        C.FarnebackOpticalFlow_setPyrScaleCuda(self.ptr, val)
     end
 
     function FarnebackOpticalFlow:getPyrScale()
-        return C.FarnebackOpticalFlow_getPyrScale(self.ptr)
+        return C.FarnebackOpticalFlow_getPyrScaleCuda(self.ptr)
     end
 
     function FarnebackOpticalFlow:setFastPyramids(t)
@@ -480,11 +480,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.FarnebackOpticalFlow_setFastPyramids(self.ptr, val)
+        C.FarnebackOpticalFlow_setFastPyramidsCuda(self.ptr, val)
     end
 
     function FarnebackOpticalFlow:getFastPyramids()
-        return C.FarnebackOpticalFlow_getFastPyramids(self.ptr)
+        return C.FarnebackOpticalFlow_getFastPyramidsCuda(self.ptr)
     end
 
     function FarnebackOpticalFlow:setWinSize(t)
@@ -493,11 +493,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.FarnebackOpticalFlow_setWinSize(self.ptr, val)
+        C.FarnebackOpticalFlow_setWinSizeCuda(self.ptr, val)
     end
 
     function FarnebackOpticalFlow:getWinSize()
-        return C.FarnebackOpticalFlow_getWinSize(self.ptr)
+        return C.FarnebackOpticalFlow_getWinSizeCuda(self.ptr)
     end
 
     function FarnebackOpticalFlow:setNumIters(t)
@@ -506,11 +506,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.FarnebackOpticalFlow_setNumIters(self.ptr, val)
+        C.FarnebackOpticalFlow_setNumItersCuda(self.ptr, val)
     end
 
     function FarnebackOpticalFlow:getNumIters()
-        return C.FarnebackOpticalFlow_getNumIters(self.ptr)
+        return C.FarnebackOpticalFlow_getNumItersCuda(self.ptr)
     end
 
     function FarnebackOpticalFlow:setPolyN(t)
@@ -519,11 +519,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.FarnebackOpticalFlow_setPolyN(self.ptr, val)
+        C.FarnebackOpticalFlow_setPolyNCuda(self.ptr, val)
     end
 
     function FarnebackOpticalFlow:getPolyN()
-        return C.FarnebackOpticalFlow_getPolyN(self.ptr)
+        return C.FarnebackOpticalFlow_getPolyNCuda(self.ptr)
     end
 
     function FarnebackOpticalFlow:setPolySigma(t)
@@ -532,11 +532,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.FarnebackOpticalFlow_setPolySigma(self.ptr, val)
+        C.FarnebackOpticalFlow_setPolySigmaCuda(self.ptr, val)
     end
 
     function FarnebackOpticalFlow:getPolySigma()
-        return C.FarnebackOpticalFlow_getPolySigma(self.ptr)
+        return C.FarnebackOpticalFlow_getPolySigmaCuda(self.ptr)
     end
 
     function FarnebackOpticalFlow:setFlags(t)
@@ -545,11 +545,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.FarnebackOpticalFlow_setFlags(self.ptr, val)
+        C.FarnebackOpticalFlow_setFlagsCuda(self.ptr, val)
     end
 
     function FarnebackOpticalFlow:getFlags()
-        return C.FarnebackOpticalFlow_getFlags(self.ptr)
+        return C.FarnebackOpticalFlow_getFlagsCuda(self.ptr)
     end
 end
 
@@ -570,7 +570,7 @@ do
             {"useInitialFlow", default = false}
         }
 
-        self.ptr = ffi.gc(C.OpticalFlowDual_TVL1_ctor(cv.argcheck(t, argRules)), Classes.Algorithm_dtor)
+        self.ptr = ffi.gc(C.OpticalFlowDual_TVL1_ctorCuda(cv.argcheck(t, argRules)), Classes.Algorithm_dtor)
     end
 
     function OpticalFlowDual_TVL1:setTau(t)
@@ -579,11 +579,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.OpticalFlowDual_TVL1_setTau(self.ptr, val)
+        C.OpticalFlowDual_TVL1_setTauCuda(self.ptr, val)
     end
 
     function OpticalFlowDual_TVL1:getTau()
-        return C.OpticalFlowDual_TVL1_getTau(self.ptr)
+        return C.OpticalFlowDual_TVL1_getTauCuda(self.ptr)
     end
 
     function OpticalFlowDual_TVL1:setLambda(t)
@@ -592,11 +592,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.OpticalFlowDual_TVL1_setLambda(self.ptr, val)
+        C.OpticalFlowDual_TVL1_setLambdaCuda(self.ptr, val)
     end
 
     function OpticalFlowDual_TVL1:getLambda()
-        return C.OpticalFlowDual_TVL1_getLambda(self.ptr)
+        return C.OpticalFlowDual_TVL1_getLambdaCuda(self.ptr)
     end
 
     function OpticalFlowDual_TVL1:setGamma(t)
@@ -605,11 +605,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.OpticalFlowDual_TVL1_setGamma(self.ptr, val)
+        C.OpticalFlowDual_TVL1_setGammaCuda(self.ptr, val)
     end
 
     function OpticalFlowDual_TVL1:getGamma()
-        return C.OpticalFlowDual_TVL1_getGamma(self.ptr)
+        return C.OpticalFlowDual_TVL1_getGammaCuda(self.ptr)
     end
 
     function OpticalFlowDual_TVL1:setTheta(t)
@@ -618,11 +618,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.OpticalFlowDual_TVL1_setTheta(self.ptr, val)
+        C.OpticalFlowDual_TVL1_setThetaCuda(self.ptr, val)
     end
 
     function OpticalFlowDual_TVL1:getTheta()
-        return C.OpticalFlowDual_TVL1_getTheta(self.ptr)
+        return C.OpticalFlowDual_TVL1_getThetaCuda(self.ptr)
     end
 
     function OpticalFlowDual_TVL1:setNumScales(t)
@@ -631,11 +631,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.OpticalFlowDual_TVL1_setNumScales(self.ptr, val)
+        C.OpticalFlowDual_TVL1_setNumScalesCuda(self.ptr, val)
     end
 
     function OpticalFlowDual_TVL1:getNumScales()
-        return C.OpticalFlowDual_TVL1_getNumScales(self.ptr)
+        return C.OpticalFlowDual_TVL1_getNumScalesCuda(self.ptr)
     end
 
     function OpticalFlowDual_TVL1:setNumWarps(t)
@@ -644,11 +644,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.OpticalFlowDual_TVL1_setNumWarps(self.ptr, val)
+        C.OpticalFlowDual_TVL1_setNumWarpsCuda(self.ptr, val)
     end
 
     function OpticalFlowDual_TVL1:getNumWarps()
-        return C.OpticalFlowDual_TVL1_getNumWarps(self.ptr)
+        return C.OpticalFlowDual_TVL1_getNumWarpsCuda(self.ptr)
     end
 
     function OpticalFlowDual_TVL1:setEpsilon(t)
@@ -657,11 +657,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.OpticalFlowDual_TVL1_setEpsilon(self.ptr, val)
+        C.OpticalFlowDual_TVL1_setEpsilonCuda(self.ptr, val)
     end
 
     function OpticalFlowDual_TVL1:getEpsilon()
-        return C.OpticalFlowDual_TVL1_getEpsilon(self.ptr)
+        return C.OpticalFlowDual_TVL1_getEpsilonCuda(self.ptr)
     end
 
     function OpticalFlowDual_TVL1:setNumIterations(t)
@@ -670,11 +670,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.OpticalFlowDual_TVL1_setNumIterations(self.ptr, val)
+        C.OpticalFlowDual_TVL1_setNumIterationsCuda(self.ptr, val)
     end
 
     function OpticalFlowDual_TVL1:getNumIterations()
-        return C.OpticalFlowDual_TVL1_getNumIterations(self.ptr)
+        return C.OpticalFlowDual_TVL1_getNumIterationsCuda(self.ptr)
     end
 
     function OpticalFlowDual_TVL1:setScaleStep(t)
@@ -683,11 +683,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.OpticalFlowDual_TVL1_setScaleStep(self.ptr, val)
+        C.OpticalFlowDual_TVL1_setScaleStepCuda(self.ptr, val)
     end
 
     function OpticalFlowDual_TVL1:getScaleStep()
-        return C.OpticalFlowDual_TVL1_getScaleStep(self.ptr)
+        return C.OpticalFlowDual_TVL1_getScaleStepCuda(self.ptr)
     end
 
     function OpticalFlowDual_TVL1:setUseInitialFlow(t)
@@ -696,11 +696,11 @@ do
         }
         local val = cv.argcheck(t, argRules)
         
-        C.OpticalFlowDual_TVL1_setUseInitialFlow(self.ptr, val)
+        C.OpticalFlowDual_TVL1_setUseInitialFlowCuda(self.ptr, val)
     end
 
     function OpticalFlowDual_TVL1:getUseInitialFlow()
-        return C.OpticalFlowDual_TVL1_getUseInitialFlow(self.ptr)
+        return C.OpticalFlowDual_TVL1_getUseInitialFlowCuda(self.ptr)
     end
 end
 

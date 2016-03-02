@@ -7,59 +7,59 @@ cv.cuda = cv.cuda or require 'cv._env_cuda'
 local ffi = require 'ffi'
 
 ffi.cdef[[
-struct TensorWrapper Filter_apply(struct cutorchInfo info,
+struct TensorWrapper Filter_applyCuda(struct cutorchInfo info,
     struct PtrWrapper ptr, struct TensorWrapper src, struct TensorWrapper dst);
 
-struct PtrWrapper createBoxFilter(
+struct PtrWrapper createBoxFilterCuda(
         int srcType, int dstType, struct SizeWrapper ksize, struct PointWrapper anchor,
         int borderMode, struct ScalarWrapper borderVal);
 
-struct PtrWrapper createLinearFilter(
+struct PtrWrapper createLinearFilterCuda(
         int srcType, int dstType, struct TensorWrapper kernel, struct PointWrapper anchor,
         int borderMode, struct ScalarWrapper borderVal);
 
-struct PtrWrapper createLaplacianFilter(
+struct PtrWrapper createLaplacianFilterCuda(
         int srcType, int dstType, int ksize, double scale,
         int borderMode, struct ScalarWrapper borderVal);
 
-struct PtrWrapper createSeparableLinearFilter(
+struct PtrWrapper createSeparableLinearFilterCuda(
         int srcType, int dstType, struct TensorWrapper rowKernel,
         struct TensorWrapper columnKernel, struct PointWrapper anchor,
         int rowBorderMode, int columnBorderMode);
 
-struct PtrWrapper createDerivFilter(
+struct PtrWrapper createDerivFilterCuda(
         int srcType, int dstType, int dx, int dy, int ksize, bool normalize,
         double scale, int rowBorderMode, int columnBorderMode);
 
-struct PtrWrapper createSobelFilter(
+struct PtrWrapper createSobelFilterCuda(
         int srcType, int dstType, int dx, int dy, int ksize,
         double scale, int rowBorderMode, int columnBorderMode);
 
-struct PtrWrapper createScharrFilter(
+struct PtrWrapper createScharrFilterCuda(
         int srcType, int dstType, int dx, int dy,
         double scale, int rowBorderMode, int columnBorderMode);
 
-struct PtrWrapper createGaussianFilter(
+struct PtrWrapper createGaussianFilterCuda(
         int srcType, int dstType, struct SizeWrapper ksize,
         double sigma1, double sigma2, int rowBorderMode, int columnBorderMode);
 
-struct PtrWrapper createMorphologyFilter(
+struct PtrWrapper createMorphologyFilterCuda(
         int op, int srcType, struct TensorWrapper kernel,
         struct PointWrapper anchor, int iterations);
 
-struct PtrWrapper createBoxMaxFilter(
+struct PtrWrapper createBoxMaxFilterCuda(
         int srcType, struct SizeWrapper ksize, struct PointWrapper anchor,
         int borderMode, struct ScalarWrapper borderVal);
 
-struct PtrWrapper createBoxMinFilter(
+struct PtrWrapper createBoxMinFilterCuda(
         int srcType, struct SizeWrapper ksize, struct PointWrapper anchor,
         int borderMode, struct ScalarWrapper borderVal);
 
-struct PtrWrapper createRowSumFilter(
+struct PtrWrapper createRowSumFilterCuda(
         int srcType, int dstType, int ksize, int anchor,
         int borderMode, struct ScalarWrapper borderVal);
 
-struct PtrWrapper createColumnSumFilter(
+struct PtrWrapper createColumnSumFilterCuda(
         int srcType, int dstType, int ksize, int anchor,
         int borderMode, struct ScalarWrapper borderVal);
 ]]
@@ -79,7 +79,7 @@ do
         }
         local src, dst = cv.argcheck(t, argRules)
 
-        return cv.unwrap_tensors(C.Filter_apply(
+        return cv.unwrap_tensors(C.Filter_applyCuda(
             cv.cuda._info(), self.ptr, cv.wrap_tensor(src), cv.wrap_tensor(dst)))
     end
 end
@@ -96,7 +96,7 @@ function cv.cuda.createBoxFilter(t)
     local srcType, dstType, ksize, anchor, borderMode, borderVal = cv.argcheck(t, argRules)
 
     local retval = torch.factory('cuda.Filter')()
-    retval.ptr = ffi.gc(C.createBoxFilter(
+    retval.ptr = ffi.gc(C.createBoxFilterCuda(
         srcType, dstType, ksize, anchor, borderMode, borderVal),
         Classes.Algorithm_dtor)
     return retval
@@ -114,7 +114,7 @@ function cv.cuda.createLinearFilter(t)
     local srcType, dstType, kernel, anchor, borderMode, borderVal = cv.argcheck(t, argRules)
 
     local retval = torch.factory('cuda.Filter')()
-    retval.ptr = ffi.gc(C.createLinearFilter(
+    retval.ptr = ffi.gc(C.createLinearFilterCuda(
         srcType, dstType, cv.wrap_tensor(kernel), anchor, borderMode, borderVal),
         Classes.Algorithm_dtor)
     return retval
@@ -132,7 +132,7 @@ function cv.cuda.createLaplacianFilter(t)
     local srcType, dstType, ksize, scale, borderMode, borderVal = cv.argcheck(t, argRules)
 
     local retval = torch.factory('cuda.Filter')()
-    retval.ptr = ffi.gc(C.createLaplacianFilter(
+    retval.ptr = ffi.gc(C.createLaplacianFilterCuda(
         srcType, dstType, ksize, scale, borderMode, borderVal),
         Classes.Algorithm_dtor)
     return retval
@@ -152,7 +152,7 @@ function cv.cuda.createSeparableLinearFilter(t)
         rowBorderMode, columnBorderMode = cv.argcheck(t, argRules)
 
     local retval = torch.factory('cuda.Filter')()
-    retval.ptr = ffi.gc(C.createSeparableLinearFilter(
+    retval.ptr = ffi.gc(C.createSeparableLinearFilterCuda(
         srcType, dstType, rowKernel, columnKernel, anchor, rowBorderMode, columnBorderMode),
         Classes.Algorithm_dtor)
     return retval
@@ -173,7 +173,7 @@ function cv.cuda.createDerivFilter(t)
         rowBorderMode, columnBorderMode = cv.argcheck(t, argRules)
 
     local retval = torch.factory('cuda.Filter')()
-    retval.ptr = ffi.gc(C.createDerivFilter(
+    retval.ptr = ffi.gc(C.createDerivFilterCuda(
         srcType, dstType, dx, dy, ksize, normalize, rowBorderMode, columnBorderMode),
         Classes.Algorithm_dtor)
     return retval
@@ -194,7 +194,7 @@ function cv.cuda.createSobelFilter(t)
         rowBorderMode, columnBorderMode = cv.argcheck(t, argRules)
 
     local retval = torch.factory('cuda.Filter')()
-    retval.ptr = ffi.gc(C.createSobelFilter(
+    retval.ptr = ffi.gc(C.createSobelFilterCuda(
         srcType, dstType, dx, dy, ksize, scale, rowBorderMode, columnBorderMode),
         Classes.Algorithm_dtor)
     return retval
@@ -214,7 +214,7 @@ function cv.cuda.createScharrFilter(t)
         rowBorderMode, columnBorderMode = cv.argcheck(t, argRules)
 
     local retval = torch.factory('cuda.Filter')()
-    retval.ptr = ffi.gc(C.createScharrFilter(
+    retval.ptr = ffi.gc(C.createScharrFilterCuda(
         srcType, dstType, dx, dy, scale, rowBorderMode, columnBorderMode),
         Classes.Algorithm_dtor)
     return retval
@@ -234,7 +234,7 @@ function cv.cuda.createGaussianFilter(t)
         rowBorderMode, columnBorderMode = cv.argcheck(t, argRules)
 
     local retval = torch.factory('cuda.Filter')()
-    retval.ptr = ffi.gc(C.createGaussianFilter(
+    retval.ptr = ffi.gc(C.createGaussianFilterCuda(
         srcType, dstType, ksize, sigma1, sigma2, rowBorderMode, columnBorderMode),
         Classes.Algorithm_dtor)
     return retval
@@ -251,7 +251,7 @@ function cv.cuda.createMorphologyFilter(t)
     local op, srcType, kernel, anchor, iterations = cv.argcheck(t, argRules)
 
     local retval = torch.factory('cuda.Filter')()
-    retval.ptr = ffi.gc(C.createMorphologyFilter(
+    retval.ptr = ffi.gc(C.createMorphologyFilterCuda(
         op, srcType, kernel, anchor, iterations),
         Classes.Algorithm_dtor)
     return retval
@@ -268,7 +268,7 @@ function cv.cuda.createBoxMaxFilter(t)
     local srcType, ksize, anchor, borderMode, borderVal = cv.argcheck(t, argRules)
 
     local retval = torch.factory('cuda.Filter')()
-    retval.ptr = ffi.gc(C.createBoxMaxFilter(
+    retval.ptr = ffi.gc(C.createBoxMaxFilterCuda(
         srcType, ksize, anchor, borderMode, borderVal),
         Classes.Algorithm_dtor)
     return retval
@@ -285,7 +285,7 @@ function cv.cuda.createBoxMinFilter(t)
     local srcType, ksize, anchor, borderMode, borderVal = cv.argcheck(t, argRules)
 
     local retval = torch.factory('cuda.Filter')()
-    retval.ptr = ffi.gc(C.createBoxMinFilter(
+    retval.ptr = ffi.gc(C.createBoxMinFilterCuda(
         srcType, ksize, anchor, borderMode, borderVal),
         Classes.Algorithm_dtor)
     return retval
@@ -303,7 +303,7 @@ function cv.cuda.createRowSumFilter(t)
     local srcType, dstType, ksize, anchor, borderMode, borderVal = cv.argcheck(t, argRules)
 
     local retval = torch.factory('cuda.Filter')()
-    retval.ptr = ffi.gc(C.createRowSumFilter(
+    retval.ptr = ffi.gc(C.createRowSumFilterCuda(
         srcType, dstType, ksize, anchor, borderMode, borderVal),
         Classes.Algorithm_dtor)
     return retval
@@ -321,7 +321,7 @@ function cv.cuda.createColumnSumFilter(t)
     local srcType, dstType, ksize, anchor, borderMode, borderVal = cv.argcheck(t, argRules)
 
     local retval = torch.factory('cuda.Filter')()
-    retval.ptr = ffi.gc(C.createColumnSumFilter(
+    retval.ptr = ffi.gc(C.createColumnSumFilterCuda(
         srcType, dstType, ksize, anchor, borderMode, borderVal),
         Classes.Algorithm_dtor)
     return retval

@@ -159,8 +159,8 @@ end
 function cv.setMouseCallback(t)
     local argRules = {
         {"winname", required = true},
-        {"onMouse", default = nil},
-        {"userdata", required = true}
+        {"onMouse", required = true},
+        {"userdata", default = nil}
     }
     local winname, onMouse, userdata = cv.argcheck(t, argRules)
 

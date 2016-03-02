@@ -39,96 +39,96 @@ struct DisparityBilateralFilterPtr {
 };
 
 extern "C"
-struct StereoBMPtr createStereoBM(int numDisparities, int blockSize);
+struct StereoBMPtr createStereoBMCuda(int numDisparities, int blockSize);
 
 extern "C"
-struct TensorWrapper StereoBM_compute(struct cutorchInfo info, struct StereoBMPtr ptr,
+struct TensorWrapper StereoBM_computeCuda(struct cutorchInfo info, struct StereoBMPtr ptr,
                                     struct TensorWrapper left, struct TensorWrapper right, struct TensorWrapper disparity);
 
 extern "C"
-struct StereoBeliefPropagationPtr createStereoBeliefPropagation(
+struct StereoBeliefPropagationPtr createStereoBeliefPropagationCuda(
         int ndisp, int iters, int levels, int msg_type);
 
 extern "C"
-struct TensorWrapper StereoBeliefPropagation_compute(struct cutorchInfo info,
+struct TensorWrapper StereoBeliefPropagation_computeCuda(struct cutorchInfo info,
                                                      struct StereoBeliefPropagationPtr ptr, struct TensorWrapper left,
                                                      struct TensorWrapper right, struct TensorWrapper disparity);
 
 extern "C"
-struct TensorWrapper StereoBeliefPropagation_compute2(struct cutorchInfo info,
+struct TensorWrapper StereoBeliefPropagation_compute2Cuda(struct cutorchInfo info,
                                                       struct StereoBeliefPropagationPtr ptr, struct TensorWrapper data,
                                                       struct TensorWrapper disparity);
 
 extern "C"
-void StereoBeliefPropagation_setNumIters(struct StereoBeliefPropagationPtr ptr, int val);
+void StereoBeliefPropagation_setNumItersCuda(struct StereoBeliefPropagationPtr ptr, int val);
 
 extern "C"
-int StereoBeliefPropagation_getNumIters(struct StereoBeliefPropagationPtr ptr);
+int StereoBeliefPropagation_getNumItersCuda(struct StereoBeliefPropagationPtr ptr);
 
 extern "C"
-void StereoBeliefPropagation_setNumLevels(struct StereoBeliefPropagationPtr ptr, int val);
+void StereoBeliefPropagation_setNumLevelsCuda(struct StereoBeliefPropagationPtr ptr, int val);
 
 extern "C"
-int StereoBeliefPropagation_getNumLevels(struct StereoBeliefPropagationPtr ptr);
+int StereoBeliefPropagation_getNumLevelsCuda(struct StereoBeliefPropagationPtr ptr);
 
 extern "C"
-void StereoBeliefPropagation_setMaxDataTerm(struct StereoBeliefPropagationPtr ptr, double val);
+void StereoBeliefPropagation_setMaxDataTermCuda(struct StereoBeliefPropagationPtr ptr, double val);
 
 extern "C"
-double StereoBeliefPropagation_getMaxDataTerm(struct StereoBeliefPropagationPtr ptr);
+double StereoBeliefPropagation_getMaxDataTermCuda(struct StereoBeliefPropagationPtr ptr);
 
 extern "C"
-void StereoBeliefPropagation_setDataWeight(struct StereoBeliefPropagationPtr ptr, double val);
+void StereoBeliefPropagation_setDataWeightCuda(struct StereoBeliefPropagationPtr ptr, double val);
 
 extern "C"
-double StereoBeliefPropagation_getDataWeight(struct StereoBeliefPropagationPtr ptr);
+double StereoBeliefPropagation_getDataWeightCuda(struct StereoBeliefPropagationPtr ptr);
 
 extern "C"
-void StereoBeliefPropagation_setMaxDiscTerm(struct StereoBeliefPropagationPtr ptr, double val);
+void StereoBeliefPropagation_setMaxDiscTermCuda(struct StereoBeliefPropagationPtr ptr, double val);
 
 extern "C"
-double StereoBeliefPropagation_getMaxDiscTerm(struct StereoBeliefPropagationPtr ptr);
+double StereoBeliefPropagation_getMaxDiscTermCuda(struct StereoBeliefPropagationPtr ptr);
 
 extern "C"
-void StereoBeliefPropagation_setDiscSingleJump(struct StereoBeliefPropagationPtr ptr, double val);
+void StereoBeliefPropagation_setDiscSingleJumpCuda(struct StereoBeliefPropagationPtr ptr, double val);
 
 extern "C"
-double StereoBeliefPropagation_getDiscSingleJump(struct StereoBeliefPropagationPtr ptr);
+double StereoBeliefPropagation_getDiscSingleJumpCuda(struct StereoBeliefPropagationPtr ptr);
 
 extern "C"
-void StereoBeliefPropagation_setMsgType(struct StereoBeliefPropagationPtr ptr, int val);
+void StereoBeliefPropagation_setMsgTypeCuda(struct StereoBeliefPropagationPtr ptr, int val);
 
 extern "C"
-int StereoBeliefPropagation_getMsgType(struct StereoBeliefPropagationPtr ptr);
+int StereoBeliefPropagation_getMsgTypeCuda(struct StereoBeliefPropagationPtr ptr);
 
 extern "C"
-struct Vec3iWrapper StereoBeliefPropagation_estimateRecommendedParams(int width, int height);
+struct Vec3iWrapper StereoBeliefPropagation_estimateRecommendedParamsCuda(int width, int height);
 
 extern "C"
-int StereoConstantSpaceBP_getNrPlane(struct StereoConstantSpaceBPPtr ptr);
+int StereoConstantSpaceBP_getNrPlaneCuda(struct StereoConstantSpaceBPPtr ptr);
 
 extern "C"
-void StereoConstantSpaceBP_setNrPlane(struct StereoConstantSpaceBPPtr ptr, int val);
+void StereoConstantSpaceBP_setNrPlaneCuda(struct StereoConstantSpaceBPPtr ptr, int val);
 
 extern "C"
-bool StereoConstantSpaceBP_getUseLocalInitDataCost(struct StereoConstantSpaceBPPtr ptr);
+bool StereoConstantSpaceBP_getUseLocalInitDataCostCuda(struct StereoConstantSpaceBPPtr ptr);
 
 extern "C"
-void StereoConstantSpaceBP_setUseLocalInitDataCost(struct StereoConstantSpaceBPPtr ptr, bool val);
+void StereoConstantSpaceBP_setUseLocalInitDataCostCuda(struct StereoConstantSpaceBPPtr ptr, bool val);
 
 extern "C"
-struct Vec4iWrapper StereoConstantSpaceBP_estimateRecommendedParams(int width, int height);
+struct Vec4iWrapper StereoConstantSpaceBP_estimateRecommendedParamsCuda(int width, int height);
 
 extern "C"
-struct StereoConstantSpaceBPPtr createStereoConstantSpaceBP(
+struct StereoConstantSpaceBPPtr createStereoConstantSpaceBPCuda(
         int ndisp, int iters, int levels, int nr_plane, int msg_type);
 
 extern "C"
-struct TensorWrapper reprojectImageTo3D(
+struct TensorWrapper reprojectImageTo3DCuda(
         struct cutorchInfo info, struct TensorWrapper disp,
         struct TensorWrapper xyzw, struct TensorWrapper Q, int dst_cn);
 
 extern "C"
-struct TensorWrapper drawColorDisp(
+struct TensorWrapper drawColorDispCuda(
         struct cutorchInfo info, struct TensorWrapper src_disp,
         struct TensorWrapper dst_disp, int ndisp);

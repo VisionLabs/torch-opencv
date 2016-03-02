@@ -1,7 +1,7 @@
 #include <cudaimgproc.hpp>
 
 extern "C"
-struct TensorWrapper cvtColor(struct cutorchInfo info,
+struct TensorWrapper cvtColorCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst, int code, int dstCn)
 {
     GpuMatT dstMat = dst.toGpuMatT();
@@ -10,7 +10,7 @@ struct TensorWrapper cvtColor(struct cutorchInfo info,
 }
 
 extern "C"
-struct TensorWrapper demosaicing(struct cutorchInfo info,
+struct TensorWrapper demosaicingCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst, int code, int dcn)
 {
     cuda::GpuMat retval;
@@ -20,7 +20,7 @@ struct TensorWrapper demosaicing(struct cutorchInfo info,
 }
 
 extern "C"
-void swapChannels(
+void swapChannelsCuda(
         struct cutorchInfo info, struct TensorWrapper image,
         struct Vec4iWrapper dstOrder)
 {
@@ -28,7 +28,7 @@ void swapChannels(
 }
 
 extern "C"
-struct TensorWrapper gammaCorrection(struct cutorchInfo info,
+struct TensorWrapper gammaCorrectionCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst, bool forward)
 {
     cuda::GpuMat retval;
@@ -38,7 +38,7 @@ struct TensorWrapper gammaCorrection(struct cutorchInfo info,
 }
 
 extern "C"
-struct TensorWrapper alphaComp(struct cutorchInfo info,
+struct TensorWrapper alphaCompCuda(struct cutorchInfo info,
         struct TensorWrapper img1, struct TensorWrapper img2,
         struct TensorWrapper dst, int alpha_op)
 {
@@ -49,7 +49,7 @@ struct TensorWrapper alphaComp(struct cutorchInfo info,
 }
 
 extern "C"
-struct TensorWrapper calcHist(
+struct TensorWrapper calcHistCuda(
         struct cutorchInfo info, struct TensorWrapper src, struct TensorWrapper hist)
 {
     cuda::GpuMat retval;
@@ -59,7 +59,7 @@ struct TensorWrapper calcHist(
 }
 
 extern "C"
-struct TensorWrapper equalizeHist(struct cutorchInfo info,
+struct TensorWrapper equalizeHistCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst)
 {
     cuda::GpuMat retval;
@@ -69,7 +69,7 @@ struct TensorWrapper equalizeHist(struct cutorchInfo info,
 }
 
 extern "C"
-struct TensorWrapper evenLevels(struct cutorchInfo info,
+struct TensorWrapper evenLevelsCuda(struct cutorchInfo info,
         struct TensorWrapper levels, int nLevels, int lowerLevel, int upperLevel)
 {
     cuda::GpuMat retval;
@@ -128,7 +128,7 @@ struct TensorWrapper evenLevels(struct cutorchInfo info,
 //}
 
 extern "C"
-struct CornernessCriteriaPtr createHarrisCorner(
+struct CornernessCriteriaPtr createHarrisCornerCuda(
         int srcType, int blockSize, int ksize, double k, int borderType)
 {
     return rescueObjectFromPtr(cuda::createHarrisCorner(
@@ -136,7 +136,7 @@ struct CornernessCriteriaPtr createHarrisCorner(
 }
 
 extern "C"
-struct CornernessCriteriaPtr createMinEigenValCorner(
+struct CornernessCriteriaPtr createMinEigenValCornerCuda(
         int srcType, int blockSize, int ksize, int borderType)
 {
     return rescueObjectFromPtr(cuda::createMinEigenValCorner(
@@ -144,7 +144,7 @@ struct CornernessCriteriaPtr createMinEigenValCorner(
 }
 
 extern "C"
-struct TensorWrapper CornernessCriteria_compute(
+struct TensorWrapper CornernessCriteria_computeCuda(
         struct cutorchInfo info, struct CornernessCriteriaPtr ptr,
         struct TensorWrapper src, struct TensorWrapper dst)
 {
@@ -154,7 +154,7 @@ struct TensorWrapper CornernessCriteria_compute(
 }
 
 extern "C"
-struct CornersDetectorPtr createGoodFeaturesToTrackDetector(
+struct CornersDetectorPtr createGoodFeaturesToTrackDetectorCuda(
         int srcType, int maxCorners, double qualityLevel, double minDistance,
         int blockSize, bool useHarrisDetector, double harrisK)
 {
@@ -164,7 +164,7 @@ struct CornersDetectorPtr createGoodFeaturesToTrackDetector(
 }
 
 extern "C"
-struct TensorWrapper CornersDetector_detect(
+struct TensorWrapper CornersDetector_detectCuda(
         struct cutorchInfo info, struct CornersDetectorPtr ptr, struct TensorWrapper image,
         struct TensorWrapper corners, struct TensorWrapper mask)
 {
@@ -175,7 +175,7 @@ struct TensorWrapper CornersDetector_detect(
 }
 
 extern "C"
-struct TemplateMatchingPtr createTemplateMatching(
+struct TemplateMatchingPtr createTemplateMatchingCuda(
         int srcType, int method, struct SizeWrapper user_block_size)
 {
     return rescueObjectFromPtr(cuda::createTemplateMatching(
@@ -183,7 +183,7 @@ struct TemplateMatchingPtr createTemplateMatching(
 }
 
 extern "C"
-struct TensorWrapper TemplateMatching_match(
+struct TensorWrapper TemplateMatching_matchCuda(
         struct cutorchInfo info, struct TemplateMatchingPtr ptr, struct TensorWrapper image,
         struct TensorWrapper templ, struct TensorWrapper result)
 {
@@ -194,7 +194,7 @@ struct TensorWrapper TemplateMatching_match(
 }
 
 extern "C"
-struct TensorWrapper bilateralFilter(struct cutorchInfo info,
+struct TensorWrapper bilateralFilterCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst, int kernel_size,
         float sigma_color, float sigma_spatial, int borderMode)
 {
@@ -207,7 +207,7 @@ struct TensorWrapper bilateralFilter(struct cutorchInfo info,
 }
 
 extern "C"
-struct TensorWrapper blendLinear(struct cutorchInfo info,
+struct TensorWrapper blendLinearCuda(struct cutorchInfo info,
         struct TensorWrapper img1, struct TensorWrapper img2, struct TensorWrapper weights1, 
         struct TensorWrapper weights2, struct TensorWrapper result)
 {

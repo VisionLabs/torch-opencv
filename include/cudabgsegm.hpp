@@ -21,125 +21,125 @@ struct BackgroundSubtractorMOG2Ptr {
 };
 
 extern "C"
-struct BackgroundSubtractorMOGPtr BackgroundSubtractorMOG_ctor(
+struct BackgroundSubtractorMOGPtr BackgroundSubtractorMOG_ctorCuda(
         int History, int NMixtures, double BackgroundRatio, double NoiseSigma);
 
 extern "C"
-struct TensorWrapper BackgroundSubtractorMOG_apply(struct cutorchInfo info,
+struct TensorWrapper BackgroundSubtractorMOG_applyCuda(struct cutorchInfo info,
                                                    struct BackgroundSubtractorMOGPtr ptr, struct TensorWrapper image,
                                                    struct TensorWrapper fgmask, double learningRate);
 
 extern "C"
-struct TensorWrapper BackgroundSubtractorMOG_getBackgroundImage(
+struct TensorWrapper BackgroundSubtractorMOG_getBackgroundImageCuda(
         struct cutorchInfo info, struct BackgroundSubtractorMOGPtr ptr,
         struct TensorWrapper backgroundImage);
 
 extern "C"
-void BackgroundSubtractorMOG_setHistory(struct BackgroundSubtractorMOGPtr ptr, int val);
+void BackgroundSubtractorMOG_setHistoryCuda(struct BackgroundSubtractorMOGPtr ptr, int val);
 
 extern "C"
-int BackgroundSubtractorMOG_getHistory(struct BackgroundSubtractorMOGPtr ptr);
+int BackgroundSubtractorMOG_getHistoryCuda(struct BackgroundSubtractorMOGPtr ptr);
 
 extern "C"
-void BackgroundSubtractorMOG_setNMixtures(struct BackgroundSubtractorMOGPtr ptr, int val);
+void BackgroundSubtractorMOG_setNMixturesCuda(struct BackgroundSubtractorMOGPtr ptr, int val);
 
 extern "C"
-int BackgroundSubtractorMOG_getNMixtures(struct BackgroundSubtractorMOGPtr ptr);
+int BackgroundSubtractorMOG_getNMixturesCuda(struct BackgroundSubtractorMOGPtr ptr);
 
 extern "C"
-void BackgroundSubtractorMOG_setBackgroundRatio(struct BackgroundSubtractorMOGPtr ptr, double val);
+void BackgroundSubtractorMOG_setBackgroundRatioCuda(struct BackgroundSubtractorMOGPtr ptr, double val);
 
 extern "C"
-double BackgroundSubtractorMOG_getBackgroundRatio(struct BackgroundSubtractorMOGPtr ptr);
+double BackgroundSubtractorMOG_getBackgroundRatioCuda(struct BackgroundSubtractorMOGPtr ptr);
 
 extern "C"
-void BackgroundSubtractorMOG_setNoiseSigma(struct BackgroundSubtractorMOGPtr ptr, double val);
+void BackgroundSubtractorMOG_setNoiseSigmaCuda(struct BackgroundSubtractorMOGPtr ptr, double val);
 
 extern "C"
-double BackgroundSubtractorMOG_getNoiseSigma(struct BackgroundSubtractorMOGPtr ptr);
+double BackgroundSubtractorMOG_getNoiseSigmaCuda(struct BackgroundSubtractorMOGPtr ptr);
 
 extern "C"
-struct BackgroundSubtractorMOG2Ptr BackgroundSubtractorMOG2_ctor(
+struct BackgroundSubtractorMOG2Ptr BackgroundSubtractorMOG2_ctorCuda(
         int history, double varThreshold, bool detectShadows);
 
 extern "C"
-struct TensorWrapper BackgroundSubtractorMOG2_apply(struct cutorchInfo info,
+struct TensorWrapper BackgroundSubtractorMOG2_applyCuda(struct cutorchInfo info,
                                                     struct BackgroundSubtractorMOG2Ptr ptr, struct TensorWrapper image,
                                                     struct TensorWrapper fgmask, double learningRate);
 
 extern "C"
-struct TensorWrapper BackgroundSubtractorMOG2_getBackgroundImage(
+struct TensorWrapper BackgroundSubtractorMOG2_getBackgroundImageCuda(
         struct cutorchInfo info, struct BackgroundSubtractorMOG2Ptr ptr,
         struct TensorWrapper backgroundImage);
 
 extern "C"
-int BackgroundSubtractorMOG2_getHistory(struct BackgroundSubtractorMOG2Ptr ptr);
+int BackgroundSubtractorMOG2_getHistoryCuda(struct BackgroundSubtractorMOG2Ptr ptr);
 
 extern "C"
-void BackgroundSubtractorMOG2_setHistory(struct BackgroundSubtractorMOG2Ptr ptr, int history);
+void BackgroundSubtractorMOG2_setHistoryCuda(struct BackgroundSubtractorMOG2Ptr ptr, int history);
 
 extern "C"
-int BackgroundSubtractorMOG2_getNMixtures(struct BackgroundSubtractorMOG2Ptr ptr);
+int BackgroundSubtractorMOG2_getNMixturesCuda(struct BackgroundSubtractorMOG2Ptr ptr);
 
 extern "C"
-void BackgroundSubtractorMOG2_setNMixtures(struct BackgroundSubtractorMOG2Ptr ptr, int nmixtures);
+void BackgroundSubtractorMOG2_setNMixturesCuda(struct BackgroundSubtractorMOG2Ptr ptr, int nmixtures);
 
 extern "C"
-int BackgroundSubtractorMOG2_getShadowValue(struct BackgroundSubtractorMOG2Ptr ptr);
+int BackgroundSubtractorMOG2_getShadowValueCuda(struct BackgroundSubtractorMOG2Ptr ptr);
 
 extern "C"
-void BackgroundSubtractorMOG2_setShadowValue(struct BackgroundSubtractorMOG2Ptr ptr, int shadow_value);
+void BackgroundSubtractorMOG2_setShadowValueCuda(struct BackgroundSubtractorMOG2Ptr ptr, int shadow_value);
 
 extern "C"
-double BackgroundSubtractorMOG2_getBackgroundRatio(struct BackgroundSubtractorMOG2Ptr ptr);
+double BackgroundSubtractorMOG2_getBackgroundRatioCuda(struct BackgroundSubtractorMOG2Ptr ptr);
 
 extern "C"
-void BackgroundSubtractorMOG2_setBackgroundRatio(struct BackgroundSubtractorMOG2Ptr ptr, double ratio);
+void BackgroundSubtractorMOG2_setBackgroundRatioCuda(struct BackgroundSubtractorMOG2Ptr ptr, double ratio);
 
 extern "C"
-double BackgroundSubtractorMOG2_getVarThreshold(struct BackgroundSubtractorMOG2Ptr ptr);
+double BackgroundSubtractorMOG2_getVarThresholdCuda(struct BackgroundSubtractorMOG2Ptr ptr);
 
 extern "C"
-void BackgroundSubtractorMOG2_setVarThreshold(struct BackgroundSubtractorMOG2Ptr ptr, double varThreshold);
+void BackgroundSubtractorMOG2_setVarThresholdCuda(struct BackgroundSubtractorMOG2Ptr ptr, double varThreshold);
 
 extern "C"
-double BackgroundSubtractorMOG2_getVarThresholdGen(struct BackgroundSubtractorMOG2Ptr ptr);
+double BackgroundSubtractorMOG2_getVarThresholdGenCuda(struct BackgroundSubtractorMOG2Ptr ptr);
 
 extern "C"
-void BackgroundSubtractorMOG2_setVarThresholdGen(struct BackgroundSubtractorMOG2Ptr ptr, double varThresholdGen);
+void BackgroundSubtractorMOG2_setVarThresholdGenCuda(struct BackgroundSubtractorMOG2Ptr ptr, double varThresholdGen);
 
 extern "C"
-double BackgroundSubtractorMOG2_getVarInit(struct BackgroundSubtractorMOG2Ptr ptr);
+double BackgroundSubtractorMOG2_getVarInitCuda(struct BackgroundSubtractorMOG2Ptr ptr);
 
 extern "C"
-void BackgroundSubtractorMOG2_setVarInit(struct BackgroundSubtractorMOG2Ptr ptr, double varInit);
+void BackgroundSubtractorMOG2_setVarInitCuda(struct BackgroundSubtractorMOG2Ptr ptr, double varInit);
 
 extern "C"
-double BackgroundSubtractorMOG2_getVarMin(struct BackgroundSubtractorMOG2Ptr ptr);
+double BackgroundSubtractorMOG2_getVarMinCuda(struct BackgroundSubtractorMOG2Ptr ptr);
 
 extern "C"
-void BackgroundSubtractorMOG2_setVarMin(struct BackgroundSubtractorMOG2Ptr ptr, double varMin);
+void BackgroundSubtractorMOG2_setVarMinCuda(struct BackgroundSubtractorMOG2Ptr ptr, double varMin);
 
 extern "C"
-double BackgroundSubtractorMOG2_getVarMax(struct BackgroundSubtractorMOG2Ptr ptr);
+double BackgroundSubtractorMOG2_getVarMaxCuda(struct BackgroundSubtractorMOG2Ptr ptr);
 
 extern "C"
-void BackgroundSubtractorMOG2_setVarMax(struct BackgroundSubtractorMOG2Ptr ptr, double varMax);
+void BackgroundSubtractorMOG2_setVarMaxCuda(struct BackgroundSubtractorMOG2Ptr ptr, double varMax);
 
 extern "C"
-bool BackgroundSubtractorMOG2_getDetectShadows(struct BackgroundSubtractorMOG2Ptr ptr);
+bool BackgroundSubtractorMOG2_getDetectShadowsCuda(struct BackgroundSubtractorMOG2Ptr ptr);
 
 extern "C"
-void BackgroundSubtractorMOG2_setDetectShadows(struct BackgroundSubtractorMOG2Ptr ptr, bool detectShadows);
+void BackgroundSubtractorMOG2_setDetectShadowsCuda(struct BackgroundSubtractorMOG2Ptr ptr, bool detectShadows);
 
 extern "C"
-double BackgroundSubtractorMOG2_getComplexityReductionThreshold(struct BackgroundSubtractorMOG2Ptr ptr);
+double BackgroundSubtractorMOG2_getComplexityReductionThresholdCuda(struct BackgroundSubtractorMOG2Ptr ptr);
 
 extern "C"
-void BackgroundSubtractorMOG2_setComplexityReductionThreshold(struct BackgroundSubtractorMOG2Ptr ptr, double ct);
+void BackgroundSubtractorMOG2_setComplexityReductionThresholdCuda(struct BackgroundSubtractorMOG2Ptr ptr, double ct);
 
 extern "C"
-double BackgroundSubtractorMOG2_getShadowThreshold(struct BackgroundSubtractorMOG2Ptr ptr);
+double BackgroundSubtractorMOG2_getShadowThresholdCuda(struct BackgroundSubtractorMOG2Ptr ptr);
 
 extern "C"
-void BackgroundSubtractorMOG2_setShadowThreshold(struct BackgroundSubtractorMOG2Ptr ptr, double shadowThreshold);
+void BackgroundSubtractorMOG2_setShadowThresholdCuda(struct BackgroundSubtractorMOG2Ptr ptr, double shadowThreshold);

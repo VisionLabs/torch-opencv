@@ -7,77 +7,77 @@ cv.cuda = cv.cuda or require 'cv._env_cuda'
 local ffi = require 'ffi'
 
 ffi.cdef[[
-struct TensorWrapper cvtColor(struct cutorchInfo info,
+struct TensorWrapper cvtColorCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst, int code, int dstCn);
 
-struct TensorWrapper demosaicing(struct cutorchInfo info,
+struct TensorWrapper demosaicingCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst, int code, int dcn);
 
-void swapChannels(
+void swapChannelsCuda(
         struct cutorchInfo info, struct TensorWrapper image,
         struct Vec4iWrapper dstOrder);
 
-struct TensorWrapper gammaCorrection(struct cutorchInfo info,
+struct TensorWrapper gammaCorrectionCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst, bool forward);
 
-struct TensorWrapper alphaComp(struct cutorchInfo info,
+struct TensorWrapper alphaCompCuda(struct cutorchInfo info,
         struct TensorWrapper img1, struct TensorWrapper img2,
         struct TensorWrapper dst, int alpha_op);
 
-struct TensorWrapper calcHist(
+struct TensorWrapper calcHistCuda(
         struct cutorchInfo info, struct TensorWrapper src, struct TensorWrapper hist);
 
-struct TensorWrapper equalizeHist(struct cutorchInfo info,
+struct TensorWrapper equalizeHistCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst);
 
-struct TensorWrapper evenLevels(struct cutorchInfo info,
+struct TensorWrapper evenLevelsCuda(struct cutorchInfo info,
         struct TensorWrapper levels, int nLevels, int lowerLevel, int upperLevel);
 
-struct TensorWrapper histEven(struct cutorchInfo info,
+struct TensorWrapper histEvenCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper hist,
         int histSize, int lowerLevel, int upperLevel);
 
-struct TensorArray histEven_4(struct cutorchInfo info,
+struct TensorArray histEven_4Cuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorArray hist, struct TensorWrapper histSize,
         struct TensorWrapper lowerLevel, struct TensorWrapper upperLevel);
 
-struct TensorWrapper histRange(struct cutorchInfo info,
+struct TensorWrapper histRangeCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper hist,
         struct TensorWrapper levels);
 
-struct TensorArray histRange_4(struct cutorchInfo info,
+struct TensorArray histRange_4Cuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorArray hist, struct TensorWrapper levels);
 
-struct PtrWrapper createHarrisCorner(
+struct PtrWrapper createHarrisCornerCuda(
         int srcType, int blockSize, int ksize, double k, int borderType);
 
-struct PtrWrapper createMinEigenValCorner(
+struct PtrWrapper createMinEigenValCornerCuda(
         int srcType, int blockSize, int ksize, int borderType);
 
-struct TensorWrapper CornernessCriteria_compute(
+struct TensorWrapper CornernessCriteria_computeCuda(
         struct cutorchInfo info, struct PtrWrapper ptr,
         struct TensorWrapper src, struct TensorWrapper dst);
 
-struct PtrWrapper createGoodFeaturesToTrackDetector(
+struct PtrWrapper createGoodFeaturesToTrackDetectorCuda(
         int srcType, int maxCorners, double qualityLevel, double minDistance,
         int blockSize, bool useHarrisDetector, double harrisK);
 
-struct TensorWrapper CornersDetector_detect(
+struct TensorWrapper CornersDetector_detectCuda(
         struct cutorchInfo info, struct PtrWrapper ptr, struct TensorWrapper image,
         struct TensorWrapper corners, struct TensorWrapper mask);
 
-struct PtrWrapper createTemplateMatching(
+struct PtrWrapper createTemplateMatchingCuda(
         int srcType, int method, struct SizeWrapper user_block_size);
 
-struct TensorWrapper TemplateMatching_match(
+struct TensorWrapper TemplateMatching_matchCuda(
         struct cutorchInfo info, struct PtrWrapper ptr, struct TensorWrapper image,
         struct TensorWrapper templ, struct TensorWrapper result);
 
-struct TensorWrapper bilateralFilter(struct cutorchInfo info,
+struct TensorWrapper bilateralFilterCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst, int kernel_size,
         float sigma_color, float sigma_spatial, int borderMode);
 
-struct TensorWrapper blendLinear(struct cutorchInfo info,
+struct TensorWrapper blendLinearCuda(struct cutorchInfo info,
         struct TensorWrapper img1, struct TensorWrapper img2, struct TensorWrapper weights1, 
         struct TensorWrapper weights2, struct TensorWrapper result);
 ]]
@@ -94,7 +94,7 @@ function cv.cuda.cvtColor(t)
         {"code", required = true},
         {"dcn", default = 0},
     }
-    return cv.unwrap_tensors(C.cvtColor(cv.cuda._info(), cv.argcheck(t, argRules)))
+    return cv.unwrap_tensors(C.cvtColorCuda(cv.cuda._info(), cv.argcheck(t, argRules)))
 end
 
 function cv.cuda.demosaicing(t)
@@ -104,7 +104,7 @@ function cv.cuda.demosaicing(t)
         {"code", required = true},
         {"dcn", default = -1},
     }
-    return cv.unwrap_tensors(C.demosaicing(cv.cuda._info(), cv.argcheck(t, argRules)))
+    return cv.unwrap_tensors(C.demosaicingCuda(cv.cuda._info(), cv.argcheck(t, argRules)))
 end
 
 function cv.cuda.swapChannels(t)
@@ -112,7 +112,7 @@ function cv.cuda.swapChannels(t)
         {"image", required = true, operator = cv.wrap_tensor},
         {"dstOrder", operator = cv.Vec4i},
     }
-    C.swapChannels(cv.cuda._info(), cv.argcheck(t, argRules))
+    C.swapChannelsCuda(cv.cuda._info(), cv.argcheck(t, argRules))
 end
 
 function cv.cuda.gammaCorrection(t)
@@ -121,7 +121,7 @@ function cv.cuda.gammaCorrection(t)
         {"dst", default = nil, operator = cv.wrap_tensor},
         {"forward", default = true}
     }
-    return cv.unwrap_tensors(C.gammaCorrection(cv.cuda._info(), cv.argcheck(t, argRules)))
+    return cv.unwrap_tensors(C.gammaCorrectionCuda(cv.cuda._info(), cv.argcheck(t, argRules)))
 end
 
 function cv.cuda.alphaComp(t)
@@ -131,7 +131,7 @@ function cv.cuda.alphaComp(t)
         {"dst", default = nil, operator = cv.wrap_tensor},
         {"alpha_op", required = true}
     }
-    return cv.unwrap_tensors(C.alphaComp(cv.cuda._info(), cv.argcheck(t, argRules)))
+    return cv.unwrap_tensors(C.alphaCompCuda(cv.cuda._info(), cv.argcheck(t, argRules)))
 end
 
 function cv.cuda.calcHist(t)
@@ -139,7 +139,7 @@ function cv.cuda.calcHist(t)
         {"src", required = true, operator = cv.wrap_tensor},
         {"hist", default = nil, operator = cv.wrap_tensor}
     }
-    return cv.unwrap_tensors(C.calcHist(cv.cuda._info(), cv.argcheck(t, argRules)))
+    return cv.unwrap_tensors(C.calcHistCuda(cv.cuda._info(), cv.argcheck(t, argRules)))
 end
 
 function cv.cuda.equalizeHist(t)
@@ -147,7 +147,7 @@ function cv.cuda.equalizeHist(t)
         {"src", required = true, operator = cv.wrap_tensor},
         {"dst", default = nil, operator = cv.wrap_tensor}
     }
-    return cv.unwrap_tensors(C.equalizeHist(cv.cuda._info(), cv.argcheck(t, argRules)))
+    return cv.unwrap_tensors(C.equalizeHistCuda(cv.cuda._info(), cv.argcheck(t, argRules)))
 end
 
 function cv.cuda.evenLevels(t)
@@ -157,7 +157,7 @@ function cv.cuda.evenLevels(t)
         {"lowerLevel", required = true},
         {"upperLevel", required = true}
     }
-    return cv.unwrap_tensors(C.evenLevels(cv.cuda._info(), cv.argcheck(t, argRules)))
+    return cv.unwrap_tensors(C.evenLevelsCuda(cv.cuda._info(), cv.argcheck(t, argRules)))
 end
 
 do
@@ -168,7 +168,7 @@ do
             {"src", required = true, operator = cv.wrap_tensor},
             {"dst", default = nil, operator = cv.wrap_tensor}
         }
-        return cv.unwrap_tensors(C.CornernessCriteria_compute(cv.cuda._info(), 
+        return cv.unwrap_tensors(C.CornernessCriteria_computeCuda(cv.cuda._info(), 
             self.ptr, cv.argcheck(t,argRules)))
     end
 end
@@ -183,7 +183,7 @@ function cv.cuda.createHarrisCorner(t)
     }
     local retval = torch.factory('cuda.CornernessCriteria')()
     retval.ptr = ffi.gc(
-        C.createHarrisCorner(cv.argcheck(t, argRules)),
+        C.createHarrisCornerCuda(cv.argcheck(t, argRules)),
         Classes.Algorithm_dtor)
     return retval
 end
@@ -197,7 +197,7 @@ function cv.cuda.createMinEigenValCorner(t)
     }
     local retval = torch.factory('cuda.CornernessCriteria')()
     retval.ptr = ffi.gc(
-        C.createMinEigenValCorner(cv.argcheck(t, argRules)),
+        C.createMinEigenValCornerCuda(cv.argcheck(t, argRules)),
         Classes.Algorithm_dtor)
     return retval
 end
@@ -211,7 +211,7 @@ do
             {"corners", default = nil, operator = cv.wrap_tensor},
             {"mask", default = nil, operator = cv.wrap_tensor}
         }
-        return cv.unwrap_tensors(C.CornersDetector_detect(cv.cuda._info(), 
+        return cv.unwrap_tensors(C.CornersDetector_detectCuda(cv.cuda._info(), 
             self.ptr, cv.argcheck(t,argRules)))
     end
 end
@@ -228,7 +228,7 @@ function cv.cuda.createGoodFeaturesToTrackDetector(t)
     }
     local retval = torch.factory('cuda.CornersDetector')()
     retval.ptr = ffi.gc(
-        C.createGoodFeaturesToTrackDetector(cv.argcheck(t, argRules)), 
+        C.createGoodFeaturesToTrackDetectorCuda(cv.argcheck(t, argRules)), 
         Classes.Algorithm_dtor)
     return retval
 end
@@ -242,7 +242,7 @@ do
             {"templ", required = true, operator = cv.wrap_tensor},
             {"result", default = nil, operator = cv.wrap_tensor}
         }
-        return cv.unwrap_tensors(C.TemplateMatching_match(cv.cuda._info(),
+        return cv.unwrap_tensors(C.TemplateMatching_matchCuda(cv.cuda._info(),
             self.ptr, cv.argcheck(t, argRules)))
     end
 end
@@ -255,7 +255,7 @@ function cv.cuda.createTemplateMatching(t)
     }
     local retval = torch.factory('cuda.TemplateMatching')()
     retval.ptr = ffi.gc(
-        C.createTemplateMatching(cv.argcheck(t, argRules)), 
+        C.createTemplateMatchingCuda(cv.argcheck(t, argRules)), 
         Classes.Algorithm_dtor)
     return retval
 end
@@ -270,7 +270,7 @@ function cv.cuda.bilateralFilter(t)
         {"kernel_size", required = true},
         {"borderMode", default = cv.BORDER_DEFAULT}
     }
-    return cv.unwrap_tensors(C.bilateralFilter(cv.cuda._info(), cv.argcheck(t, argRules)))
+    return cv.unwrap_tensors(C.bilateralFilterCuda(cv.cuda._info(), cv.argcheck(t, argRules)))
 end
 
 function cv.cuda.blendLinear(t)
@@ -281,7 +281,7 @@ function cv.cuda.blendLinear(t)
         {"weights2", required = true, operator = cv.wrap_tensor},
         {"result", default = nil, operator = cv.wrap_tensor}
     }
-    return cv.unwrap_tensors(C.blendLinear(cv.cuda._info(), cv.argcheck(t, argRules)))
+    return cv.unwrap_tensors(C.blendLinearCuda(cv.cuda._info(), cv.argcheck(t, argRules)))
 end
 
 return cv.cuda

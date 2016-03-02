@@ -1,7 +1,7 @@
 #include <cudawarping.hpp>
 
 extern "C"
-struct TensorWrapper remap(struct cutorchInfo info,
+struct TensorWrapper remapCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper map1,
         struct TensorWrapper map2, int interpolation, struct TensorWrapper dst,
         int borderMode, struct ScalarWrapper borderValue)
@@ -24,7 +24,7 @@ struct TensorWrapper remap(struct cutorchInfo info,
 }
 
 extern "C"
-struct TensorWrapper resize(struct cutorchInfo info,
+struct TensorWrapper resizeCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst,
         struct SizeWrapper dsize, double fx, double fy,
         int interpolation)
@@ -36,7 +36,7 @@ struct TensorWrapper resize(struct cutorchInfo info,
 
 
 extern "C"
-struct TensorWrapper warpAffine(struct cutorchInfo info,
+struct TensorWrapper warpAffineCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst,
         struct TensorWrapper M, struct SizeWrapper dsize,
         int flags, int borderMode, struct ScalarWrapper borderValue)
@@ -59,7 +59,7 @@ struct TensorWrapper warpAffine(struct cutorchInfo info,
 }
 
 extern "C"
-struct TensorArray buildWarpAffineMaps(
+struct TensorArray buildWarpAffineMapsCuda(
         struct cutorchInfo info, struct TensorWrapper M, bool inverse,
         struct SizeWrapper dsize, struct TensorWrapper xmap, struct TensorWrapper ymap)
 {
@@ -74,7 +74,7 @@ struct TensorArray buildWarpAffineMaps(
 }
 
 extern "C"
-struct TensorWrapper warpPerspective(struct cutorchInfo info,
+struct TensorWrapper warpPerspectiveCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst,
         struct TensorWrapper M, struct SizeWrapper dsize,
         int flags, int borderMode, struct ScalarWrapper borderValue)
@@ -97,7 +97,7 @@ struct TensorWrapper warpPerspective(struct cutorchInfo info,
 }
 
 extern "C"
-struct TensorArray buildWarpPerspectiveMaps(
+struct TensorArray buildWarpPerspectiveMapsCuda(
         struct cutorchInfo info, struct TensorWrapper M, bool inverse,
         struct SizeWrapper dsize, struct TensorWrapper xmap, struct TensorWrapper ymap)
 {
@@ -112,7 +112,7 @@ struct TensorArray buildWarpPerspectiveMaps(
 }
 
 extern "C"
-struct TensorWrapper rotate(
+struct TensorWrapper rotateCuda(
         struct cutorchInfo info, struct TensorWrapper src, struct TensorWrapper dst,
         struct SizeWrapper dsize, double angle, double xShift, double yShift, int interpolation)
 {
@@ -124,7 +124,7 @@ struct TensorWrapper rotate(
 }
 
 extern "C"
-struct TensorWrapper pyrDown(struct cutorchInfo info,
+struct TensorWrapper pyrDownCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst)
 {
     if (dst.isNull()) {
@@ -142,7 +142,7 @@ struct TensorWrapper pyrDown(struct cutorchInfo info,
 }
 
 extern "C"
-struct TensorWrapper pyrUp(struct cutorchInfo info,
+struct TensorWrapper pyrUpCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst)
 {
     if (dst.isNull()) {
