@@ -1380,7 +1380,7 @@ function cv.adaptiveThreshold(t)
         {"blockSize", required = true},
         {"C", required = true}
     }
-    local src, dst, maxValue, adaptiveMethod, thresholdType, blockSize, C = cv.argcheck(t, argRules)
+    local src, dst, maxValue, adaptiveMethod, thresholdType, blockSize, c = cv.argcheck(t, argRules)
 
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
@@ -1389,7 +1389,7 @@ function cv.adaptiveThreshold(t)
     return cv.unwrap_tensors(
         C.adaptiveThreshold(
             cv.wrap_tensor(src), cv.wrap_tensor(dst), maxValue,
-                            adaptiveMethod, thresholdType, blockSize))
+                            adaptiveMethod, thresholdType, blockSize, c))
 end
 
 
