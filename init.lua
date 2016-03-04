@@ -684,14 +684,6 @@ end
 
 -- make an array that has come from C++ garbage-collected
 
-
-local C = ffi.load(cv.libPath('stitching'))
-
-ffi.cdef[[
-void MatchesInfo_dtor(
-struct PtrWrapper other);
-]]
-
 function cv.gcarray(array)
     array.data = ffi.gc(array.data, C.free)
     return array
@@ -716,6 +708,21 @@ function cv.unwrap_string(array)
     return string_array
 end
 
+
+
+ffi.cdef[[
+void MatchesInfo_dtor(
+        struct PtrWrapper other);
+
+struct PtrWrapper ImageFeatures_dtor(
+	struct PtrWrapper ptr);
+
+void CameraParams_dtor(
+	struct PtrWrapper ptr);
+]]
+
+local C = ffi.load(cv.libPath('stitching'))
+
 function cv.unwrap_class(name_class, array)
 
     --need to add unwrapper for every class
@@ -724,7 +731,7 @@ function cv.unwrap_class(name_class, array)
         local class_array = {}
         for i = 1,array.size do
             local temp = torch.factory('cv.' .. name_class)()
-            temp.ptr.ptr = ffi.gc(array.data[i-1], C.MatchesInfo_dtor)
+            temp.ptr = ffi.gc(array.data[i-1], C.MatchesInfo_dtor)
             class_array[i] = temp
         end
 
@@ -735,7 +742,7 @@ function cv.unwrap_class(name_class, array)
         local class_array = {}
         for i = 1,array.size do
             local temp = torch.factory('cv.' .. name_class)()
-            temp.ptr.ptr = ffi.gc(array.data[i-1], C.ImageFeatures_dtor)
+            temp.ptr = ffi.gc(array.data[i-1], C.ImageFeatures_dtor)
             class_array[i] = temp
         end
 
@@ -746,7 +753,7 @@ function cv.unwrap_class(name_class, array)
         local class_array = {}
         for i = 1,array.size do
             local temp = torch.factory('cv.' .. name_class)()
-            temp.ptr.ptr = ffi.gc(array.data[i-1], C.CameraParams_dtor)
+            temp.ptr = ffi.gc(array.data[i-1], C.CameraParams_dtor)
             class_array[i] = temp
         end
 

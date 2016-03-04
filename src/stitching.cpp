@@ -1,5 +1,93 @@
 #include <stitching.hpp>
 
+ClassArray::ClassArray(const std::vector<cv::detail::MatchesInfo> & vec)
+{
+    MatchesInfoPtr *temp = static_cast<MatchesInfoPtr *>(malloc(vec.size() * sizeof(MatchesInfoPtr)));
+
+    this->size = vec.size();
+
+    MatchesInfoPtr class_wrapped;
+
+    for (int i = 0; i < vec.size(); i++) {
+        class_wrapped.ptr = new cv::detail::MatchesInfo(vec[i]);;
+        temp[i] = class_wrapped;
+    }
+    this->data = temp;
+}
+
+ClassArray::ClassArray(const std::vector<cv::detail::ImageFeatures> & vec)
+{
+    ImageFeaturesPtr *temp = static_cast<ImageFeaturesPtr *>(malloc(vec.size() * sizeof(ImageFeaturesPtr)));
+
+    this->size = vec.size();
+
+    ImageFeaturesPtr class_wrapped;
+
+    for (int i = 0; i < vec.size(); i++) {
+        class_wrapped.ptr = new cv::detail::ImageFeatures(vec[i]);;
+        temp[i] = class_wrapped;
+    }
+
+    this->data = temp;
+}
+
+ClassArray::ClassArray(const std::vector<cv::detail::CameraParams> & vec)
+{
+    CameraParamsPtr *temp = static_cast<CameraParamsPtr *>(malloc(vec.size() * sizeof(CameraParamsPtr)));
+
+    this->size = vec.size();
+
+    CameraParamsPtr class_wrapped;
+
+    for (int i = 0; i < vec.size(); i++) {
+        class_wrapped.ptr = new cv::detail::CameraParams(vec[i]);;
+        temp[i] = class_wrapped;
+    }
+    this->data = temp;
+}
+
+ClassArray::operator std::vector<cv::detail::MatchesInfo>()
+{
+    MatchesInfoPtr *temp =
+            static_cast<MatchesInfoPtr *>(this->data);
+
+    std::vector<cv::detail::MatchesInfo> retval(this->size);
+
+    for(int i = 0; i < this->size; i++) {
+        retval[i] = *static_cast<cv::detail::MatchesInfo *>(temp[i].ptr);
+        //memcpy(retval.data() + i, temp[i].ptr, sizeof(cv::detail::MatchesInfo));
+    }
+    return retval;
+}
+
+ClassArray::operator std::vector<cv::detail::ImageFeatures>()
+{
+    ImageFeaturesPtr *temp =
+            static_cast<ImageFeaturesPtr *>(this->data);
+
+    std::vector<cv::detail::ImageFeatures> retval(this->size);
+
+    for(int i = 0; i < this->size; i++) {
+        retval[i] = *static_cast<cv::detail::ImageFeatures *>(temp[i].ptr);
+        //memcpy(retval.data() + i, temp[i].ptr, sizeof(cv::detail::ImageFeatures));
+    }
+    return retval;
+}
+
+ClassArray::operator std::vector<cv::detail::CameraParams>()
+{
+    CameraParamsPtr *temp =
+            static_cast<CameraParamsPtr *>(this->data);
+
+    std::vector<cv::detail::CameraParams> retval(this->size);
+
+    for(int i = 0; i < this->size; i++) {
+        retval[i] = *static_cast<cv::detail::CameraParams *>(temp[i].ptr);
+        //memcpy(retval.data() + i, temp[i].ptr, sizeof(cv::detail::CameraParams));
+    }
+    return retval;
+}
+
 extern "C"
 struct RectPlusBool detail_overlapRoi(
     struct PointWrapper tl1, struct PointWrapper tl2,
@@ -18,7 +106,16 @@ struct RectWrapper detail_resultRoi(
 	struct SizeArray sizes)
 {
     return RectWrapper(detail::resultRoi(corners, sizes));
-}	
+}
+
+extern "C"
+struct RectWrapper detail_resultRoi2(
+        struct PointArray corners,
+        struct TensorArray images)
+{
+    std::vector<cv::UMat> uvec = get_vec_UMat(images.toMatList());
+    return RectWrapper(detail::resultRoi(corners, uvec));
+}
 
 extern "C"
 struct RectWrapper detail_resultRoiIntersection(
@@ -247,7 +344,6 @@ extern "C"
 void MatchesInfo_dtor(
         struct MatchesInfoPtr ptr)
 {
-    std::cout<< "d_tor" << std::endl;
     delete static_cast<cv::detail::MatchesInfo *>(ptr.ptr);
 }
 
@@ -306,7 +402,9 @@ extern "C"
 struct SurfFeaturesFinderPtr SurfFeaturesFinder_ctor(
         double hess_thresh, int num_octaves, int num_layers, int num_octaves_descr, int num_layers_descr)
 {
-    return new cv::detail::SurfFeaturesFinder(hess_thresh, num_octaves, num_layers, num_octaves_descr, num_layers_descr);
+    return new cv::detail::SurfFeaturesFinder(
+                                hess_thresh, num_octaves, num_layers,
+                                num_octaves_descr, num_layers_descr);
 }
 
 //ImageFeatures
@@ -366,7 +464,8 @@ struct BestOf2NearestMatcherPtr BestOf2NearestMatcher_ctor(
         bool try_use_gpu, float match_conf,
         int num_matches_thresh1, int num_matches_thresh2)
 {
-    return new cv::detail::BestOf2NearestMatcher(try_use_gpu, match_conf, num_matches_thresh1, num_matches_thresh2);
+    return new cv::detail::BestOf2NearestMatcher(
+                    try_use_gpu, match_conf, num_matches_thresh1, num_matches_thresh2);
 }
 
 extern "C"
@@ -385,6 +484,23 @@ struct BestOf2NearestRangeMatcherPtr BestOf2NearestRangeMatcher_ctor(
 {
     return new cv::detail::BestOf2NearestRangeMatcher(range_width, try_use_gpu, match_conf,
                                                       num_matches_thresh1, num_matches_thresh2);
+}
+
+extern "C"
+void BestOf2NearestRangeMatcher_call(
+        struct BestOf2NearestRangeMatcherPtr ptr, struct ClassArray features,
+        struct ClassArray pairwise_matches, struct TensorWrapper mask)
+{
+    std::vector<cv::detail::ImageFeatures> features_vec = features;
+    std::vector<cv::detail::MatchesInfo> pairwise_matches_vec = pairwise_matches;
+
+    if(mask.isNull()){
+        ptr->operator()(features_vec, pairwise_matches_vec);
+    }
+    else {
+        cv::UMat umat = mask.toMat().getUMat(cv::ACCESS_RW);
+        ptr->operator()(features_vec, pairwise_matches_vec, umat);
+    }
 }
 
 //**********************Rotation Estimation********************************
@@ -423,7 +539,8 @@ struct StringWrapper detail_matchesGraphAsString(
     struct StringWrapper result;
     std::vector<cv::String> pathes_vec = pathes;
     std::vector<cv::detail::MatchesInfo> pairwise_matches_vec = pairwise_matches;
-    cv::String retval = cv::detail::matchesGraphAsString(pathes_vec, pairwise_matches_vec, conf_threshold);
+    cv::String retval = cv::detail::matchesGraphAsString(
+                                            pathes_vec, pairwise_matches_vec, conf_threshold);
     result.str = retval.c_str();
     return result;
 }
@@ -438,6 +555,8 @@ void detail_waveCorrect(
     std::vector<cv::Mat> rmats_vec = rmats.toMatList();
     cv::detail::waveCorrect(rmats_vec, enum_kind);
 }
+
+//Estimator
 
 extern "C"
 void Estimator_dtor(
@@ -461,12 +580,16 @@ struct BoolPlusClassArray Estimator_call(
     return result;
 }
 
+//HomographyBasedEstimator
+
 extern "C"
 struct HomographyBasedEstimatorPtr HomographyBasedEstimator_ctor(
         bool is_focals_estimated)
 {
     return new cv::detail::HomographyBasedEstimator(is_focals_estimated);
 }
+
+//BundleAdjusterBase
 
 extern "C"
 double BundleAdjusterBase_confThresh(
@@ -538,7 +661,7 @@ struct BundleAdjusterReprojPtr BundleAdjusterReproj_ctor()
 
 
 extern "C"
-struct TensorPlusBool detail_alibrateRotatingCamera(
+struct TensorPlusBool detail_calibrateRotatingCamera(
         struct TensorArray Hs)
 {
     struct TensorPlusBool result;
@@ -1094,7 +1217,8 @@ struct RectWrapper RotationWarper_warpRoi(
 //RotationWarperBase_CompressedRectilinearPortraitProjector
 
 extern "C"
-struct RotationWarperBase_CompressedRectilinearPortraitProjectorPtr RotationWarperBase_CompressedRectilinearPortraitProjector_ctor()
+struct RotationWarperBase_CompressedRectilinearPortraitProjectorPtr
+                        RotationWarperBase_CompressedRectilinearPortraitProjector_ctor()
 {
     return new cv::detail::RotationWarperBase<cv::detail::CompressedRectilinearPortraitProjector>();
 }
@@ -2568,7 +2692,9 @@ struct TensorPlusPoint detail_CylindricalWarperGpu_warp(
     TensorPlusPoint result;
     MatT dst_mat;
     if(!dst.isNull()) dst_mat = dst.toMatT();
-    result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(), interp_mode, border_mode, dst_mat);
+    result.point = ptr->warp(
+            src.toMat(), K.toMat(), R.toMat(),
+            interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
     return result;
 }
@@ -2655,7 +2781,9 @@ struct TensorArrayPlusRect detail_PlaneWarper_buildMaps(
     if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
     if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
 
-    result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), T.toMat(), map_mat[0], map_mat[1]);
+    result.rect = ptr->buildMaps(
+            src_size, K.toMat(),R.toMatT(),
+            T.toMat(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
 
     return result;
@@ -2848,7 +2976,8 @@ void SeamFinder_dtor(
 
 extern "C"
 void SeamFinder_find(
-        struct SeamFinderPtr ptr, struct TensorArray src, struct PointArray corners, struct TensorArray masks)
+        struct SeamFinderPtr ptr, struct TensorArray src,
+        struct PointArray corners, struct TensorArray masks)
 {
     std::vector<cv::UMat> src_uvec = get_vec_UMat(src.toMatList());
     std::vector<cv::UMat> masks_uvec = get_vec_UMat(masks.toMatList());
@@ -2913,7 +3042,8 @@ void GraphCutSeamFinder_dtor(
 
 extern "C"
 void GraphCutSeamFinder_find(
-        struct GraphCutSeamFinderPtr ptr, struct TensorArray src, struct PointArray corners, struct TensorArray masks)
+        struct GraphCutSeamFinderPtr ptr, struct TensorArray src,
+        struct PointArray corners, struct TensorArray masks)
 {
     std::vector<cv::UMat> src_uvec = get_vec_UMat(src.toMatList());
     std::vector<cv::UMat> masks_uvec = get_vec_UMat(masks.toMatList());
@@ -2930,7 +3060,8 @@ struct NoSeamFinderPtr NoSeamFinder_ctor()
 
 extern "C"
 void NoSeamFinder_find(
-        struct NoSeamFinderPtr ptr, struct TensorArray src, struct PointArray corners, struct TensorArray masks)
+        struct NoSeamFinderPtr ptr, struct TensorArray src,
+        struct PointArray corners, struct TensorArray masks)
 {
     std::vector<cv::UMat> src_uvec = get_vec_UMat(src.toMatList());
     std::vector<cv::UMat> masks_uvec = get_vec_UMat(masks.toMatList());
@@ -2941,7 +3072,8 @@ void NoSeamFinder_find(
 
 extern "C"
 void PairwiseSeamFinder_find(
-        struct PairwiseSeamFinderPtr ptr, struct TensorArray src, struct PointArray corners, struct TensorArray masks)
+        struct PairwiseSeamFinderPtr ptr, struct TensorArray src,
+        struct PointArray corners, struct TensorArray masks)
 {
     std::vector<cv::UMat> src_uvec = get_vec_UMat(src.toMatList());
     std::vector<cv::UMat> masks_uvec = get_vec_UMat(masks.toMatList());
@@ -2958,7 +3090,8 @@ struct VoronoiSeamFinderPtr VoronoiSeamFinder_ctor()
 
 extern "C"
 void VoronoiSeamFinder_find(
-        struct VoronoiSeamFinderPtr ptr, struct TensorArray src, struct PointArray corners, struct TensorArray masks)
+        struct VoronoiSeamFinderPtr ptr, struct TensorArray src,
+        struct PointArray corners, struct TensorArray masks)
 {
     std::vector<cv::UMat> src_uvec = get_vec_UMat(src.toMatList());
     std::vector<cv::UMat> masks_uvec = get_vec_UMat(masks.toMatList());
@@ -3483,7 +3616,8 @@ extern "C"
 void Stitcher_setExposureCompensator(
         struct StitcherPtr ptr, struct ExposureCompensatorPtr exposure_comp)
 {
-    cv::Ptr<cv::detail::ExposureCompensator> p(static_cast<cv::detail::ExposureCompensator *>(exposure_comp.ptr));
+    cv::Ptr<cv::detail::ExposureCompensator>
+            p(static_cast<cv::detail::ExposureCompensator *>(exposure_comp.ptr));
     rescueObjectFromPtr(p);
     ptr->setExposureCompensator(p);
 }
@@ -3492,7 +3626,8 @@ extern "C"
 void Stitcher_setFeaturesFinder(
         struct StitcherPtr ptr, struct FeaturesFinderPtr features_finder)
 {
-    cv::Ptr<cv::detail::FeaturesFinder> p(static_cast<cv::detail::FeaturesFinder *>(features_finder.ptr));
+    cv::Ptr<cv::detail::FeaturesFinder>
+            p(static_cast<cv::detail::FeaturesFinder *>(features_finder.ptr));
     rescueObjectFromPtr(p);
     ptr->setFeaturesFinder(p);
 }
@@ -3501,7 +3636,8 @@ extern "C"
 void Stitcher_setFeaturesMatcher(
         struct StitcherPtr ptr, FeaturesMatcherPtr features_matcher)
 {
-    cv::Ptr<cv::detail::FeaturesMatcher> p(static_cast<cv::detail::FeaturesMatcher *>(features_matcher.ptr));
+    cv::Ptr<cv::detail::FeaturesMatcher>
+            p(static_cast<cv::detail::FeaturesMatcher *>(features_matcher.ptr));
     rescueObjectFromPtr(p);
     ptr->setFeaturesMatcher(p);
 }
@@ -3539,7 +3675,8 @@ extern "C"
 void Stitcher_setSeamFinder(
         struct StitcherPtr ptr, struct SeamFinderPtr seam_finder)
 {
-    cv::Ptr<cv::detail::SeamFinder> p(static_cast<cv::detail::SeamFinder *>(seam_finder.ptr));
+    cv::Ptr<cv::detail::SeamFinder>
+            p(static_cast<cv::detail::SeamFinder *>(seam_finder.ptr));
     rescueObjectFromPtr(p);
     ptr->setSeamFinder(p);
 }

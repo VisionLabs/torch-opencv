@@ -11,6 +11,10 @@ struct RectWrapper detail_resultRoi(
 	struct PointArray corners,
 	struct SizeArray sizes);
 
+struct RectWrapper detail_resultRoi2(
+		struct PointArray corners,
+		struct TensorArray images);
+
 struct RectWrapper detail_resultRoiIntersection(
 	struct PointArray corners,
 	struct SizeArray sizes);
@@ -40,7 +44,7 @@ struct StringWrapper detail_matchesGraphAsString(
 void detail_waveCorrect(
         struct TensorArray rmats, int kind);
 
-struct TensorPlusBool detail_alibrateRotatingCamera(
+struct TensorPlusBool detail_calibrateRotatingCamera(
         struct TensorArray Hs);
 
 struct DoubleArray detail_estimateFocal(struct ClassArray features, struct ClassArray pairwise_matches);
@@ -94,6 +98,14 @@ function cv.detail.resultRoi(t)
         {"sizes", required = true}}
     local corners, sizes = cv.argcheck(t, argRules)
     return C.detail_resultRoi(corners, sizes)
+end
+
+function cv.detail.resultRoi2(t)
+    local argRules = {
+        {"corners", required = true},
+        {"images", required = true}}
+    local corners, images = cv.argcheck(t, argRules)
+    return C.detail_resultRoi2(corners, cv.wrap_tensors(images))
 end
 
 function cv.detail.resultRoiIntersection(t)
@@ -176,7 +188,7 @@ function cv.detail.calibrateRotatingCamera(t)
     local argRules = {
         {"Hs", required = true}}
     local Hs = cv.argcheck(t, argRules)
-    local result = C.detail_alibrateRotatingCamera(cv.wrap_tensors(Hs))
+    local result = C.detail_calibrateRotatingCamera(cv.wrap_tensors(Hs))
     return result.val, cv.unwrap_tensors(result.tensor)
 end
 
@@ -376,6 +388,10 @@ void MatchesInfo_dtor(
 struct PtrWrapper BestOf2NearestRangeMatcher_ctor(
 		int range_width, bool try_use_gpu, float match_conf,
 		int num_matches_thresh1, int num_matches_thresh2);
+
+void BestOf2NearestRangeMatcher_call(
+        struct PtrWrapper ptr, struct ClassArray features,
+        struct ClassArray pairwise_matches, struct TensorWrapper mask);
 
 struct PtrWrapper OrbFeaturesFinder_ctor(
         struct SizeWrapper _grid_size, int nfeatures, float scaleFactor, int nlevels);
@@ -1268,7 +1284,8 @@ int DpSeamFinder_costFunction(
         struct PtrWrapper ptr);
 
 void DpSeamFinder_find(
-        struct PtrWrapper ptr, struct TensorArray src, struct PointArray corners, struct TensorArray masks);
+        struct PtrWrapper ptr, struct TensorArray src,
+        struct PointArray corners, struct TensorArray masks);
 
 void DpSeamFinder_setCostFunction(
         struct PtrWrapper ptr, int val);
@@ -1534,7 +1551,6 @@ double Stitcher_workScale(
 
 --CameraParams
 
---TODO
 do
     local CameraParams = torch.class('cv.CameraParams', cv);
 
@@ -1542,10 +1558,10 @@ do
         local argRules = {
             {"other", default = nil}}
         local other = cv.argcheck(t, argRules)
-        if other then 
-            self.ptr = ffi.gc(C.CameraParams_ctor(), C.CameraParams_dtor)
-        else
+        if other then
             self.ptr = ffi.gc(C.CameraParams_ctor2(other.ptr), C.CameraParams_dtor)
+        else
+            self.ptr = ffi.gc(C.CameraParams_ctor(), C.CameraParams_dtor)
         end
     end
 
@@ -1684,8 +1700,6 @@ end
 do
     local TimelapserCrop = torch.class('cv.TimelapserCrop', 'cv.Timelapser', cv)
 
---TODO need to add constructor & destructor C.Timelapser_dtor 
-
     function TimelapserCrop:initialize(t)
         local argRules = {
             {"corners", required = true},
@@ -1714,8 +1728,6 @@ do
             self.ptr = ffi.gc(C.MatchesInfo_ctor(), C.MatchesInfo_dtor);
         end
     end
-
-    --TODO need to add operator=
 end
 
 --FeaturesFinder
@@ -1727,7 +1739,7 @@ do
         C.FeaturesFinder_collectGarbage(self.ptr)
     end
 
-    function FeaturesFinder:__call(op, t)
+    function FeaturesFinder:__call(t)
         local argRules = {
             {"image", required = true},
             {"rois", default = nil}}
@@ -1781,7 +1793,8 @@ do
             {"num_octaves_descr", default = 3},
             {"num_layers_descr", default = 4} }
         local hess_thresh, num_octaves, num_layers, num_octaves_descr, num_layers_descr = cv.argcheck(t, argRules)
-        self.ptr = ffi.gc(C.SurfFeaturesFinder_ctor(hess_thresh, num_octaves, num_layers, num_octaves_descr, num_layers_descr),
+        self.ptr = ffi.gc(C.SurfFeaturesFinder_ctor(hess_thresh, num_octaves, num_layers,
+                                                    num_octaves_descr, num_layers_descr),
                           C.FeaturesFinder_dtor)
     end
 end
@@ -1809,7 +1822,7 @@ do
         return C.FeaturesMatcher_isThreadSafe(self.ptr);
     end
 
-    function FeaturesMatcher:__call(op, t)
+    function FeaturesMatcher:__call(t)
         local argRules = {
             {"features1", required = true},
             {"features2", required = true} }
@@ -1864,7 +1877,15 @@ do
                           C.FeaturesMatcher_dtor)
     end
 
---TODO need to make operator()
+    function BestOf2NearestRangeMatcher:__call(t)
+        local argRules = {
+            {"features", required = true},
+            {"pairwise_matches", required = true},
+            {"mask", default = nil} }
+        local features, pairwise_matches, mask = cv.argcheck(t, argRules)
+        C.BestOf2NearestRangeMatcher_call(
+            self.ptr, cv.newArray("Class", features), cv.newArray("Class", pairwise_matches), cv.wrap_tensor(mask))
+    end
 end
 
 --Estimator
@@ -1872,7 +1893,7 @@ end
 do
     local Estimator = torch.class('cv.Estimator', cv)
 
-    function Estimator:__call(op, t)
+    function Estimator:__call(t)
         local argRules = {
             {"features", required = true},
             {"pairwise_matches", required = true} }
@@ -1980,7 +2001,8 @@ end
 --CompressedRectilinearPortraitProjector
 
 do
-    local CompressedRectilinearPortraitProjector = torch.class('cv.CompressedRectilinearPortraitProjector', 'cv.ProjectorBase', cv)
+    local CompressedRectilinearPortraitProjector =
+                torch.class('cv.CompressedRectilinearPortraitProjector', 'cv.ProjectorBase', cv)
 
     function CompressedRectilinearPortraitProjector:__init(t)
         self.ptr = ffi.gc(C.CompressedRectilinearPortraitProjector_ctor(), C.CompressedRectilinearPortraitProjector_dtor)
@@ -2509,7 +2531,8 @@ do
             {"dst", default = nil} }
         local src, K, R, interp_mode, border_mode, dst = cv.argcheck(t, argRules)
         return cv.unwrap_tensors(
-            C.RotationWarperBase_CompressedRectilinearPortraitProjector_warpBackward(self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
+            C.RotationWarperBase_CompressedRectilinearPortraitProjector_warpBackward(
+                        self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
                 interp_mode, border_mode, cv.wrap_tensor(dst)))
     end
 
@@ -2595,7 +2618,8 @@ do
             {"dst", default = nil} }
         local src, K, R, interp_mode, border_mode, dst = cv.argcheck(t, argRules)
         return cv.unwrap_tensors(
-            C.RotationWarperBase_CompressedRectilinearProjector_warpBackward(self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
+            C.RotationWarperBase_CompressedRectilinearProjector_warpBackward(
+                        self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
                 interp_mode, border_mode, cv.wrap_tensor(dst)))
     end
 
@@ -3022,7 +3046,8 @@ do
             {"dst", default = nil} }
         local src, K, R, interp_mode, border_mode, dst = cv.argcheck(t, argRules)
         return cv.unwrap_tensors(
-            C.RotationWarperBase_PaniniPortraitProjector_warpBackward(self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
+            C.RotationWarperBase_PaniniPortraitProjector_warpBackward(
+                self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
                 interp_mode, border_mode, cv.wrap_tensor(dst)))
     end
 
@@ -3107,7 +3132,8 @@ do
             {"dst", default = nil} }
         local src, K, R, interp_mode, border_mode, dst = cv.argcheck(t, argRules)
         return cv.unwrap_tensors(
-            C.RotationWarperBase_PaniniProjector_warpBackward(self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
+            C.RotationWarperBase_PaniniProjector_warpBackward(
+                self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
                 interp_mode, border_mode, cv.wrap_tensor(dst)))
     end
 
@@ -3192,7 +3218,8 @@ do
             {"dst", default = nil} }
         local src, K, R, interp_mode, border_mode, dst = cv.argcheck(t, argRules)
         return cv.unwrap_tensors(
-            C.RotationWarperBase_PlanePortraitProjector_warpBackward(self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
+            C.RotationWarperBase_PlanePortraitProjector_warpBackward(
+                self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
                 interp_mode, border_mode, cv.wrap_tensor(dst)))
     end
 
@@ -3362,7 +3389,8 @@ do
             {"dst", default = nil} }
         local src, K, R, interp_mode, border_mode, dst = cv.argcheck(t, argRules)
         return cv.unwrap_tensors(
-            C.RotationWarperBase_SphericalPortraitProjector_warpBackward(self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
+            C.RotationWarperBase_SphericalPortraitProjector_warpBackward(
+                self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
                 interp_mode, border_mode, cv.wrap_tensor(dst)))
     end
 
@@ -3447,7 +3475,8 @@ do
             {"dst", default = nil} }
         local src, K, R, interp_mode, border_mode, dst = cv.argcheck(t, argRules)
         return cv.unwrap_tensors(
-            C.RotationWarperBase_SphericalProjector_warpBackward(self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
+            C.RotationWarperBase_SphericalProjector_warpBackward(
+                self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
                 interp_mode, border_mode, cv.wrap_tensor(dst)))
     end
 
@@ -3532,7 +3561,8 @@ do
             {"dst", default = nil} }
         local src, K, R, interp_mode, border_mode, dst = cv.argcheck(t, argRules)
         return cv.unwrap_tensors(
-            C.RotationWarperBase_StereographicProjector_warpBackward(self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
+            C.RotationWarperBase_StereographicProjector_warpBackward(
+                self.ptr, cv.wrap_tensor(K), cv.wrap_tensor(R),
                 interp_mode, border_mode, cv.wrap_tensor(dst)))
     end
 
@@ -4377,7 +4407,8 @@ do
             {"terminal_cost", default = 10000},
             {"bad_region_penalty", default = 1000} }
         local cost_type, terminal_cost, bad_region_penalty = cv.argcheck(t, argRules)
-        self.ptr = ffi.gc(C.GraphCutSeamFinder_ctor(cost_type, terminal_cost, bad_region_penalty), C.GraphCutSeamFinder_dtor)
+        self.ptr = ffi.gc(C.GraphCutSeamFinder_ctor(cost_type, terminal_cost, bad_region_penalty),
+                          C.GraphCutSeamFinder_dtor)
     end
 
     function GraphCutSeamFinder:find(t)

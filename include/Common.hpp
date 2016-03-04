@@ -14,8 +14,6 @@ extern "C" {
 #include <iostream>
 #include <array>
 
-#include <opencv2/stitching.hpp>
-
 extern "C" int getIntMax() { return INT_MAX; }
 extern "C" float getFloatMax() { return FLT_MAX; }
 extern "C" double getDblEpsilon() { return DBL_EPSILON; }
@@ -468,21 +466,6 @@ struct SizeArray {
     SizeArray() {}
     SizeArray(const std::vector<cv::Size> & vec);
     operator std::vector<cv::Size>();
-};
-
-struct ClassArray {
-    void *data;
-    int size;
-
-    ClassArray() {}
-
-    ClassArray(const std::vector<cv::detail::ImageFeatures> & vec);
-    ClassArray(const std::vector<cv::detail::MatchesInfo> & vec);
-    ClassArray(const std::vector<cv::detail::CameraParams> & vec);
-
-    operator std::vector<cv::detail::ImageFeatures>();
-    operator std::vector<cv::detail::MatchesInfo>();
-    operator std::vector<cv::detail::CameraParams>();
 };
 
 struct TensorPlusRectArray {
