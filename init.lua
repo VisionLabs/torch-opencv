@@ -141,6 +141,11 @@ struct TensorPlusKeyPointArray {
     struct KeyPointArray keypoints;
 };
 
+struct TensorPlusInt {
+    struct TensorWrapper tensor;
+    int val;
+};
+
 struct TensorPlusDouble {
     struct TensorWrapper tensor;
     double val;
@@ -211,6 +216,11 @@ struct IntArray {
     int size;
 };
 
+struct UCharArray {
+    unsigned char *data;
+    int size;
+};
+
 struct FloatArray {
     float *data;
     int size;
@@ -228,6 +238,11 @@ struct PointArray {
 
 struct RectArray {
     struct RectWrapper *data;
+    int size;
+};
+
+struct SizeArray {
+    struct SizeWrapper *data;
     int size;
 };
 
@@ -386,7 +401,7 @@ function cv.wrap_tensors(...)
 
     local wrapper = ffi.new("struct TensorArray")
     wrapper.size = #args
-    wrapper.tensors = ffi.gc(C.malloc(#args * ffi.sizeof("struct TensorWrapper *")), C.free)
+    wrapper.tensors = ffi.gc(C.malloc(#args * ffi.sizeof("struct TensorWrapper")), C.free)
 
     for i, tensor in ipairs(args) do
         wrapper.tensors[i-1] = cv.wrap_tensor(tensor)
@@ -560,7 +575,11 @@ function cv.newArray(elemType, data)
         retval = ffi.new('struct ' .. shortTypeName .. 'Array')
     else
         -- C primitive type, such as 'Int' or 'Float'
-        fullTypeName = elemType:lower()
+        if elemType:byte(1) == 85 then
+            fullTypeName = 'unsigned ' .. elemType:sub(2):lower()
+        else
+            fullTypeName = elemType:lower()
+        end
         retval = ffi.new('struct ' .. elemType .. 'Array')
     end
 
@@ -697,15 +716,15 @@ function cv.unwrap_string(array)
     return string_array
 end
 
-function cv.unwrap_class(array, name_class)
+function cv.unwrap_class(name_class, array)
 
     --need to add unwrapper for every class
 
     if name_class == "MatchesInfo" then
         local class_array = {}
         for i = 1,array.size do
-            local temp = cv[name_class]
-            temp.ptr = ffi.gc(array.data[i-1], C.MatchesInfo_dtor)
+            local temp = torch.factory('cv.' .. name_class)()
+            temp.ptr.ptr = ffi.gc(array.data[i-1], C.MatchesInfo_dtor)
             class_array[i] = temp
         end
 
@@ -715,8 +734,8 @@ function cv.unwrap_class(array, name_class)
     if name_class == "ImageFeatures" then
         local class_array = {}
         for i = 1,array.size do
-            local temp = cv[name_class]
-            temp.ptr = ffi.gc(array.data[i-1], C.ImageFeatures_dtor)
+            local temp = torch.factory('cv.' .. name_class)()
+            temp.ptr.ptr = ffi.gc(array.data[i-1], C.ImageFeatures_dtor)
             class_array[i] = temp
         end
 
@@ -726,8 +745,8 @@ function cv.unwrap_class(array, name_class)
     if name_class == "CameraParams" then
         local class_array = {}
         for i = 1,array.size do
-            local temp = cv[name_class]
-            temp.ptr = ffi.gc(array.data[i-1], C.CameraParams_dtor)
+            local temp = torch.factory('cv.' .. name_class)()
+            temp.ptr.ptr = ffi.gc(array.data[i-1], C.CameraParams_dtor)
             class_array[i] = temp
         end
 

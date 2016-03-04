@@ -648,3 +648,16 @@ std::vector<MatT> get_vec_MatT(std::vector<cv::Mat> vec_mat) {
     return retval;
 }
 
+std::vector<cv::UMat> get_vec_UMat(std::vector<cv::Mat> vec_mat)
+{
+    std::vector<cv::UMat> retval(vec_mat.size());
+    for(int i = 0; i < vec_mat.size(); i++) retval[i] = vec_mat[i].getUMat(cv::ACCESS_RW);
+    return retval;
+}
+
+std::vector<cv::Mat> get_vec_Mat(std::vector<cv::UMat> vec_umat)
+{
+std::vector<cv::Mat> retval(vec_umat.size());
+for(int i = 0; i < vec_umat.size(); i++) retval[i] = vec_umat[i].getMat(cv::ACCESS_RW);
+return retval;
+}

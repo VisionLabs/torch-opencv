@@ -189,6 +189,15 @@ void Timelapser_dtor(
 	struct TimelapserPtr ptr)
 {
     ptr->~Timelapser();
+    delete static_cast<cv::detail::Timelapser *>(ptr.ptr);
+}
+
+extern "C"
+struct TensorWrapper Timelapser_getDst(
+        struct TimelapserPtr ptr)
+{
+    cv::UMat umat = ptr->getDst();
+    return TensorWrapper(MatT(umat.getMat(cv::ACCESS_RW)));
 }
 
 extern "C"
@@ -316,8 +325,6 @@ struct ImageFeaturesPtr ImageFeatures_dtor(
 }
 
 //FeaturesMatcher
-
-//TODO need to do constructor protected
 
 extern "C"
 void FeaturesMatcher_dtor(
@@ -2807,25 +2814,799 @@ struct TensorPlusPoint detail_SphericalWarperGpu_warp(
     return result;
 }
 
+//detail_StereographicWarper
 
-
-
-//*************************test***************************
 extern "C"
-struct StringWrapper test(struct StringArray str){
+struct detail_StereographicWarperPtr detail_StereographicWarper_ctor(
+        float scale)
+{
+    return new cv::detail::StereographicWarper(scale);
+}
 
-    std::cout << "__C++__\n";
+//detail_TransverseMercatorWarper
 
-    std::vector<cv::String> vec = str;
+extern "C"
+struct detail_TransverseMercatorWarperPtr detail_TransverseMercatorWarper_ctor(
+        float scale)
+{
+    return new cv::detail::TransverseMercatorWarper(scale);
+}
 
-    for(int i = 0; i < vec.size(); i++){
-        std::cout << vec[i];
+
+//************************Seam Estimation******************************
+
+
+//SeamFinder
+
+extern "C"
+void SeamFinder_dtor(
+        struct SeamFinderPtr ptr)
+{
+    ptr->~SeamFinder();
+    delete static_cast<cv::detail::SeamFinder *>(ptr.ptr);
+}
+
+extern "C"
+void SeamFinder_find(
+        struct SeamFinderPtr ptr, struct TensorArray src, struct PointArray corners, struct TensorArray masks)
+{
+    std::vector<cv::UMat> src_uvec = get_vec_UMat(src.toMatList());
+    std::vector<cv::UMat> masks_uvec = get_vec_UMat(masks.toMatList());
+    ptr->find(src_uvec, corners, masks_uvec);
+}
+
+//DpSeamFinder
+
+extern "C"
+struct DpSeamFinderPtr DpSeamFinder_ctor(int costFunc)
+{
+    enum  	cv::detail::DpSeamFinder::CostFunction costFunc_enum;
+    if(costFunc == 0) costFunc_enum = cv::detail::DpSeamFinder::COLOR;
+    else costFunc_enum = cv::detail::DpSeamFinder::COLOR_GRAD;
+    return new cv::detail::DpSeamFinder(costFunc_enum);
+}
+
+extern "C"
+int DpSeamFinder_costFunction(
+        struct DpSeamFinderPtr ptr)
+{
+    cv::detail::DpSeamFinder::CostFunction costFunc = ptr->costFunction();
+    if(costFunc == cv::detail::DpSeamFinder::COLOR) return 0;
+    else return 1;
+}
+
+extern "C"
+void DpSeamFinder_find(
+        struct DpSeamFinderPtr ptr, struct TensorArray src, struct PointArray corners, struct TensorArray masks)
+{
+    std::vector<cv::UMat> src_uvec = get_vec_UMat(src.toMatList());
+    std::vector<cv::UMat> masks_uvec = get_vec_UMat(masks.toMatList());
+    ptr->find(src_uvec, corners, masks_uvec);
+}
+
+extern "C"
+void DpSeamFinder_setCostFunction(
+        struct DpSeamFinderPtr ptr, int val)
+{
+    enum cv::detail::DpSeamFinder::CostFunction costFunc;
+    if(val == 0) costFunc = cv::detail::DpSeamFinder::COLOR;
+    else costFunc = cv::detail::DpSeamFinder::COLOR_GRAD;
+    ptr->setCostFunction(costFunc);
+}
+
+//GraphCutSeamFinder
+
+extern "C"
+struct GraphCutSeamFinderPtr GraphCutSeamFinder_ctor(
+        int cost_type, float terminal_cost, float bad_region_penalty)
+{
+    return new cv::detail::GraphCutSeamFinder(cost_type, terminal_cost, bad_region_penalty);
+}
+
+extern "C"
+void GraphCutSeamFinder_dtor(
+        struct GraphCutSeamFinderPtr ptr)
+{
+    ptr->~GraphCutSeamFinder();
+    delete static_cast<cv::detail::GraphCutSeamFinder *>(ptr.ptr);
+}
+
+extern "C"
+void GraphCutSeamFinder_find(
+        struct GraphCutSeamFinderPtr ptr, struct TensorArray src, struct PointArray corners, struct TensorArray masks)
+{
+    std::vector<cv::UMat> src_uvec = get_vec_UMat(src.toMatList());
+    std::vector<cv::UMat> masks_uvec = get_vec_UMat(masks.toMatList());
+    ptr->find(src_uvec, corners, masks_uvec);
+}
+
+//NoSeamFinder
+
+extern "C"
+struct NoSeamFinderPtr NoSeamFinder_ctor()
+{
+    return new cv::detail::NoSeamFinder();
+}
+
+extern "C"
+void NoSeamFinder_find(
+        struct NoSeamFinderPtr ptr, struct TensorArray src, struct PointArray corners, struct TensorArray masks)
+{
+    std::vector<cv::UMat> src_uvec = get_vec_UMat(src.toMatList());
+    std::vector<cv::UMat> masks_uvec = get_vec_UMat(masks.toMatList());
+    ptr->find(src_uvec, corners, masks_uvec);
+}
+
+//PairwiseSeamFinder
+
+extern "C"
+void PairwiseSeamFinder_find(
+        struct PairwiseSeamFinderPtr ptr, struct TensorArray src, struct PointArray corners, struct TensorArray masks)
+{
+    std::vector<cv::UMat> src_uvec = get_vec_UMat(src.toMatList());
+    std::vector<cv::UMat> masks_uvec = get_vec_UMat(masks.toMatList());
+    ptr->find(src_uvec, corners, masks_uvec);
+}
+
+//VoronoiSeamFinder
+
+extern "C"
+struct VoronoiSeamFinderPtr VoronoiSeamFinder_ctor()
+{
+    return new cv::detail::VoronoiSeamFinder();
+}
+
+extern "C"
+void VoronoiSeamFinder_find(
+        struct VoronoiSeamFinderPtr ptr, struct TensorArray src, struct PointArray corners, struct TensorArray masks)
+{
+    std::vector<cv::UMat> src_uvec = get_vec_UMat(src.toMatList());
+    std::vector<cv::UMat> masks_uvec = get_vec_UMat(masks.toMatList());
+    ptr->find(src_uvec, corners, masks_uvec);
+}
+
+extern "C"
+void VoronoiSeamFinder_find2(
+        struct VoronoiSeamFinderPtr ptr, struct SizeArray size,
+        struct PointArray corners, struct TensorArray masks)
+{
+    std::vector<cv::UMat> masks_uvec = get_vec_UMat(masks.toMatList());
+    ptr->find(size, corners, masks_uvec);
+}
+
+//************************ExposureCompensator*******************************
+
+
+//ExposureCompensator
+
+extern "C"
+struct ExposureCompensatorPtr ExposureCompensator_ctor(
+        int type)
+{
+    return rescueObjectFromPtr(cv::detail::ExposureCompensator::createDefault(type));
+}
+
+extern "C"
+void ExposureCompensator_dtor(
+        struct ExposureCompensatorPtr ptr)
+{
+    ptr->~ExposureCompensator();
+    delete static_cast<cv::detail::ExposureCompensator *>(ptr.ptr);
+}
+
+extern "C"
+void  ExposureCompensator_apply(
+        struct ExposureCompensatorPtr ptr, int index, struct PointWrapper corner,
+        struct TensorWrapper image, struct TensorWrapper mask)
+{
+    ptr->apply(index, corner, image.toMat(), mask.toMat());
+}
+
+extern "C"
+void ExposureCompensator_feed(
+        struct ExposureCompensatorPtr ptr, struct PointArray corners,
+        struct TensorArray images, struct TensorArray masks)
+{
+    std::vector<cv::UMat> images_uvec = get_vec_UMat(images.toMatList());
+    std::vector<cv::UMat> masks_uvec = get_vec_UMat(masks.toMatList());
+    ptr->feed(corners, images_uvec, masks_uvec);
+}
+
+//BlocksGainCompensator
+
+extern "C"
+struct BlocksGainCompensatorPtr BlocksGainCompensator_ctor(
+        int bl_width, int bl_height)
+{
+    return new cv::detail::BlocksGainCompensator(bl_width, bl_height);
+}
+
+extern "C"
+void  BlocksGainCompensator_apply(
+        struct BlocksGainCompensatorPtr ptr, int index, struct PointWrapper corner,
+        struct TensorWrapper image, struct TensorWrapper mask)
+{
+    ptr->apply(index, corner, image.toMat(), mask.toMat());
+}
+
+extern "C"
+void BlocksGainCompensator_feed(
+        struct BlocksGainCompensatorPtr ptr, struct PointArray corners,
+        struct TensorArray images, struct TensorArray mat, struct UCharArray chr)
+{
+    std::vector<cv::UMat> images_uvec = get_vec_UMat(images.toMatList());
+    std::vector<cv::UMat> masks_uvec = get_vec_UMat(mat.toMatList());
+    std::vector<std::pair<cv::UMat, uchar>> masks_vec(mat.size);
+    for(int i = 0; i < mat.size; i++){
+        masks_vec[i] = std::pair<cv::UMat, uchar>(masks_uvec[i], chr.data[i]);
     }
-    std::cout << std::endl;
+    ptr->feed(corners, images_uvec, masks_vec);
+}
 
-    struct  StringWrapper retval;
+//GainCompensator
 
-    retval.str = static_cast<char *>(malloc(sizeof(char) * 3));
-    retval.str = "aa";
-    return retval;
- }
+extern "C"
+struct GainCompensatorPtr GainCompensator_ctor()
+{
+    return new cv::detail::GainCompensator();
+}
+
+extern "C"
+void  GainCompensator_apply(
+        struct GainCompensatorPtr ptr, int index, struct PointWrapper corner,
+        struct TensorWrapper image, struct TensorWrapper mask)
+{
+    ptr->apply(index, corner, image.toMat(), mask.toMat());
+}
+
+extern "C"
+void GainCompensator_feed(
+        struct GainCompensatorPtr ptr, struct PointArray corners,
+        struct TensorArray images, struct TensorArray mat, struct UCharArray chr)
+{
+    std::vector<cv::UMat> images_uvec = get_vec_UMat(images.toMatList());
+    std::vector<cv::UMat> masks_uvec = get_vec_UMat(mat.toMatList());
+    std::vector<std::pair<cv::UMat, uchar>> masks_vec(mat.size);
+    for(int i = 0; i < mat.size; i++){
+        masks_vec[i] = std::pair<cv::UMat, uchar>(masks_uvec[i], chr.data[i]);
+    }
+    ptr->feed(corners, images_uvec, masks_vec);
+}
+
+extern "C"
+struct DoubleArray GainCompensator_gains(
+        struct GainCompensatorPtr ptr)
+{
+    return DoubleArray(ptr->gains());
+}
+
+//NoExposureCompensator
+
+extern "C"
+struct NoExposureCompensatorPtr NoExposureCompensator_ctor()
+{
+    return new cv::detail::NoExposureCompensator();
+}
+
+extern "C"
+void  NoExposureCompensator_apply(
+        struct NoExposureCompensatorPtr ptr, int index, struct PointWrapper corner,
+        struct TensorWrapper image, struct TensorWrapper mask)
+{
+    ptr->apply(index, corner, image.toMat(), mask.toMat());
+}
+
+extern "C"
+void NoExposureCompensator_feed(
+        struct NoExposureCompensatorPtr ptr, struct PointArray corners,
+        struct TensorArray images, struct TensorArray mat, struct UCharArray chr)
+{
+    std::vector<cv::UMat> images_uvec = get_vec_UMat(images.toMatList());
+    std::vector<cv::UMat> masks_uvec = get_vec_UMat(mat.toMatList());
+    std::vector<std::pair<cv::UMat, uchar>> masks_vec(mat.size);
+    for(int i = 0; i < mat.size; i++){
+        masks_vec[i] = std::pair<cv::UMat, uchar>(masks_uvec[i], chr.data[i]);
+    }
+    ptr->feed(corners, images_uvec, masks_vec);
+}
+
+
+//*******************************Image Blenders**********************
+
+
+extern "C"
+struct TensorArray detail_createLaplacePyr(
+        struct TensorWrapper img, int num_levels)
+{
+    std::vector<cv::UMat> pyr_uvec;
+    cv::detail::createLaplacePyr(img.toMat(), num_levels, pyr_uvec);
+    std::vector<cv::Mat> pyr_vec = get_vec_Mat(pyr_uvec);
+    return TensorArray(pyr_vec);
+}
+
+extern "C"
+struct TensorArray detail_createLaplacePyrGpu(
+        struct TensorWrapper img, int num_levels)
+{
+    std::vector<cv::UMat> pyr_uvec;
+    cv::detail::createLaplacePyr(img.toMat(), num_levels, pyr_uvec);
+    std::vector<cv::Mat> pyr_vec = get_vec_Mat(pyr_uvec);
+    return TensorArray(pyr_vec);
+}
+
+extern "C"
+void detail_createWeightMap(
+        struct TensorWrapper mask, float sharpness,
+        struct TensorWrapper weight)
+{
+    cv::detail::createWeightMap(mask.toMat(), sharpness, weight.toMat());
+}
+
+extern "C"
+void detail_normalizeUsingWeightMap(
+        struct TensorWrapper weight, struct TensorWrapper src)
+{
+    cv::detail::normalizeUsingWeightMap(weight.toMat(), src.toMat());
+}
+
+extern "C"
+void detail_restoreImageFromLaplacePyr(
+        struct TensorArray pyr) {
+    std::vector<cv::UMat> pyr_uvec = get_vec_UMat(pyr.toMatList());
+    cv::detail::restoreImageFromLaplacePyr(pyr_uvec);
+}
+
+extern "C"
+void detail_restoreImageFromLaplacePyrGpu(
+        struct TensorArray pyr) {
+    std::vector<cv::UMat> pyr_uvec = get_vec_UMat(pyr.toMatList());
+    cv::detail::restoreImageFromLaplacePyrGpu(pyr_uvec);
+}
+
+//Blender
+
+extern "C"
+struct BlenderPtr Blender_ctor(
+        int type, bool try_gpu)
+{
+    return rescueObjectFromPtr(cv::detail::Blender::createDefault(type, try_gpu));
+}
+
+extern "C"
+void Blender_dtor(
+        struct BlenderPtr ptr)
+{
+    ptr->~Blender();
+    delete static_cast<cv::detail::Blender *>(ptr.ptr);
+}
+
+extern "C"
+void Blender_blend(
+        struct BlenderPtr ptr, struct TensorWrapper dst,
+        struct TensorWrapper dst_mask)
+{
+    ptr->blend(dst.toMat(), dst_mask.toMat());
+}
+
+extern "C"
+void Blender_feed(
+        struct BlenderPtr ptr, struct TensorWrapper img,
+        struct TensorWrapper mask, struct PointWrapper tl)
+{
+    ptr->feed(img.toMat(), mask.toMat(), tl);
+}
+
+extern "C"
+void Blender_prepare(
+        struct BlenderPtr ptr, struct RectWrapper dst_roi)
+{
+    ptr->prepare(dst_roi);
+}
+
+extern "C"
+void Blender_prepare2(
+        struct BlenderPtr ptr, struct PointArray corners,
+        struct SizeArray sizes)
+{
+    ptr->prepare(corners, sizes);
+}
+
+//FeatherBlender
+
+extern "C"
+struct FeatherBlenderPtr FeatherBlender_ctor(
+        float sharpness)
+{
+    return new cv::detail::FeatherBlender(sharpness);
+}
+
+extern "C"
+void FeatherBlender_blend(
+        struct FeatherBlenderPtr ptr, struct TensorWrapper dst,
+        struct TensorWrapper dst_mask)
+{
+    ptr->blend(dst.toMat(), dst_mask.toMat());
+}
+
+extern "C"
+struct RectWrapper FeatherBlender_createWeightMaps(
+        struct FeatherBlenderPtr ptr, struct TensorArray masks,
+        struct PointArray corners, struct TensorArray weight_maps)
+{
+    std::vector<cv::UMat> masks_uvec = get_vec_UMat(masks.toMatList());
+    std::vector<cv::UMat> weight_maps_uvec = get_vec_UMat(weight_maps.toMatList());
+    return RectWrapper(ptr->createWeightMaps(masks_uvec, corners, weight_maps_uvec));
+}
+
+extern "C"
+void FeatherBlender_feed(
+        struct FeatherBlenderPtr ptr, struct TensorWrapper img,
+        struct TensorWrapper mask, struct PointWrapper tl)
+{
+    ptr->feed(img.toMat(), mask.toMat(), tl);
+}
+
+extern "C"
+void FeatherBlender_prepare(
+        struct FeatherBlenderPtr ptr, struct RectWrapper dst_roi)
+{
+    ptr->prepare(dst_roi);
+}
+
+extern "C"
+void FeatherBlender_setSharpness(
+        struct FeatherBlenderPtr ptr, float val)
+{
+    ptr->setSharpness(val);
+}
+
+extern "C"
+float FeatherBlender_sharpness(
+        struct FeatherBlenderPtr ptr)
+{
+    return ptr->sharpness();
+}
+
+//MultiBandBlender
+
+extern "C"
+struct MultiBandBlenderPtr MultiBandBlender_ctor(
+        int try_gpu, int num_bands, int weight_type)
+{
+    return new cv::detail::MultiBandBlender(try_gpu, num_bands, weight_type);
+}
+
+extern "C"
+void MultiBandBlender_blend(
+        struct MultiBandBlenderPtr ptr, struct TensorWrapper dst,
+        struct TensorWrapper dst_mask)
+{
+    ptr->blend(dst.toMat(), dst_mask.toMat());
+}
+
+extern "C"
+void MultiBandBlender_feed(
+        struct MultiBandBlenderPtr ptr, struct TensorWrapper img,
+        struct TensorWrapper mask, struct PointWrapper tl)
+{
+    ptr->feed(img.toMat(), mask.toMat(), tl);
+}
+
+extern "C"
+int MultiBandBlender_numBands(
+        struct MultiBandBlenderPtr ptr)
+{
+    return ptr->numBands();
+}
+
+extern "C"
+void MultiBandBlender_prepare(
+        struct MultiBandBlenderPtr ptr, struct RectWrapper dst_roi)
+{
+    ptr->prepare(dst_roi);
+}
+
+extern "C"
+void MultiBandBlender_setNumBands(
+        struct MultiBandBlenderPtr ptr, int val)
+{
+    ptr->setNumBands(val);
+}
+
+//Stitcher
+
+extern "C"
+struct StitcherPtr Stitcher_ctor(bool try_use_gpu)
+{
+    cv::Stitcher *ptr = new cv::Stitcher();
+    *ptr = cv::Stitcher::createDefault(try_use_gpu);
+    return ptr;
+}
+
+extern "C"
+void Stitcher_dtor(
+        struct StitcherPtr ptr)
+{
+    delete static_cast<cv::Stitcher *>(ptr.ptr);
+}
+
+extern "C"
+struct BlenderPtr Stitcher_blender(
+        struct StitcherPtr ptr)
+{
+    return rescueObjectFromPtr(ptr->blender());
+}
+
+extern "C"
+struct BundleAdjusterBasePtr Stitcher_bundleAdjuster(
+        struct StitcherPtr ptr)
+{
+    return rescueObjectFromPtr(ptr->bundleAdjuster());
+}
+
+extern "C"
+struct ClassArray Stitcher_cameras(
+        struct StitcherPtr ptr)
+{
+    return ClassArray(ptr->cameras());
+}
+
+extern "C"
+struct IntArray Stitcher_component(
+        struct StitcherPtr ptr)
+{
+    return IntArray(ptr->component());
+}
+
+extern "C"
+struct TensorPlusInt Stitcher_composePanorama(
+        struct StitcherPtr ptr)
+{
+    TensorPlusInt result;
+    MatT pano;
+    cv::Stitcher::Status status;
+    status = ptr->composePanorama(pano);
+    result.val = status;
+    new(&result.tensor) TensorWrapper(pano);
+    return result;
+}
+
+extern "C"
+struct TensorPlusInt Stitcher_composePanorama2(
+        struct StitcherPtr ptr, struct TensorArray images)
+{
+    TensorPlusInt result;
+    MatT pano;
+    cv::Stitcher::Status status;
+    status = ptr->composePanorama(images.toMatList(), pano);
+    result.val = status;
+    new(&result.tensor) TensorWrapper(pano);
+    return result;
+}
+
+extern "C"
+double Stitcher_compositingResol(
+        struct StitcherPtr ptr)
+{
+    return ptr->compositingResol();
+}
+
+extern "C"
+int Stitcher_estimateTransform(
+        struct StitcherPtr ptr, struct TensorArray images)
+{
+    return ptr->estimateTransform(images.toMatList());
+}
+
+extern "C"
+struct ExposureCompensatorPtr Stitcher_exposureCompensator(
+        struct StitcherPtr ptr)
+{
+    return rescueObjectFromPtr(ptr->exposureCompensator());
+}
+
+extern "C"
+struct FeaturesFinderPtr Stitcher_featuresFinder(
+        struct StitcherPtr ptr)
+{
+    return rescueObjectFromPtr(ptr->featuresFinder());
+}
+
+extern "C"
+struct FeaturesMatcherPtr Stitcher_featuresMatcher(
+        struct StitcherPtr ptr)
+{
+    return rescueObjectFromPtr(ptr->featuresMatcher());
+}
+
+extern "C"
+struct TensorWrapper Stitcher_matchingMask(
+        struct StitcherPtr ptr)
+{
+    return TensorWrapper(MatT(ptr->matchingMask().getMat(cv::ACCESS_RW)));
+}
+
+extern "C"
+double Stitcher_panoConfidenceThresh(
+        struct StitcherPtr ptr)
+{
+    return ptr->panoConfidenceThresh();
+}
+
+extern "C"
+double Stitcher_registrationResol(
+        struct StitcherPtr ptr)
+{
+    return ptr->registrationResol();
+}
+
+extern "C"
+double Stitcher_seamEstimationResol(
+        struct StitcherPtr ptr)
+{
+    return ptr->seamEstimationResol();
+}
+
+extern "C"
+struct SeamFinderPtr Stitcher_seamFinder(
+        struct StitcherPtr ptr)
+{
+    return rescueObjectFromPtr(ptr->seamFinder());
+}
+
+extern "C"
+void Stitcher_setBlender(
+        struct StitcherPtr ptr, struct BlenderPtr b)
+{
+    cv::Ptr<cv::detail::Blender> p(static_cast<cv::detail::Blender *>(b.ptr));
+    rescueObjectFromPtr(p);
+    ptr->setBlender(p);
+}
+
+extern "C"
+void Stitcher_setBundleAdjuster(
+        struct StitcherPtr ptr, struct BundleAdjusterBasePtr bundle_adjuster)
+{
+    cv::Ptr<cv::detail::BundleAdjusterBase> p(static_cast<cv::detail::BundleAdjusterBase *>(bundle_adjuster.ptr));
+    rescueObjectFromPtr(p);
+    ptr->setBundleAdjuster(p);
+}
+
+extern "C"
+void Stitcher_setCompositingResol(
+        struct StitcherPtr ptr, double resol_mpx)
+{
+    ptr->setCompositingResol(resol_mpx);
+}
+
+extern "C"
+void Stitcher_setExposureCompensator(
+        struct StitcherPtr ptr, struct ExposureCompensatorPtr exposure_comp)
+{
+    cv::Ptr<cv::detail::ExposureCompensator> p(static_cast<cv::detail::ExposureCompensator *>(exposure_comp.ptr));
+    rescueObjectFromPtr(p);
+    ptr->setExposureCompensator(p);
+}
+
+extern "C"
+void Stitcher_setFeaturesFinder(
+        struct StitcherPtr ptr, struct FeaturesFinderPtr features_finder)
+{
+    cv::Ptr<cv::detail::FeaturesFinder> p(static_cast<cv::detail::FeaturesFinder *>(features_finder.ptr));
+    rescueObjectFromPtr(p);
+    ptr->setFeaturesFinder(p);
+}
+
+extern "C"
+void Stitcher_setFeaturesMatcher(
+        struct StitcherPtr ptr, FeaturesMatcherPtr features_matcher)
+{
+    cv::Ptr<cv::detail::FeaturesMatcher> p(static_cast<cv::detail::FeaturesMatcher *>(features_matcher.ptr));
+    rescueObjectFromPtr(p);
+    ptr->setFeaturesMatcher(p);
+}
+
+extern "C"
+void Stitcher_setMatchingMask(
+        struct StitcherPtr ptr, struct TensorWrapper mask)
+{
+    cv::UMat umat =  mask.toMat().getUMat(cv::ACCESS_RW);
+    ptr->setMatchingMask(umat);
+}
+
+extern "C"
+void Stitcher_setPanoConfidenceThresh(
+        struct StitcherPtr ptr, double conf_thresh)
+{
+    ptr->setPanoConfidenceThresh(conf_thresh);
+}
+
+extern "C"
+void Stitcher_setRegistrationResol(
+        struct StitcherPtr ptr, double resol_mpx)
+{
+    ptr->setRegistrationResol(resol_mpx);
+}
+
+extern "C"
+void Stitcher_setSeamEstimationResol(
+        struct StitcherPtr ptr, double resol_mpx)
+{
+    ptr->setSeamEstimationResol(resol_mpx);
+}
+
+extern "C"
+void Stitcher_setSeamFinder(
+        struct StitcherPtr ptr, struct SeamFinderPtr seam_finder)
+{
+    cv::Ptr<cv::detail::SeamFinder> p(static_cast<cv::detail::SeamFinder *>(seam_finder.ptr));
+    rescueObjectFromPtr(p);
+    ptr->setSeamFinder(p);
+}
+
+extern "C"
+void Stitcher_setWarper(
+        struct StitcherPtr ptr, struct WarperCreatorPtr creator)
+{
+    cv::Ptr<cv::WarperCreator> p(static_cast<cv::WarperCreator *>(creator.ptr));
+    rescueObjectFromPtr(p);
+    ptr->setWarper(p);
+}
+
+extern "C"
+void Stitcher_setWaveCorrection(
+        struct StitcherPtr ptr, bool flag)
+{
+    ptr->setWaveCorrection(flag);
+}
+
+extern "C"
+void Stitcher_setWaveCorrectKind(
+        struct StitcherPtr ptr, int kind)
+{
+    cv::detail::WaveCorrectKind wave;
+    if(kind == 0) wave = cv::detail::WAVE_CORRECT_HORIZ;
+    else wave = cv::detail::WAVE_CORRECT_VERT;
+    ptr->setWaveCorrectKind(wave);
+}
+
+extern "C"
+struct TensorPlusInt Stitcher_stitch(
+        struct StitcherPtr ptr, struct TensorArray images,
+        struct TensorWrapper pano)
+{
+    TensorPlusInt result;
+    MatT pano_mat;
+    if(!pano.isNull()) pano_mat = pano.toMatT();
+    result.val = ptr->stitch(images.toMatList(), pano_mat);
+    new(&result.tensor) TensorWrapper(pano_mat);
+    return result;
+}
+
+extern "C"
+struct WarperCreatorPtr Stitcher_warper(
+        struct StitcherPtr ptr)
+{
+    return rescueObjectFromPtr(ptr->warper());
+}
+
+extern "C"
+bool Stitcher_waveCorrection(
+        struct StitcherPtr ptr)
+{
+    ptr->waveCorrection();
+}
+
+extern "C"
+int Stitcher_waveCorrectKind(
+        struct StitcherPtr ptr)
+{
+    return ptr->waveCorrectKind();
+}
+
+extern "C"
+double Stitcher_workScale(
+        struct StitcherPtr ptr)
+{
+    return ptr->workScale();
+}

@@ -401,6 +401,20 @@ struct IntArray {
     }
 };
 
+struct UCharArray {
+    unsigned char *data;
+    int size;
+
+    UCharArray() {}
+    UCharArray(const std::vector<unsigned char> vec);
+
+    inline std::vector<unsigned char>& toCharList(std::vector<unsigned char>& res) {
+        for (int i = 0; i < size; ++i)
+            res.push_back(data[i]);
+        return res;
+    }
+};
+
 struct FloatArray {
     float *data;
     int size;
@@ -518,3 +532,6 @@ struct PointArrayOfArrays {
 
 std::vector<MatT> get_vec_MatT(std::vector<cv::Mat> vec_mat);
 
+std::vector<cv::UMat> get_vec_UMat(std::vector<cv::Mat> vec_mat);
+
+std::vector<cv::Mat> get_vec_Mat(std::vector<cv::UMat> vec_umat);

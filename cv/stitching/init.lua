@@ -52,6 +52,25 @@ struct focalsFromHomographyRetval {
 
 struct focalsFromHomographyRetval detail_focalsFromHomography(
         struct TensorWrapper H);
+
+struct TensorArray detail_createLaplacePyr(
+		struct TensorWrapper img, int num_levels);
+
+struct TensorArray detail_createLaplacePyrGpu(
+		struct TensorWrapper img, int num_levels);
+
+void detail_createWeightMap(
+		struct TensorWrapper mask, float sharpness,
+		struct TensorWrapper weight);
+
+void detail_normalizeUsingWeightMap(
+		struct TensorWrapper weight, struct TensorWrapper src);
+
+void detail_restoreImageFromLaplacePyr(
+		struct TensorArray pyr);
+
+void detail_restoreImageFromLaplacePyrGpu(
+		struct TensorArray pyr);
 ]]
 
 local C = ffi.load(cv.libPath('stitching'))
@@ -106,8 +125,8 @@ end
 
 --**********************Rotation Estimation********************************
 
-cv.detail.WAVE_CORRECT_HORIZ = 0;
-cv.detail.WAVE_CORRECT_VERT = 1;
+cv.detail.WAVE_CORRECT_HORIZ = 0
+cv.detail.WAVE_CORRECT_VERT = 1
 
 function cv.detail.findMaxSpanningTree(t)
     local argRules = {
@@ -180,6 +199,60 @@ function cv.detail.focalsFromHomography(t)
 end
 
 
+--*******************************Image Blenders**********************
+
+cv.detail_WAVE_CORRECT_HORIZ = 0
+cv.detail_WAVE_CORRECT_VERT = 1
+
+function cv.detail.createLaplacePyr(t)
+    local argRules = {
+        {"img", required = true},
+        {"num_levels", required = true} }
+    local img, num_levels = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+                C.detail_createLaplacePyr(cv.wrap_tensor(img), num_levels))
+end
+
+function cv.detail.createLaplacePyrGpu(t)
+    local argRules = {
+        {"img", required = true},
+        {"num_levels", required = true} }
+    local img, num_levels = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(
+        C.detail_createLaplacePyrGpu(cv.wrap_tensor(img), num_levels))
+end
+
+function cv.detail.createWeightMap(t)
+    local argRules = {
+        {"mask", required = true},
+        {"sharpness", required = true},
+        {"weight", required = true} }
+    local mask, sharpness, weight = cv.argcheck(t, argRules)
+    C.detail_createWeightMap(cv.wrap_tensor(mask), sharpness, cv.wrap_tensor(weight))
+end
+
+function cv.detail.normalizeUsingWeightMap(t)
+    local argRules = {
+        {"weight", required = true},
+        {"src", required = true} }
+    local weight, src = cv.argcheck(t, argRules)
+    C.detail_normalizeUsingWeightMap(cv.wrap_tensor(weight), cv.wrap_tensor(src))
+end
+
+function cv.detail.restoreImageFromLaplacePyr(t)
+    local argRules = {
+        {"pyr", required = true}}
+    local pyr = cv.argcheck(t, argRules)
+    C.detail_restoreImageFromLaplacePyr(cv.wrap_tensors(pyr))
+end
+
+function cv.detail.restoreImageFromLaplacePyrGpu(t)
+    local argRules = {
+        {"pyr", required = true}}
+    local pyr = cv.argcheck(t, argRules)
+    C.detail_restoreImageFromLaplacePyrGpu(cv.wrap_tensors(pyr))
+end
+
 --- ***************** Classes *****************
 
 local Classes = ffi.load(cv.libPath('Classes'))
@@ -238,6 +311,9 @@ struct PtrWrapper Timelapser_ctor(
 
 void Timelapser_dtor(
 	struct PtrWrapper ptr);
+
+struct TensorWrapper Timelapser_getDst(
+		struct PtrWrapper ptr);
 
 void Timelapser_initialize(
 	struct PtrWrapper ptr, struct PointArray corners,
@@ -306,8 +382,6 @@ struct PtrWrapper OrbFeaturesFinder_ctor(
 
 struct PtrWrapper SurfFeaturesFinder_ctor(
         double hess_thresh, int num_octaves, int num_layers, int num_octaves_descr, int num_layers_descr);
-
-struct StringWrapper test(struct StringArray str);
 
 void Estimator_dtor(
         struct EstimatorPtr ptr);
@@ -1175,6 +1249,287 @@ struct TensorPlusPoint detail_SphericalWarperGpu_warp(
 		struct PtrWrapper ptr, struct TensorWrapper src,
 		struct TensorWrapper K, struct TensorWrapper R,	int interp_mode,
 		int border_mode, struct TensorWrapper dst);
+
+struct PtrWrapper detail_StereographicWarper_ctor(
+		float scale);
+
+struct PtrWrapper detail_TransverseMercatorWarper_ctor(
+        float scale);
+
+void SeamFinder_dtor(
+		struct PtrWrapper ptr);
+
+void SeamFinder_find(
+         struct TensorArray src);
+
+struct PtrWrapper DpSeamFinder_ctor(int costFunc);
+
+int DpSeamFinder_costFunction(
+        struct PtrWrapper ptr);
+
+void DpSeamFinder_find(
+        struct PtrWrapper ptr, struct TensorArray src, struct PointArray corners, struct TensorArray masks);
+
+void DpSeamFinder_setCostFunction(
+        struct PtrWrapper ptr, int val);
+
+struct PtrWrapper GraphCutSeamFinder_ctor(
+		int cost_type, float terminal_cost, float bad_region_penalty);
+
+void GraphCutSeamFinder_dtor(
+        struct PtrWrapper ptr);
+
+void GraphCutSeamFinder_find(
+		struct PtrWrapper ptr, struct TensorArray src,
+		struct PointArray corners, struct TensorArray masks);
+
+struct PtrWrapper NoSeamFinder_ctor();
+
+void NoSeamFinder_find(
+        struct PtrWrapper ptr, struct TensorArray src,
+        struct PointArray corners, struct TensorArray masks);
+
+void PairwiseSeamFinder_find(
+		struct PtrWrapper ptr, struct TensorArray src,
+		struct PointArray corners, struct TensorArray masks);
+
+struct PtrWrapper VoronoiSeamFinder_ctor();
+
+void VoronoiSeamFinder_find(
+		struct PtrWrapper ptr, struct TensorArray src,
+		struct PointArray corners, struct TensorArray masks);
+
+void VoronoiSeamFinder_find2(
+        struct PtrWrapper ptr, struct SizeArray size,
+        struct PointArray corners, struct TensorArray masks);
+
+void ExposureCompensator_dtor(
+		struct PtrWrapper ptr);
+
+void  ExposureCompensator_apply(
+		struct PtrWrapper ptr, int index, struct PointWrapper corner,
+		struct TensorWrapper image, struct TensorWrapper mask);
+
+struct PtrWrapper ExposureCompensator_ctor(
+        int type);
+
+void ExposureCompensator_feed(
+		struct PtrWrapper ptr, struct PointArray corners,
+		struct TensorArray images, struct TensorArray masks);
+
+struct PtrWrapper BlocksGainCompensator_ctor(
+		int bl_width, int bl_height);
+
+void  BlocksGainCompensator_apply(
+        struct PtrWrapper ptr, int index, struct PointWrapper corner,
+        struct TensorWrapper image, struct TensorWrapper mask);
+
+void BlocksGainCompensator_feed(
+		struct PtrWrapper ptr, struct PointArray corners,
+		struct TensorArray images, struct TensorArray mat, struct UCharArray chr);
+
+struct PtrWrapper GainCompensator_ctor();
+
+void  GainCompensator_apply(
+		struct PtrWrapper ptr, int index, struct PointWrapper corner,
+		struct TensorWrapper image, struct TensorWrapper mask);
+
+void GainCompensator_feed(
+        struct PtrWrapper ptr, struct PointArray corners,
+        struct TensorArray images, struct TensorArray mat, struct UCharArray chr);
+
+struct DoubleArray GainCompensator_gains(
+		struct PtrWrapper ptr);
+
+struct PtrWrapper NoExposureCompensator_ctor();
+
+void NoExposureCompensator_apply(
+		struct PtrWrapper ptr, int index, struct PointWrapper corner,
+		struct TensorWrapper image, struct TensorWrapper mask);
+
+void NoExposureCompensator_feed(
+		struct PtrWrapper ptr, struct PointArray corners,
+		struct TensorArray images, struct TensorArray mat, struct UCharArray chr);
+
+struct PtrWrapper Blender_ctor(
+		int type, bool try_gpu);
+
+void Blender_dtor(
+		struct PtrWrapper ptr);
+
+void Blender_blend(
+		struct PtrWrapper ptr, struct TensorWrapper dst,
+		struct TensorWrapper dst_mask);
+
+void Blender_feed(
+		struct PtrWrapper ptr, struct TensorWrapper img,
+		struct TensorWrapper mask, struct PointWrapper tl);
+
+void Blender_prepare2(
+        struct PtrWrapper ptr, struct PointArray corners,
+        struct SizeArray sizes);
+
+void Blender_prepare(
+		struct PtrWrapper ptr, struct RectWrapper dst_roi);
+
+struct PtrWrapper FeatherBlender_ctor(
+		float sharpness);
+
+void FeatherBlender_blend(
+		struct PtrWrapper ptr, struct TensorWrapper dst,
+		struct TensorWrapper dst_mask);
+
+struct RectWrapper FeatherBlender_createWeightMaps(
+		struct PtrWrapper ptr, struct TensorArray masks,
+		struct PointArray corners, struct TensorArray weight_maps);
+
+void FeatherBlender_feed(
+		struct PtrWrapper ptr, struct TensorWrapper img,
+		struct TensorWrapper mask, struct PointWrapper tl);
+
+void FeatherBlender_prepare(
+		struct PtrWrapper ptr, struct RectWrapper dst_roi);
+
+void FeatherBlender_setSharpness(
+		struct PtrWrapper ptr, float val);
+
+float FeatherBlender_sharpness(
+		struct PtrWrapper ptr);
+
+struct PtrWrapper MultiBandBlender_ctor(
+		int try_gpu, int num_bands, int weight_type);
+
+void MultiBandBlender_blend(
+		struct PtrWrapper ptr, struct TensorWrapper dst,
+		struct TensorWrapper dst_mask);
+
+void MultiBandBlender_feed(
+		struct PtrWrapper ptr, struct TensorWrapper img,
+		struct TensorWrapper mask, struct PointWrapper tl);
+
+int MultiBandBlender_numBands(
+		struct PtrWrapper ptr);
+
+void MultiBandBlender_prepare(
+		struct PtrWrapper ptr, struct RectWrapper dst_roi);
+
+void MultiBandBlender_setNumBands(
+		struct PtrWrapper ptr, int val);
+
+struct PtrWrapper Stitcher_ctor(
+    bool try_use_gpu);
+
+void Stitcher_dtor(
+		struct PtrWrapper ptr);
+
+struct PtrWrapper Stitcher_blender(
+		struct PtrWrapper ptr);
+
+struct PtrWrapper Stitcher_bundleAdjuster(
+		struct PtrWrapper ptr);
+
+struct ClassArray Stitcher_cameras(
+		struct PtrWrapper ptr);
+
+struct IntArray Stitcher_component(
+		struct PtrWrapper ptr);
+
+struct TensorPlusInt Stitcher_composePanorama(
+		struct PtrWrapper ptr);
+
+struct TensorPlusInt Stitcher_composePanorama2(
+		struct PtrWrapper ptr, struct TensorArray images);
+
+double Stitcher_compositingResol(
+		struct PtrWrapper ptr);
+
+struct StitcherPtr Stitcher_createDefault(
+		struct PtrWrapper ptr, bool try_use_gpu);
+
+int Stitcher_estimateTransform(
+		struct PtrWrapper ptr, struct TensorArray images);
+
+struct PtrWrapper Stitcher_exposureCompensator(
+		struct PtrWrapper ptr);
+
+struct PtrWrapper Stitcher_featuresFinder(
+		struct PtrWrapper ptr);
+
+struct PtrWrapper Stitcher_featuresMatcher(
+		struct PtrWrapper ptr);
+
+struct TensorWrapper Stitcher_matchingMask(
+		struct PtrWrapper ptr);
+
+double Stitcher_panoConfidenceThresh(
+		struct PtrWrapper ptr);
+
+double Stitcher_registrationResol(
+		struct PtrWrapper ptr);
+
+double Stitcher_seamEstimationResol(
+		struct PtrWrapper ptr);
+
+struct PtrWrapper Stitcher_seamFinder(
+		struct PtrWrapper ptr);
+
+void Stitcher_setBlender(
+		struct PtrWrapper ptr, struct PtrWrapper b);
+
+void Stitcher_setBundleAdjuster(
+		struct PtrWrapper ptr, struct PtrWrapper bundle_adjuster);
+
+void Stitcher_setCompositingResol(
+		struct PtrWrapper ptr, double resol_mpx);
+
+void Stitcher_setExposureCompensator(
+		struct PtrWrapper ptr, struct PtrWrapper exposure_comp);
+
+void Stitcher_setFeaturesFinder(
+		struct PtrWrapper ptr, struct PtrWrapper features_finder);
+
+void Stitcher_setFeaturesMatcher(
+		struct PtrWrapper ptr, struct PtrWrapper features_matcher);
+
+void Stitcher_setMatchingMask(
+		struct PtrWrapper ptr, struct TensorWrapper mask);
+
+void Stitcher_setPanoConfidenceThresh(
+		struct PtrWrapper ptr, double conf_thresh);
+
+void Stitcher_setRegistrationResol(
+		struct PtrWrapper ptr, double resol_mpx);
+
+void Stitcher_setSeamEstimationResol(
+		struct PtrWrapper ptr, double resol_mpx);
+
+void Stitcher_setSeamFinder(
+		struct PtrWrapper ptr, struct PtrWrapper seam_finder);
+
+void Stitcher_setWarper(
+		struct PtrWrapper ptr, struct PtrWrapper creator);
+
+void Stitcher_setWaveCorrection(
+		struct PtrWrapper ptr, bool flag);
+
+void Stitcher_setWaveCorrectKind(
+		struct PtrWrapper ptr, int kind);
+
+struct TensorPlusInt Stitcher_stitch(
+		struct PtrWrapper ptr, struct TensorArray images,
+		struct TensorWrapper pano);
+
+struct PtrWrapper Stitcher_warper(
+		struct PtrWrapper ptr);
+
+bool Stitcher_waveCorrection(
+		struct PtrWrapper ptr);
+
+int Stitcher_waveCorrectKind(
+		struct PtrWrapper ptr);
+
+double Stitcher_workScale(
+		struct PtrWrapper ptr);
 ]]
 
 --CameraParams
@@ -1294,13 +1649,17 @@ end
 do
     local Timelapser = torch.class('cv.Timelapser', cv)
 
-    function Timelapser:__init()
+    function Timelapser:__init(t)
         local argRules = {
             {"type", required = true}}
         local type_arg = cv.argcheck(t, argRules)
         self.ptr = ffi.gc(C.Timelapser_ctor(type_arg), C.Timelapser_dtor)
     end
-			
+
+    function Timelapser:getDst()
+        return cv.unwrap_tensors(C.Timelapser_getDst(self.ptr))
+    end
+
     function Timelapser:initialize(t)
         local argRules = {
             {"corners", required = true},
@@ -1536,7 +1895,7 @@ do
     end
 end
 
---double BundleAdjusterBase
+--BundleAdjusterBase
 
 do
     local BundleAdjusterBase = torch.class("cv.BundleAdjusterBase", 'cv.Estimator', cv)
@@ -3923,11 +4282,698 @@ do
     end
 end
 
---*************************test***************************
-function cv.test(t)
-   local retval = cv.newArray('cv.String', t)
-   return cv.unwrap_string(C.test(retval))
+--detail_StereographicWarper
+
+do
+    local detail_StereographicWarper =
+    torch.class('cv.detail_StereographicWarper', 'cv.RotationWarperBase_StereographicProjector', cv)
+
+    function detail_StereographicWarper:__init(t)
+        local argRules = {
+            {"scale", required = true}}
+        local scale = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(C.detail_SphericalWarperGpu_ctor(scale), C.RotationWarper_dtor)
+    end
 end
---********************************************************
+
+--detail_TransverseMercatorWarper
+
+do
+    local detail_TransverseMercatorWarper =
+    torch.class('cv.detail_TransverseMercatorWarper', 'cv.RotationWarperBase_TransverseMercatorProjector', cv)
+
+    function detail_TransverseMercatorWarper:__init(t)
+        local argRules = {
+            {"scale", required = true}}
+        local scale = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(C.detail_TransverseMercatorWarper_ctor(scale), C.RotationWarper_dtor)
+    end
+end
+
+
+--************************Seam Estimation******************************
+
+cv.COLOR = 0
+cv.COLOR_GRAD = 1
+cv.COST_COLOR = 0
+cv.COST_COLOR_GRAD = 1
+
+--SeamFinder
+
+do
+    local SeamFinder = torch.class('cv.SeamFinder', cv)
+
+    function SeamFinder:find(t)
+        local argRules = {
+            {"src", required = true},
+            {"corners", required = true},
+            {"masks", required = true}}
+        local src, corners, masks = cv.argcheck(t, argRules)
+        C.SeamFinder_find(self.ptr, cv.wrap_tensors(src), corners, cv.wrap_tensors(masks))
+    end
+end
+
+--DpSeamFinder
+
+do
+    local DpSeamFinder = torch.class('cv.DpSeamFinder', 'cv.SeamFinder', cv)
+
+    function DpSeamFinder:__init(t)
+        local argRules = {
+            {"costFunc", default = cv.COLOR}}
+        local costFunc = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(C.DpSeamFinder_ctor(costFunc), C.SeamFinder_dtor)
+    end
+
+    function DpSeamFinder:costFunction()
+        return C.DpSeamFinder_costFunction(self.ptr)
+    end
+
+    function DpSeamFinder:find(t)
+        local argRules = {
+            {"src", required = true},
+            {"corners", required = true},
+            {"masks", required = true}}
+        local src, corners, masks = cv.argcheck(t, argRules)
+        C.DpSeamFinder_find(self.ptr, cv.wrap_tensors(src), corners, cv.wrap_tensors(masks))
+    end
+
+    function DpSeamFinder:setCostFunction(t)
+        local argRules = {
+            {"val", required = true} }
+        local val = cv.argcheck(t, argRules)
+        C.DpSeamFinder_setCostFunction(self.ptr, val)
+    end
+end
+
+--GraphCutSeamFinder
+
+do
+    local GraphCutSeamFinder = torch.class('cv.GraphCutSeamFinder', 'cv.SeamFinder', cv)
+
+    function GraphCutSeamFinder:__init(t)
+        local argRules = {
+            {"cost_type", default = cv.COST_COLOR_GRAD},
+            {"terminal_cost", default = 10000},
+            {"bad_region_penalty", default = 1000} }
+        local cost_type, terminal_cost, bad_region_penalty = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(C.GraphCutSeamFinder_ctor(cost_type, terminal_cost, bad_region_penalty), C.GraphCutSeamFinder_dtor)
+    end
+
+    function GraphCutSeamFinder:find(t)
+        local argRules = {
+            {"src", required = true},
+            {"corners", required = true},
+            {"masks", required = true}}
+        local src, corners, masks = cv.argcheck(t, argRules)
+        C.GraphCutSeamFinder_find(self.ptr, cv.wrap_tensors(src), corners, cv.wrap_tensors(masks))
+    end
+end
+
+--NoSeamFinder
+
+do
+    local NoSeamFinder = torch.class('cv.NoSeamFinder', 'cv.SeamFinder', cv)
+
+    function NoSeamFinder:__init(t)
+        self.ptr = ffi.gc(C.NoSeamFinder_ctor(), C.SeamFinder_dtor)
+    end
+
+    function NoSeamFinder:find(t)
+        local argRules = {
+            {"src", required = true},
+            {"corners", required = true},
+            {"masks", required = true}}
+        local src, corners, masks = cv.argcheck(t, argRules)
+        C.NoSeamFinder_find(self.ptr, cv.wrap_tensors(src), corners, cv.wrap_tensors(masks))
+    end
+end
+
+--PairwiseSeamFinder
+
+do
+    local PairwiseSeamFinder = torch.class('cv.PairwiseSeamFinder', 'cv.SeamFinder', cv)
+
+    function PairwiseSeamFinder:find(t)
+        local argRules = {
+            {"src", required = true},
+            {"corners", required = true},
+            {"masks", required = true}}
+        local src, corners, masks = cv.argcheck(t, argRules)
+        C.PairwiseSeamFinder_find(self.ptr, cv.wrap_tensors(src), corners, cv.wrap_tensors(masks))
+    end
+end
+
+--VoronoiSeamFinder
+
+do
+    local VoronoiSeamFinder = torch.class('cv.VoronoiSeamFinder', 'cv.PairwiseSeamFinder', cv)
+
+    function VoronoiSeamFinder:__init(t)
+        self.ptr = ffi.gc(C.VoronoiSeamFinder_ctor(), C.SeamFinder_dtor)
+    end
+
+    function VoronoiSeamFinder:find(t)
+        local argRules = {
+            {"src", required = true},
+            {"corners", required = true},
+            {"masks", required = true}}
+        local src, corners, masks = cv.argcheck(t, argRules)
+        C.VoronoiSeamFinder_find(self.ptr, cv.wrap_tensors(src), corners, cv.wrap_tensors(masks))
+    end
+
+    function VoronoiSeamFinder:find2(t)
+        local argRules = {
+            {"size", required = true},
+            {"corners", required = true},
+            {"masks", required = true}}
+        local size, corners, masks = cv.argcheck(t, argRules)
+        C.VoronoiSeamFinder_find2(self.ptr, size, corners, cv.wrap_tensors(masks))
+    end
+end
+
+--ExposureCompensator
+
+do
+    local ExposureCompensator = torch.class('cv.ExposureCompensator', cv)
+
+    function ExposureCompensator:__init(t)
+        local argRules = {
+            {"type", required = true} }
+        local type = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(C.ExposureCompensator_ctor(type), C.ExposureCompensator_dtor)
+    end
+
+    function ExposureCompensator:apply(t)
+        local argRules = {
+            {"index", required = true},
+            {"corner", required = true, operator = cv.Point},
+            {"image", required = true},
+            {"mask", required = true} }
+        local index, corner, image, mask = cv.argcheck(t, argRules)
+        C.ExposureCompensator_apply(self.ptr, index, corner, cv.wrap_tensor(image), cv.wrap_tensor(mask))
+    end
+
+    function ExposureCompensator:feed(t)
+        local argRules = {
+            {"corners", required = true},
+            {"images", required= true},
+            {"masks", required = true} }
+        local corners, images, masks = cv.argcheck(t, argRules)
+        C.ExposureCompensator_feed(self.ptr, corners, cv.wrap_tensors(images),
+                                   cv.wrap_tensors(masks));
+    end
+end
+
+--BlocksGainCompensator
+
+do
+    local BlocksGainCompensator = torch.class('cv.BlocksGainCompensator', 'cv.ExposureCompensator', cv)
+
+    function BlocksGainCompensator:__init(t)
+        local argRules = {
+            {"bl_width", default = 32},
+            {"bl_height", default = 32} }
+        local bl_width, bl_height = cv.argcheck(t, argRules)
+        self.ptr = C.BlocksGainCompensator_ctor(bl_width, bl_height)
+    end
+
+    function BlocksGainCompensator:apply(t)
+        local argRules = {
+            {"index", required = true},
+            {"corner", required = true, operator = cv.Point},
+            {"image", required = true},
+            {"mask", required = true} }
+        local index, corner, image, mask = cv.argcheck(t, argRules)
+        C.BlocksGainCompensator_apply(self.ptr, index, corner, cv.wrap_tensor(image),
+                                      cv.wrap_tensor(mask))
+    end
+
+    function BlocksGainCompensator:feed(t)
+        local argRules = {
+            {"corners", required = true},
+            {"images", required= true},
+            {"mat", required = true},
+            {"chr", required = true}}
+        local corners, images, mat, chr = cv.argcheck(t, argRules)
+        C.BlocksGainCompensator_feed(self.ptr, corners, cv.wrap_tensors(images),
+                                     cv.wrap_tensors(mat), chr);
+    end
+end
+
+--GainCompensator
+
+do
+    local GainCompensator = torch.class('cv.GainCompensator', 'cv.ExposureCompensator', cv)
+
+    function GainCompensator:__init()
+        self.ptr = C.GainCompensator_ctor()
+    end
+
+    function GainCompensator:apply(t)
+        local argRules = {
+            {"index", required = true},
+            {"corner", required = true, operator = cv.Point},
+            {"image", required = true},
+            {"mask", required = true} }
+        local index, corner, image, mask = cv.argcheck(t, argRules)
+        C.GainCompensator_apply(self.ptr, index, corner, cv.wrap_tensor(image), cv.wrap_tensor(mask))
+    end
+
+    function GainCompensator:feed(t)
+        local argRules = {
+            {"corners", required = true},
+            {"images", required= true},
+            {"mat", required = true},
+            {"chr", required = true}}
+        local corners, images, mat, chr = cv.argcheck(t, argRules)
+        C.GainCompensator_feed(self.ptr, corners, cv.wrap_tensors(images),
+            cv.wrap_tensors(mat), chr);
+    end
+
+    function GainCompensator:gains()
+        return C.GainCompensator_gains(self.ptr)
+    end
+end
+
+--NoExposureCompensator
+
+do
+    local NoExposureCompensator = torch.class('cv.NoExposureCompensator', 'cv.ExposureCompensator', cv)
+
+    function NoExposureCompensator:__init()
+        self.ptr = C.NoExposureCompensator_ctor()
+    end
+
+    function NoExposureCompensator:apply(t)
+        local argRules = {
+            {"index", required = true},
+            {"corner", required = true, operator = cv.Point},
+            {"image", required = true},
+            {"mask", required = true} }
+        local index, corner, image, mask = cv.argcheck(t, argRules)
+        C.NoExposureCompensator_apply(self.ptr, index, corner, cv.wrap_tensor(image), cv.wrap_tensor(mask))
+    end
+
+    function NoExposureCompensator:feed(t)
+        local argRules = {
+            {"corners", required = true},
+            {"images", required= true},
+            {"mat", required = true},
+            {"chr", required = true}}
+        local corners, images, mat, chr = cv.argcheck(t, argRules)
+        C.NoExposureCompensator_feed(self.ptr, corners, cv.wrap_tensors(images),
+            cv.wrap_tensors(mat), chr);
+    end
+end
+
+
+--*******************************Image Blenders**********************
+
+
+--Blender
+
+do
+    local Blender = torch.class('cv.Blender', cv)
+
+    function Blender:__init(t)
+        local argRules = {
+            {"type", required = true},
+            {"try_gpu", default = false} }
+        local type, try_gpu = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(C.Blender_ctor(type, try_gpu), C.Blender_dtor)
+    end
+
+    function Blender:blend(t)
+        local argRules = {
+            {"dst", required = true},
+            {"dst_mask", required = true} }
+        local dst, dst_mat = cv.argcheck(t, argRules)
+        C.Blender_blend(self.ptr, cv.wrap_tensor(dst), cv.wrap_tensor(dst_mat))
+    end
+
+    function Blender:feed(t)
+        local argRules = {
+            {"img", required = true},
+            {"mask", required = true},
+            {"tl", required = true, operator = cv.Point} }
+        local img, mask, tl = cv.argcheck(t, argRules)
+        C.Blender_feed(self.ptr, cv.wrap_tensor(img), cv.wrap_tensor(mask), tl)
+    end
+
+    function Blender:prepare(t)
+        local argRules = {
+            {"dst_roi", required = true, operator = cv.Rect}}
+        local dst_roi = cv.argcheck(t, argRules)
+        C.Blender_prepare(self.ptr, dst_roi)
+    end
+
+    function Blender:prepare2(t)
+        local argRules = {
+            {"corners", required = true},
+            {"sizes", required = true} }
+        local corners, sizes = cv.argcheck(t, argRules)
+        C.Blender_prepare2(self.ptr, corners, sizes)
+    end
+end
+
+--FeatherBlender
+
+do
+    local FeatherBlender = torch.class('cv.FeatherBlender', 'cv.Blender', cv)
+
+    function FeatherBlender:__init(t)
+        local argRules = {
+            {"sharpness", default = 0.02} }
+        local sharpness = cv.argcheck(t, argRules)
+        self.ptr = C.FeatherBlender_ctor(sharpness)
+    end
+
+    function FeatherBlender:blend(t)
+        local argRules = {
+            {"dst", required = true},
+            {"dst_mask", required = true} }
+        local dst, dst_mat = cv.argcheck(t, argRules)
+        C.FeatherBlender_blend(self.ptr, cv.wrap_tensor(dst), cv.wrap_tensor(dst_mat))
+    end
+
+    function FeatherBlender:createWeightMaps(t)
+        local argRules ={
+            {"masks", required = true},
+            {"corners", required = true},
+            {"weight_maps", requird = true} }
+        local masks, corners, weight_maps = cv.argcheck(t, argRules)
+
+        assert(#masks == #weight_maps)
+
+        return C.FeatherBlender_createWeightMaps(
+                    self.ptr, cv.wrap_tensors(masks), corners,
+                    cv.wrap_tensors(weight_maps))
+    end
+
+    function FeatherBlender:feed(t)
+        local argRules = {
+            {"img", required = true},
+            {"mask", required = true},
+            {"tl", required = true, operator = cv.Point} }
+        local img, mask, tl = cv.argcheck(t, argRules)
+        C.FeatherBlender_feed(self.ptr, cv.wrap_tensor(img), cv.wrap_tensor(mask), tl)
+    end
+
+    function FeatherBlender:prepare(t)
+        local argRules = {
+            {"dst_roi", required = true, operator = cv.Rect}}
+        local dst_roi = cv.argcheck(t, argRules)
+        C.FeatherBlender_prepare(self.ptr, dst_roi)
+    end
+
+    function FeatherBlender:setSharpness(t)
+        local argRules = {
+            {"val", required = true} }
+        local val = cv.argcheck(t, argRules);
+        C.FeatherBlender_setSharpness(self.ptr, val)
+    end
+
+    function FeatherBlender:sharpness()
+        return C.FeatherBlender_sharpness(self.ptr);
+    end
+
+end
+
+--MultiBandBlender
+
+do
+    local MultiBandBlender = torch.class('cv.MultiBandBlender', 'cv.Blender', cv)
+
+    function MultiBandBlender:__init(t)
+        local argRules = {
+            {"try_gpu", default = false},
+            {"num_bands", default = 5},
+            {"weight_type", default = cv.CV_32F}}
+        local try_gpu, num_bands, weight_type = cv.argcheck(t, argRules)
+        self.ptr = C.MultiBandBlender_ctor(try_gpu, num_bands, weight_type)
+    end
+
+    function MultiBandBlender:blend(t)
+        local argRules = {
+            {"dst", required = true},
+            {"dst_mask", required = true} }
+        local dst, dst_mat = cv.argcheck(t, argRules)
+        C.MultiBandBlender_blend(self.ptr, cv.wrap_tensor(dst), cv.wrap_tensor(dst_mat))
+    end
+
+    function MultiBandBlender:feed(t)
+        local argRules = {
+            {"img", required = true},
+            {"mask", required = true},
+            {"tl", required = true, operator = cv.Point} }
+        local img, mask, tl = cv.argcheck(t, argRules)
+        C.MultiBandBlender_feed(self.ptr, cv.wrap_tensor(img), cv.wrap_tensor(mask), tl)
+    end
+
+    function MultiBandBlender:numBands()
+        return C.MultiBandBlender_numBands(self.ptr)
+    end
+
+    function MultiBandBlender:prepare(t)
+        local argRules = {
+            {"dst_roi", required = true, operator = cv.Rect}}
+        local dst_roi = cv.argcheck(t, argRules)
+        C.MultiBandBlender_prepare(self.ptr, dst_roi)
+    end
+
+    function MultiBandBlender:setNumBands(t)
+        local argRules = {
+            {"val", required= true} }
+        local val = cv.argcheck(t, argRules)
+        C.MultiBandBlender_setNumBands(self.ptr, val)
+    end
+end
+
+--Stitcher
+
+do
+    local Stitcher = torch.class('cv.Stitcher', cv)
+
+    function Stitcher:__init(t)
+        local argRules = {
+            {"try_use_gpu", default = false}}
+        local try_use_gpu = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(C.Stitcher_ctor(try_use_gpu), C.Stitcher_dtor)
+    end
+
+    function Stitcher:blender()
+        local retval = torch.factory('cv.Blender')()
+        retval.ptr = ffi.gc(C.Stitcher_blender(self.ptr), C.Blender_dtor)
+        return retval
+    end
+
+    function Stitcher:bundleAdjuster()
+        local retval = torch.factory('cv.BundleAdjusterBase')()
+        retval.ptr = ffi.gc(C.Stitcher_bundleAdjuster(self.ptr), C.Estimator_dtor)
+        return retval
+    end
+
+    function Stitcher:cameras()
+        return cv.unwrap_class("CameraParams", C.Stitcher_cameras(self.ptr))
+    end
+
+    function Stitcher:component()
+        return cv.gcarray(C.Stitcher_component(self.ptr))
+    end
+
+    function Stitcher:composePanorama(t)
+        local  argRules = {
+            {"images", default = nil} }
+        local images = cv.argcheck(t, argRules)
+        if images then
+            local result = C.Stitcher_composePanorama2(self.ptr, cv.wrap_tensors(images))
+        else
+            local result = C.Stitcher_composePanorama(self.ptr)
+        end
+        return result.val, cv.unwrap_tensors(result.tensor)
+    end
+
+    function Stitcher:compositingResol()
+        return C.Stitcher_compositingResol(self.ptr)
+    end
+
+    function Stitcher:createDefault(t)
+        local argRules = {
+            {"try_use_gpu", default = false} }
+        local try_use_gpu = cv.argcheck(t, argRules)
+        local retval = torch.factory('cv.Stitcher')()
+        retval.ptr = ffi.gc(C.Stitcher_createDefault(self.ptr, try_use_gpu), C.Blender_dtor)
+        return retval
+    end
+
+    function Stitcher:estimateTransform(t)
+        local argRules = {
+            {"images", required = true} }
+        local images = cv.argcheck(t, argRules)
+        return C.Stitcher_estimateTransform(self.ptr, cv.wrap_tensors(images))
+    end
+
+    function Stitcher:exposureCompensator()
+        local retval = torch.factory('cv.ExposureCompensator')()
+        retval.ptr = ffi.gc(C.Stitcher_exposureCompensator(self.ptr), C.ExposureCompensator_dtor)
+        return retval
+    end
+
+    function Stitcher:featuresFinder() --TODO
+        local retval = torch.factory('cv.featuresFinder')()
+        retval.ptr = ffi.gc(C.Stitcher_featuresFinder(self.ptr), C.FeaturesFinder_dtor)
+        return retval
+    end
+
+    function Stitcher:featuresMatcher()
+        local retval = torch.factory('cv.FeaturesMatcher')()
+        retval.ptr = ffi.gc(C.Stitcher_featuresMatcher(self.ptr), C.FeaturesMatcher_dtor)
+        return retval
+    end
+
+    function Stitcher:matchingMask()
+        return cv.unwrap_tensors(C.Stitcher_matchingMask(self.ptr));
+    end
+
+    function Stitcher:panoConfidenceThresh()
+        return C.Stitcher_panoConfidenceThresh(self.ptr)
+    end
+
+    function Stitcher:registrationResol()
+        return C.Stitcher_registrationResol(self.ptr)
+    end
+
+    function Stitcher:seamEstimationResol()
+        return C.Stitcher_seamEstimationResol(self.ptr)
+    end
+
+    function Stitcher:setBlender(t)
+        local argRules = {
+            {"b", required = true} }
+        local b = cv.argcheck(t, argRules)
+        C.Stitcher_setBlender(self.ptr, b.ptr)
+    end
+
+    function Stitcher:setBundleAdjuster(t)
+        local argRules = {
+            {"bundle_adjuster", required = true} }
+        local bundle_adjuster = cv.argcheck(t, argRules)
+        C.Stitcher_setBundleAdjuster(self.ptr, bundle_adjuster.ptr)
+    end
+
+    function Stitcher:setCompositingResol(t)
+        local argRules = {
+            {"resol_mpx", required = true} }
+        local resol_mpx = cv.argcheck(t, argRules)
+        C.Stitcher_setCompositingResol(self.ptr, resol_mpx)
+    end
+
+    function Stitcher:setExposureCompensator(t)
+        local argRules = {
+            {"exposure_comp", required = true} }
+        local exposure_comp = cv.argcheck(t, argRules)
+        C.Stitcher_setExposureCompensator(self.ptr, exposure_comp.ptr)
+    end
+
+    function Stitcher:setFeaturesFinder(t)
+        local argRules = {
+            {"features_finder", required = true} }
+        local features_finder = cv.argcheck()
+        C.Stitcher_setFeaturesFinder(self.ptr, features_finder.ptr)
+    end
+
+    function Stitcher:setFeaturesMatcher(t)
+        local argRules = {
+            {"features_matcher", required = true} }
+        local features_matcher = cv.argcheck()
+        C.Stitcher_setFeaturesMatcher(self.ptr, features_matcher.ptr)
+    end
+
+    function Stitcher:setMatchingMask(t)
+        local argRules = {
+            {"mask", required = true} }
+        local mask = cv.argcheck(t, argRules)
+        C.Stitcher_setMatchingMask(self.ptr, cv.wrap_tensor(mask))
+    end
+
+    function Stitcher:setPanoConfidenceThresh(t)
+        local argRules = {
+            {"conf_thresh", required = true} }
+        local conf_thresh = cv.argcheck(t, argRules)
+        C.Stitcher_setPanoConfidenceThresh(self.ptr, conf_thresh)
+    end
+
+    function Stitcher:setRegistrationResol(t)
+        local argRules = {
+            {"resol_mpx", required = true} }
+        local resol_mpx = cv.argcheck(t, argRules)
+        C.Stitcher_setRegistrationResol(self.ptr, resol_mpx)
+    end
+
+    function Stitcher:setSeamEstimationResol(t)
+        local argRules = {
+            {"resol_mpx", required = true} }
+        local resol_mpx = cv.argcheck(t, argRules)
+        C.Stitcher_setSeamEstimationResol(self.ptr, resol_mpx)
+    end
+
+    function Stitcher:setSeamFinder(t)
+        local argRules = {
+            {"seam_finder", required = true} }
+        local seam_finder = cv.argcheck(t, argRules)
+        C.Stitcher_setSeamFinder(self.ptr, seam_finder.ptr)
+    end
+
+    function Stitcher:setWarper(t)
+        local argRules = {
+            {"creator", required = true} }
+        local creator = cv.argcheck(t, argRules)
+        C.Stitcher_setWarper(self.ptr, creator.ptr)
+    end
+
+    function Stitcher:setWaveCorrection(t)
+        local argRules = {
+            {"flag", required = true} }
+        local flag = cv.argcheck(t, argRules)
+        C.Stitcher_setWaveCorrection(self.ptr, flag)
+    end
+
+    function Stitcher:setWaveCorrectKind(t)
+        local argRules = {
+            {"kind", required = true} }
+        local kind = cv.argcheck(t, argRules)
+        C.Stitcher_setWaveCorrectKind(self.ptr, kind)
+    end
+
+    function Stitcher:stitch(t)
+        local argRules = {
+            {"images", required = true},
+            {"pano", required = true} }
+        local images, pano = cv.argcheck(t, argRules)
+        C.Stitcher_stitch(self.ptr, cv.wrap_tensors(images), cv.wrap_tensor(pano))
+    end
+
+    --TODO add 2nd stitch
+
+    function Stitcher:warper()
+        local retval = torch.factory('cv.WarperCreator')()
+        retval.ptr = ffi.gc(C.Stitcher_warper(self.ptr), C.WarperCreator_dtor)
+        return retval
+    end
+
+    function Stitcher:waveCorrection()
+        return C.Stitcher_waveCorrection(self.ptr)
+    end
+
+    function Stitcher:waveCorrectKind()
+        return C.Stitcher_waveCorrectKind(self.ptr)
+    end
+
+    function Stitcher:workScale()
+        return C.Stitcher_workScale(self.ptr)
+    end
+end
+
 
 return cv
