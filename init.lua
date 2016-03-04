@@ -141,6 +141,11 @@ struct TensorPlusKeyPointArray {
     struct KeyPointArray keypoints;
 };
 
+struct TensorPlusInt {
+    struct TensorWrapper tensor;
+    int val;
+};
+
 struct TensorPlusDouble {
     struct TensorWrapper tensor;
     double val;
@@ -164,6 +169,11 @@ struct TensorPlusRect {
 struct TensorArrayPlusInt {
     struct TensorArray tensors;
     int val;
+};
+
+struct TensorArrayPlusRect {
+    struct TensorArray tensors;
+    struct RectWrapper rect;
 };
 
 struct TensorArrayPlusFloat {
@@ -191,6 +201,11 @@ struct RectPlusInt {
     int val;
 };
 
+struct RectPlusBool {
+    struct RectWrapper rect;
+    bool val;
+};
+
 struct ScalarPlusBool {
     struct ScalarWrapper scalar;
     bool val;
@@ -198,6 +213,11 @@ struct ScalarPlusBool {
 
 struct IntArray {
     int *data;
+    int size;
+};
+
+struct UCharArray {
+    unsigned char *data;
     int size;
 };
 
@@ -221,9 +241,24 @@ struct RectArray {
     int size;
 };
 
+struct SizeArray {
+    struct SizeWrapper *data;
+    int size;
+};
+
+struct ClassArray {
+    struct PtrWrapper *data;
+    int size;
+};
+
 struct TensorPlusRectArray {
     struct TensorWrapper tensor;
     struct RectArray rects;
+};
+
+struct TensorPlusPoint {
+    struct TensorWrapper tensor;
+    struct PointWrapper point;
 };
 
 struct FloatArrayOfArrays {
@@ -243,9 +278,17 @@ struct PointArrayOfArrays {
     int *sizes;
 };
 
+struct StringWrapper {
+    const char *str;
+};
+
+struct StringArray {
+    struct StringWrapper *data;
+    int size;
+};
+
 // for debugging
 void refcount(void *x);
-
 ]]
 
 local C = ffi.load(cv.libPath('Common'))
@@ -487,6 +530,10 @@ function cv.RotatedRect(...)
     return ffi.new('struct RotatedRectWrapper', ...)
 end
 
+function cv.String(...)
+    return ffi.new('struct StringWrapper', ...)
+end
+
 --- ***************** Other helper structs *****************
 
 --[[
@@ -510,6 +557,19 @@ function cv.newArray(elemType, data)
     local fullTypeName
     local shortTypeName
 
+    if elemType == "Class" then
+        -- create class array
+        local retval = ffi.new('struct ClassArray')
+
+        retval.data = ffi.gc(C.malloc(#data * ffi.sizeof('struct PtrWrapper')), C.free)
+        retval.size = #data
+
+        for i, value in ipairs(data) do
+            retval.data[i-1] = data[i].ptr
+        end
+        return retval
+    end
+
     if elemType:byte(3) == 46 then
         -- there's a period after 2 symbols: likely "cv.Something"
         shortTypeName = elemType:sub(4)
@@ -517,7 +577,11 @@ function cv.newArray(elemType, data)
         retval = ffi.new('struct ' .. shortTypeName .. 'Array')
     else
         -- C primitive type, such as 'Int' or 'Float'
-        fullTypeName = elemType:lower()
+        if elemType:byte(1) == 85 then
+            fullTypeName = 'unsigned ' .. elemType:sub(2):lower()
+        else
+            fullTypeName = elemType:lower()
+        end
         retval = ffi.new('struct ' .. elemType .. 'Array')
     end
 
@@ -621,9 +685,82 @@ function cv.tableToDMatchArrayOfArrays(tbl)
 end
 
 -- make an array that has come from C++ garbage-collected
+
 function cv.gcarray(array)
     array.data = ffi.gc(array.data, C.free)
     return array
+end
+
+function cv.unwrap_string(array)
+    if ffi.istype('struct  StringWrapper', array) then
+        array.str = ffi.gc(array.str, C.free)
+        return ffi.string(array.str)
+    end
+
+    array.data = ffi.gc(array.data, C.free)
+
+    local string_array = {}
+    for i = 1,array.size do
+        array.data[i-1].str = ffi.gc(array.data[i-1].str, C.free)
+        string_array[i] = ffi.string(array.data[i-1].str)
+    end
+
+    return string_array
+end
+
+
+
+ffi.cdef[[
+void MatchesInfo_dtor(
+        struct PtrWrapper other);
+
+struct PtrWrapper ImageFeatures_dtor(
+	struct PtrWrapper ptr);
+
+void CameraParams_dtor(
+	struct PtrWrapper ptr);
+]]
+
+local C = ffi.load(cv.libPath('stitching'))
+
+function cv.unwrap_class(name_class, array)
+
+    --need to add unwrapper for every class
+
+    if name_class == "MatchesInfo" then
+        local class_array = {}
+        for i = 1,array.size do
+            local temp = torch.factory('cv.' .. name_class)()
+            temp.ptr = ffi.gc(array.data[i-1], C.MatchesInfo_dtor)
+            class_array[i] = temp
+        end
+
+        return class_array
+    end
+
+    if name_class == "ImageFeatures" then
+        local class_array = {}
+        for i = 1,array.size do
+            local temp = torch.factory('cv.' .. name_class)()
+            temp.ptr = ffi.gc(array.data[i-1], C.ImageFeatures_dtor)
+            class_array[i] = temp
+        end
+
+        return class_array
+    end
+
+    if name_class == "CameraParams" then
+        local class_array = {}
+        for i = 1,array.size do
+            local temp = torch.factory('cv.' .. name_class)()
+            temp.ptr = ffi.gc(array.data[i-1], C.CameraParams_dtor)
+            class_array[i] = temp
+        end
+
+        return class_array
+    end
+
+    return nil
 end
 
 -- for debugging

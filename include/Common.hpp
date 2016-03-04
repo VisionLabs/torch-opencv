@@ -38,6 +38,7 @@ public:
     THByteTensor *tensor;
 
     operator cv::_InputOutputArray() { return this->mat; }
+
     MatT(cv::Mat && mat);
     MatT(cv::Mat & mat);
     MatT();
@@ -130,6 +131,8 @@ struct TermCriteriaWrapper {
     int type, maxCount;
     double epsilon;
 
+    TermCriteriaWrapper() {}
+
     inline operator cv::TermCriteria() { return cv::TermCriteria(type, maxCount, epsilon); }
     inline cv::TermCriteria orDefault(cv::TermCriteria defaultVal) {
         return (this->type == 0 ? defaultVal : *this);
@@ -189,6 +192,8 @@ struct PointWrapper {
     int x, y;
 
     inline operator cv::Point() { return cv::Point(x, y); }
+
+    PointWrapper() {}
     PointWrapper(const cv::Point & other);
 };
 
@@ -304,6 +309,11 @@ struct TensorPlusRect {
     struct RectWrapper rect;
 };
 
+struct TensorPlusPoint {
+    struct TensorWrapper tensor;
+    struct PointWrapper point;
+};
+
 struct TensorArrayPlusFloat {
     struct TensorArray tensors;
     float val;
@@ -329,9 +339,19 @@ struct TensorArrayPlusVec3d {
     struct Vec3dWrapper vec3d;
 };
 
+struct TensorArrayPlusRect {
+    struct TensorArray tensors;
+    struct RectWrapper rect;
+};
+
 struct RectPlusInt {
     struct RectWrapper rect;
     int val;
+};
+
+struct RectPlusBool {
+    struct RectWrapper rect;
+    bool val;
 };
 
 struct ScalarPlusBool {
@@ -351,16 +371,60 @@ struct Point2fPlusInt {
 
 /***************** Other helper structs *****************/
 
+//string
+
+struct StringWrapper {
+    const char *str;
+};
+
 // Arrays
+
+struct StringArray {
+    struct StringWrapper *data;
+    int size;
+
+    StringArray() {}
+    StringArray(const std::vector<cv::String> vec);
+
+    operator std::vector<cv::String>();
+
+};
 
 struct IntArray {
     int *data;
     int size;
+
+    IntArray() {}
+    IntArray(const std::vector<int> vec);
+
+    inline std::vector<int>& toIntList(std::vector<int>& res) {
+        for (int i = 0; i < size; ++i)
+            res.push_back(data[i]);
+        return res;
+    }
+};
+
+struct UCharArray {
+    unsigned char *data;
+    int size;
+
+    UCharArray() {}
+    UCharArray(const std::vector<unsigned char> vec);
+
+    inline std::vector<unsigned char>& toCharList(std::vector<unsigned char>& res) {
+        for (int i = 0; i < size; ++i)
+            res.push_back(data[i]);
+        return res;
+    }
 };
 
 struct FloatArray {
     float *data;
     int size;
+
+    FloatArray() {}
+    FloatArray(const std::vector<float> vec);
+
     inline std::vector<float>& toFloatList(std::vector<float>& res) {
         for (int i = 0; i < size; ++i)
             res.push_back(data[i]);
@@ -371,6 +435,15 @@ struct FloatArray {
 struct DoubleArray {
     double *data;
     int size;
+
+    DoubleArray() {}
+    DoubleArray(const std::vector<double> vec);
+
+    inline std::vector<double>& toFloatList(std::vector<double>& res) {
+        for (int i = 0; i < size; ++i)
+            res.push_back(data[i]);
+        return res;
+    }
 };
 
 struct PointArray {
@@ -389,6 +462,15 @@ struct RectArray {
     RectArray() {}
     RectArray(const std::vector<cv::Rect> & vec);
     operator std::vector<cv::Rect>();
+};
+
+struct SizeArray {
+    struct SizeWrapper *data;
+    int size;
+
+    SizeArray() {}
+    SizeArray(const std::vector<cv::Size> & vec);
+    operator std::vector<cv::Size>();
 };
 
 struct TensorPlusRectArray {
@@ -438,3 +520,6 @@ struct PointArrayOfArrays {
 
 std::vector<MatT> get_vec_MatT(std::vector<cv::Mat> vec_mat);
 
+std::vector<cv::UMat> get_vec_UMat(std::vector<cv::Mat> vec_mat);
+
+std::vector<cv::Mat> get_vec_Mat(std::vector<cv::UMat> vec_umat);
