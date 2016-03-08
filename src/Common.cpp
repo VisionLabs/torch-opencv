@@ -52,7 +52,7 @@ void refcount(THByteTensor *x) {
     std::cout << "Tensor refcount: " << x->refcount << std::endl;
     std::cout << "Storage address: " << x->storage << std::endl;
     std::cout << "Storage refcount: " << x->storage->refcount << std::endl;
-    std::cout << "Data: " << ((THCudaStorage*)(x->storage))->data << std::endl;
+    std::cout << "Data: " << (void*)(x->storage->data) << std::endl;
 }
 
 MatT::MatT(cv::Mat & mat) {
