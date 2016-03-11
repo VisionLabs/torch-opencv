@@ -3709,12 +3709,10 @@ void Stitcher_setWaveCorrectKind(
 
 extern "C"
 struct TensorPlusInt Stitcher_stitch(
-        struct StitcherPtr ptr, struct TensorArray images,
-        struct TensorWrapper pano)
+        struct StitcherPtr ptr, struct TensorArray images)
 {
     TensorPlusInt result;
     MatT pano_mat;
-    if(!pano.isNull()) pano_mat = pano.toMatT();
     result.val = ptr->stitch(images.toMatList(), pano_mat);
     new(&result.tensor) TensorWrapper(pano_mat);
     return result;

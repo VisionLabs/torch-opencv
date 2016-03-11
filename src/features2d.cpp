@@ -78,7 +78,7 @@ struct TensorPlusKeyPointArray Feature2D_compute(
     std::vector<cv::KeyPoint> keypointsVector(keypoints);
 
     MatT descriptors_mat;
-    if(descriptors.isNull()) descriptors_mat = descriptors.toMatT();
+    if(!descriptors.isNull()) descriptors_mat = descriptors.toMatT();
     ptr->compute(image.toMat(), keypointsVector, descriptors_mat);
 
     new (&retval.tensor) TensorWrapper(descriptors_mat);

@@ -6,7 +6,7 @@ struct calibrateCameraRetval calibrateCamera(
 	struct SizeWrapper imageSize, struct TensorWrapper cameraMatrix,
 	struct TensorWrapper distCoeffs, struct TensorArray rvecs,
 	struct TensorArray tvecs, int flags, struct TermCriteriaWrapper criteria)
-{   
+{
     struct calibrateCameraRetval result;
     std::vector<MatT> intrinsics(2);
     std::vector<cv::Mat> rvecs_vec, tvecs_vec;

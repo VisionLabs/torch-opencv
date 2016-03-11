@@ -83,10 +83,10 @@ cv.detail = {};
 
 function cv.detail.overlapRoi(t)
     local argRules = {
-        {"tl1", required = true},
-        {"tl2", required = true},
-        {"sz1", required = true},
-        {"sz2", required = true}}
+        {"tl1", required = true, operator = cv.Point},
+        {"tl2", required = true, operator = cv.Point},
+        {"sz1", required = true, operator = cv.Size},
+        {"sz2", required = true, operator = cv.Size}}
     local tl1, tl2, sz1, sz2 = cv.argcheck(t, argRules)
     local result = C.detail_overlapRoi(tl1, tl2, sz1, sz2)
     return result.val, result.rect
@@ -1533,8 +1533,7 @@ void Stitcher_setWaveCorrectKind(
 		struct PtrWrapper ptr, int kind);
 
 struct TensorPlusInt Stitcher_stitch(
-		struct PtrWrapper ptr, struct TensorArray images,
-		struct TensorWrapper pano);
+		struct PtrWrapper ptr, struct TensorArray images);
 
 struct PtrWrapper Stitcher_warper(
 		struct PtrWrapper ptr);
@@ -4621,6 +4620,10 @@ end
 
 --*******************************Image Blenders**********************
 
+cv.OK = 0
+cv.ERR_NEED_MORE_IMGS = 1
+cv.ERR_HOMOGRAPHY_EST_FAIL = 2
+cv.ERR_CAMERA_PARAMS_ADJUST_FAIL = 3
 
 --Blender
 
@@ -4979,10 +4982,10 @@ do
 
     function Stitcher:stitch(t)
         local argRules = {
-            {"images", required = true},
-            {"pano", required = true} }
-        local images, pano = cv.argcheck(t, argRules)
-        C.Stitcher_stitch(self.ptr, cv.wrap_tensors(images), cv.wrap_tensor(pano))
+            {"images", required = true}}
+        local images = cv.argcheck(t, argRules)
+        local  result = C.Stitcher_stitch(self.ptr, cv.wrap_tensors(images))
+        return result.val, cv.unwrap_tensors(result.tensor)
     end
 
     --TODO add 2nd stitch

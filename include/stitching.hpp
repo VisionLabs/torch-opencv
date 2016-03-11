@@ -2877,8 +2877,7 @@ void Stitcher_setWaveCorrectKind(
 
 extern "C"
 struct TensorPlusInt Stitcher_stitch(
-		struct StitcherPtr ptr, struct TensorArray images,
-		struct TensorWrapper pano);
+		struct StitcherPtr ptr, struct TensorArray images);
 
 extern "C"
 struct WarperCreatorPtr Stitcher_warper(

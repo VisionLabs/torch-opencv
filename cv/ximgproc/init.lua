@@ -22,7 +22,7 @@ function cv.niBlackThreshold(t)
     local src, dst, maxValue, type_, blockSize, delta = cv.argcheck(t, argRules)
 
     assert(src:nDimension() == 2 and cv.tensorType(src) == cv.CV_8U)
-    assert(dst:nDimension() == 2 and cv.tensorType(dst) == cv.CV_8U)
+    if dst then assert(dst:nDimension() == 2 and cv.tensorType(dst) == cv.CV_8U) end
 
     return cv.unwrap_tensors(C.niBlackThreshold(cv.wrap_tensor(src), cv.wrap_tensor(dst), maxValue, type_, blockSize, delta))
 end
