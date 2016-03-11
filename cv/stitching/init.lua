@@ -4620,7 +4620,6 @@ end
 
 --*******************************Image Blenders**********************
 
-cv.OK = 0
 cv.ERR_NEED_MORE_IMGS = 1
 cv.ERR_HOMOGRAPHY_EST_FAIL = 2
 cv.ERR_CAMERA_PARAMS_ADJUST_FAIL = 3
