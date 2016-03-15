@@ -356,6 +356,11 @@ KeyPointArray::operator std::vector<cv::KeyPoint>()
     return retval;
 }
 
+FloatArray::FloatArray(const std::vector<float> vec) {
+    this->size = vec.size();
+    memcpy(this->data, vec.data(), this->size * sizeof(float));
+}
+
 Vec3dWrapper & Vec3dWrapper::operator=(cv::Vec3d & other) {
    this->v0 = other[0];
    this->v1 = other[1];

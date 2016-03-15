@@ -729,14 +729,18 @@ extern "C"
 struct TensorPlusFloat EMD(
         struct TensorWrapper signature1, struct TensorWrapper signature2,
         int distType, struct TensorWrapper cost,
-        struct FloatArray lowerBound, struct TensorWrapper flow)
+        struct TensorWrapper lowerBound, struct TensorWrapper flow)
 {
     TensorPlusFloat retval;
     MatT flow_mat;
     if(!flow.isNull()) flow_mat = flow.toMatT();
+
+    cv::Mat lowerBoundMat = lowerBound.toMat();
+
     retval.val = cv::EMD(
-            signature1.toMat(), signature2.toMat(), distType,
-            TO_MAT_OR_NOARRAY(cost), lowerBound.data, flow_mat);
+            signature1.toMat(), signature2.toMat(), distType, TO_MAT_OR_NOARRAY(cost),
+            reinterpret_cast<float *>(lowerBoundMat.data), flow_mat);
+
     new(&retval.tensor) TensorWrapper(flow_mat);
     return retval;
 }
@@ -851,13 +855,11 @@ struct MomentsWrapper moments(
 }
 
 extern "C"
-struct DoubleArray HuMoments(struct MomentsWrapper m)
+struct TensorWrapper HuMoments(struct MomentsWrapper m)
 {
-    DoubleArray retval;
-    retval.size = 7;
-    retval.data = static_cast<double *>(malloc(retval.size * sizeof(double)));
-    cv::HuMoments(m, retval.data);
-    return retval;
+    cv::Mat retval;
+    cv::HuMoments(m, retval);
+    return TensorWrapper(retval);
 }
 
 extern "C"

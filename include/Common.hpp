@@ -425,7 +425,7 @@ struct FloatArray {
     FloatArray() {}
     FloatArray(const std::vector<float> vec);
 
-    inline std::vector<float>& toFloatList(std::vector<float>& res) {
+    std::vector<float>& toFloatList(std::vector<float>& res) {
         for (int i = 0; i < size; ++i)
             res.push_back(data[i]);
         return res;
@@ -439,7 +439,7 @@ struct DoubleArray {
     DoubleArray() {}
     DoubleArray(const std::vector<double> vec);
 
-    inline std::vector<double>& toFloatList(std::vector<double>& res) {
+    std::vector<double>& toFloatList(std::vector<double>& res) {
         for (int i = 0; i < size; ++i)
             res.push_back(data[i]);
         return res;

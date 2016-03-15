@@ -537,6 +537,8 @@ end
 --- ***************** Other helper structs *****************
 
 --[[
+TODO: get rid of this function!
+
 Makes an <IntArray, FloatArray, ...> from a table of numbers.
 Generally, if you're calling a function that uses Array many
 times, consider reusing the retval of this function.
@@ -616,6 +618,7 @@ function cv.newArray(elemType, data)
     return retval
 end
 
+-- TODO: get rid of this function!
 -- example: table of tables of numbers ---> struct FloatArrayOfArrays
 function cv.numberArrayOfArrays(elemType, data)
     local retval = ffi.new('struct ' .. elemType .. 'ArrayOfArrays')
@@ -642,7 +645,7 @@ function cv.numberArrayOfArrays(elemType, data)
     end
 end
 
-
+-- TODO: get rid of this function!
 function cv.arrayToLua(array, outputType, output)
     local retval
 
@@ -685,14 +688,13 @@ function cv.tableToDMatchArrayOfArrays(tbl)
 end
 
 -- make an array that has come from C++ garbage-collected
-
 function cv.gcarray(array)
     array.data = ffi.gc(array.data, C.free)
     return array
 end
 
 function cv.unwrap_string(array)
-    if ffi.istype('struct  StringWrapper', array) then
+    if ffi.istype('struct StringWrapper', array) then
         array.str = ffi.gc(array.str, C.free)
         return ffi.string(array.str)
     end
@@ -707,7 +709,6 @@ function cv.unwrap_string(array)
 
     return string_array
 end
-
 
 
 ffi.cdef[[

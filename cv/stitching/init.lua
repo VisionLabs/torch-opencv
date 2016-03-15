@@ -2054,7 +2054,7 @@ do
     end
 end
 
---CylindricalPortraitProjector
+-- CylindricalPortraitProjector
 
 do
     local CylindricalPortraitProjector = torch.class('cv.CylindricalPortraitProjector', 'cv.ProjectorBase', cv)

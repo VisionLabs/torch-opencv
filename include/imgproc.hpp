@@ -326,7 +326,7 @@ extern "C"
 struct TensorPlusFloat EMD(
         struct TensorWrapper signature1, struct TensorWrapper signature2,
         int distType, struct TensorWrapper cost,
-        struct FloatArray lowerBound, struct TensorWrapper flow);
+        struct TensorWrapper lowerBound, struct TensorWrapper flow);
 
 extern "C"
 void watershed(
@@ -373,7 +373,7 @@ struct MomentsWrapper moments(
         struct TensorWrapper array, bool binaryImage);
 
 extern "C"
-struct DoubleArray HuMoments(
+struct TensorWrapper HuMoments(
         struct MomentsWrapper m);
 
 extern "C"

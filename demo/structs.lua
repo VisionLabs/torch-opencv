@@ -1,5 +1,4 @@
 -- A demo of how to use complex structs
-
 local cv = require 'cv'
 require 'cv.imgproc'
 
@@ -18,13 +17,6 @@ local points = torch.FloatTensor {
     {10, 4.42}
 }
 
-moments = cv.moments{points}
+local moments = cv.moments{points}
 
-Hu_table = {}
-Hu_tensor = torch.DoubleTensor(7)
-
-cv.HuMoments{moments=moments, outputType='table', output=Hu_table}
-cv.HuMoments{moments=moments, outputType='Tensor', output=Hu_tensor}
-
-print(Hu_table)
-print(Hu_tensor)
+print(cv.HuMoments{moments})

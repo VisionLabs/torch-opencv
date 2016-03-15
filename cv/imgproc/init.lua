@@ -264,7 +264,7 @@ struct TensorWrapper equalizeHist(
 struct TensorPlusFloat EMD(
         struct TensorWrapper signature1, struct TensorWrapper signature2,
         int distType, struct TensorWrapper cost,
-        struct FloatArray lowerBound, struct TensorWrapper flow);
+        struct TensorWrapper lowerBound, struct TensorWrapper flow);
 
 void watershed(
         struct TensorWrapper image, struct TensorWrapper markers);
@@ -301,7 +301,7 @@ struct TensorWrapper demosaicing(
 struct MomentsWrapper moments(
         struct TensorWrapper array, bool binaryImage);
 
-struct DoubleArray HuMoments(
+struct TensorWrapper HuMoments(
         struct MomentsWrapper m);
 
 struct TensorWrapper matchTemplate(
@@ -1650,17 +1650,18 @@ function cv.EMD(t)
         {"signature2", required = true},
         {"distType", required = true},
         {"cost", default = nil},
-        {"lowerBound", default = ffi.new('struct FloatArray', nil)},
+        {"lowerBound", default = nil},
         {"flow", default = nil}
     }
     local signature1, signature2, distType, cost, lowerBound, flow = cv.argcheck(t, argRules)
-    if type(lowerBound) == "table" then
-        lowerBound = cv.newArray(lowerBound)
+
+    if torch.isTensor(lowerBound) then
+        assert(lowerBound:type() == 'torch.FloatTensor')
     end
 
     local result = C.EMD(
         cv.wrap_tensor(signature1), cv.wrap_tensor(signature2), distType,
-        cv.wrap_tensor(cost), lowerBound, cv.wrap_tensor(flow))
+        cv.wrap_tensor(cost), cv.wrap_tensor(lowerBound), cv.wrap_tensor(flow))
     return result.val, cv.unwrap_tensors(result.tensor)
 end
 
@@ -1805,18 +1806,12 @@ function cv.moments(t)
 end
 
 
--- moments: Input moments computed with cv.moments()
--- toTable: Output to table if true, otherwise output to Tensor. Default: true
--- output : Optional. A Tensor of length 7 or a table; if provided, will output there
 function cv.HuMoments(t)
     local argRules = {
-        {"moments", required = true},
-        {"outputType", default = 'table'},
-        {"output", default = nil}
+        {"moments", required = true}
     }
-    local moments, outputType, output = cv.argcheck(t, argRules)
-
-    return cv.arrayToLua(C.HuMoments(moments), outputType, output)
+    local moments = cv.argcheck(t, argRules)
+    return cv.unwrap_tensors(C.HuMoments(moments))
 end
 
 
