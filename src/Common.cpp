@@ -468,6 +468,13 @@ SizeArray::operator std::vector<cv::Size>() {
     return retval;
 }
 
+StringArray::operator std::vector<cv::String>() {
+    std::vector<cv::String> retval(this->size);
+    for (int i = 0; i < this->size; ++i) {
+        retval[i] = this->data[i];
+    }
+}
+
 /***************** Helper functions *****************/
 
 std::vector<MatT> get_vec_MatT(std::vector<cv::Mat> vec_mat) {
