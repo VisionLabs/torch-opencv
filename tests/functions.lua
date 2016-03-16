@@ -9,6 +9,7 @@ require 'cv.photo'
 require 'cv.calib3d'
 require 'cv.ximgproc'
 require 'cv.stitching'
+require 'cv.xphoto'
 
 if not arg[1] then
     print('Usage: `th demo/filtering.lua path-to-image`')
@@ -374,7 +375,33 @@ do
 
     local status, pano = stitcher:stitch{imgs}
 
-    assert(status == cv.OK)
+    assert(status == 0)
+end
+collectgarbage("collect")
+collectgarbage("collect")
+local memory_after = collectgarbage("count")
+print('memory change ', memory_after - memory_before .. ' Kb')
+assert(memory_after - memory_before < memDiff)
+print("OK")
+
+-------------------------------
+print('>')
+
+print('cv.xphoto.autowbGrayworld testing...')
+local memory_before = collectgarbage("count")
+do
+    local src = image:clone()
+    local dst2 = torch.ByteTensor(src:size(1), src:size(2), src:size(3))
+
+    local dst = cv.xphoto.autowbGrayworld{src = src}
+
+    cv.xphoto.autowbGrayworld{src = src, dst = dst2}
+
+    cv.xphoto.autowbGrayworld{src = src, dst = src}
+
+    assert((src:eq(dst) - 1):sum() == 0)
+    assert((src:eq(dst2) - 1):sum() == 0)
+
 end
 collectgarbage("collect")
 collectgarbage("collect")
