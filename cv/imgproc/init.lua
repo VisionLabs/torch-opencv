@@ -419,6 +419,9 @@ struct ScalarPlusBool clipLineRect(
 void putText(
         struct TensorWrapper img, const char *text, struct PointWrapper org, int fontFace, double fontScale, struct ScalarWrapper color, int thickness, int lineType, bool bottomLeftOrigin);
 
+struct SizePlusInt getTextSize(
+        const char *text, int fontFace, double fontScale, int thickness);
+
 struct TensorWrapper addWeighted(
         struct TensorWrapper src1, double alpha, struct TensorWrapper src2, double beta,
         double gamma, struct TensorWrapper dst, int dtype);
