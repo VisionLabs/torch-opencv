@@ -22,23 +22,23 @@ struct RectWrapper detail_resultRoiIntersection(
 struct PointWrapper detail_resultTl(
 	struct PointArray corners);
 
-void detail_selectRandomSubset(
+struct TensorWrapper detail_selectRandomSubset(
 	int count, int size);
 
 int detail_stitchingLogLevel();
 
-struct GraphPtrPlusIntArray {
-	struct IntArray array;
+struct GraphPtrPlusTensor {
 	struct PtrWrapper graph;
+	struct TensorWrapper tensor;
 };
 
-struct GraphPtrPlusIntArray detail_findMaxSpanningTree(
+struct GraphPtrPlusTensor detail_findMaxSpanningTree(
         int num_images, struct ClassArray pairwise_matches);
 
-struct IntArray detail_leaveBiggestComponent(
+struct TensorWrapper detail_leaveBiggestComponent(
         struct ClassArray features, struct ClassArray pairwise_matches, float conf_threshold);
 
-struct StringWrapper detail_matchesGraphAsString(
+struct StringArray detail_matchesGraphAsString(
         struct StringArray pathes, struct ClassArray pairwise_matches, float conf_threshold);
 
 void detail_waveCorrect(
@@ -47,7 +47,7 @@ void detail_waveCorrect(
 struct TensorPlusBool detail_calibrateRotatingCamera(
         struct TensorArray Hs);
 
-struct DoubleArray detail_estimateFocal(struct ClassArray features, struct ClassArray pairwise_matches);
+struct TensorWrapper detail_estimateFocal(struct ClassArray features, struct ClassArray pairwise_matches);
 
 struct focalsFromHomographyRetval {
 	double f0, f1;
@@ -128,7 +128,7 @@ function cv.detail.selectRandomSubset(t)
         {"count", required = true},
         {"size", required = true}}
     local count, size = cv.argcheck(t, argRules)
-    return cv.gcarray(C.detail_selectRandomSubset(count, size))
+    return cv.unwrap_tensors(C.detail_selectRandomSubset(count, size))
 end
 
 function cv.detail.stitchingLogLevel(t)
@@ -145,11 +145,12 @@ function cv.detail.findMaxSpanningTree(t)
         {"num_images", required = true},
         {"pairwise_matches", required = true}}
     local num_images, pairwise_matches = cv.argcheck(t, argRules)
+
     local array = cv.newArray("Class", pairwise_matches)
     local result = C.detail_findMaxSpanningTree(num_images, array)
-    local retval = cv.MatchesInfo
+    local retval = torch.factory('cv.MatchesInfo')()
     retval.ptr = result.graph
-    return retval, cv.gcarray(result.array)
+    return retval, cv.unwrap_tensors(result.tensor)
 end
 
 function cv.detail.leaveBiggestComponent(t)
@@ -158,7 +159,7 @@ function cv.detail.leaveBiggestComponent(t)
         {"pairwise_matches", required  = true},
         {"conf_threshold", required = true}}
     local features, pairwise_matches, conf_threshold = cv.argcheck(t, argRules)
-    return cv.gcarray(
+    return cv.unwrap_tensors(
                 C.detail_leaveBiggestComponent(
                     cv.newArray("Class", features), cv.newArray("Class", pairwise_matches), conf_threshold))
 end
@@ -169,9 +170,10 @@ function cv.detail.matchesGraphAsString(t)
         {"pairwise_matches", required = true},
         {"conf_threshold", required = true}}
     local pathes, pairwise_matches, conf_threshold = cv.argcheck(t, argRules)
-    return cv.unwrap_string(
+    return cv.unwrap_strings(
                 C.detail_matchesGraphAsString(
-                    cv.newArray("cv.String", pathes), cv.newArray("Class", pairwise_matches), conf_threshold))
+                    cv.newArray("cv.String", pathes), cv.newArray("Class",
+                    pairwise_matches), conf_threshold))[0]
 end
 
 function cv.detail.waveCorrect(t)
@@ -1355,7 +1357,7 @@ void GainCompensator_feed(
         struct PtrWrapper ptr, struct PointArray corners,
         struct TensorArray images, struct TensorArray mat, struct UCharArray chr);
 
-struct DoubleArray GainCompensator_gains(
+struct TensorWrapper GainCompensator_gains(
 		struct PtrWrapper ptr);
 
 struct PtrWrapper NoExposureCompensator_ctor();
@@ -1448,7 +1450,7 @@ struct PtrWrapper Stitcher_bundleAdjuster(
 struct ClassArray Stitcher_cameras(
 		struct PtrWrapper ptr);
 
-struct IntArray Stitcher_component(
+struct TensorWrapper Stitcher_component(
 		struct PtrWrapper ptr);
 
 struct TensorPlusInt Stitcher_composePanorama(
@@ -2022,7 +2024,7 @@ do
             {"y", required = true} }
         local x, y = cv.argcheck(t, argRules)
         local result = cv.gcarray(C.CompressedRectilinearPortraitProjector_mapForward(self.ptr, x, y))
-        return  result.data[0], result.data[1]
+        return result.data[0], result.data[1]
     end
 end
 
@@ -4582,7 +4584,7 @@ do
     end
 
     function GainCompensator:gains()
-        return C.GainCompensator_gains(self.ptr)
+        return cv.unwrap_tensors(C.GainCompensator_gains(self.ptr))
     end
 end
 

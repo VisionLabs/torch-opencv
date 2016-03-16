@@ -1,6 +1,6 @@
 #include <stitching.hpp>
 
-ClassArray::ClassArray(const std::vector<cv::detail::MatchesInfo> & vec)
+ClassArray::ClassArray(const std::vector<detail::MatchesInfo> & vec)
 {
     MatchesInfoPtr *temp = static_cast<MatchesInfoPtr *>(malloc(vec.size() * sizeof(MatchesInfoPtr)));
 
@@ -9,13 +9,13 @@ ClassArray::ClassArray(const std::vector<cv::detail::MatchesInfo> & vec)
     MatchesInfoPtr class_wrapped;
 
     for (int i = 0; i < vec.size(); i++) {
-        class_wrapped.ptr = new cv::detail::MatchesInfo(vec[i]);;
+        class_wrapped.ptr = new detail::MatchesInfo(vec[i]);;
         temp[i] = class_wrapped;
     }
     this->data = temp;
 }
 
-ClassArray::ClassArray(const std::vector<cv::detail::ImageFeatures> & vec)
+ClassArray::ClassArray(const std::vector<detail::ImageFeatures> & vec)
 {
     ImageFeaturesPtr *temp = static_cast<ImageFeaturesPtr *>(malloc(vec.size() * sizeof(ImageFeaturesPtr)));
 
@@ -24,14 +24,14 @@ ClassArray::ClassArray(const std::vector<cv::detail::ImageFeatures> & vec)
     ImageFeaturesPtr class_wrapped;
 
     for (int i = 0; i < vec.size(); i++) {
-        class_wrapped.ptr = new cv::detail::ImageFeatures(vec[i]);;
+        class_wrapped.ptr = new detail::ImageFeatures(vec[i]);;
         temp[i] = class_wrapped;
     }
 
     this->data = temp;
 }
 
-ClassArray::ClassArray(const std::vector<cv::detail::CameraParams> & vec)
+ClassArray::ClassArray(const std::vector<detail::CameraParams> & vec)
 {
     CameraParamsPtr *temp = static_cast<CameraParamsPtr *>(malloc(vec.size() * sizeof(CameraParamsPtr)));
 
@@ -40,50 +40,50 @@ ClassArray::ClassArray(const std::vector<cv::detail::CameraParams> & vec)
     CameraParamsPtr class_wrapped;
 
     for (int i = 0; i < vec.size(); i++) {
-        class_wrapped.ptr = new cv::detail::CameraParams(vec[i]);;
+        class_wrapped.ptr = new detail::CameraParams(vec[i]);;
         temp[i] = class_wrapped;
     }
     this->data = temp;
 }
 
-ClassArray::operator std::vector<cv::detail::MatchesInfo>()
+ClassArray::operator std::vector<detail::MatchesInfo>()
 {
     MatchesInfoPtr *temp =
             static_cast<MatchesInfoPtr *>(this->data);
 
-    std::vector<cv::detail::MatchesInfo> retval(this->size);
+    std::vector<detail::MatchesInfo> retval(this->size);
 
     for(int i = 0; i < this->size; i++) {
-        retval[i] = *static_cast<cv::detail::MatchesInfo *>(temp[i].ptr);
-        //memcpy(retval.data() + i, temp[i].ptr, sizeof(cv::detail::MatchesInfo));
+        retval[i] = *static_cast<detail::MatchesInfo *>(temp[i].ptr);
+        //memcpy(retval.data() + i, temp[i].ptr, sizeof(detail::MatchesInfo));
     }
     return retval;
 }
 
-ClassArray::operator std::vector<cv::detail::ImageFeatures>()
+ClassArray::operator std::vector<detail::ImageFeatures>()
 {
     ImageFeaturesPtr *temp =
             static_cast<ImageFeaturesPtr *>(this->data);
 
-    std::vector<cv::detail::ImageFeatures> retval(this->size);
+    std::vector<detail::ImageFeatures> retval(this->size);
 
     for(int i = 0; i < this->size; i++) {
-        retval[i] = *static_cast<cv::detail::ImageFeatures *>(temp[i].ptr);
-        //memcpy(retval.data() + i, temp[i].ptr, sizeof(cv::detail::ImageFeatures));
+        retval[i] = *static_cast<detail::ImageFeatures *>(temp[i].ptr);
+        //memcpy(retval.data() + i, temp[i].ptr, sizeof(detail::ImageFeatures));
     }
     return retval;
 }
 
-ClassArray::operator std::vector<cv::detail::CameraParams>()
+ClassArray::operator std::vector<detail::CameraParams>()
 {
     CameraParamsPtr *temp =
             static_cast<CameraParamsPtr *>(this->data);
 
-    std::vector<cv::detail::CameraParams> retval(this->size);
+    std::vector<detail::CameraParams> retval(this->size);
 
     for(int i = 0; i < this->size; i++) {
-        retval[i] = *static_cast<cv::detail::CameraParams *>(temp[i].ptr);
-        //memcpy(retval.data() + i, temp[i].ptr, sizeof(cv::detail::CameraParams));
+        retval[i] = *static_cast<detail::CameraParams *>(temp[i].ptr);
+        //memcpy(retval.data() + i, temp[i].ptr, sizeof(detail::CameraParams));
     }
     return retval;
 }
@@ -133,12 +133,11 @@ struct PointWrapper detail_resultTl(
 }
 
 extern "C"
-struct IntArray detail_selectRandomSubset(
-	int count, int size)
+struct TensorWrapper detail_selectRandomSubset(int count, int size)
 {
     std::vector<int> subset;
     detail::selectRandomSubset(count, size, subset);
-    return IntArray(subset);
+    return TensorWrapper(cv::Mat(subset, true));
 }
 
 extern "C"
@@ -154,22 +153,22 @@ int detail_stitchingLogLevel()
 extern "C"
 struct CameraParamsPtr CameraParams_ctor()
 {
-    return new cv::detail::CameraParams();
+    return new detail::CameraParams();
 }
 
 extern "C"
 struct CameraParamsPtr CameraParams_ctor2(
 	struct CameraParamsPtr other)
 {
-    cv::detail::CameraParams * instant = static_cast<cv::detail::CameraParams *>(other.ptr);
-    return new cv::detail::CameraParams(*instant);
+    detail::CameraParams * instant = static_cast<detail::CameraParams *>(other.ptr);
+    return new detail::CameraParams(*instant);
 }
 
 extern "C"
 void CameraParams_dtor(
 	struct CameraParamsPtr ptr)
 {
-    delete static_cast<cv::detail::CameraParams *>(ptr.ptr);
+    delete static_cast<detail::CameraParams *>(ptr.ptr);
 }
 
 struct TensorWrapper CameraParams_K(
@@ -178,7 +177,7 @@ struct TensorWrapper CameraParams_K(
     return TensorWrapper(ptr->K());
 }
 
-//TODO need to add const CameraParams& cv::detail::CameraParams::operator=(const CameraParams & other)	
+//TODO need to add const CameraParams& detail::CameraParams::operator=(const CameraParams & other)	
 
 //DisjointSets
 
@@ -186,14 +185,14 @@ extern "C"
 struct DisjointSetsPtr DisjointSets_ctor(
 	int elem_count)
 {
-    return new cv::detail::DisjointSets(elem_count);
+    return new detail::DisjointSets(elem_count);
 }
 
 extern "C"
 void DisjointSets_dtor(
 	struct DisjointSetsPtr ptr)
 {
-    delete static_cast<cv::detail::DisjointSets *>(ptr.ptr);
+    delete static_cast<detail::DisjointSets *>(ptr.ptr);
 }
 
 extern "C"
@@ -224,14 +223,14 @@ extern "C"
 struct GraphPtr Graph_ctor(
 	int num_vertices)
 {
-    return new cv::detail::Graph(num_vertices);
+    return new detail::Graph(num_vertices);
 }
 
 extern "C"
 void Graph_dtor(
 	struct GraphPtr ptr)
 {
-    delete static_cast<cv::detail::Graph *>(ptr.ptr);
+    delete static_cast<detail::Graph *>(ptr.ptr);
 }
 
 extern "C"
@@ -261,14 +260,14 @@ extern "C"
 struct GraphEdgePtr GraphEdge_ctor(
 	int from, int to, float weight)
 {
-    return new cv::detail::GraphEdge(from, to, weight);
+    return new detail::GraphEdge(from, to, weight);
 }
 
 extern "C"
 void GraphEdge_dtor(
 	struct GraphEdgePtr ptr)
 {
-    delete static_cast<cv::detail::GraphEdge *>(ptr.ptr);
+    delete static_cast<detail::GraphEdge *>(ptr.ptr);
 }
 
 //Timelapser
@@ -278,15 +277,14 @@ struct TimelapserPtr Timelapser_ctor(
 	int type)
 {
     return rescueObjectFromPtr(
-			cv::detail::Timelapser::createDefault(type));
+			detail::Timelapser::createDefault(type));
 }
 
 extern "C"
 void Timelapser_dtor(
 	struct TimelapserPtr ptr)
 {
-    ptr->~Timelapser();
-    delete static_cast<cv::detail::Timelapser *>(ptr.ptr);
+    delete static_cast<detail::Timelapser *>(ptr.ptr);
 }
 
 extern "C"
@@ -330,21 +328,21 @@ void TimelapserCrop_initialize(
 extern "C"
 struct MatchesInfoPtr MatchesInfo_ctor()
 {
-    return new cv::detail::MatchesInfo();
+    return new detail::MatchesInfo();
 }
 
 extern "C"
 struct MatchesInfoPtr MatchesInfo_ctor2(
         struct MatchesInfoPtr other)
 {
-    return new cv::detail::MatchesInfo(*static_cast<cv::detail::MatchesInfo *>(other.ptr));
+    return new detail::MatchesInfo(*static_cast<detail::MatchesInfo *>(other.ptr));
 }
 
 extern "C"
 void MatchesInfo_dtor(
         struct MatchesInfoPtr ptr)
 {
-    delete static_cast<cv::detail::MatchesInfo *>(ptr.ptr);
+    delete static_cast<detail::MatchesInfo *>(ptr.ptr);
 }
 
 
@@ -357,8 +355,7 @@ extern "C"
 void FeaturesFinder_dtor(
 	struct FeaturesFinderPtr ptr)
 {
-    ptr->~FeaturesFinder();
-    delete static_cast<cv::detail::FeaturesFinder *>(ptr.ptr);
+    delete static_cast<detail::FeaturesFinder *>(ptr.ptr);
 }
 
 extern "C"
@@ -372,7 +369,7 @@ extern "C"
 struct ImageFeaturesPtr FeaturesFinder_call(
         struct FeaturesFinderPtr ptr, struct TensorWrapper image)
 {
-    detail::ImageFeatures *features = new cv::detail::ImageFeatures();
+    detail::ImageFeatures *features = new detail::ImageFeatures();
     ptr->operator()(image.toMat(), *features);
     return ImageFeaturesPtr(features);
 }
@@ -382,7 +379,7 @@ struct ImageFeaturesPtr FeaturesFinder_call2(
         struct FeaturesFinderPtr ptr, struct TensorWrapper image,
         struct RectArray rois)
 {
-    detail::ImageFeatures *features = new cv::detail::ImageFeatures();
+    detail::ImageFeatures *features = new detail::ImageFeatures();
     ptr->operator()(image.toMat(), *features, rois);
     return ImageFeaturesPtr(features);
 }
@@ -393,7 +390,7 @@ extern "C"
 struct OrbFeaturesFinderPtr OrbFeaturesFinder_ctor(
         struct SizeWrapper _grid_size, int nfeatures, float scaleFactor, int nlevels)
 {
-    return new cv::detail::OrbFeaturesFinder(_grid_size, nfeatures, scaleFactor, nlevels);
+    return new detail::OrbFeaturesFinder(_grid_size, nfeatures, scaleFactor, nlevels);
 }
 
 //SurfFeaturesFinder
@@ -402,7 +399,7 @@ extern "C"
 struct SurfFeaturesFinderPtr SurfFeaturesFinder_ctor(
         double hess_thresh, int num_octaves, int num_layers, int num_octaves_descr, int num_layers_descr)
 {
-    return new cv::detail::SurfFeaturesFinder(
+    return new detail::SurfFeaturesFinder(
                                 hess_thresh, num_octaves, num_layers,
                                 num_octaves_descr, num_layers_descr);
 }
@@ -412,14 +409,14 @@ struct SurfFeaturesFinderPtr SurfFeaturesFinder_ctor(
 extern "C"
 struct ImageFeaturesPtr ImageFeatures_ctor()
 {
-    return new cv::detail::ImageFeatures();
+    return new detail::ImageFeatures();
 }
 
 extern "C"
 struct ImageFeaturesPtr ImageFeatures_dtor(
         struct ImageFeaturesPtr ptr)
 {
-    delete static_cast<cv::detail::ImageFeatures *>(ptr.ptr);
+    delete static_cast<detail::ImageFeatures *>(ptr.ptr);
 }
 
 //FeaturesMatcher
@@ -428,8 +425,7 @@ extern "C"
 void FeaturesMatcher_dtor(
         struct FeaturesMatcherPtr ptr)
 {
-    ptr->~FeaturesMatcher();
-    delete static_cast<cv::detail::FeaturesMatcher *>(ptr.ptr);
+    delete static_cast<detail::FeaturesMatcher *>(ptr.ptr);
 }
 
 extern "C"
@@ -451,9 +447,9 @@ struct MatchesInfoPtr FeaturesMatcher_call(
         struct FeaturesMatcherPtr ptr, struct ImageFeaturesPtr features1,
         struct ImageFeaturesPtr features2)
 {
-    cv::detail::MatchesInfo *Mat_inf = new cv::detail::MatchesInfo();
-    ptr->operator()(*static_cast<cv::detail::ImageFeatures *>(features1.ptr),
-                    *static_cast<cv::detail::ImageFeatures *>(features2.ptr), *Mat_inf);
+    detail::MatchesInfo *Mat_inf = new detail::MatchesInfo();
+    ptr->operator()(*static_cast<detail::ImageFeatures *>(features1.ptr),
+                    *static_cast<detail::ImageFeatures *>(features2.ptr), *Mat_inf);
     return Mat_inf;
 }
 
@@ -464,7 +460,7 @@ struct BestOf2NearestMatcherPtr BestOf2NearestMatcher_ctor(
         bool try_use_gpu, float match_conf,
         int num_matches_thresh1, int num_matches_thresh2)
 {
-    return new cv::detail::BestOf2NearestMatcher(
+    return new detail::BestOf2NearestMatcher(
                     try_use_gpu, match_conf, num_matches_thresh1, num_matches_thresh2);
 }
 
@@ -482,7 +478,7 @@ struct BestOf2NearestRangeMatcherPtr BestOf2NearestRangeMatcher_ctor(
         int range_width, bool try_use_gpu, float match_conf,
         int num_matches_thresh1, int num_matches_thresh2)
 {
-    return new cv::detail::BestOf2NearestRangeMatcher(range_width, try_use_gpu, match_conf,
+    return new detail::BestOf2NearestRangeMatcher(range_width, try_use_gpu, match_conf,
                                                       num_matches_thresh1, num_matches_thresh2);
 }
 
@@ -491,8 +487,8 @@ void BestOf2NearestRangeMatcher_call(
         struct BestOf2NearestRangeMatcherPtr ptr, struct ClassArray features,
         struct ClassArray pairwise_matches, struct TensorWrapper mask)
 {
-    std::vector<cv::detail::ImageFeatures> features_vec = features;
-    std::vector<cv::detail::MatchesInfo> pairwise_matches_vec = pairwise_matches;
+    std::vector<detail::ImageFeatures> features_vec = features;
+    std::vector<detail::MatchesInfo> pairwise_matches_vec = pairwise_matches;
 
     if(mask.isNull()){
         ptr->operator()(features_vec, pairwise_matches_vec);
@@ -506,54 +502,55 @@ void BestOf2NearestRangeMatcher_call(
 //**********************Rotation Estimation********************************
 
 extern "C"
-struct GraphPtrPlusIntArray detail_findMaxSpanningTree(
+struct GraphPtrPlusTensor detail_findMaxSpanningTree(
         int num_images, struct ClassArray pairwise_matches)
 {
-    GraphPtrPlusIntArray result;
-    cv::detail::Graph *span_tree = new cv::detail::Graph();
+    GraphPtrPlusTensor result;
+    detail::Graph *span_tree = new detail::Graph();
     std::vector<int> centers;
-    cv::detail::findMaxSpanningTree(num_images, pairwise_matches, *span_tree, centers);
-    result.graph = GraphPtr(span_tree);
-    result.array = IntArray(centers);
+    detail::findMaxSpanningTree(num_images, pairwise_matches, *span_tree, centers);
+    result.graph.ptr = span_tree;
+    new (&result.tensor) TensorWrapper(cv::Mat(centers, true));
     return result;
 }
 
 extern "C"
-struct IntArray detail_leaveBiggestComponent(
+struct TensorWrapper detail_leaveBiggestComponent(
         struct ClassArray features, struct ClassArray pairwise_matches, float conf_threshold)
 {
-    std::vector<cv::detail::ImageFeatures> features_vec = features;
-    std::vector<cv::detail::MatchesInfo> pairwise_matches_vec = pairwise_matches;
+    std::vector<detail::ImageFeatures> features_vec = features;
+    std::vector<detail::MatchesInfo> pairwise_matches_vec = pairwise_matches;
 
-    return IntArray(
-               cv::detail::leaveBiggestComponent(
+    return TensorWrapper(cv::Mat(
+               detail::leaveBiggestComponent(
                        features_vec,
                        pairwise_matches_vec,
-                       conf_threshold));
+                       conf_threshold), true));
 }
 
 extern "C"
-struct StringWrapper detail_matchesGraphAsString(
+struct StringArray detail_matchesGraphAsString(
         struct StringArray pathes, struct ClassArray pairwise_matches, float conf_threshold)
 {
-    struct StringWrapper result;
     std::vector<cv::String> pathes_vec = pathes;
-    std::vector<cv::detail::MatchesInfo> pairwise_matches_vec = pairwise_matches;
-    cv::String retval = cv::detail::matchesGraphAsString(
-                                            pathes_vec, pairwise_matches_vec, conf_threshold);
-    result.str = retval.c_str();
-    return result;
+    std::vector<detail::MatchesInfo> pairwise_matches_vec = pairwise_matches;
+
+    // TODO avoid copying (possibly by hacking cv::String)
+    cv::String result = detail::matchesGraphAsString(
+            pathes_vec, pairwise_matches_vec, conf_threshold);
+
+    StringArray retval(1);
+    retval.data[0] = static_cast<char *>(malloc(retval.size * sizeof(char)));
+    strcpy(retval.data[0], result.c_str());
+    return retval;
 }
 
 extern "C"
 void detail_waveCorrect(
         struct TensorArray rmats, int kind)
 {
-    cv::detail::WaveCorrectKind enum_kind;
-    if(kind == 0) enum_kind = cv::detail::WAVE_CORRECT_HORIZ;
-    else enum_kind = cv::detail::WAVE_CORRECT_VERT;
     std::vector<cv::Mat> rmats_vec = rmats.toMatList();
-    cv::detail::waveCorrect(rmats_vec, enum_kind);
+    detail::waveCorrect(rmats_vec, static_cast<detail::WaveCorrectKind>(kind));
 }
 
 //Estimator
@@ -562,8 +559,7 @@ extern "C"
 void Estimator_dtor(
         struct EstimatorPtr ptr)
 {
-    ptr->~Estimator();
-    delete static_cast<cv::detail::Estimator *>(ptr.ptr);
+    delete static_cast<detail::Estimator *>(ptr.ptr);
 }
 
 extern "C"
@@ -571,9 +567,9 @@ struct BoolPlusClassArray Estimator_call(
         struct EstimatorPtr ptr, struct ClassArray features, struct ClassArray 	pairwise_matches)
 {
     struct BoolPlusClassArray result;
-    std::vector<cv::detail::CameraParams> cameras;
-    std::vector<cv::detail::ImageFeatures> features_vec = features;
-    std::vector<cv::detail::MatchesInfo> pairwise_matches_vec = pairwise_matches;
+    std::vector<detail::CameraParams> cameras;
+    std::vector<detail::ImageFeatures> features_vec = features;
+    std::vector<detail::MatchesInfo> pairwise_matches_vec = pairwise_matches;
 
     result.val = ptr->operator()(features_vec, pairwise_matches_vec, cameras);
     new(&result.array) ClassArray(cameras);
@@ -586,7 +582,7 @@ extern "C"
 struct HomographyBasedEstimatorPtr HomographyBasedEstimator_ctor(
         bool is_focals_estimated)
 {
-    return new cv::detail::HomographyBasedEstimator(is_focals_estimated);
+    return new detail::HomographyBasedEstimator(is_focals_estimated);
 }
 
 //BundleAdjusterBase
@@ -645,7 +641,7 @@ struct TermCriteriaWrapper BundleAdjusterBase_termCriteria(
 extern "C"
 struct BundleAdjusterRayPtr BundleAdjusterRay_ctor()
 {
-    return new cv::detail::BundleAdjusterRay();
+    return new detail::BundleAdjusterRay();
 }
 
 //BundleAdjusterReproj
@@ -653,7 +649,7 @@ struct BundleAdjusterRayPtr BundleAdjusterRay_ctor()
 extern "C"
 struct BundleAdjusterReprojPtr BundleAdjusterReproj_ctor()
 {
-    return new cv::detail::BundleAdjusterReproj();
+    return new detail::BundleAdjusterReproj();
 }
 
 
@@ -666,19 +662,19 @@ struct TensorPlusBool detail_calibrateRotatingCamera(
 {
     struct TensorPlusBool result;
     cv::Mat K;
-    result.val = cv::detail::calibrateRotatingCamera(Hs.toMatList(), K);
+    result.val = detail::calibrateRotatingCamera(Hs.toMatList(), K);
     new(&result.tensor) TensorWrapper(MatT(K));
     return result;
 }
 
 extern "C"
-struct DoubleArray detail_estimateFocal(struct ClassArray features, struct ClassArray pairwise_matches)
+struct TensorWrapper detail_estimateFocal(struct ClassArray features, struct ClassArray pairwise_matches)
 {
     std::vector<double> focals;
-    std::vector<cv::detail::ImageFeatures> features_vec = features;
-    std::vector<cv::detail::MatchesInfo> pairwise_matches_vec = pairwise_matches;
-    cv::detail::estimateFocal(features_vec, pairwise_matches_vec, focals);
-    return DoubleArray(focals);
+    std::vector<detail::ImageFeatures> features_vec = features;
+    std::vector<detail::MatchesInfo> pairwise_matches_vec = pairwise_matches;
+    detail::estimateFocal(features_vec, pairwise_matches_vec, focals);
+    return TensorWrapper(cv::Mat(focals, true));
 }
 
 extern "C"
@@ -689,7 +685,7 @@ struct focalsFromHomographyRetval detail_focalsFromHomography(
     double f0, f1;
     bool f0_ok, f1_ok;
 
-    cv::detail::focalsFromHomography(H.toMat(), f0, f1, f0_ok, f1_ok);
+    detail::focalsFromHomography(H.toMat(), f0, f1, f0_ok, f1_ok);
 
     result.f0 = f0;
     result.f1 = f1;
@@ -707,14 +703,14 @@ struct focalsFromHomographyRetval detail_focalsFromHomography(
 extern "C"
 struct ProjectorBasePtr ProjectorBase_ctor()
 {
-    return new cv::detail::ProjectorBase;
+    return new detail::ProjectorBase;
 }
 
 extern "C"
 void ProjectorBase_dtor(
         struct ProjectorBasePtr ptr)
 {
-    delete static_cast<cv::detail::ProjectorBase *>(ptr.ptr);
+    delete static_cast<detail::ProjectorBase *>(ptr.ptr);
 }
 
 extern "C"
@@ -730,14 +726,14 @@ void ProjectorBase_setCameraParams(
 extern "C"
 struct CompressedRectilinearPortraitProjectorPtr CompressedRectilinearPortraitProjector_ctor()
 {
-    return new cv::detail::CompressedRectilinearPortraitProjector;
+    return new detail::CompressedRectilinearPortraitProjector;
 }
 
 extern "C"
 void CompressedRectilinearPortraitProjector_dtor(
         struct CompressedRectilinearPortraitProjectorPtr ptr)
 {
-    delete static_cast<cv::detail::CompressedRectilinearPortraitProjector *>(ptr.ptr);
+    delete static_cast<detail::CompressedRectilinearPortraitProjector *>(ptr.ptr);
 }
 
 extern "C"
@@ -763,14 +759,14 @@ struct FloatArray CompressedRectilinearPortraitProjector_mapForward(
 extern "C"
 struct CompressedRectilinearProjectorPtr CompressedRectilinearProjector_ctor()
 {
-    return new cv::detail::CompressedRectilinearProjector;
+    return new detail::CompressedRectilinearProjector;
 }
 
 extern "C"
 void CompressedRectilinearProjector_dtor(
         struct CompressedRectilinearProjectorPtr ptr)
 {
-    delete static_cast<cv::detail::CompressedRectilinearProjector *>(ptr.ptr);
+    delete static_cast<detail::CompressedRectilinearProjector *>(ptr.ptr);
 }
 
 extern "C"
@@ -796,14 +792,14 @@ struct FloatArray CompressedRectilinearProjector_mapForward(
 extern "C"
 struct CylindricalPortraitProjectorPtr CylindricalPortraitProjector_ctor()
 {
-    return new cv::detail::CylindricalPortraitProjector;
+    return new detail::CylindricalPortraitProjector;
 }
 
 extern "C"
 void CylindricalPortraitProjector_dtor(
         struct CylindricalPortraitProjectorPtr ptr)
 {
-    delete static_cast<cv::detail::CylindricalPortraitProjector *>(ptr.ptr);
+    delete static_cast<detail::CylindricalPortraitProjector *>(ptr.ptr);
 }
 
 extern "C"
@@ -829,14 +825,14 @@ struct FloatArray CylindricalPortraitProjector_mapForward(
 extern "C"
 struct CylindricalProjectorPtr CylindricalProjector_ctor()
 {
-    return new cv::detail::CylindricalProjector;
+    return new detail::CylindricalProjector;
 }
 
 extern "C"
 void CylindricalProjector_dtor(
         struct CylindricalProjectorPtr ptr)
 {
-    delete static_cast<cv::detail::CylindricalProjector *>(ptr.ptr);
+    delete static_cast<detail::CylindricalProjector *>(ptr.ptr);
 }
 
 extern "C"
@@ -863,7 +859,7 @@ extern "C"
 void FisheyeProjector_dtor(
         struct FisheyeProjectorPtr ptr)
 {
-    delete static_cast<cv::detail::FisheyeProjector *>(ptr.ptr);
+    delete static_cast<detail::FisheyeProjector *>(ptr.ptr);
 }
 
 extern "C"
@@ -890,7 +886,7 @@ extern "C"
 void MercatorProjector_dtor(
         struct MercatorProjectorPtr ptr)
 {
-    delete static_cast<cv::detail::MercatorProjector *>(ptr.ptr);
+    delete static_cast<detail::MercatorProjector *>(ptr.ptr);
 }
 
 extern "C"
@@ -917,7 +913,7 @@ extern "C"
 void PaniniPortraitProjector_dtor(
         struct PaniniPortraitProjectorPtr ptr)
 {
-    delete static_cast<cv::detail::PaniniPortraitProjector *>(ptr.ptr);
+    delete static_cast<detail::PaniniPortraitProjector *>(ptr.ptr);
 }
 
 extern "C"
@@ -944,7 +940,7 @@ extern "C"
 void PaniniProjector_dtor(
         struct PaniniProjectorPtr ptr)
 {
-    delete static_cast<cv::detail::PaniniProjector *>(ptr.ptr);
+    delete static_cast<detail::PaniniProjector *>(ptr.ptr);
 }
 
 extern "C"
@@ -971,7 +967,7 @@ extern "C"
 void PlanePortraitProjector_dtor(
         struct PlanePortraitProjectorPtr ptr)
 {
-    delete static_cast<cv::detail::PlanePortraitProjector *>(ptr.ptr);
+    delete static_cast<detail::PlanePortraitProjector *>(ptr.ptr);
 }
 
 extern "C"
@@ -998,7 +994,7 @@ extern "C"
 void PlaneProjector_dtor(
         struct PlaneProjectorPtr ptr)
 {
-    delete static_cast<cv::detail::PlaneProjector *>(ptr.ptr);
+    delete static_cast<detail::PlaneProjector *>(ptr.ptr);
 }
 
 extern "C"
@@ -1025,7 +1021,7 @@ extern "C"
 void SphericalPortraitProjector_dtor(
         struct SphericalPortraitProjectorPtr ptr)
 {
-    delete static_cast<cv::detail::SphericalPortraitProjector *>(ptr.ptr);
+    delete static_cast<detail::SphericalPortraitProjector *>(ptr.ptr);
 }
 
 extern "C"
@@ -1052,7 +1048,7 @@ extern "C"
 void SphericalProjector_dtor(
         struct SphericalProjectorPtr ptr)
 {
-    delete static_cast<cv::detail::SphericalProjector *>(ptr.ptr);
+    delete static_cast<detail::SphericalProjector *>(ptr.ptr);
 }
 
 extern "C"
@@ -1079,7 +1075,7 @@ extern "C"
 void StereographicProjector_dtor(
         struct StereographicProjectorPtr ptr)
 {
-    delete static_cast<cv::detail::StereographicProjector *>(ptr.ptr);
+    delete static_cast<detail::StereographicProjector *>(ptr.ptr);
 }
 
 extern "C"
@@ -1106,7 +1102,7 @@ extern "C"
 void TransverseMercatorProjector_dtor(
         struct TransverseMercatorProjectorPtr ptr)
 {
-    delete static_cast<cv::detail::TransverseMercatorProjector *>(ptr.ptr);
+    delete static_cast<detail::TransverseMercatorProjector *>(ptr.ptr);
 }
 
 extern "C"
@@ -1133,8 +1129,7 @@ extern "C"
 void RotationWarper_dtor(
         struct RotationWarperPtr ptr)
 {
-    ptr->~RotationWarper();
-    delete static_cast<cv::detail::RotationWarper *>(ptr.ptr);
+    delete static_cast<detail::RotationWarper *>(ptr.ptr);
 }
 
 extern "C"
@@ -1220,7 +1215,7 @@ extern "C"
 struct RotationWarperBase_CompressedRectilinearPortraitProjectorPtr
                         RotationWarperBase_CompressedRectilinearPortraitProjector_ctor()
 {
-    return new cv::detail::RotationWarperBase<cv::detail::CompressedRectilinearPortraitProjector>();
+    return new detail::RotationWarperBase<detail::CompressedRectilinearPortraitProjector>();
 }
 
 extern "C"
@@ -1305,7 +1300,7 @@ struct RectWrapper RotationWarperBase_CompressedRectilinearPortraitProjector_war
 extern "C"
 struct RotationWarperBase_CompressedRectilinearProjectorPtr RotationWarperBase_CompressedRectilinearProjector_ctor()
 {
-    return new cv::detail::RotationWarperBase<cv::detail::CompressedRectilinearProjector>();
+    return new detail::RotationWarperBase<detail::CompressedRectilinearProjector>();
 }
 
 extern "C"
@@ -1391,7 +1386,7 @@ struct RectWrapper RotationWarperBase_CompressedRectilinearProjector_warpRoi(
 extern "C"
 struct RotationWarperBase_CylindricalPortraitProjectorPtr RotationWarperBase_CylindricalPortraitProjector_ctor()
 {
-    return new cv::detail::RotationWarperBase<cv::detail::CylindricalPortraitProjector>();
+    return new detail::RotationWarperBase<detail::CylindricalPortraitProjector>();
 }
 
 extern "C"
@@ -1476,7 +1471,7 @@ struct RectWrapper RotationWarperBase_CylindricalPortraitProjector_warpRoi(
 extern "C"
 struct RotationWarperBase_CylindricalProjectorPtr RotationWarperBase_CylindricalProjector_ctor()
 {
-    return new cv::detail::RotationWarperBase<cv::detail::CylindricalProjector>();
+    return new detail::RotationWarperBase<detail::CylindricalProjector>();
 }
 
 extern "C"
@@ -1561,7 +1556,7 @@ struct RectWrapper RotationWarperBase_CylindricalProjector_warpRoi(
 extern "C"
 struct RotationWarperBase_FisheyeProjectorPtr RotationWarperBase_FisheyeProjector_ctor()
 {
-    return new cv::detail::RotationWarperBase<cv::detail::FisheyeProjector>();
+    return new detail::RotationWarperBase<detail::FisheyeProjector>();
 }
 
 extern "C"
@@ -1646,7 +1641,7 @@ struct RectWrapper RotationWarperBase_FisheyeProjector_warpRoi(
 extern "C"
 struct RotationWarperBase_MercatorProjectorPtr RotationWarperBase_MercatorProjector_ctor()
 {
-    return new cv::detail::RotationWarperBase<cv::detail::MercatorProjector>();
+    return new detail::RotationWarperBase<detail::MercatorProjector>();
 }
 
 extern "C"
@@ -1731,7 +1726,7 @@ struct RectWrapper RotationWarperBase_MercatorProjector_warpRoi(
 extern "C"
 struct RotationWarperBase_PaniniPortraitProjectorPtr RotationWarperBase_PaniniPortraitProjector_ctor()
 {
-    return new cv::detail::RotationWarperBase<cv::detail::PaniniPortraitProjector>();
+    return new detail::RotationWarperBase<detail::PaniniPortraitProjector>();
 }
 
 extern "C"
@@ -1816,7 +1811,7 @@ struct RectWrapper RotationWarperBase_PaniniPortraitProjector_warpRoi(
 extern "C"
 struct RotationWarperBase_PaniniProjectorPtr RotationWarperBase_PaniniProjector_ctor()
 {
-    return new cv::detail::RotationWarperBase<cv::detail::PaniniProjector>();
+    return new detail::RotationWarperBase<detail::PaniniProjector>();
 }
 
 extern "C"
@@ -1901,7 +1896,7 @@ struct RectWrapper RotationWarperBase_PaniniProjector_warpRoi(
 extern "C"
 struct RotationWarperBase_PlanePortraitProjectorPtr RotationWarperBase_PlanePortraitProjector_ctor()
 {
-    return new cv::detail::RotationWarperBase<cv::detail::PlanePortraitProjector>();
+    return new detail::RotationWarperBase<detail::PlanePortraitProjector>();
 }
 
 extern "C"
@@ -1986,7 +1981,7 @@ struct RectWrapper RotationWarperBase_PlanePortraitProjector_warpRoi(
 extern "C"
 struct RotationWarperBase_PlaneProjectorPtr RotationWarperBase_PlaneProjector_ctor()
 {
-    return new cv::detail::RotationWarperBase<cv::detail::PlaneProjector>();
+    return new detail::RotationWarperBase<detail::PlaneProjector>();
 }
 
 extern "C"
@@ -2071,7 +2066,7 @@ struct RectWrapper RotationWarperBase_PlaneProjector_warpRoi(
 extern "C"
 struct RotationWarperBase_SphericalPortraitProjectorPtr RotationWarperBase_SphericalPortraitProjector_ctor()
 {
-    return new cv::detail::RotationWarperBase<cv::detail::SphericalPortraitProjector>();
+    return new detail::RotationWarperBase<detail::SphericalPortraitProjector>();
 }
 
 extern "C"
@@ -2156,7 +2151,7 @@ struct RectWrapper RotationWarperBase_SphericalPortraitProjector_warpRoi(
 extern "C"
 struct RotationWarperBase_SphericalProjectorPtr RotationWarperBase_SphericalProjector_ctor()
 {
-    return new cv::detail::RotationWarperBase<cv::detail::SphericalProjector>();
+    return new detail::RotationWarperBase<detail::SphericalProjector>();
 }
 
 extern "C"
@@ -2241,7 +2236,7 @@ struct RectWrapper RotationWarperBase_SphericalProjector_warpRoi(
 extern "C"
 struct RotationWarperBase_StereographicProjectorPtr RotationWarperBase_StereographicProjector_ctor()
 {
-    return new cv::detail::RotationWarperBase<cv::detail::StereographicProjector>();
+    return new detail::RotationWarperBase<detail::StereographicProjector>();
 }
 
 extern "C"
@@ -2326,7 +2321,7 @@ struct RectWrapper RotationWarperBase_StereographicProjector_warpRoi(
 extern "C"
 struct RotationWarperBase_TransverseMercatorProjectorPtr RotationWarperBase_TransverseMercatorProjector_ctor()
 {
-    return new cv::detail::RotationWarperBase<cv::detail::TransverseMercatorProjector>();
+    return new detail::RotationWarperBase<detail::TransverseMercatorProjector>();
 }
 
 extern "C"
@@ -2412,7 +2407,6 @@ extern "C"
 void WarperCreator_dtor(
         struct WarperCreatorPtr ptr)
 {
-    ptr->~WarperCreator();
     delete static_cast<cv::WarperCreator *>(ptr.ptr);
 }
 
@@ -2598,7 +2592,7 @@ extern "C"
 struct detail_CompressedRectilinearPortraitWarperPtr detail_CompressedRectilinearPortraitWarper_ctor(
         float scale, float A, float B)
 {
-    return new cv::detail::CompressedRectilinearPortraitWarper(scale, A, B);
+    return new detail::CompressedRectilinearPortraitWarper(scale, A, B);
 }
 
 //detail_CompressedRectilinearWarper
@@ -2607,7 +2601,7 @@ extern "C"
 struct detail_CompressedRectilinearWarperPtr detail_CompressedRectilinearWarper_ctor(
         float scale, float A, float B)
 {
-    return new cv::detail::CompressedRectilinearWarper(scale, A, B);
+    return new detail::CompressedRectilinearWarper(scale, A, B);
 }
 
 //detail_CylindricalPortraitWarper
@@ -2616,7 +2610,7 @@ extern "C"
 struct detail_CylindricalPortraitWarperPtr detail_CylindricalPortraitWarper_ctor(
         float scale)
 {
-    return new cv::detail::CylindricalPortraitWarper(scale);
+    return new detail::CylindricalPortraitWarper(scale);
 }
 
 //detail_CylindricalWarper
@@ -2625,7 +2619,7 @@ extern "C"
 struct detail_CylindricalWarperPtr detail_CylindricalWarper_ctor(
         float scale)
 {
-    return new cv::detail::CylindricalWarper(scale);
+    return new detail::CylindricalWarper(scale);
 }
 
 extern "C"
@@ -2664,7 +2658,7 @@ extern "C"
 struct detail_CylindricalWarperGpuPtr detail_CylindricalWarperGpu_ctor(
         float scale)
 {
-    return new cv::detail::CylindricalWarperGpu(scale);
+    return new detail::CylindricalWarperGpu(scale);
 }
 
 extern "C"
@@ -2705,7 +2699,7 @@ extern "C"
 struct detail_FisheyeWarperPtr detail_FisheyeWarper_ctor(
         float scale)
 {
-    return new cv::detail::FisheyeWarper(scale);
+    return new detail::FisheyeWarper(scale);
 }
 
 //detail_MercatorWarper
@@ -2714,7 +2708,7 @@ extern "C"
 struct detail_MercatorWarperPtr detail_MercatorWarper_ctor(
         float scale)
 {
-    return new cv::detail::MercatorWarper(scale);
+    return new detail::MercatorWarper(scale);
 }
 
 //detail_PaniniPortraitWarper
@@ -2723,7 +2717,7 @@ extern "C"
 struct detail_PaniniPortraitWarperPtr detail_PaniniPortraitWarper_ctor(
         float scale, float A, float B)
 {
-    return new cv::detail::PaniniPortraitWarper(scale, A, B);
+    return new detail::PaniniPortraitWarper(scale, A, B);
 }
 
 //detail_PaniniWarper
@@ -2732,7 +2726,7 @@ extern "C"
 struct detail_PaniniWarperPtr detail_PaniniWarper_ctor(
         float scale, float A, float B)
 {
-    return new cv::detail::PaniniWarper(scale, A, B);
+    return new detail::PaniniWarper(scale, A, B);
 }
 
 //detail_PlanePortraitWarper
@@ -2741,7 +2735,7 @@ extern "C"
 struct detail_PlanePortraitWarperPtr detail_PlanePortraitWarper_ctor(
         float scale)
 {
-    return new cv::detail::PlanePortraitWarper(scale);
+    return new detail::PlanePortraitWarper(scale);
 }
 
 //detail_PlaneWarper
@@ -2750,7 +2744,7 @@ extern "C"
 struct detail_PlaneWarperPtr detail_PlaneWarper_ctor(
         float scale)
 {
-    return new cv::detail::PlaneWarper(scale);
+    return new detail::PlaneWarper(scale);
 }
 
 extern "C"
@@ -2859,7 +2853,7 @@ extern "C"
 struct detail_SphericalPortraitWarperPtr detail_SphericalPortraitWarper_ctor(
         float scale)
 {
-    return new cv::detail::SphericalPortraitWarper(scale);
+    return new detail::SphericalPortraitWarper(scale);
 }
 
 //detail_SphericalWarper
@@ -2868,7 +2862,7 @@ extern "C"
 struct detail_SphericalWarperPtr detail_SphericalWarper_ctor(
         float scale)
 {
-    return new cv::detail::SphericalWarper(scale);
+    return new detail::SphericalWarper(scale);
 }
 
 extern "C"
@@ -2908,7 +2902,7 @@ extern "C"
 struct detail_SphericalWarperGpuPtr detail_SphericalWarperGpu_ctor(
         float scale)
 {
-    return new cv::detail::SphericalWarperGpu(scale);
+    return new detail::SphericalWarperGpu(scale);
 }
 
 extern "C"
@@ -2948,7 +2942,7 @@ extern "C"
 struct detail_StereographicWarperPtr detail_StereographicWarper_ctor(
         float scale)
 {
-    return new cv::detail::StereographicWarper(scale);
+    return new detail::StereographicWarper(scale);
 }
 
 //detail_TransverseMercatorWarper
@@ -2957,7 +2951,7 @@ extern "C"
 struct detail_TransverseMercatorWarperPtr detail_TransverseMercatorWarper_ctor(
         float scale)
 {
-    return new cv::detail::TransverseMercatorWarper(scale);
+    return new detail::TransverseMercatorWarper(scale);
 }
 
 
@@ -2970,8 +2964,7 @@ extern "C"
 void SeamFinder_dtor(
         struct SeamFinderPtr ptr)
 {
-    ptr->~SeamFinder();
-    delete static_cast<cv::detail::SeamFinder *>(ptr.ptr);
+    delete static_cast<detail::SeamFinder *>(ptr.ptr);
 }
 
 extern "C"
@@ -2989,18 +2982,18 @@ void SeamFinder_find(
 extern "C"
 struct DpSeamFinderPtr DpSeamFinder_ctor(int costFunc)
 {
-    enum  	cv::detail::DpSeamFinder::CostFunction costFunc_enum;
-    if(costFunc == 0) costFunc_enum = cv::detail::DpSeamFinder::COLOR;
-    else costFunc_enum = cv::detail::DpSeamFinder::COLOR_GRAD;
-    return new cv::detail::DpSeamFinder(costFunc_enum);
+    enum  	detail::DpSeamFinder::CostFunction costFunc_enum;
+    if(costFunc == 0) costFunc_enum = detail::DpSeamFinder::COLOR;
+    else costFunc_enum = detail::DpSeamFinder::COLOR_GRAD;
+    return new detail::DpSeamFinder(costFunc_enum);
 }
 
 extern "C"
 int DpSeamFinder_costFunction(
         struct DpSeamFinderPtr ptr)
 {
-    cv::detail::DpSeamFinder::CostFunction costFunc = ptr->costFunction();
-    if(costFunc == cv::detail::DpSeamFinder::COLOR) return 0;
+    detail::DpSeamFinder::CostFunction costFunc = ptr->costFunction();
+    if(costFunc == detail::DpSeamFinder::COLOR) return 0;
     else return 1;
 }
 
@@ -3017,9 +3010,9 @@ extern "C"
 void DpSeamFinder_setCostFunction(
         struct DpSeamFinderPtr ptr, int val)
 {
-    enum cv::detail::DpSeamFinder::CostFunction costFunc;
-    if(val == 0) costFunc = cv::detail::DpSeamFinder::COLOR;
-    else costFunc = cv::detail::DpSeamFinder::COLOR_GRAD;
+    enum detail::DpSeamFinder::CostFunction costFunc;
+    if(val == 0) costFunc = detail::DpSeamFinder::COLOR;
+    else costFunc = detail::DpSeamFinder::COLOR_GRAD;
     ptr->setCostFunction(costFunc);
 }
 
@@ -3029,15 +3022,14 @@ extern "C"
 struct GraphCutSeamFinderPtr GraphCutSeamFinder_ctor(
         int cost_type, float terminal_cost, float bad_region_penalty)
 {
-    return new cv::detail::GraphCutSeamFinder(cost_type, terminal_cost, bad_region_penalty);
+    return new detail::GraphCutSeamFinder(cost_type, terminal_cost, bad_region_penalty);
 }
 
 extern "C"
 void GraphCutSeamFinder_dtor(
         struct GraphCutSeamFinderPtr ptr)
 {
-    ptr->~GraphCutSeamFinder();
-    delete static_cast<cv::detail::GraphCutSeamFinder *>(ptr.ptr);
+    delete static_cast<detail::GraphCutSeamFinder *>(ptr.ptr);
 }
 
 extern "C"
@@ -3055,7 +3047,7 @@ void GraphCutSeamFinder_find(
 extern "C"
 struct NoSeamFinderPtr NoSeamFinder_ctor()
 {
-    return new cv::detail::NoSeamFinder();
+    return new detail::NoSeamFinder();
 }
 
 extern "C"
@@ -3085,7 +3077,7 @@ void PairwiseSeamFinder_find(
 extern "C"
 struct VoronoiSeamFinderPtr VoronoiSeamFinder_ctor()
 {
-    return new cv::detail::VoronoiSeamFinder();
+    return new detail::VoronoiSeamFinder();
 }
 
 extern "C"
@@ -3116,15 +3108,14 @@ extern "C"
 struct ExposureCompensatorPtr ExposureCompensator_ctor(
         int type)
 {
-    return rescueObjectFromPtr(cv::detail::ExposureCompensator::createDefault(type));
+    return rescueObjectFromPtr(detail::ExposureCompensator::createDefault(type));
 }
 
 extern "C"
 void ExposureCompensator_dtor(
         struct ExposureCompensatorPtr ptr)
 {
-    ptr->~ExposureCompensator();
-    delete static_cast<cv::detail::ExposureCompensator *>(ptr.ptr);
+    delete static_cast<detail::ExposureCompensator *>(ptr.ptr);
 }
 
 extern "C"
@@ -3151,7 +3142,7 @@ extern "C"
 struct BlocksGainCompensatorPtr BlocksGainCompensator_ctor(
         int bl_width, int bl_height)
 {
-    return new cv::detail::BlocksGainCompensator(bl_width, bl_height);
+    return new detail::BlocksGainCompensator(bl_width, bl_height);
 }
 
 extern "C"
@@ -3181,7 +3172,7 @@ void BlocksGainCompensator_feed(
 extern "C"
 struct GainCompensatorPtr GainCompensator_ctor()
 {
-    return new cv::detail::GainCompensator();
+    return new detail::GainCompensator();
 }
 
 extern "C"
@@ -3207,10 +3198,10 @@ void GainCompensator_feed(
 }
 
 extern "C"
-struct DoubleArray GainCompensator_gains(
+struct TensorWrapper GainCompensator_gains(
         struct GainCompensatorPtr ptr)
 {
-    return DoubleArray(ptr->gains());
+    return TensorWrapper(cv::Mat(ptr->gains(), true));
 }
 
 //NoExposureCompensator
@@ -3218,7 +3209,7 @@ struct DoubleArray GainCompensator_gains(
 extern "C"
 struct NoExposureCompensatorPtr NoExposureCompensator_ctor()
 {
-    return new cv::detail::NoExposureCompensator();
+    return new detail::NoExposureCompensator();
 }
 
 extern "C"
@@ -3252,7 +3243,7 @@ struct TensorArray detail_createLaplacePyr(
         struct TensorWrapper img, int num_levels)
 {
     std::vector<cv::UMat> pyr_uvec;
-    cv::detail::createLaplacePyr(img.toMat(), num_levels, pyr_uvec);
+    detail::createLaplacePyr(img.toMat(), num_levels, pyr_uvec);
     std::vector<cv::Mat> pyr_vec = get_vec_Mat(pyr_uvec);
     return TensorArray(pyr_vec);
 }
@@ -3262,7 +3253,7 @@ struct TensorArray detail_createLaplacePyrGpu(
         struct TensorWrapper img, int num_levels)
 {
     std::vector<cv::UMat> pyr_uvec;
-    cv::detail::createLaplacePyr(img.toMat(), num_levels, pyr_uvec);
+    detail::createLaplacePyr(img.toMat(), num_levels, pyr_uvec);
     std::vector<cv::Mat> pyr_vec = get_vec_Mat(pyr_uvec);
     return TensorArray(pyr_vec);
 }
@@ -3272,28 +3263,28 @@ void detail_createWeightMap(
         struct TensorWrapper mask, float sharpness,
         struct TensorWrapper weight)
 {
-    cv::detail::createWeightMap(mask.toMat(), sharpness, weight.toMat());
+    detail::createWeightMap(mask.toMat(), sharpness, weight.toMat());
 }
 
 extern "C"
 void detail_normalizeUsingWeightMap(
         struct TensorWrapper weight, struct TensorWrapper src)
 {
-    cv::detail::normalizeUsingWeightMap(weight.toMat(), src.toMat());
+    detail::normalizeUsingWeightMap(weight.toMat(), src.toMat());
 }
 
 extern "C"
 void detail_restoreImageFromLaplacePyr(
         struct TensorArray pyr) {
     std::vector<cv::UMat> pyr_uvec = get_vec_UMat(pyr.toMatList());
-    cv::detail::restoreImageFromLaplacePyr(pyr_uvec);
+    detail::restoreImageFromLaplacePyr(pyr_uvec);
 }
 
 extern "C"
 void detail_restoreImageFromLaplacePyrGpu(
         struct TensorArray pyr) {
     std::vector<cv::UMat> pyr_uvec = get_vec_UMat(pyr.toMatList());
-    cv::detail::restoreImageFromLaplacePyrGpu(pyr_uvec);
+    detail::restoreImageFromLaplacePyrGpu(pyr_uvec);
 }
 
 //Blender
@@ -3302,15 +3293,14 @@ extern "C"
 struct BlenderPtr Blender_ctor(
         int type, bool try_gpu)
 {
-    return rescueObjectFromPtr(cv::detail::Blender::createDefault(type, try_gpu));
+    return rescueObjectFromPtr(detail::Blender::createDefault(type, try_gpu));
 }
 
 extern "C"
 void Blender_dtor(
         struct BlenderPtr ptr)
 {
-    ptr->~Blender();
-    delete static_cast<cv::detail::Blender *>(ptr.ptr);
+    delete static_cast<detail::Blender *>(ptr.ptr);
 }
 
 extern "C"
@@ -3350,7 +3340,7 @@ extern "C"
 struct FeatherBlenderPtr FeatherBlender_ctor(
         float sharpness)
 {
-    return new cv::detail::FeatherBlender(sharpness);
+    return new detail::FeatherBlender(sharpness);
 }
 
 extern "C"
@@ -3406,7 +3396,7 @@ extern "C"
 struct MultiBandBlenderPtr MultiBandBlender_ctor(
         int try_gpu, int num_bands, int weight_type)
 {
-    return new cv::detail::MultiBandBlender(try_gpu, num_bands, weight_type);
+    return new detail::MultiBandBlender(try_gpu, num_bands, weight_type);
 }
 
 extern "C"
@@ -3485,10 +3475,10 @@ struct ClassArray Stitcher_cameras(
 }
 
 extern "C"
-struct IntArray Stitcher_component(
+struct TensorWrapper Stitcher_component(
         struct StitcherPtr ptr)
 {
-    return IntArray(ptr->component());
+    return TensorWrapper(cv::Mat(ptr->component(), true));
 }
 
 extern "C"
@@ -3591,7 +3581,7 @@ extern "C"
 void Stitcher_setBlender(
         struct StitcherPtr ptr, struct BlenderPtr b)
 {
-    cv::Ptr<cv::detail::Blender> p(static_cast<cv::detail::Blender *>(b.ptr));
+    cv::Ptr<detail::Blender> p(static_cast<detail::Blender *>(b.ptr));
     rescueObjectFromPtr(p);
     ptr->setBlender(p);
 }
@@ -3600,7 +3590,7 @@ extern "C"
 void Stitcher_setBundleAdjuster(
         struct StitcherPtr ptr, struct BundleAdjusterBasePtr bundle_adjuster)
 {
-    cv::Ptr<cv::detail::BundleAdjusterBase> p(static_cast<cv::detail::BundleAdjusterBase *>(bundle_adjuster.ptr));
+    cv::Ptr<detail::BundleAdjusterBase> p(static_cast<detail::BundleAdjusterBase *>(bundle_adjuster.ptr));
     rescueObjectFromPtr(p);
     ptr->setBundleAdjuster(p);
 }
@@ -3616,8 +3606,8 @@ extern "C"
 void Stitcher_setExposureCompensator(
         struct StitcherPtr ptr, struct ExposureCompensatorPtr exposure_comp)
 {
-    cv::Ptr<cv::detail::ExposureCompensator>
-            p(static_cast<cv::detail::ExposureCompensator *>(exposure_comp.ptr));
+    cv::Ptr<detail::ExposureCompensator>
+            p(static_cast<detail::ExposureCompensator *>(exposure_comp.ptr));
     rescueObjectFromPtr(p);
     ptr->setExposureCompensator(p);
 }
@@ -3626,8 +3616,8 @@ extern "C"
 void Stitcher_setFeaturesFinder(
         struct StitcherPtr ptr, struct FeaturesFinderPtr features_finder)
 {
-    cv::Ptr<cv::detail::FeaturesFinder>
-            p(static_cast<cv::detail::FeaturesFinder *>(features_finder.ptr));
+    cv::Ptr<detail::FeaturesFinder>
+            p(static_cast<detail::FeaturesFinder *>(features_finder.ptr));
     rescueObjectFromPtr(p);
     ptr->setFeaturesFinder(p);
 }
@@ -3636,8 +3626,8 @@ extern "C"
 void Stitcher_setFeaturesMatcher(
         struct StitcherPtr ptr, FeaturesMatcherPtr features_matcher)
 {
-    cv::Ptr<cv::detail::FeaturesMatcher>
-            p(static_cast<cv::detail::FeaturesMatcher *>(features_matcher.ptr));
+    cv::Ptr<detail::FeaturesMatcher>
+            p(static_cast<detail::FeaturesMatcher *>(features_matcher.ptr));
     rescueObjectFromPtr(p);
     ptr->setFeaturesMatcher(p);
 }
@@ -3675,8 +3665,8 @@ extern "C"
 void Stitcher_setSeamFinder(
         struct StitcherPtr ptr, struct SeamFinderPtr seam_finder)
 {
-    cv::Ptr<cv::detail::SeamFinder>
-            p(static_cast<cv::detail::SeamFinder *>(seam_finder.ptr));
+    cv::Ptr<detail::SeamFinder>
+            p(static_cast<detail::SeamFinder *>(seam_finder.ptr));
     rescueObjectFromPtr(p);
     ptr->setSeamFinder(p);
 }
@@ -3701,9 +3691,9 @@ extern "C"
 void Stitcher_setWaveCorrectKind(
         struct StitcherPtr ptr, int kind)
 {
-    cv::detail::WaveCorrectKind wave;
-    if(kind == 0) wave = cv::detail::WAVE_CORRECT_HORIZ;
-    else wave = cv::detail::WAVE_CORRECT_VERT;
+    detail::WaveCorrectKind wave;
+    if(kind == 0) wave = detail::WAVE_CORRECT_HORIZ;
+    else wave = detail::WAVE_CORRECT_VERT;
     ptr->setWaveCorrectKind(wave);
 }
 

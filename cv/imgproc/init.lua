@@ -245,14 +245,14 @@ struct TensorWrapper undistortPoints(
 
 struct TensorWrapper calcHist(
         struct TensorArray images,
-        struct IntArray channels, struct TensorWrapper mask,
-        struct TensorWrapper hist, int dims, struct IntArray histSize,
-        struct FloatArrayOfArrays ranges, bool uniform, bool accumulate);
+        struct TensorWrapper channels, struct TensorWrapper mask,
+        struct TensorWrapper hist, int dims, struct TensorWrapper histSize,
+        struct TensorWrapper ranges, bool uniform, bool accumulate);
 
 struct TensorWrapper calcBackProject(
         struct TensorArray images, int nimages,
-        struct IntArray channels, struct TensorWrapper hist,
-        struct TensorWrapper backProject, struct FloatArrayOfArrays ranges,
+        struct TensorWrapper channels, struct TensorWrapper hist,
+        struct TensorWrapper backProject, struct TensorWrapper ranges,
         double scale, bool uniform);
 
 double compareHist(
@@ -1563,29 +1563,21 @@ function cv.calcHist(t)
         {"dims", required = true},
         {"histSize", required = true},
         {"ranges", required = true},
-        {"uniform", default = nil},
+        {"uniform", default = true},
         {"accumulate", default = false}
     }
     local images, channels, mask, hist, dims, histSize, ranges, uniform, accumulate = cv.argcheck(t, argRules)
-    assert(type(images) == "table")
-    if type(channels) == "table" then
-        channels = cv.newArray('Int', channels)
-    end
-    if type(histSize) == "table" then
-        histSize = cv.newArray('Int', histSize)
-    end
-    if type(ranges) == "table" then
-        ranges = cv.FloatArrayOfArrays(ranges)
-    end
-    if uniform == nil then
-        uniform = true
-    end
+
+    assert(type(images) == 'table')
+    assert(torch.isTensor(channels) and channels:type() == 'torch.IntTensor')
+    assert(torch.isTensor(histSize) and histSize:type() == 'torch.IntTensor')
+    assert(torch.isTensor(ranges) and ranges:type() == 'torch.FloatTensor')
     assert(hist or accumulate == false)
 
     return cv.unwrap_tensors(
         C.calcHist(
-            cv.wrap_tensors(images), channels, cv.wrap_tensor(mask),
-            cv.wrap_tensor(hist), dims, histSize, ranges, uniform, accumulate))
+            cv.wrap_tensors(images), cv.wrap_tensor(channels), cv.wrap_tensor(mask),
+            cv.wrap_tensor(hist), dims, histSize, cv.wrap_tensor(ranges), uniform, accumulate))
 end
 
 
@@ -1601,21 +1593,15 @@ function cv.calcBackProject(t)
         {"uniform", default = nil}
     }
     local images, nimages, channels, hist, backProject, ranges, scale, uniform = cv.argcheck(t, argRules)
+
     assert(type(images) == "table")
-    if type(channels) == "table" then
-        channels = cv.newArray('Int', channels)
-    end
-    if type(ranges) == "table" then
-        ranges = cv.FloatArrayOfArrays(ranges)
-    end
-    if uniform == nil then
-        uniform = true
-    end
+    assert(torch.isTensor(channels) and channels:type() == 'torch.IntTensor')
+    assert(torch.isTensor(ranges) and ranges:type() == 'torch.FloatTensor')
 
     return cv.unwrap_tensors(
         C.calcBackProject(
-            cv.wrap_tensors(images), nimages, channels, cv.wrap_tensor(hist),
-            cv.wrap_tensor(backProject), ranges, scale, uniform))
+            cv.wrap_tensors(images), nimages, cv.wrap_tensor(channels), cv.wrap_tensor(hist),
+            cv.wrap_tensor(backProject), cv.wrap_tensor(ranges), scale, uniform))
 end
 
 

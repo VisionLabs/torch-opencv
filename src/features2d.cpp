@@ -282,14 +282,14 @@ struct TensorArray MSER_detectRegions(struct MSERPtr ptr,
         struct TensorWrapper image, struct TensorWrapper bboxes)
 {
     std::vector<std::vector<cv::Point>> result;
-    cv::Mat bboxesMat = bboxes;
+    cv::Mat bboxesMat = bboxes.toMat();
     std::vector<cv::Rect> bboxesVec(bboxesMat.rows);
     for (int row = 0; row < bboxesMat.rows; ++row) {
         int *rowPtr = reinterpret_cast<int*>(bboxesMat.ptr(row));
         bboxesVec[row].x = *rowPtr++;
         bboxesVec[row].y = *rowPtr++;
         bboxesVec[row].width = *rowPtr++;
-        bboxesVec[row].height = *rowPtr++;
+        bboxesVec[row].height = *rowPtr;
     }
 
     ptr->detectRegions(image.toMat(), result, bboxesVec);
@@ -300,7 +300,7 @@ struct TensorArray MSER_detectRegions(struct MSERPtr ptr,
         *rowPtr++ = bboxesVec[row].x;
         *rowPtr++ = bboxesVec[row].y;
         *rowPtr++ = bboxesVec[row].width;
-        *rowPtr++ = bboxesVec[row].height;
+        *rowPtr   = bboxesVec[row].height;
     }
 
     TensorArray retval;
@@ -308,7 +308,7 @@ struct TensorArray MSER_detectRegions(struct MSERPtr ptr,
     retval.tensors = static_cast<TensorWrapper *>(
             malloc(retval.size * sizeof(TensorWrapper)));
     for (int i = 0; i < result.size(); ++i) {
-        new (retval.tensors + i) TensorWrapper(MatT(cv::Mat(result[i])));
+        new (retval.tensors + i) TensorWrapper(cv::Mat(result[i], true));
     }
     new (retval.tensors + retval.size - 1) TensorWrapper(bboxesMat);
 
@@ -988,7 +988,7 @@ struct TensorWrapper computeRecallPrecisionCurve(
 
     std::vector<cv::Point2f> result;
     cv::computeRecallPrecisionCurve(matches1to2, correctMatches1to2MaskVec, result);
-    return TensorWrapper(MatT(cv::Mat(result)));
+    return TensorWrapper(cv::Mat(result, true));
 }
 
 extern "C"

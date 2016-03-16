@@ -371,37 +371,17 @@ struct Point2fPlusInt {
 
 /***************** Other helper structs *****************/
 
-//string
-
-struct StringWrapper {
-    const char *str;
-};
-
 // Arrays
 
 struct StringArray {
-    struct StringWrapper *data;
+    char **data;
     int size;
 
-    StringArray() {}
-    StringArray(const std::vector<cv::String> vec);
+    StringArray(int size):
+        size(size),
+        data(static_cast<char **>(malloc(size * sizeof(char*)))) {}
 
     operator std::vector<cv::String>();
-
-};
-
-struct IntArray {
-    int *data;
-    int size;
-
-    IntArray() {}
-    IntArray(const std::vector<int> vec);
-
-    inline std::vector<int>& toIntList(std::vector<int>& res) {
-        for (int i = 0; i < size; ++i)
-            res.push_back(data[i]);
-        return res;
-    }
 };
 
 struct UCharArray {
@@ -410,12 +390,6 @@ struct UCharArray {
 
     UCharArray() {}
     UCharArray(const std::vector<unsigned char> vec);
-
-    inline std::vector<unsigned char>& toCharList(std::vector<unsigned char>& res) {
-        for (int i = 0; i < size; ++i)
-            res.push_back(data[i]);
-        return res;
-    }
 };
 
 struct FloatArray {
@@ -424,12 +398,6 @@ struct FloatArray {
 
     FloatArray() {}
     FloatArray(const std::vector<float> vec);
-
-    std::vector<float>& toFloatList(std::vector<float>& res) {
-        for (int i = 0; i < size; ++i)
-            res.push_back(data[i]);
-        return res;
-    }
 };
 
 struct DoubleArray {
@@ -438,12 +406,6 @@ struct DoubleArray {
 
     DoubleArray() {}
     DoubleArray(const std::vector<double> vec);
-
-    std::vector<double>& toFloatList(std::vector<double>& res) {
-        for (int i = 0; i < size; ++i)
-            res.push_back(data[i]);
-        return res;
-    }
 };
 
 struct PointArray {
@@ -468,8 +430,6 @@ struct SizeArray {
     struct SizeWrapper *data;
     int size;
 
-    SizeArray() {}
-    SizeArray(const std::vector<cv::Size> & vec);
     operator std::vector<cv::Size>();
 };
 

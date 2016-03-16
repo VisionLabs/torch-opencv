@@ -278,12 +278,8 @@ struct PointArrayOfArrays {
     int *sizes;
 };
 
-struct StringWrapper {
-    const char *str;
-};
-
 struct StringArray {
-    struct StringWrapper *data;
+    char **data;
     int size;
 };
 
@@ -530,10 +526,6 @@ function cv.RotatedRect(...)
     return ffi.new('struct RotatedRectWrapper', ...)
 end
 
-function cv.String(...)
-    return ffi.new('struct StringWrapper', ...)
-end
-
 --- ***************** Other helper structs *****************
 
 --[[
@@ -693,12 +685,7 @@ function cv.gcarray(array)
     return array
 end
 
-function cv.unwrap_string(array)
-    if ffi.istype('struct StringWrapper', array) then
-        array.str = ffi.gc(array.str, C.free)
-        return ffi.string(array.str)
-    end
-
+function cv.unwrap_strings(array)
     array.data = ffi.gc(array.data, C.free)
 
     local string_array = {}

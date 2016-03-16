@@ -226,10 +226,10 @@ extern "C"
 struct TensorWrapper TrainData_getSample(
         struct TrainDataPtr ptr, struct TensorWrapper varIdx, int sidx)
 {
-    cv::Mat varIdxMat = varIdx;
+    cv::Mat varIdxMat = varIdx.toMat();
     std::vector<float> output(varIdxMat.rows * varIdxMat.cols);
     ptr->getSample(varIdxMat, sidx, output.data());
-    return TensorWrapper(MatT(cv::Mat(output)));
+    return TensorWrapper(cv::Mat(output, true));
 }
 
 extern "C"
@@ -243,20 +243,20 @@ extern "C"
 struct TensorWrapper TrainData_getValues(
         struct TrainDataPtr ptr, int vi, struct TensorWrapper sidx)
 {
-    cv::Mat sidxMat = sidx;
+    cv::Mat sidxMat = sidx.toMat();
     std::vector<float> output(sidxMat.rows * sidxMat.cols);
     ptr->getValues(vi, sidxMat, output.data());
-    return TensorWrapper(MatT(cv::Mat(output)));
+    return TensorWrapper(cv::Mat(output, true));
 }
 
 extern "C"
 struct TensorWrapper TrainData_getNormCatValues(
         struct TrainDataPtr ptr, int vi, struct TensorWrapper sidx)
 {
-    cv::Mat sidxMat = sidx;
+    cv::Mat sidxMat = sidx.toMat();
     std::vector<int> output(sidxMat.rows * sidxMat.cols);
     ptr->getNormCatValues(vi, sidxMat, output.data());
-    return TensorWrapper(MatT(cv::Mat(output)));
+    return TensorWrapper(cv::Mat(output, true));
 }
 
 extern "C"
@@ -833,7 +833,7 @@ struct TensorWrapper DTrees_getPriors(struct DTreesPtr ptr)
 extern "C"
 struct TensorWrapper DTrees_getRoots(struct DTreesPtr ptr)
 {
-    return TensorWrapper(MatT(cv::Mat(ptr->getRoots())));
+    return TensorWrapper(cv::Mat(ptr->getRoots(), true));
 }
 
 extern "C"
@@ -859,7 +859,7 @@ struct ConstSplitArray DTrees_getSplits(struct DTreesPtr ptr)
 extern "C"
 struct TensorWrapper DTrees_getSubsets(struct DTreesPtr ptr)
 {
-    return TensorWrapper(MatT(cv::Mat(ptr->getSubsets())));
+    return TensorWrapper(cv::Mat(ptr->getSubsets(), true));
 }
 
 // RTrees

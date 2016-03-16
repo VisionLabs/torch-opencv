@@ -678,33 +678,49 @@ struct TensorWrapper undistortPoints(
 extern "C"
 struct TensorWrapper calcHist(
         struct TensorArray images,
-        struct IntArray channels, struct TensorWrapper mask,
-        struct TensorWrapper hist, int dims, struct IntArray histSize,
-        struct FloatArrayOfArrays ranges, bool uniform, bool accumulate)
+        struct TensorWrapper channels, struct TensorWrapper mask,
+        struct TensorWrapper hist, int dims, struct TensorWrapper histSize,
+        struct TensorWrapper ranges, bool uniform, bool accumulate)
 {
     auto imagesVec = images.toMatList();
     MatT hist_mat;
-    if(!hist.isNull()) hist_mat = hist.toMatT();
+    if (!hist.isNull()) hist_mat = hist.toMatT();
+    cv::Mat channelsMat = channels.toMat();
+    cv::Mat histSizeMat = histSize.toMat();
+    cv::Mat rangesMat = ranges.toMat();
+    std::vector<float *> rangesVec(rangesMat.rows);
+    for (int i = 0; i < rangesVec.size(); ++i) {
+        rangesVec[i] = reinterpret_cast<float *>(rangesMat.row(i).data);
+    }
+
     cv::calcHist(
-            imagesVec.data(), imagesVec.size(), channels.data, TO_MAT_OR_NOARRAY(mask),
-            hist_mat, dims, histSize.data, const_cast<const float**>(ranges.pointers),
-            uniform, accumulate);
+            imagesVec.data(), imagesVec.size(), reinterpret_cast<int*>(channelsMat.data),
+            TO_MAT_OR_NOARRAY(mask), hist_mat, dims, reinterpret_cast<int*>(histSizeMat.data),
+            const_cast<const float**>(rangesVec.data()), uniform, accumulate);
     return TensorWrapper(hist_mat);
 }
 
 extern "C"
 struct TensorWrapper calcBackProject(
         struct TensorArray images, int nimages,
-        struct IntArray channels, struct TensorWrapper hist,
-        struct TensorWrapper backProject, struct FloatArrayOfArrays ranges,
+        struct TensorWrapper channels, struct TensorWrapper hist,
+        struct TensorWrapper backProject, struct TensorWrapper ranges,
         double scale, bool uniform)
 {
     auto imagesVec = images.toMatList();
     MatT backProject_mat;
     if(!backProject.isNull()) backProject_mat = backProject.toMatT();
+
+    cv::Mat channelsMat = channels.toMat();
+    cv::Mat rangesMat = ranges.toMat();
+    std::vector<float *> rangesVec(rangesMat.rows);
+    for (int i = 0; i < rangesVec.size(); ++i) {
+        rangesVec[i] = reinterpret_cast<float *>(rangesMat.row(i).data);
+    }
+
     cv::calcBackProject(
-                imagesVec.data(), nimages, channels.data, hist.toMat(), backProject_mat,
-                const_cast<const float **>(ranges.pointers), scale, uniform);
+                imagesVec.data(), nimages, reinterpret_cast<int*>(channelsMat.data), hist.toMat(),
+                backProject_mat, const_cast<const float **>(rangesVec.data()), scale, uniform);
     return TensorWrapper(backProject_mat);
 }
 
@@ -1220,7 +1236,7 @@ struct TensorWrapper ellipse2Poly(
 {
     std::vector<cv::Point> result;
     cv::ellipse2Poly(center, axes, angle, arcStart, arcEnd, delta, result);
-    return TensorWrapper(MatT(cv::Mat(result)));
+    return TensorWrapper(cv::Mat(result, true));
 }
 
 extern "C"
@@ -1667,31 +1683,31 @@ struct Point2fPlusInt Subdiv2D_findNearest(struct Subdiv2DPtr ptr, struct Point2
 extern "C"
 struct TensorWrapper Subdiv2D_getEdgeList(struct Subdiv2DPtr ptr)
 {
-    auto result = new std::vector<cv::Vec4f>;
-    ptr->getEdgeList(*result);
-    return TensorWrapper(MatT(cv::Mat(*result, false)));
+    std::vector<cv::Vec4f> result;
+    ptr->getEdgeList(result);
+    return TensorWrapper(cv::Mat(result, true));
 }
 
 extern "C"
 struct TensorWrapper Subdiv2D_getTriangleList(struct Subdiv2DPtr ptr)
 {
-    auto result = new std::vector<cv::Vec6f>;
-    ptr->getTriangleList(*result);
-    return TensorWrapper(MatT(cv::Mat(*result, false)));
+    std::vector<cv::Vec6f> result;
+    ptr->getTriangleList(result);
+    return TensorWrapper(cv::Mat(result, true));
 }
 
 extern "C"
 struct TensorArray Subdiv2D_getVoronoiFacetList(struct Subdiv2DPtr ptr, struct TensorWrapper idx)
 {
-    auto facetList = new std::vector<std::vector<cv::Point2f>>;
-    auto facetCenters = new std::vector<cv::Point2f>;
-    ptr->getVoronoiFacetList(idx.toMat(), *facetList, *facetCenters);
+    std::vector<std::vector<cv::Point2f>> facetList;
+    std::vector<cv::Point2f> facetCenters;
+    ptr->getVoronoiFacetList(idx.toMat(), facetList, facetCenters);
 
-    std::vector<MatT> retval(facetList->size() + 1);
-    for (int i = 0; i < facetList->size(); ++i) {
-        new (&retval[i + 1]) MatT(cv::Mat((*facetList)[i]));
+    std::vector<cv::Mat> retval(facetList.size() + 1);
+    for (int i = 0; i < facetList.size(); ++i) {
+        new (&retval[i + 1]) cv::Mat(facetList[i]);
     }
-    new (&retval[retval.size() - 1]) MatT(cv::Mat(*facetCenters));
+    new (&retval[retval.size() - 1]) cv::Mat(facetCenters);
 
     return TensorArray(retval);
 }

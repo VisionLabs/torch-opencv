@@ -361,6 +361,11 @@ FloatArray::FloatArray(const std::vector<float> vec) {
     memcpy(this->data, vec.data(), this->size * sizeof(float));
 }
 
+DoubleArray::DoubleArray(const std::vector<double> vec) {
+    this->size = vec.size();
+    memcpy(this->data, vec.data(), this->size * sizeof(double));
+}
+
 Vec3dWrapper & Vec3dWrapper::operator=(cv::Vec3d & other) {
    this->v0 = other[0];
    this->v1 = other[1];
@@ -454,6 +459,12 @@ RectArray::RectArray(const std::vector<cv::Rect> & vec) {
 RectArray::operator std::vector<cv::Rect>() {
     std::vector<cv::Rect> retval(this->size);
     memcpy(retval.data(), this->data + 1, this->size * sizeof(RectWrapper));
+    return retval;
+}
+
+SizeArray::operator std::vector<cv::Size>() {
+    std::vector<cv::Size> retval(this->size);
+    memcpy(retval.data(), this->data + 1, this->size * sizeof(SizeWrapper));
     return retval;
 }
 

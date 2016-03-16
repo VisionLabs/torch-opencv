@@ -12,8 +12,7 @@ struct TensorArrayPlusBool imreadmulti(const char *filename, int flags)
     TensorArrayPlusBool retval;
     std::vector<cv::Mat> mats;
     retval.val = cv::imreadmulti(filename, mats, flags);
-    std::vector<MatT> matsT = get_vec_MatT(mats);
-    new (&retval.tensors) TensorArray(matsT);
+    new (&retval.tensors) TensorArray(mats);
     return retval;
 }
 
@@ -38,5 +37,5 @@ struct TensorWrapper imencode(
 {
     std::vector<unsigned char> retval;
     cv::imencode(ext, img.toMat(), retval, params.toMat());
-    return TensorWrapper(MatT(cv::Mat(retval)));
+    return TensorWrapper(cv::Mat(retval, true));
 }

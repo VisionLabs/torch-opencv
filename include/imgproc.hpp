@@ -303,15 +303,15 @@ struct TensorWrapper undistortPoints(
 extern "C"
 struct TensorWrapper calcHist(
         struct TensorArray images,
-        struct IntArray channels, struct TensorWrapper mask,
-        struct TensorWrapper hist, int dims, struct IntArray histSize,
-        struct FloatArrayOfArrays ranges, bool uniform, bool accumulate);
+        struct TensorWrapper channels, struct TensorWrapper mask,
+        struct TensorWrapper hist, int dims, struct TensorWrapper histSize,
+        struct TensorWrapper ranges, bool uniform, bool accumulate);
 
 extern "C"
 struct TensorWrapper calcBackProject(
         struct TensorArray images, int nimages,
-        struct IntArray channels, struct TensorWrapper hist,
-        struct TensorWrapper backProject, struct FloatArrayOfArrays ranges,
+        struct TensorWrapper channels, struct TensorWrapper hist,
+        struct TensorWrapper backProject, struct TensorWrapper ranges,
         double scale, bool uniform);
 
 extern "C"

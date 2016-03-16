@@ -47,7 +47,7 @@ struct PointWrapper detail_resultTl(
 	struct PointArray corners);
 
 extern "C"
-struct IntArray detail_selectRandomSubset(
+struct TensorWrapper detail_selectRandomSubset(
 	int count, int size);
 
 extern "C"
@@ -395,10 +395,9 @@ void BestOf2NearestRangeMatcher_call(
 
 //**********************Rotation Estimation********************************
 
-
-struct GraphPtrPlusIntArray {
+struct GraphPtrPlusTensor {
 	struct GraphPtr graph;
-	struct IntArray array;
+	struct TensorWrapper tensor;
 };
 
 struct BoolPlusClassArray {
@@ -407,15 +406,15 @@ struct BoolPlusClassArray {
 };
 
 extern "C"
-struct GraphPtrPlusIntArray detail_findMaxSpanningTree(
+struct GraphPtrPlusTensor detail_findMaxSpanningTree(
 		int num_images, struct ClassArray pairwise_matches);
 
 extern "C"
-struct IntArray detail_leaveBiggestComponent(
+struct TensorWrapper detail_leaveBiggestComponent(
 		struct ClassArray features, struct ClassArray pairwise_matches, float conf_threshold);
 
 extern "C"
-struct StringWrapper detail_matchesGraphAsString(
+struct StringArray detail_matchesGraphAsString(
 		struct StringArray pathes, struct ClassArray pairwise_matches, float conf_threshold);
 
 extern "C"
@@ -534,7 +533,7 @@ struct TensorPlusBool detail_calibrateRotatingCamera(
 		struct TensorArray Hs);
 
 extern "C"
-struct DoubleArray detail_estimateFocal(
+struct TensorWrapper detail_estimateFocal(
 		struct ClassArray features, struct ClassArray pairwise_matches);
 
 extern "C"
@@ -2559,7 +2558,7 @@ void GainCompensator_feed(
 		struct TensorArray images, struct TensorArray mat, struct UCharArray chr);
 
 extern "C"
-struct DoubleArray GainCompensator_gains(
+struct TensorWrapper GainCompensator_gains(
 		struct GainCompensatorPtr ptr);
 
 //NoExposureCompensator
@@ -2762,7 +2761,7 @@ struct ClassArray Stitcher_cameras(
 		struct StitcherPtr ptr);
 
 extern "C"
-struct IntArray Stitcher_component(
+struct TensorWrapper Stitcher_component(
 		struct StitcherPtr ptr);
 
 extern "C"
