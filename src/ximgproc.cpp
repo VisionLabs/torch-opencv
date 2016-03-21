@@ -62,7 +62,8 @@ int GraphSegmentation_getMinSize(struct GraphSegmentationPtr ptr) {
 }
 
 
-
+// See #103
+#ifndef APPLE
 
 // SelectiveSearchSegmentation
 
@@ -134,3 +135,4 @@ struct RectArray SelectiveSearchSegmentation_process(struct SelectiveSearchSegme
 
     return RectArray(result);
 }
+#endif
