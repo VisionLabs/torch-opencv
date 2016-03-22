@@ -356,13 +356,41 @@ KeyPointArray::operator std::vector<cv::KeyPoint>()
     return retval;
 }
 
+BoolArray::BoolArray(const std::vector<bool> vec) {
+    this->size = vec.size();
+    this->data = static_cast<bool *>(malloc(sizeof(bool) * this->size));
+    for(int i = 0; i < vec.size(); i++){
+        this->data[i] = vec[i];
+    }
+}
+
+BoolArray::operator std::vector<bool>()
+{
+    std::vector<bool> retval(this->size);
+    for (int i = 0; i < this->size; i++) {
+        retval[i] = this->data[i];
+    }
+    return retval;
+}
+
 FloatArray::FloatArray(const std::vector<float> vec) {
     this->size = vec.size();
+    this->data = static_cast<float *>(malloc(sizeof(float) * this->size));
     memcpy(this->data, vec.data(), this->size * sizeof(float));
+}
+
+FloatArray::operator std::vector<float>()
+{
+    std::vector<float> retval(this->size);
+    for (int i = 0; i < this->size; i++) {
+        retval[i] = this->data[i];
+    }
+    return retval;
 }
 
 DoubleArray::DoubleArray(const std::vector<double> vec) {
     this->size = vec.size();
+    this->data = static_cast<double *>(malloc(sizeof(double) * this->size));
     memcpy(this->data, vec.data(), this->size * sizeof(double));
 }
 

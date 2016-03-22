@@ -2,7 +2,6 @@
 #include <Classes.hpp>
 #include <opencv2/ximgproc.hpp>
 
-
 extern "C"
 struct TensorWrapper niBlackThreshold(struct TensorWrapper src, struct TensorWrapper dst, double maxValue, int type, int blockSize, double delta);
 

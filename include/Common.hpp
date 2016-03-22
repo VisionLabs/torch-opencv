@@ -392,12 +392,24 @@ struct UCharArray {
     UCharArray(const std::vector<unsigned char> vec);
 };
 
+struct BoolArray {
+    bool *data;
+    int size;
+
+    BoolArray() {}
+    BoolArray(const std::vector<bool> vec);
+
+    operator std::vector<bool>();
+};
+
 struct FloatArray {
     float *data;
     int size;
 
     FloatArray() {}
     FloatArray(const std::vector<float> vec);
+
+    operator std::vector<float>();
 };
 
 struct DoubleArray {
