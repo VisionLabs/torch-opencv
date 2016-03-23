@@ -12,19 +12,21 @@ if not image then
     os.exit(0)
 end
 
-local x = torch.ByteTensor(100,1):fill(0)
-local y = torch.ByteTensor(100,1):fill(1)
+--cv.test()
 
---[[
-local temp = cv.CvFeatureParams{
-    type = 0,
-    featureType = 0}
+local temp = cv.MultiTracker{"TLD"}
+local rect_array = {}
 
-local v1, v2, v3 = temp:printAttrs	{
-    posx = x,
-    negx = y,
-    x = 3,
-    log = false }
+local rect = cv.Rect2d(2,2,20,20)
+rect_array[1] = rect
+rect_array[2] = rect
+
+local array = cv.newArray("cv.Rect2d", rect_array)
+
+local v1, v2, v3 = temp:update{
+    trackerType = "TLD",
+    image = image,
+    boundingBox = array}
 --[[
 ]]
 print(temp)

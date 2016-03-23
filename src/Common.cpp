@@ -373,6 +373,21 @@ BoolArray::operator std::vector<bool>()
     return retval;
 }
 
+IntArray::IntArray(const std::vector<int> vec) {
+    this->size = vec.size();
+    this->data = static_cast<int *>(malloc(sizeof(int) * this->size));
+    memcpy(this->data, vec.data(), this->size * sizeof(int));
+}
+
+IntArray::operator std::vector<int>()
+{
+    std::vector<int> retval(this->size);
+    for (int i = 0; i < this->size; i++) {
+        retval[i] = this->data[i];
+    }
+    return retval;
+}
+
 FloatArray::FloatArray(const std::vector<float> vec) {
     this->size = vec.size();
     this->data = static_cast<float *>(malloc(sizeof(float) * this->size));
@@ -428,6 +443,15 @@ RotatedRectWrapper::RotatedRectWrapper(const cv::RotatedRect & other) {
     this->size = other.size;
     this->angle = other.angle;
 }
+
+Rect2dWrapper::Rect2dWrapper(const cv::Rect2d & other) {
+    this->x = other.x;
+    this->y = other.y;
+    this->width = other.width;
+    this->height = other.height;
+}
+
+
 
 Size2fWrapper::Size2fWrapper(const cv::Size2f & other) {
     this->height = other.height;
@@ -487,6 +511,21 @@ RectArray::RectArray(const std::vector<cv::Rect> & vec) {
 RectArray::operator std::vector<cv::Rect>() {
     std::vector<cv::Rect> retval(this->size);
     memcpy(retval.data(), this->data + 1, this->size * sizeof(RectWrapper));
+    return retval;
+}
+
+Rect2dArray::Rect2dArray(const std::vector<cv::Rect2d> & vec) {
+    this->data = static_cast<Rect2dWrapper *>(malloc((vec.size() + 1) * sizeof(Rect2dWrapper)));
+    this->size = vec.size();
+
+    for (int i = 0; i < vec.size(); ++i) {
+        this->data[i + 1] = vec[i];
+    }
+}
+
+Rect2dArray::operator std::vector<cv::Rect2d>() {
+    std::vector<cv::Rect2d> retval(this->size);
+    memcpy(retval.data(), this->data + 1, this->size * sizeof(Rect2dWrapper));
     return retval;
 }
 

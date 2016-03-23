@@ -79,6 +79,10 @@ struct RectWrapper {
     int x, y, width, height;
 };
 
+struct Rect2dWrapper {
+    double x, y, width, height;
+};
+
 struct PointWrapper {
     int x, y;
 };
@@ -221,6 +225,11 @@ struct UCharArray {
     int size;
 };
 
+struct BoolArray {
+    bool *data;
+    int size;
+};
+
 struct FloatArray {
     float *data;
     int size;
@@ -238,6 +247,11 @@ struct PointArray {
 
 struct RectArray {
     struct RectWrapper *data;
+    int size;
+};
+
+struct Rect2dArray {
+    struct Rect2dWrapper *data;
     int size;
 };
 
@@ -480,6 +494,10 @@ end
 
 function cv.Rect(...)
     return ffi.new('struct RectWrapper', ...)
+end
+
+function cv.Rect2d(...)
+    return ffi.new('struct Rect2dWrapper', ...)
 end
 
 function cv.TermCriteria(...)

@@ -2,12 +2,13 @@
 
 extern "C"
 void test(){
-
     cv::Mat img = cv::imread("/home/ainur/torch-opencv/demo/data/lena.jpg");
+    cv::MultiTracker temp = cv::MultiTracker();
+    bool res = temp.add("TLD", img, cv::Rect2d(2,2,20,20));
+    if(res) std::cout << "true" << std::endl;
+    else std::cout << "false" << std::endl;
     cv::imshow("1", img);
     cv::waitKey(0);
-    cv::calcNormFactor(img, img);
-    std::cout << "here" << std::endl;
 }
 
 //WeakClassifierHaarFeature
@@ -22,7 +23,6 @@ extern "C"
 void WeakClassifierHaarFeature_dtor(
         struct WeakClassifierHaarFeaturePtr ptr)
 {
-    ptr->~WeakClassifierHaarFeature();
     delete static_cast<cv::WeakClassifierHaarFeature *>(ptr.ptr);
 }
 
@@ -53,7 +53,6 @@ extern "C"
 void BaseClassifier_dtor(
         struct BaseClassifierPtr ptr)
 {
-    ptr->~BaseClassifier();
     delete static_cast<cv::BaseClassifier *>(ptr.ptr);
 }
 
@@ -161,7 +160,6 @@ extern "C"
 void EstimatedGaussDistribution_dtor(
         struct EstimatedGaussDistributionPtr ptr)
 {
-    ptr->~EstimatedGaussDistribution();
     delete static_cast<cv::EstimatedGaussDistribution *>(ptr.ptr);
 }
 
@@ -209,7 +207,6 @@ extern "C"
 void ClassifierThreshold_dtor(
         struct ClassifierThresholdPtr ptr)
 {
-    ptr->~ClassifierThreshold();
     delete static_cast<cv::ClassifierThreshold *>(ptr.ptr);
 }
 
@@ -240,7 +237,6 @@ extern "C"
 void ClfMilBoost_dtor(
         struct ClfMilBoostPtr ptr)
 {
-    ptr->~ClfMilBoost();
     delete static_cast<cv::ClfMilBoost *>(ptr.ptr);
 }
 
@@ -331,7 +327,6 @@ extern "C"
 void CvParams_dtor(
         struct CvParamsPtr ptr)
 {
-    ptr->~CvParams();
     delete static_cast<cv::CvParams *>(ptr.ptr);
 }
 
@@ -478,7 +473,6 @@ extern "C"
 void CvFeatureEvaluator_dtor(
         struct CvFeatureEvaluatorPtr ptr)
 {
-    ptr->~CvFeatureEvaluator();
     delete static_cast<cv::CvFeatureEvaluator *>(ptr.ptr);
 }
 
@@ -600,4 +594,376 @@ void CvHaarEvaluator_setImage(
         unsigned char clsLabel, int idx)
 {
     ptr->setImage(img.toMat(), clsLabel, idx);
+}
+
+extern "C"
+void CvHaarEvaluator_setWinSize(
+        struct CvHaarEvaluatorPtr ptr, struct SizeWrapper patchSize)
+{
+    ptr->setWinSize(patchSize);
+}
+
+extern "C"
+struct SizeWrapper CvHaarEvaluator_setWinSize2(
+        struct CvHaarEvaluatorPtr ptr)
+{
+    return SizeWrapper(ptr->setWinSize());
+}
+
+extern "C"
+void CvHaarEvaluator_writeFeature(
+        struct CvHaarEvaluatorPtr ptr, struct FileStoragePtr fs)
+{
+    ptr->writeFeature(*fs);
+}
+
+extern "C"
+void CvHaarEvaluator_writeFeatures(
+        struct CvHaarEvaluatorPtr ptr, struct FileStoragePtr fs,
+        struct TensorWrapper featureMap)
+{
+    ptr->writeFeatures(*fs, featureMap.toMat());
+}
+
+//CvHOGEvaluator
+
+extern "C"
+struct CvHOGEvaluatorPtr CvHOGEvaluator_ctor()
+{
+//TODO undefined symbol: _ZTVN2cv14CvHOGEvaluatorE
+//    return new cv::CvHOGEvaluator();
+}
+
+extern "C"
+void CvHOGEvaluator_dtor(
+        struct CvHOGEvaluatorPtr ptr)
+{
+    delete static_cast<cv::CvHOGEvaluator *>(ptr.ptr);
+}
+
+extern "C"
+void CvHOGEvaluator_init(
+        struct CvHOGEvaluatorPtr ptr, struct CvFeatureParamsPtr _featureParams,
+        int _maxSampleCount, struct SizeWrapper _winSize)
+{
+    ptr->init(static_cast<cv::CvFeatureParams *>(ptr.ptr), _maxSampleCount, _winSize);
+}
+
+extern "C"
+float CvHOGEvaluator_call(
+        struct CvHOGEvaluatorPtr ptr, int featureIdx, int sampleIdx)
+{
+    ptr->operator()(featureIdx, sampleIdx);
+}
+
+extern "C"
+void CvHOGEvaluator_setImage(
+        struct CvHOGEvaluatorPtr ptr, struct TensorWrapper img,
+        unsigned char clsLabel, int idx)
+{
+    ptr->setImage(img.toMat(), clsLabel, idx);
+}
+
+extern "C"
+void CvHOGEvaluator_writeFeatures(
+        struct CvHOGEvaluatorPtr ptr, struct FileStoragePtr fs,
+        struct TensorWrapper featureMap)
+{
+    ptr->writeFeatures(*fs, featureMap.toMat());
+}
+
+//CvLBPEvaluator
+
+extern "C"
+struct CvLBPEvaluatorPtr CvLBPEvaluator_ctor()
+{
+//TODO undefined symbol
+//    return new cv::CvLBPEvaluator();
+}
+
+extern "C"
+void CvLBPEvaluator_dtor(
+        struct CvLBPEvaluatorPtr ptr)
+{
+    delete static_cast<cv::CvLBPEvaluator *>(ptr.ptr);
+}
+
+extern "C"
+void CvLBPEvaluator_init(
+        struct CvLBPEvaluatorPtr ptr, struct CvFeatureParamsPtr _featureParams,
+        int _maxSampleCount, struct SizeWrapper _winSize)
+{
+    ptr->init(static_cast<cv::CvFeatureParams *>(ptr.ptr), _maxSampleCount, _winSize);
+}
+
+extern "C"
+float CvLBPEvaluator_call(
+        struct CvLBPEvaluatorPtr ptr, int featureIdx, int sampleIdx)
+{
+    ptr->operator()(featureIdx, sampleIdx);
+}
+
+extern "C"
+void CvLBPEvaluator_setImage(
+        struct CvLBPEvaluatorPtr ptr, struct TensorWrapper img,
+        unsigned char clsLabel, int idx)
+{
+    ptr->setImage(img.toMat(), clsLabel, idx);
+}
+
+extern "C"
+void CvLBPEvaluator_writeFeatures(
+        struct CvLBPEvaluatorPtr ptr, struct FileStoragePtr fs,
+        struct TensorWrapper featureMap)
+{
+    ptr->writeFeatures(*fs, featureMap.toMat());
+}
+
+extern "C"
+struct StrongClassifierDirectSelectionPtr StrongClassifierDirectSelection_ctor(
+        int numBaseClf, int numWeakClf, struct SizeWrapper patchSz,
+        struct RectWrapper sampleROI, bool useFeatureEx, int iterationInit)
+{
+    return new cv::StrongClassifierDirectSelection(
+                        numBaseClf, numWeakClf, patchSz,
+                        sampleROI, useFeatureEx, iterationInit);
+}
+
+extern "C"
+void StrongClassifierDirectSelection_dtor(
+        struct StrongClassifierDirectSelectionPtr ptr)
+{
+    delete static_cast<cv::StrongClassifierDirectSelection *>(ptr.ptr);
+}
+
+extern "C"
+struct FloatPlusInt StrongClassifierDirectSelection_classifySmooth(
+        struct StrongClassifierDirectSelectionPtr ptr, struct TensorArray images,
+        struct RectWrapper sampleROI)
+{
+    struct FloatPlusInt result;
+    result.v1 = ptr->classifySmooth(images.toMatList(), sampleROI, result.v2);
+    return result;
+}
+
+extern "C"
+float StrongClassifierDirectSelection_eval(
+        struct StrongClassifierDirectSelectionPtr ptr, struct TensorWrapper response)
+{
+    return ptr->eval(response.toMat());
+}
+
+extern "C"
+int StrongClassifierDirectSelection_getNumBaseClassifier(
+        struct StrongClassifierDirectSelectionPtr ptr)
+{
+    return ptr->getNumBaseClassifier();
+}
+
+extern "C"
+struct SizeWrapper StrongClassifierDirectSelection_getPatchSize(
+        struct StrongClassifierDirectSelectionPtr ptr)
+{
+    return SizeWrapper(ptr->getPatchSize());
+}
+
+extern "C"
+int StrongClassifierDirectSelection_getReplacedClassifier(
+        struct StrongClassifierDirectSelectionPtr ptr)
+{
+    return ptr->getReplacedClassifier();
+}
+
+extern "C"
+struct RectWrapper StrongClassifierDirectSelection_getROI(
+        struct StrongClassifierDirectSelectionPtr ptr)
+{
+    return RectWrapper(ptr->getROI());
+}
+
+extern "C"
+struct IntArray StrongClassifierDirectSelection_getSelectedWeakClassifier(
+        struct StrongClassifierDirectSelectionPtr ptr)
+{
+    return IntArray(ptr->getSelectedWeakClassifier());
+}
+
+extern "C"
+int StrongClassifierDirectSelection_getSwappedClassifier(
+        struct StrongClassifierDirectSelectionPtr ptr)
+{
+    return ptr->getSwappedClassifier();
+}
+
+extern "C"
+bool StrongClassifierDirectSelection_getUseFeatureExchange(
+        struct StrongClassifierDirectSelectionPtr ptr)
+{
+    return ptr->getUseFeatureExchange();
+}
+
+extern "C"
+void StrongClassifierDirectSelection_initBaseClassifier(
+        struct StrongClassifierDirectSelectionPtr ptr)
+{
+    ptr->initBaseClassifier();
+}
+
+extern "C"
+void StrongClassifierDirectSelection_replaceWeakClassifier(
+        struct StrongClassifierDirectSelectionPtr ptr, int idx)
+{
+    ptr->replaceWeakClassifier(idx);
+}
+
+extern "C"
+bool StrongClassifierDirectSelection_update(
+        struct StrongClassifierDirectSelectionPtr ptr, struct TensorWrapper image,
+        int target, float importance)
+{
+    return ptr->update(image.toMat(), target, importance);
+}
+
+extern "C"
+struct DetectorPtr Detector_ctor(
+        struct StrongClassifierDirectSelectionPtr ptr)
+{
+    return new cv::Detector(static_cast<cv::StrongClassifierDirectSelection *>(ptr.ptr));
+}
+
+extern "C"
+void Detector_dtor(
+        struct DetectorPtr ptr)
+{
+    delete static_cast<cv::Detector *>(ptr.ptr);
+}
+
+extern "C"
+void Detector_classifySmooth(
+        struct DetectorPtr ptr, struct TensorArray image, float minMargin)
+{
+    ptr->classifySmooth(image.toMatList(), minMargin);
+}
+
+extern "C"
+float Detector_getConfidence(
+        struct DetectorPtr ptr, int patchIdx)
+{
+    return ptr->getConfidence(patchIdx);
+}
+
+extern "C"
+float Detector_getConfidenceOfBestDetection(
+        struct DetectorPtr ptr)
+{
+    return ptr->getConfidenceOfBestDetection();
+}
+
+extern "C"
+float Detector_getConfidenceOfDetection(
+        struct DetectorPtr ptr, int detectionIdx)
+{
+    return ptr->getConfidenceOfDetection(detectionIdx);
+}
+
+extern "C"
+struct FloatArray Detector_getConfidences(
+        struct DetectorPtr ptr)
+{
+    return FloatArray(ptr->getConfidences());
+}
+
+extern "C"
+struct TensorWrapper Detector_getConfImageDisplay(
+        struct DetectorPtr ptr)
+{
+    cv::Mat mat = ptr->getConfImageDisplay();
+    return TensorWrapper(MatT(mat));
+}
+
+extern "C"
+struct IntArray Detector_getIdxDetections(
+        struct DetectorPtr ptr)
+{
+    ptr->getIdxDetections();
+}
+
+extern "C"
+int Detector_getNumDetections(
+        struct DetectorPtr ptr)
+{
+    return ptr->getNumDetections();
+}
+
+extern "C"
+int Detector_getPatchIdxOfDetection(
+        struct DetectorPtr ptr, int detectionIdx)
+{
+    return ptr->getPatchIdxOfDetection(detectionIdx);
+}
+
+//MultiTracker
+
+extern "C"
+struct MultiTrackerPtr MultiTracker_ctor(
+        const char *trackerType)
+{
+    return new cv::MultiTracker(trackerType);
+}
+
+extern "C"
+void MultiTracker_dtor(
+        struct MultiTrackerPtr ptr)
+{
+    delete static_cast<cv::MultiTracker *>(ptr.ptr);
+}
+
+extern "C"
+bool MultiTracker_add(
+        struct MultiTrackerPtr ptr, struct TensorWrapper image,
+        struct Rect2dWrapper boundingBox)
+{
+    cv::Mat img = cv::imread("/home/ainur/torch-opencv/demo/data/lena.jpg");
+    return ptr->add(img, cv::Rect2d(2,2,20,20));
+}
+
+extern "C"
+bool MultiTracker_add2(
+        struct MultiTrackerPtr ptr, const char *trackerType,
+        struct TensorWrapper image, struct Rect2dWrapper boundingBox)
+{
+    return ptr->add(trackerType, image.toMat(), boundingBox);
+}
+
+extern "C"
+bool MultiTracker_add3(
+        struct MultiTrackerPtr ptr, const char *trackerType,
+        struct TensorWrapper image, struct Rect2dArray boundingBox)
+{
+    return ptr->add(trackerType, image.toMat(), boundingBox);
+}
+
+extern "C"
+bool MultiTracker_add4(
+        struct MultiTrackerPtr ptr, struct TensorWrapper image,
+        struct Rect2dArray boundingBox)
+{
+    return ptr->add(image.toMat(), boundingBox);
+}
+
+extern "C"
+bool MultiTracker_update(
+        struct MultiTrackerPtr ptr, struct TensorWrapper image)
+{
+    return ptr->update(image.toMat());
+}
+
+extern "C"
+struct Rect2dArrayPlusBool MultiTracker_update2(
+        struct MultiTrackerPtr ptr, struct TensorWrapper image)
+{
+    struct Rect2dArrayPlusBool result;
+    std::vector<cv::Rect2d> vec;
+    result.val = ptr->update(image.toMat(), vec);
+    new(&result.rect2d) Rect2dArray(vec);
 }

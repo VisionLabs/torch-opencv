@@ -188,6 +188,14 @@ struct RectWrapper {
     inline RectWrapper() {}
 };
 
+struct Rect2dWrapper {
+    double x, y, width, height;
+
+    inline operator cv::Rect2d() { return cv::Rect2d(x, y, width, height); }
+    Rect2dWrapper(const cv::Rect2d & other);
+    inline Rect2dWrapper() {}
+};
+
 struct PointWrapper {
     int x, y;
 
@@ -402,6 +410,16 @@ struct BoolArray {
     operator std::vector<bool>();
 };
 
+struct IntArray {
+    int *data;
+    int size;
+
+    IntArray() {}
+    IntArray(const std::vector<int> vec);
+
+    operator std::vector<int>();
+};
+
 struct FloatArray {
     float *data;
     int size;
@@ -436,6 +454,15 @@ struct RectArray {
     RectArray() {}
     RectArray(const std::vector<cv::Rect> & vec);
     operator std::vector<cv::Rect>();
+};
+
+struct Rect2dArray {
+    struct Rect2dWrapper *data;
+    int size;
+
+    Rect2dArray() {}
+    Rect2dArray(const std::vector<cv::Rect2d> & vec);
+    operator std::vector<cv::Rect2d>();
 };
 
 struct SizeArray {
