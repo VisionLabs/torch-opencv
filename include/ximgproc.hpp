@@ -76,6 +76,9 @@ struct SelectiveSearchSegmentationStrategyPtr {
 // MULTIPLE STRTEGY
 //
 
+// See #103
+#ifndef APPLE
+
 // SelectiveSearchSegmentation
 struct SelectiveSearchSegmentationPtr {
     void *ptr;
@@ -120,3 +123,5 @@ void SelectiveSearchSegmentation_clearStrategies(struct SelectiveSearchSegmentat
 
 extern "C"
 struct RectArray SelectiveSearchSegmentation_process(struct SelectiveSearchSegmentationPtr ptr);
+
+#endif
