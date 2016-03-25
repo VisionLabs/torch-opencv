@@ -41,6 +41,8 @@ void GraphSegmentation_setMinSize(struct GraphSegmentationPtr ptr, int min_size)
 extern "C"
 int GraphSegmentation_getMinSize(struct GraphSegmentationPtr ptr);
 
+// See #103
+#ifndef APPLE
 
 // SelectiveSearchSegmentationStrategy
 struct SelectiveSearchSegmentationStrategyPtr {
@@ -75,9 +77,6 @@ struct SelectiveSearchSegmentationStrategyPtr {
 
 // MULTIPLE STRTEGY
 //
-
-// See #103
-#ifndef APPLE
 
 // SelectiveSearchSegmentation
 struct SelectiveSearchSegmentationPtr {
