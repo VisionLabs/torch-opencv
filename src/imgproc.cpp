@@ -238,7 +238,7 @@ struct TensorWrapper HoughLines(
         double min_theta, double max_theta)
 {
     MatT lines;
-    cv::HoughLines(image.toMat(), lines, theta, threshold, srn, stn,
+    cv::HoughLines(image.toMat(), lines, rho, theta, threshold, srn, stn,
                    min_theta, max_theta);
     return TensorWrapper(lines);
 }
