@@ -271,13 +271,13 @@ struct TensorPlusRectArray {
 };
 
 struct TensorPlusPoint {
-    struct TensorWrapper tensor;
-    struct PointWrapper point;
-};
 
 struct FloatArrayOfArrays {
     float **pointers;
     float *realData;
+    struct TensorWrapper tensor;
+    struct PointWrapper point;
+};
     int dims;
 };
 
@@ -725,9 +725,13 @@ struct PtrWrapper ImageFeatures_dtor(
 
 void CameraParams_dtor(
 	struct PtrWrapper ptr);
+
+void TrackerTargetState_dtor(
+        struct PtrWrapper ptr);
 ]]
 
-local C = ffi.load(cv.libPath('stitching'))
+local C_tracking = ffi.load(cv.libPath('tracking'))
+local C_stitching = ffi.load(cv.libPath('stitching'))
 
 function cv.unwrap_class(name_class, array)
 
@@ -737,7 +741,7 @@ function cv.unwrap_class(name_class, array)
         local class_array = {}
         for i = 1,array.size do
             local temp = torch.factory('cv.' .. name_class)()
-            temp.ptr = ffi.gc(array.data[i-1], C.MatchesInfo_dtor)
+            temp.ptr = ffi.gc(array.data[i-1], C_stitching.MatchesInfo_dtor)
             class_array[i] = temp
         end
 
@@ -748,7 +752,7 @@ function cv.unwrap_class(name_class, array)
         local class_array = {}
         for i = 1,array.size do
             local temp = torch.factory('cv.' .. name_class)()
-            temp.ptr = ffi.gc(array.data[i-1], C.ImageFeatures_dtor)
+            temp.ptr = ffi.gc(array.data[i-1], C_stitching.ImageFeatures_dtor)
             class_array[i] = temp
         end
 
@@ -759,7 +763,18 @@ function cv.unwrap_class(name_class, array)
         local class_array = {}
         for i = 1,array.size do
             local temp = torch.factory('cv.' .. name_class)()
-            temp.ptr = ffi.gc(array.data[i-1], C.CameraParams_dtor)
+            temp.ptr = ffi.gc(array.data[i-1], C_stitching.CameraParams_dtor)
+            class_array[i] = temp
+        end
+
+        return class_array
+    end
+
+    if name_class == "TrackerTargetState" then
+        local class_array = {}
+        for i = 1,array.size do
+            local temp = torch.factory('cv.' .. name_class)()
+            temp.ptr = ffi.gc(array.data[i-1], C_tracking.TrackerTargetState_dtor)
             class_array[i] = temp
         end
 

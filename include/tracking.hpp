@@ -2,13 +2,46 @@
 #include <Classes.hpp>
 #include <opencv2/tracking.hpp>
 
+struct ClassArray {
+    void *data;
+    int size;
+
+    ClassArray() {}
+
+    ClassArray(const std::vector<cv::TrackerTargetState> & vec);
+
+    operator std::vector<cv::TrackerTargetState>();
+};
+
+struct ConfidenceMap {
+    struct ClassArray class_array;
+    struct FloatArray float_array;
+    int size;
+
+    ConfidenceMap() {}
+    ConfidenceMap(std::vector<std::pair<cv::Ptr<cv::TrackerTargetState>, float>> vec);
+
+    operator std::vector<std::pair<cv::Ptr<cv::TrackerTargetState>, float>>();
+};
+
+struct ConfidenceMapArray {
+    struct ConfidenceMap *array;
+    int size;
+
+    ConfidenceMapArray(){}
+    ConfidenceMapArray(std::vector<std::vector<std::pair<cv::Ptr<cv::TrackerTargetState>, float>>> vec);
+
+    operator std::vector<std::vector<std::pair<cv::Ptr<cv::TrackerTargetState>, float>>>();
+};
+
 struct FloatArrayPlusInt {
     struct FloatArray array;
     int val;
 };
 
 extern "C"
-void test();
+struct ConfidenceMapArray test(
+        struct ConfidenceMapArray val);
 
 //WeakClassifierHaarFeature
 
@@ -473,6 +506,57 @@ void CvFeatureEvaluator_writeFeatures(
         struct CvFeatureEvaluatorPtr ptr, struct FileStoragePtr fs,
         struct TensorWrapper featureMap);
 
+//FeatureHaar
+
+extern "C"
+struct FeatureHaarPtr {
+    void *ptr;
+
+    inline cv::CvHaarEvaluator::FeatureHaar * operator->() {
+        return static_cast<cv::CvHaarEvaluator::FeatureHaar *>(ptr);
+    }
+    inline FeatureHaarPtr(cv::CvHaarEvaluator::FeatureHaar *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct FeatureHaarPtr FeatureHaar_ctor(
+        struct SizeWrapper patchSize);
+
+extern "C"
+void FeatureHaar_dtor(
+        struct FeatureHaarPtr ptr);
+
+struct FloatPlusBool {
+    bool v1;
+    float v2;
+};
+
+extern "C"
+struct FloatPlusBool FeatureHaar_eval(
+        struct FeatureHaarPtr ptr, struct TensorWrapper image, struct RectWrapper ROI);
+
+extern "C"
+struct RectArray FeatureHaar_getAreas(
+    struct FeatureHaarPtr ptr);
+
+extern "C"
+float FeatureHaar_getInitMean(
+        struct FeatureHaarPtr ptr);
+
+extern "C"
+float FeatureHaar_getInitSigma(
+        struct FeatureHaarPtr ptr);
+
+extern "C"
+int FeatureHaar_getNumAreas(
+        struct FeatureHaarPtr ptr);
+
+extern "C"
+struct FloatArray FeatureHaar_getWeights(
+        struct FeatureHaarPtr ptr);
+
 //CvHaarEvaluator
 
 extern "C"
@@ -486,6 +570,8 @@ struct CvHaarEvaluatorPtr {
         this->ptr = ptr;
     }
 };
+
+
 
 extern "C"
 struct CvHaarEvaluatorPtr CvHaarEvaluator_ctor();
@@ -807,3 +893,785 @@ struct Rect2dArrayPlusBool {
 extern "C"
 struct Rect2dArrayPlusBool MultiTracker_update2(
         struct MultiTrackerPtr ptr, struct TensorWrapper image);
+
+//MultiTracker_Alt
+
+extern "C"
+struct MultiTracker_AltPtr {
+    void *ptr;
+
+    inline cv::MultiTracker_Alt * operator->() {
+        return static_cast<cv::MultiTracker_Alt *>(ptr);
+    }
+    inline MultiTracker_AltPtr(cv::MultiTracker_Alt *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct MultiTracker_AltPtr MultiTracker_Alt_ctor();
+
+extern "C"
+void MultiTracker_Alt_dtor(
+        struct MultiTracker_AltPtr ptr);
+
+extern "C"
+bool MultiTracker_Alt_addTarget(
+        struct MultiTracker_AltPtr ptr, struct TensorWrapper image,
+        struct Rect2dWrapper boundingBox, const char *tracker_algorithm_name);
+
+extern "C"
+bool MultiTracker_Alt_update(
+        struct MultiTracker_AltPtr ptr, struct TensorWrapper image);
+
+//MultiTrackerTLD
+
+extern "C"
+struct MultiTrackerTLDPtr {
+    void *ptr;
+
+    inline cv::MultiTrackerTLD * operator->() {
+        return static_cast<cv::MultiTrackerTLD *>(ptr);
+    }
+    inline MultiTrackerTLDPtr(cv::MultiTrackerTLD *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct MultiTrackerTLDPtr MultiTrackerTLD_ctor();
+
+extern "C"
+void MultiTrackerTLD_dtor(
+        struct MultiTrackerTLDPtr ptr);
+
+extern "C"
+bool MultiTrackerTLD_update_opt(
+        struct MultiTrackerTLDPtr ptr, struct TensorWrapper image);
+
+//ROISelector
+
+extern "C"
+struct ROISelectorPtr {
+    void *ptr;
+
+    inline cv::ROISelector * operator->() {
+        return static_cast<cv::ROISelector *>(ptr);
+    }
+    inline ROISelectorPtr(cv::ROISelector *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct ROISelectorPtr ROISelector_ctor();
+
+extern "C"
+void ROISelector_dtor(
+        struct ROISelectorPtr ptr);
+
+extern "C"
+struct Rect2dWrapper ROISelector_select(
+        struct ROISelectorPtr ptr, struct TensorWrapper image, bool fromCenter);
+
+extern "C"
+struct Rect2dWrapper ROISelector_select2(
+        struct ROISelectorPtr ptr, const char *windowName,
+        struct TensorWrapper img, bool showCrossair, bool fromCenter);
+
+extern "C"
+void ROISelector_select3(
+        struct ROISelectorPtr ptr, const char *windowName, struct TensorWrapper img,
+        struct Rect2dArray boundingBox, bool fromCenter);
+
+//TrackerTargetState
+
+extern "C"
+struct TrackerTargetStatePtr {
+    void *ptr;
+
+    TrackerTargetStatePtr() {}
+
+    inline cv::TrackerTargetState * operator->() {
+        return static_cast<cv::TrackerTargetState *>(ptr);
+    }
+    inline TrackerTargetStatePtr(cv::TrackerTargetState *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct TrackerTargetStatePtr TrackerTargetState_ctor();
+
+extern "C"
+void TrackerTargetState_dtor(
+        struct TrackerTargetStatePtr ptr);
+
+extern "C"
+int TrackerTargetState_getTargetHeight(
+        struct TrackerTargetStatePtr ptr);
+
+extern "C"
+struct Point2fWrapper TrackerTargetState_getTargetPosition(
+        struct TrackerTargetStatePtr ptr);
+
+extern "C"
+int TrackerTargetState_getTargetWidth(
+        struct TrackerTargetStatePtr ptr);
+
+extern "C"
+void TrackerTargetState_setTargetHeight(
+        struct TrackerTargetStatePtr ptr, int height);
+
+extern "C"
+void TrackerTargetState_setTargetPosition(
+        struct TrackerTargetStatePtr ptr, struct Point2fWrapper position);
+
+extern "C"
+void TrackerTargetState_setTargetWidth(
+        struct TrackerTargetStatePtr ptr, int width);
+
+//TrackerStateEstimator
+
+extern "C"
+struct TrackerStateEstimatorPtr {
+    void *ptr;
+
+    inline cv::TrackerStateEstimator * operator->() {
+        return static_cast<cv::TrackerStateEstimator *>(ptr);
+    }
+    inline TrackerStateEstimatorPtr(cv::TrackerStateEstimator *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct TrackerStateEstimatorPtr TrackerStateEstimator_ctor(
+        const char *trackeStateEstimatorType);
+
+extern "C"
+void TrackerStateEstimator_dtor(
+        struct TrackerStateEstimatorPtr ptr);
+
+extern "C"
+struct TrackerTargetStatePtr TrackerStateEstimator_estimate(
+        struct TrackerStateEstimatorPtr ptr, struct ConfidenceMapArray confidenceMaps);
+
+extern "C"
+const char* TrackerStateEstimator_getClassName(
+        struct TrackerStateEstimatorPtr ptr);
+
+extern "C"
+void TrackerStateEstimator_update(
+        struct TrackerStateEstimatorPtr ptr, struct ConfidenceMapArray confidenceMaps);
+
+//TrackerStateEstimatorAdaBoosting
+
+extern "C"
+struct TrackerStateEstimatorAdaBoostingPtr {
+    void *ptr;
+
+    inline cv::TrackerStateEstimatorAdaBoosting * operator->() {
+        return static_cast<cv::TrackerStateEstimatorAdaBoosting *>(ptr);
+    }
+    inline TrackerStateEstimatorAdaBoostingPtr(cv::TrackerStateEstimatorAdaBoosting *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct TrackerStateEstimatorAdaBoostingPtr TrackerStateEstimatorAdaBoosting_ctor(
+        int numClassifer, int initIterations, int nFeatures,
+        struct SizeWrapper patchSize, struct RectWrapper ROI);
+
+extern "C"
+void TrackerStateEstimatorAdaBoosting_dtor(
+        struct TrackerStateEstimatorAdaBoostingPtr ptr);
+
+extern "C"
+struct IntArray TrackerStateEstimatorAdaBoosting_computeReplacedClassifier(
+        struct TrackerStateEstimatorAdaBoostingPtr ptr);
+
+extern "C"
+struct IntArray TrackerStateEstimatorAdaBoosting_computeSelectedWeakClassifier(
+        struct TrackerStateEstimatorAdaBoostingPtr ptr);
+
+extern "C"
+struct IntArray TrackerStateEstimatorAdaBoosting_computeSwappedClassifier(
+        struct TrackerStateEstimatorAdaBoostingPtr ptr);
+
+extern "C"
+void TrackerStateEstimatorAdaBoosting_setCurrentConfidenceMap(
+        struct TrackerStateEstimatorAdaBoostingPtr ptr, struct ConfidenceMap confidenceMap);
+
+extern "C"
+struct RectWrapper TrackerStateEstimatorAdaBoosting_getSampleROI(
+        struct TrackerStateEstimatorAdaBoostingPtr ptr);
+
+extern "C"
+void TrackerStateEstimatorAdaBoosting_setSampleROI(
+        struct TrackerStateEstimatorAdaBoostingPtr ptr, struct RectWrapper ROI);
+
+//TrackerStateEstimatorMILBoosting
+
+extern "C"
+struct TrackerStateEstimatorMILBoostingPtr {
+    void *ptr;
+
+    inline cv::TrackerStateEstimatorMILBoosting * operator->() {
+        return static_cast<cv::TrackerStateEstimatorMILBoosting *>(ptr);
+    }
+    inline TrackerStateEstimatorMILBoostingPtr(cv::TrackerStateEstimatorMILBoosting *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct TrackerStateEstimatorMILBoostingPtr TrackerStateEstimatorMILBoosting_ctor(
+        int nFeatures);
+
+extern "C"
+void TrackerStateEstimatorMILBoosting_dtor(
+        struct TrackerStateEstimatorMILBoostingPtr ptr);
+
+extern "C"
+void TrackerStateEstimatorMILBoosting_setCurrentConfidenceMap(
+        struct TrackerStateEstimatorMILBoostingPtr ptr, struct ConfidenceMap confidenceMap);
+
+//TrackerStateEstimatorSVM
+
+extern "C"
+struct TrackerStateEstimatorSVMPtr {
+    void *ptr;
+
+    inline cv::TrackerStateEstimatorSVM * operator->() {
+        return static_cast<cv::TrackerStateEstimatorSVM *>(ptr);
+    }
+    inline TrackerStateEstimatorSVMPtr(cv::TrackerStateEstimatorSVM *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct TrackerStateEstimatorSVMPtr TrackerStateEstimatorSVM_ctor();
+
+extern "C"
+void TrackerStateEstimatorSVM_dtor(
+        struct TrackerStateEstimatorSVMPtr ptr);
+
+//TrackerModel
+
+extern "C"
+struct TrackerModelPtr {
+    void *ptr;
+
+    inline cv::TrackerModel * operator->() {
+        return static_cast<cv::TrackerModel *>(ptr);
+    }
+    inline TrackerModelPtr(cv::TrackerModel *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+void TrackerModel_dtor(
+        struct TrackerModelPtr ptr);
+
+extern "C"
+struct ConfidenceMapArray TrackerModel_getConfidenceMaps(
+        struct TrackerModelPtr ptr);
+
+extern "C"
+struct ConfidenceMap TrackerModel_getLastConfidenceMap(
+        struct TrackerModelPtr ptr);
+
+extern "C"
+struct TrackerTargetStatePtr TrackerModel_getLastTargetState(
+        struct TrackerModelPtr ptr);
+
+extern "C"
+struct TrackerStateEstimatorPtr TrackerModel_getTrackerStateEstimator(
+        struct TrackerModelPtr ptr);
+
+extern "C"
+void TrackerModel_modelEstimation(
+        struct TrackerModelPtr ptr, struct TensorArray responses);
+
+extern "C"
+void TrackerModel_modelUpdate(
+        struct TrackerModelPtr ptr);
+
+extern "C"
+bool TrackerModel_runStateEstimator(
+        struct TrackerModelPtr ptr);
+
+extern "C"
+void TrackerModel_setLastTargetState(
+        struct TrackerModelPtr ptr, struct TrackerTargetStatePtr lastTargetState);
+
+extern "C"
+bool TrackerModel_setTrackerStateEstimator(
+        struct TrackerModelPtr ptr, struct TrackerStateEstimatorPtr trackerStateEstimator);
+
+//Tracker
+
+extern "C"
+struct TrackerPtr {
+    void *ptr;
+
+    inline cv::Tracker * operator->() {
+        return static_cast<cv::Tracker *>(ptr);
+    }
+    inline TrackerPtr(cv::Tracker *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+void Tracker_dtor(
+        struct TrackerPtr ptr);
+
+extern "C"
+struct TrackerModelPtr Tracker_getModel(
+        struct TrackerPtr ptr);
+
+extern "C"
+bool Tracker_init(
+        struct TrackerPtr ptr, struct TensorWrapper image, struct Rect2dWrapper boundingBox);
+
+extern "C"
+void Tracker_read(
+        struct TrackerPtr ptr, struct FileNodePtr fn);
+
+extern "C"
+bool Tracker_update(
+        struct TrackerPtr ptr, struct TensorWrapper image, struct Rect2dWrapper boundingBox);
+
+extern "C"
+void Tracker_write(
+        struct TrackerPtr ptr, struct FileStoragePtr fn);
+
+//TrackerBoosting
+
+extern "C"
+struct TrackerBoostingPtr {
+    void *ptr;
+
+    inline cv::TrackerBoosting * operator->() {
+        return static_cast<cv::TrackerBoosting *>(ptr);
+    }
+    inline TrackerBoostingPtr(cv::TrackerBoosting *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+struct TrackerBoosting_Params {
+    int numClassifiers;
+    float samplerOverlap;
+    float samplerSearchFactor;
+    int iterationInit;
+    int featureSetNumFeatures;
+};
+
+extern "C"
+struct TrackerBoostingPtr TrackerBoosting_ctor(
+        struct TrackerBoosting_Params parameters);
+
+extern "C"
+void TrackerBoosting_dtor(
+        struct TrackerBoostingPtr ptr);
+
+//TrackerKCF
+
+extern "C"
+struct TrackerKCFPtr {
+    void *ptr;
+
+    inline cv::TrackerKCF * operator->() {
+        return static_cast<cv::TrackerKCF *>(ptr);
+    }
+    inline TrackerKCFPtr(cv::TrackerKCF *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+struct TrackerKCF_Params {
+    double sigma;
+    double lambda;
+    double interp_factor;
+    double output_sigma_factor;
+    double pca_learning_rate;
+    bool resize;
+    bool split_coeff;
+    bool wrap_kernel;
+    bool compress_feature;
+    int max_patch_size;
+    int compressed_size;
+    unsigned int desc_pca;
+    unsigned int desc_npca;
+};
+
+extern "C"
+struct TrackerKCFPtr TrackerKCF_ctor(
+        struct TrackerKCF_Params parameters);
+
+extern "C"
+void TrackerKCF_dtor(
+        struct TrackerKCFPtr ptr);
+
+//TrackerMedianFlow
+
+extern "C"
+struct TrackerMedianFlowPtr {
+    void *ptr;
+
+    inline cv::TrackerMedianFlow * operator->() {
+        return static_cast<cv::TrackerMedianFlow *>(ptr);
+    }
+    inline TrackerMedianFlowPtr(cv::TrackerMedianFlow *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+struct TrackerMedianFlow_Params {
+    int pointsInGrid;
+};
+
+extern "C"
+struct TrackerMedianFlowPtr TrackerMedianFlow_ctor(
+        struct TrackerMedianFlow_Params parameters);
+
+extern "C"
+void TrackerMedianFlow_dtor(
+        struct TrackerMedianFlowPtr ptr);
+
+//TrackerMIL
+
+extern "C"
+struct TrackerMILPtr {
+    void *ptr;
+
+    inline cv::TrackerMIL * operator->() {
+        return static_cast<cv::TrackerMIL *>(ptr);
+    }
+    inline TrackerMILPtr(cv::TrackerMIL *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+struct TrackerMIL_Params {
+    float samplerInitInRadius;
+    int samplerInitMaxNegNum;
+    float samplerSearchWinSize;
+    float samplerTrackInRadius;
+    int samplerTrackMaxPosNum;
+    int samplerTrackMaxNegNum;
+    int featureSetNumFeatures;
+};
+
+extern "C"
+struct TrackerMILPtr TrackerMIL_ctor(
+        struct TrackerMIL_Params parameters);
+
+extern "C"
+void TrackerMIL_dtor(
+        struct TrackerMILPtr ptr);
+
+//TrackerTLD
+
+extern "C"
+struct TrackerTLDPtr {
+    void *ptr;
+
+    inline cv::TrackerTLD * operator->() {
+        return static_cast<cv::TrackerTLD *>(ptr);
+    }
+    inline TrackerTLDPtr(cv::TrackerTLD *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct TrackerTLDPtr TrackerTLD_ctor();
+
+extern "C"
+void TrackerTLD_dtor(
+        struct TrackerTLDPtr ptr);
+
+//TrackerAdaBoostingTargetState
+
+extern "C"
+struct TrackerAdaBoostingTargetStatePtr {
+    void *ptr;
+
+    inline cv::TrackerStateEstimatorAdaBoosting::TrackerAdaBoostingTargetState * operator->() {
+        return static_cast<cv::TrackerStateEstimatorAdaBoosting::TrackerAdaBoostingTargetState *>(ptr);
+    }
+    inline TrackerAdaBoostingTargetStatePtr(
+            cv::TrackerStateEstimatorAdaBoosting::TrackerAdaBoostingTargetState *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct TrackerAdaBoostingTargetStatePtr TrackerAdaBoostingTargetState_ctor(
+        struct Point2fWrapper position, int width, int height,
+        bool foreground, struct TensorWrapper responses);
+
+extern "C"
+void TrackerAdaBoostingTargetState_dtor(
+        struct TrackerAdaBoostingTargetStatePtr ptr);
+
+extern "C"
+struct TensorWrapper TrackerAdaBoostingTargetState_getTargetResponses(
+        struct TrackerAdaBoostingTargetStatePtr ptr);
+
+extern "C"
+bool TrackerAdaBoostingTargetState_isTargetFg(
+        struct TrackerAdaBoostingTargetStatePtr ptr);
+
+extern "C"
+void TrackerAdaBoostingTargetState_setTargetFg(
+        struct TrackerAdaBoostingTargetStatePtr ptr, bool foreground);
+
+extern "C"
+void TrackerAdaBoostingTargetState_setTargetResponses(
+        struct TrackerAdaBoostingTargetStatePtr ptr, struct TensorWrapper responses);
+
+//TrackerMILTargetState
+
+extern "C"
+struct TrackerMILTargetStatePtr {
+    void *ptr;
+
+    inline cv::TrackerStateEstimatorMILBoosting::TrackerMILTargetState * operator->() {
+        return static_cast<cv::TrackerStateEstimatorMILBoosting::TrackerMILTargetState *>(ptr);
+    }
+    inline TrackerMILTargetStatePtr(
+            cv::TrackerStateEstimatorMILBoosting::TrackerMILTargetState *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct TrackerMILTargetStatePtr TrackerMILTargetState_ctor(
+        struct Point2fWrapper position, int width, int height, bool foreground, struct TensorWrapper features);
+
+extern "C"
+void TrackerMILTargetState_dtor(
+        struct TrackerMILTargetStatePtr ptr);
+
+extern "C"
+struct TensorWrapper TrackerMILTargetState_getFeatures(
+        struct TrackerMILTargetStatePtr ptr);
+
+extern "C"
+bool TrackerMILTargetState_isTargetFg(
+        struct TrackerMILTargetStatePtr ptr);
+
+extern "C"
+void TrackerMILTargetState_setFeatures(
+        struct TrackerMILTargetStatePtr ptr, struct TensorWrapper features);
+
+extern "C"
+void TrackerMILTargetState_setTargetFg(
+        struct TrackerMILTargetStatePtr ptr, bool foreground);
+
+//TrackerFeature
+
+extern "C"
+struct TrackerFeaturePtr {
+    void *ptr;
+
+    inline cv::TrackerFeature * operator->() {
+        return static_cast<cv::TrackerFeature *>(ptr);
+    }
+    inline TrackerFeaturePtr(cv::TrackerFeature *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct TrackerFeaturePtr TrackerFeature_ctor(
+        const char *rackerFeatureType);
+
+extern "C"
+void TrackerFeature_dtor(
+        struct TrackerFeaturePtr ptr);
+
+extern "C"
+struct TensorWrapper TrackerFeature_compute(
+        struct TrackerFeaturePtr ptr, struct TensorArray images);
+
+extern "C"
+const char* TrackerFeature_getClassName(
+        struct TrackerFeaturePtr ptr);
+
+extern "C"
+void TrackerFeature_selection(
+        struct TrackerFeaturePtr ptr, struct TensorWrapper response, int npoints);
+
+//TrackerFeatureFeature2d
+
+extern "C"
+struct TrackerFeatureFeature2dPtr {
+    void *ptr;
+
+    inline cv::TrackerFeatureFeature2d * operator->() {
+        return static_cast<cv::TrackerFeatureFeature2d *>(ptr);
+    }
+    inline TrackerFeatureFeature2dPtr(cv::TrackerFeatureFeature2d *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct TrackerFeatureFeature2dPtr TrackerFeatureFeature2d_ctor(
+        const char *detectorType, const char *descriptorType);
+
+extern "C"
+void TrackerFeatureFeature2d_dtor(
+        struct TrackerFeatureFeature2dPtr ptr);
+
+extern "C"
+void TrackerFeatureFeature2d_selection(
+        struct TrackerFeatureFeature2dPtr ptr, struct TensorWrapper response, int npoints);
+
+//TrackerFeatureHAAR
+
+extern "C"
+struct TrackerFeatureHAARPtr {
+    void *ptr;
+
+    inline cv::TrackerFeatureHAAR * operator->() {
+        return static_cast<cv::TrackerFeatureHAAR *>(ptr);
+    }
+    inline TrackerFeatureHAARPtr(cv::TrackerFeatureHAAR *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+struct TrackerFeatureHAAR_Params
+{
+    int numFeatures;
+    struct SizeWrapper rectSize;
+    bool isIntegral;
+};
+
+extern "C"
+struct TrackerFeatureHAARPtr TrackerFeatureHAAR_ctor(
+        struct TrackerFeatureHAAR_Params parameters);
+
+extern "C"
+void TrackerFeatureHAAR_dtor(
+        struct TrackerFeatureHAARPtr ptr);
+
+extern "C"
+struct TensorWrapper TrackerFeatureHAAR_extractSelected(
+        struct TrackerFeatureHAARPtr ptr, struct IntArray selFeatures,
+        struct TensorArray images);
+
+extern "C"
+struct FeatureHaarPtr TrackerFeatureHAAR_getFeatureAt(
+        struct TrackerFeatureHAARPtr ptr, int id);
+
+extern "C"
+void TrackerFeatureHAAR_selection(
+    struct TrackerFeatureHAARPtr ptr, struct TensorWrapper response, int npoints);
+
+extern "C"
+bool TrackerFeatureHAAR_swapFeature(
+        struct TrackerFeatureHAARPtr ptr, int source, int target);
+
+extern "C"
+bool TrackerFeatureHAAR_swapFeature2(
+        struct TrackerFeatureHAARPtr ptr, int id,
+        struct FeatureHaarPtr feature);
+
+//TrackerFeatureHOG
+
+extern "C"
+struct TrackerFeatureHOGPtr {
+    void *ptr;
+
+    inline cv::TrackerFeatureHOG * operator->() {
+        return static_cast<cv::TrackerFeatureHOG *>(ptr);
+    }
+    inline TrackerFeatureHOGPtr(cv::TrackerFeatureHOG *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct TrackerFeatureHOGPtr TrackerFeatureHOG_ctor();
+
+extern "C"
+void TrackerFeatureHOG_dtor(
+        struct TrackerFeatureHOGPtr ptr);
+
+extern "C"
+void TrackerFeatureHOG_selection(
+        struct TrackerFeatureHOGPtr ptr, struct TensorWrapper response, int npoints);
+
+//TrackerFeatureLBP
+
+extern "C"
+struct TrackerFeatureLBPPtr {
+    void *ptr;
+
+    inline cv::TrackerFeatureLBP * operator->() {
+        return static_cast<cv::TrackerFeatureLBP *>(ptr);
+    }
+    inline TrackerFeatureLBPPtr(cv::TrackerFeatureLBP *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct TrackerFeatureLBPPtr TrackerFeatureLBP_ctor();
+
+extern "C"
+void TrackerFeatureLBP_dtor(
+        struct TrackerFeatureLBPPtr ptr);
+
+extern "C"
+void TrackerFeatureLBP_selection(
+        struct TrackerFeatureLBPPtr ptr, struct TensorWrapper response, int npoints);
+
+//TrackerFeatureSet
+
+extern "C"
+struct TrackerFeatureSetPtr {
+    void *ptr;
+
+    inline cv::TrackerFeatureSet * operator->() {
+        return static_cast<cv::TrackerFeatureSet *>(ptr);
+    }
+    inline TrackerFeatureSetPtr(cv::TrackerFeatureSet *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct TrackerFeatureSetPtr TrackerFeatureSet_ctor();
+
+extern "C"
+void TrackerFeatureSet_dtor(
+        struct TrackerFeatureSetPtr ptr);
+
+extern "C"
+bool TrackerFeatureSet_addTrackerFeature(
+        struct TrackerFeatureSetPtr ptr, const char *trackerFeatureType);
+
+
+extern "C"
+bool TrackerFeatureSet_addTrackerFeature2(
+        struct TrackerFeatureSetPtr ptr, struct TrackerFeaturePtr feature);
+
+extern "C"
+void TrackerFeatureSet_extraction(
+        struct TrackerFeatureSetPtr ptr, struct TensorArray images);
+
+extern "C"
+struct TensorArray TrackerFeatureSet_getResponses(
+        struct TrackerFeatureSetPtr ptr);
