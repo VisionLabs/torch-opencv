@@ -546,7 +546,7 @@ StringArray::operator std::vector<cv::String>() {
 
 std::vector<MatT> get_vec_MatT(std::vector<cv::Mat> vec_mat) {
     std::vector<MatT> retval(vec_mat.size());
-    for(int i = 0; i < vec_mat.size(); i++) retval[i] = vec_mat[i];
+    for(int i = 0; i < vec_mat.size(); i++) retval[i] = MatT(vec_mat[i]);
     return retval;
 }
 

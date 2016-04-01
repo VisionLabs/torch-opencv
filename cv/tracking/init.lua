@@ -8,9 +8,6 @@ local C = ffi.load(cv.libPath('tracking'))
 --- ***************** Classes *****************
 
 ffi.cdef[[
-struct ConfidenceMapArray test(
-    struct ConfidenceMapArray val);
-
 struct ConfidenceMap {
     struct ClassArray class_array;
     struct FloatArray float_array;
@@ -281,6 +278,9 @@ void CvHaarEvaluator_generateFeatures(
 
 void CvHaarEvaluator_generateFeatures2(
         struct PtrWrapper ptr, int numFeatures);
+
+struct PtrWrapper CvHaarEvaluator_getFeatures(
+        struct PtrWrapper ptr, int idx);
 
 void CvHaarEvaluator_init(
         struct PtrWrapper ptr, struct PtrWrapper _featureParams,
@@ -807,11 +807,102 @@ void TrackerFeatureSet_extraction(
 
 struct TensorArray TrackerFeatureSet_getResponses(
         struct PtrWrapper ptr);
-]]
 
-function cv.test(val)
-    return cv.unwrap_ConfidenceMapArray(C.test(val))
-end
+void TrackerFeatureSet_removeOutliers(
+        struct PtrWrapper ptr);
+
+void TrackerFeatureSet_selection(
+        struct PtrWrapper ptr);
+
+struct PtrWrapper TrackerSampler_ctor();
+
+void TrackerSampler_dtor(
+        struct PtrWrapper ptr);
+
+bool TrackerSampler_addTrackerSamplerAlgorithm(
+        struct PtrWrapper ptr, const char *trackerSamplerAlgorithmType);
+
+bool TrackerSampler_addTrackerSamplerAlgorithm2(
+        struct PtrWrapper ptr, struct PtrWrapper sampler);
+
+struct TensorArray TrackerSampler_getSamples(
+        struct PtrWrapper ptr);
+
+void TrackerSampler_sampling(
+        struct PtrWrapper ptr, struct TensorWrapper image,
+        struct RectWrapper boundingBox);
+
+struct PtrWrapper TrackerSamplerAlgorithm_ctor(
+        const char *trackerSamplerType);
+
+void TrackerSamplerAlgorithm_dtor(
+        struct PtrWrapper ptr);
+
+const char* TrackerSamplerAlgorithm_getClassName(
+        struct PtrWrapper ptr);
+
+struct TensorArrayPlusBool TrackerSamplerAlgorithm_sampling(
+        struct PtrWrapper ptr, struct TensorWrapper image,
+        struct RectWrapper boundingBox);
+
+struct TrackerSamplerCS_Params
+{
+    float overlap;
+    float searchFactor;
+};
+
+struct PtrWrapper TrackerSamplerCS_ctor(
+        struct TrackerSamplerCS_Params parameters);
+
+void TrackerSamplerCS_dtor(
+        struct PtrWrapper ptr);
+
+struct RectWrapper TrackerSamplerCS_getROI(
+        struct PtrWrapper ptr);
+
+struct TensorArrayPlusBool TrackerSamplerCS_samplingImpl(
+        struct PtrWrapper ptr, struct TensorWrapper image,
+        struct RectWrapper boundingBox);
+
+void TrackerSamplerCS_setMode(
+        struct PtrWrapper ptr, int samplingMode);
+
+struct TrackerSamplerCSC_Params
+{
+    float initInRad;
+    float trackInPosRad;
+    float searchWinSize;
+    int initMaxNegNum;
+    int trackMaxPosNum;
+    int trackMaxNegNum;
+};
+
+struct PtrWrapper TrackerSamplerCSC_ctor(
+        struct TrackerSamplerCSC_Params parameters);
+
+void TrackerSamplerCSC_dtor(
+        struct PtrWrapper ptr);
+
+void TrackerSamplerCSC_setMode(
+        struct PtrWrapper ptr, int samplingMode);
+
+struct TrackerSamplerPF_Params
+{
+    int iterationNum;
+    int particlesNum;
+    double alpha;
+    double std_1;
+    double std_2;
+    double std_3;
+    double std_4;
+};
+
+struct PtrWrapper TrackerSamplerPF_ctor(
+        struct TensorWrapper chosenRect, struct TrackerSamplerPF_Params parameters);
+
+void TrackerSamplerPF_dtor(
+        struct PtrWrapper ptr);
+]]
 
 function cv.unwrap_ConfidenceMap(confMap)
     local retval = {}
@@ -1367,7 +1458,17 @@ do
         local argRules = {
             {"numFeatures", required = true } }
         local numFeatures = cv.argcheck(t, argRules)
-        C.CvHaarEvaluator_generateFeatures(self.ptr, numFeatures)
+        C.CvHaarEvaluator_generateFeatures2(self.ptr, numFeatures)
+    end
+
+    function CvHaarEvaluator:getFeatures(t)
+        local argRules = {
+            {"idx", required = true} }
+        local idx = cv.argcheck(t, argRules)
+        local retval = torch.factory('cv.FeatureHaar')()
+        retval.ptr = ffi.gc(
+                        C.CvHaarEvaluator_getFeatures(self.ptr, idx),
+                        C.FeatureHaar_dtor)
     end
 
     function CvHaarEvaluator:init(t)
@@ -2390,5 +2491,166 @@ do
     function TrackerFeatureSet:getResponses()
         return cv.unwrap_tensors(
                     C.TrackerFeatureSet_getResponses(self.ptr))
+    end
+
+    function TrackerFeatureSet:removeOutliers()
+        C.TrackerFeatureSet_removeOutliers(self.ptr)
+    end
+
+    function TrackerFeatureSet:selection()
+        C.TrackerFeatureSet_selection(self.ptr)
+    end
+end
+
+--TrackerSampler
+
+do
+    local TrackerSampler = torch.class('cv.TrackerSampler', cv)
+
+    function TrackerSampler:__init()
+        self.ptr = ffi.gc(C.TrackerSampler_ctor(), C.TrackerSampler_dtor)
+    end
+
+    function TrackerSampler:addTrackerSamplerAlgorithm(t)
+        local argRules = {
+            {"trackerSamplerAlgorithmType", required = true} }
+        local trackerSamplerAlgorithmType = cv.argcheck(t, argRules)
+        return C.TrackerSampler_addTrackerSamplerAlgorithm(self.ptr, trackerSamplerAlgorithmType)
+    end
+
+    function TrackerSampler:addTrackerSamplerAlgorithm2(t)
+        local argRules = {
+            {"sampler", required = true} }
+        local sampler = cv.argcheck(t, argRules)
+        return C.TrackerSampler_addTrackerSamplerAlgorithm2(self.ptr, sampler.ptr)
+    end
+
+    function TrackerSampler:getSamples()
+        return cv.unwrap_tensors(C.TrackerSampler_getSamples(self.ptr))
+    end
+
+    function TrackerSampler:sampling(t)
+        local argRules = {
+            {"image", required = true},
+            {"boundingBox", required = true, operator = cv.Rect} }
+        local image, boundingBox = cv.argcheck(t, argRules)
+        C.TrackerSampler_sampling(self.ptr, cv.wrap_tensor(image), boundingBox)
+    end
+end
+
+--TrackerSamplerAlgorithm
+
+do
+    local TrackerSamplerAlgorithm = torch.class('cv.TrackerSamplerAlgorithm', cv)
+
+    function TrackerSamplerAlgorithm:__init(t)
+        local argRules = {
+            {"trackerSamplerType", required = true} }
+        local trackerSamplerType = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(C.TrackerSamplerAlgorithm_ctor(trackerSamplerType), C.TrackerSamplerAlgorithm_dtor)
+    end
+
+    function TrackerSamplerAlgorithm:getClassName(t)
+        return ffi.string(C.TrackerSamplerAlgorithm_getClassName(self.ptr))
+    end
+
+    function TrackerSamplerAlgorithm:sampling(t)
+        local argRules = {
+            {"image", required = true},
+            {"boundingBox", required = true, operator = cv.Rect} }
+        local image, boundingBox = cv.argcheck(t, argRules)
+        local result =
+                C.TrackerSamplerAlgorithm_sampling(
+                        self.ptr, cv.wrap_tensor(image), boundingBox)
+        return result.val, cv.unwrap_tensors(result.tensors)
+    end
+end
+
+--TrackerSamplerCS
+
+do
+    local TrackerSamplerCS = torch.class('cv.TrackerSamplerCS', 'cv.TrackerSamplerAlgorithm', cv)
+
+    function TrackerSamplerCS:__init(t)
+        local parameters = ffi.new("struct TrackerSamplerCS_Params")
+        parameters.overlap = 0.99
+        parameters.searchFactor = 2
+        local argRules = {
+            {"parameters", default = parameters} }
+        local parameters = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(C.TrackerSamplerCS_ctor(parameters), C.TrackerSamplerCS_dtor)
+    end
+
+    function TrackerSamplerCS:getROI()
+        return C.TrackerSamplerCS_getROI(self.ptr)
+    end
+
+    function TrackerSamplerCS:samplingImpl(t)
+    local argRules = {
+        {"image", required = true},
+        {"boundingBox", required = true, operator = cv.Rect} }
+    local image, boundingBox = cv.argcheck(t, argRules)
+    local result =
+            C.TrackerSamplerCS_samplingImpl(
+                    self.ptr, cv.wrap_tensor(image), boundingBox)
+    return result.val, cv.unwrap_tensors(result.tensors)
+    end
+
+    function TrackerSamplerCS:setMode(t)
+        local argRules = {
+            {"samplingMode", required = true} }
+        local samplingMode = cv.argcheck(t, argRules)
+        C.TrackerSamplerCS_setMode(self.ptr, samplingMode)
+    end
+end
+
+--TrackerSamplerCSC
+
+do
+    local TrackerSamplerCSC = torch.class('cv.TrackerSamplerCSC', 'cv.TrackerSamplerAlgorithm', cv)
+
+    function TrackerSamplerCSC:__init(t)
+        local parameters = ffi.new("struct TrackerSamplerCSC_Params")
+        parameters.initInRad = 3
+        parameters.initMaxNegNum = 65
+        parameters.searchWinSize = 25
+        parameters.trackInPosRad = 4
+        parameters.trackMaxNegNum = 65
+        parameters.trackMaxPosNum = 100000
+        local argRules = {
+            {"parameters", default = parameters} }
+        local parameters = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(C.TrackerSamplerCSC_ctor(parameters), C.TrackerSamplerCSC_dtor)
+    end
+
+    function TrackerSamplerCSC:setMode(t)
+        local argRules = {
+            {"samplingMode", required = true} }
+        local samplingMode = cv.argcheck(t, argRules)
+        C.TrackerSamplerCSC_setMode(self.ptr, samplingMode)
+    end
+end
+
+--TrackerSamplerPF
+
+do
+    local TrackerSamplerPF = torch.class('cv.TrackerSamplerPF', 'cv.TrackerSamplerAlgorithm', cv)
+
+    function TrackerSamplerPF:__init(t)
+        local parameters = ffi.new("struct TrackerSamplerPF_Params")
+        parameters.iterationNum = 20
+        parameters.particlesNum = 100
+        parameters.alpha = 0.9
+        parameters.std_1 = 15
+        parameters.std_2 = 15
+        parameters.std_3 = 15
+        parameters.std_4 = 15
+        local argRules = {
+            {"chosenRect", required = true},
+            {"parameters", default = parameters} }
+        local chosenRect, parameters = cv.argcheck(t, argRules)
+        self.ptr = ffi.gc(
+                    C.TrackerSamplerPF_ctor(cv.wrap_tensor(chosenRect), parameters),
+                    C.TrackerSamplerPF_dtor)
     end
 end

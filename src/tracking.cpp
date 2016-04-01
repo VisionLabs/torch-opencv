@@ -6,10 +6,11 @@ ClassArray::ClassArray(const std::vector<cv::TrackerTargetState> & vec)
 
     this->size = vec.size();
 
+    TrackerTargetStatePtr class_wrapped;
+
     for (int i = 0; i < vec.size(); i++) {
-        cv::TrackerTargetState *cls = new cv::TrackerTargetState();
-        *cls = vec[i];
-        temp[i] = cls;
+        class_wrapped.ptr = new cv::TrackerTargetState(vec[i]);;
+        temp[i] = class_wrapped;
     }
     this->data = temp;
 }
@@ -80,15 +81,6 @@ ConfidenceMapArray::ConfidenceMapArray(std::vector<std::vector<std::pair<cv::Ptr
     for(int i = 0; i < vec.size(); i++){
         this->array[i] = vec[i];
     }
-}
-
-extern "C"
-struct ConfidenceMapArray test(
-        struct ConfidenceMapArray val)
-{
-    std::vector<std::vector<std::pair<cv::Ptr<cv::TrackerTargetState>, float>>> vec = val;
-
-    return ConfidenceMapArray(vec);
 }
 
 //WeakClassifierHaarFeature
@@ -711,6 +703,13 @@ void CvHaarEvaluator_generateFeatures2(
         struct CvHaarEvaluatorPtr ptr, int numFeatures)
 {
     ptr->generateFeatures(numFeatures);
+}
+
+extern "C"
+struct FeatureHaarPtr CvHaarEvaluator_getFeatures(
+        struct CvHaarEvaluatorPtr ptr, int idx)
+{
+    return new cv::CvHaarEvaluator::FeatureHaar(ptr->getFeatures(idx));
 }
 
 extern "C"
@@ -1924,7 +1923,212 @@ extern "C"
 struct TensorArray TrackerFeatureSet_getResponses(
         struct TrackerFeatureSetPtr ptr)
 {
-    //need to check
     std::vector<cv::Mat> vec = ptr->getResponses();
-    return vec;
+    std::vector<MatT> vect = get_vec_MatT(vec);
+    return TensorArray(vect);
+}
+
+extern "C"
+void TrackerFeatureSet_removeOutliers(
+        struct TrackerFeatureSetPtr ptr)
+{
+    ptr->removeOutliers();
+}
+
+extern "C"
+void TrackerFeatureSet_selection(
+        struct TrackerFeatureSetPtr ptr)
+{
+    ptr->selection();
+}
+
+//TrackerSampler
+
+extern "C"
+struct TrackerSamplerPtr TrackerSampler_ctor()
+{
+    return new cv::TrackerSampler();
+}
+
+extern "C"
+void TrackerSampler_dtor(
+        struct TrackerSamplerPtr ptr)
+{
+    delete static_cast<cv::TrackerSampler *>(ptr.ptr);
+}
+
+extern "C"
+bool TrackerSampler_addTrackerSamplerAlgorithm(
+        struct TrackerSamplerPtr ptr, const char *trackerSamplerAlgorithmType)
+{
+    return ptr->addTrackerSamplerAlgorithm(trackerSamplerAlgorithmType);
+}
+
+extern "C"
+bool TrackerSampler_addTrackerSamplerAlgorithm2(
+        struct TrackerSamplerPtr ptr, struct TrackerSamplerAlgorithmPtr sampler)
+{
+    cv::Ptr<cv::TrackerSamplerAlgorithm> p(static_cast<cv::TrackerSamplerAlgorithm *>(sampler.ptr));
+    rescueObjectFromPtr(p);
+    return ptr->addTrackerSamplerAlgorithm(p);
+}
+
+extern "C"
+struct TensorArray TrackerSampler_getSamples(
+        struct TrackerSamplerPtr ptr)
+{
+    std::vector<cv::Mat> vec = ptr->getSamples();
+    return TensorArray(vec);
+}
+
+extern "C"
+void TrackerSampler_sampling(
+        struct TrackerSamplerPtr ptr, struct TensorWrapper image,
+        struct RectWrapper boundingBox)
+{
+    ptr->sampling(image.toMat(), boundingBox);
+}
+
+//TrackerSamplerAlgorithm
+
+extern "C"
+struct TrackerSamplerAlgorithmPtr TrackerSamplerAlgorithm_ctor(
+        const char *trackerSamplerType)
+{
+    return rescueObjectFromPtr(cv::TrackerSamplerAlgorithm::create(trackerSamplerType));
+}
+
+extern "C"
+void TrackerSamplerAlgorithm_dtor(
+        struct TrackerSamplerAlgorithmPtr ptr)
+{
+    delete static_cast<cv::TrackerSamplerAlgorithm *>(ptr.ptr);
+}
+
+extern "C"
+const char* TrackerSamplerAlgorithm_getClassName(
+        struct TrackerSamplerAlgorithmPtr ptr)
+{
+    return ptr->getClassName().c_str();
+}
+
+extern "C"
+struct TensorArrayPlusBool TrackerSamplerAlgorithm_sampling(
+        struct TrackerSamplerAlgorithmPtr ptr, struct TensorWrapper image,
+        struct RectWrapper boundingBox)
+{
+    struct TensorArrayPlusBool result;
+    std::vector<cv::Mat> sample;
+    result.val = ptr->sampling(image.toMat(), boundingBox, sample);
+    std::vector<cv::Mat> temp(sample.size());
+    for(int i = 0; i < sample.size(); i++){
+        sample[i].copyTo(temp[i]);
+    }
+    std::vector<MatT> vecT = get_vec_MatT(temp);
+    new(&result.tensors) TensorArray(vecT);
+    return result;
+}
+
+//TrackerSamplerCS
+
+extern "C"
+struct TrackerSamplerCSPtr TrackerSamplerCS_ctor(
+        struct TrackerSamplerCS_Params parameters)
+{
+    cv::TrackerSamplerCS::Params p;
+    p.overlap = parameters.overlap;
+    p.searchFactor = parameters.searchFactor;
+    return new cv::TrackerSamplerCS(p);
+}
+
+extern "C"
+void TrackerSamplerCS_dtor(
+        struct TrackerSamplerCSPtr ptr)
+{
+    delete static_cast<cv::TrackerSamplerCS *>(ptr.ptr);
+}
+
+extern "C"
+struct RectWrapper TrackerSamplerCS_getROI(
+        struct TrackerSamplerCSPtr ptr)
+{
+    return RectWrapper(ptr->getROI());
+}
+
+extern "C"
+struct TensorArrayPlusBool TrackerSamplerCS_samplingImpl(
+        struct TrackerSamplerCSPtr ptr, struct TensorWrapper image,
+        struct RectWrapper boundingBox)
+{
+    struct TensorArrayPlusBool result;
+    std::vector<cv::Mat> sample;
+    result.val = ptr->samplingImpl(image.toMat(), boundingBox, sample);
+    std::vector<cv::Mat> temp(sample.size());
+    for(int i = 0; i < sample.size(); i++){
+        sample[i].copyTo(temp[i]);
+    }
+    std::vector<MatT> sampleT = get_vec_MatT(temp);
+    new(&result.tensors) TensorArray(sampleT);
+    return result;
+}
+
+extern "C"
+void TrackerSamplerCS_setMode(
+        struct TrackerSamplerCSPtr ptr, int samplingMode)
+{
+    ptr->setMode(samplingMode);
+}
+
+//TrackerSamplerCSC
+
+extern "C"
+struct TrackerSamplerCSCPtr TrackerSamplerCSC_ctor(
+        struct TrackerSamplerCSC_Params parameters)
+{
+    cv::TrackerSamplerCSC::Params p;
+    p.initInRad = parameters.initInRad;
+    p.initMaxNegNum = parameters.initMaxNegNum;
+    p.searchWinSize = parameters.searchWinSize;
+    p.trackInPosRad = parameters.trackInPosRad;
+    p.trackMaxNegNum = parameters.initMaxNegNum;
+    p.trackMaxPosNum = parameters.trackMaxPosNum;
+    return new cv::TrackerSamplerCSC(p);
+}
+
+extern "C"
+void TrackerSamplerCSC_dtor(
+        struct TrackerSamplerCSCPtr ptr)
+{
+    delete static_cast<cv::TrackerSamplerCSC *>(ptr.ptr);
+}
+
+extern "C"
+void TrackerSamplerCSC_setMode(
+        struct TrackerSamplerCSCPtr ptr, int samplingMode)
+{
+    ptr->setMode(samplingMode);
+}
+
+//TrackerSamplerPF
+
+extern "C"
+struct TrackerSamplerPFPtr TrackerSamplerPF_ctor(
+        struct TensorWrapper chosenRect, struct TrackerSamplerPF_Params parameters)
+{
+    cv::TrackerSamplerPF::Params p;
+    p.alpha = parameters.alpha;
+    p.iterationNum = parameters.iterationNum;
+    p.particlesNum = parameters.particlesNum;
+    p.std.at<double>(0,0) = parameters.std_1;
+    p.std.at<double>(0,1) = parameters.std_2;
+    p.std.at<double>(0,2) = parameters.std_3;
+    p.std.at<double>(0,3) = parameters.std_4;
+    return new cv::TrackerSamplerPF(chosenRect.toMat(), p);
+}
+
+extern "C"
+void TrackerSamplerPF_dtor(
+        struct TrackerSamplerPFPtr ptr)
+{
+    delete static_cast<cv::TrackerSamplerPF *>(ptr.ptr);
 }

@@ -39,10 +39,6 @@ struct FloatArrayPlusInt {
     int val;
 };
 
-extern "C"
-struct ConfidenceMapArray test(
-        struct ConfidenceMapArray val);
-
 //WeakClassifierHaarFeature
 
 extern "C"
@@ -114,7 +110,7 @@ extern "C"
 int BaseClassifier_getIdxOfNewWeakClassifier(
         struct BaseClassifierPtr ptr);
 
-//TODO cv::BaseClassifier::getReferenceWeakClassifier
+//TODO WeakClassifierHaarFeature** cv::BaseClassifier::getReferenceWeakClassifier()
 
 extern "C"
 int BaseClassifier_getSelectedClassifier(
@@ -512,6 +508,7 @@ extern "C"
 struct FeatureHaarPtr {
     void *ptr;
 
+    FeatureHaarPtr() {}
     inline cv::CvHaarEvaluator::FeatureHaar * operator->() {
         return static_cast<cv::CvHaarEvaluator::FeatureHaar *>(ptr);
     }
@@ -588,9 +585,11 @@ extern "C"
 void CvHaarEvaluator_generateFeatures2(
         struct CvHaarEvaluatorPtr ptr, int numFeatures);
 
-//TODO need to do
-//const std::vector< CvHaarEvaluator::FeatureHaar > & getFeatures () const
-//CvHaarEvaluator::FeatureHaar & getFeatures (int idx)
+//TODO need to do const std::vector<CvHaarEvaluator::FeatureHaar>& getFeatures() const
+
+extern "C"
+struct FeatureHaarPtr CvHaarEvaluator_getFeatures(
+        struct CvHaarEvaluatorPtr ptr, int idx);
 
 extern "C"
 void CvHaarEvaluator_init(
@@ -1675,3 +1674,199 @@ void TrackerFeatureSet_extraction(
 extern "C"
 struct TensorArray TrackerFeatureSet_getResponses(
         struct TrackerFeatureSetPtr ptr);
+
+struct ClassPlusStringArray {
+    struct ClassArray cls_array;
+    struct StringArray str_array;
+};
+
+//TODO const std::vector<std::pair<String,Ptr<TrackerFeature>>>& cv::TrackerFeatureSet::getTrackerFeature() const
+
+extern "C"
+void TrackerFeatureSet_removeOutliers(
+        struct TrackerFeatureSetPtr ptr);
+
+extern "C"
+void TrackerFeatureSet_selection(
+        struct TrackerFeatureSetPtr ptr);
+
+//TrackerSampler
+
+extern "C"
+struct TrackerSamplerPtr {
+    void *ptr;
+
+    inline cv::TrackerSampler * operator->() {
+        return static_cast<cv::TrackerSampler *>(ptr);
+    }
+    inline TrackerSamplerPtr(cv::TrackerSampler *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct TrackerSamplerPtr TrackerSampler_ctor();
+
+extern "C"
+void TrackerSampler_dtor(
+        struct TrackerSamplerPtr ptr);
+
+extern "C"
+bool TrackerSampler_addTrackerSamplerAlgorithm(
+        struct TrackerSamplerPtr ptr, const char *trackerSamplerAlgorithmType);
+
+extern "C"
+bool TrackerSampler_addTrackerSamplerAlgorithm2(
+        struct TrackerSamplerPtr ptr, struct TrackerSamplerAlgorithmPtr sampler);
+
+//TODO need to do const std::vector<std::pair<String,Ptr<TrackerSamplerAlgorithm>>> &getSamplers()const
+
+extern "C"
+struct TensorArray TrackerSampler_getSamples(
+        struct TrackerSamplerPtr ptr);
+
+extern "C"
+void TrackerSampler_sampling(
+        struct TrackerSamplerPtr ptr, struct TensorWrapper image,
+        struct RectWrapper boundingBox);
+
+//TrackerSamplerAlgorithm
+
+extern "C"
+struct TrackerSamplerAlgorithmPtr {
+    void *ptr;
+
+    inline cv::TrackerSamplerAlgorithm * operator->() {
+        return static_cast<cv::TrackerSamplerAlgorithm *>(ptr);
+    }
+    inline TrackerSamplerAlgorithmPtr(cv::TrackerSamplerAlgorithm *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+extern "C"
+struct TrackerSamplerAlgorithmPtr TrackerSamplerAlgorithm_ctor(
+        const char *trackerSamplerType);
+
+extern "C"
+void TrackerSamplerAlgorithm_dtor(
+        struct TrackerSamplerAlgorithmPtr ptr);
+
+extern "C"
+const char* TrackerSamplerAlgorithm_getClassName(
+        struct TrackerSamplerAlgorithmPtr ptr);
+
+extern "C"
+struct TensorArrayPlusBool TrackerSamplerAlgorithm_sampling(
+        struct TrackerSamplerAlgorithmPtr ptr, struct TensorWrapper image,
+        struct RectWrapper boundingBox);
+
+//TrackerSamplerCS
+
+extern "C"
+struct TrackerSamplerCSPtr {
+    void *ptr;
+
+    inline cv::TrackerSamplerCS * operator->() {
+        return static_cast<cv::TrackerSamplerCS *>(ptr);
+    }
+    inline TrackerSamplerCSPtr(cv::TrackerSamplerCS *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+struct TrackerSamplerCS_Params
+{
+    float overlap;
+    float searchFactor;
+};
+
+extern "C"
+struct TrackerSamplerCSPtr TrackerSamplerCS_ctor(
+        struct TrackerSamplerCS_Params parameters);
+
+extern "C"
+void TrackerSamplerCS_dtor(
+        struct TrackerSamplerCSPtr ptr);
+
+extern "C"
+struct RectWrapper TrackerSamplerCS_getROI(
+        struct TrackerSamplerCSPtr ptr);
+
+extern "C"
+struct TensorArrayPlusBool TrackerSamplerCS_samplingImpl(
+        struct TrackerSamplerCSPtr ptr, struct TensorWrapper image,
+        struct RectWrapper boundingBox);
+
+extern "C"
+void TrackerSamplerCS_setMode(
+        struct TrackerSamplerCSPtr ptr, int samplingMode);
+
+//TrackerSamplerCSC
+
+extern "C"
+struct TrackerSamplerCSCPtr {
+    void *ptr;
+
+    inline cv::TrackerSamplerCSC * operator->() {
+        return static_cast<cv::TrackerSamplerCSC *>(ptr);
+    }
+    inline TrackerSamplerCSCPtr(cv::TrackerSamplerCSC *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+struct TrackerSamplerCSC_Params
+{
+    float initInRad;
+    float trackInPosRad;
+    float searchWinSize;
+    int initMaxNegNum;
+    int trackMaxPosNum;
+    int trackMaxNegNum;
+};
+
+extern "C"
+struct TrackerSamplerCSCPtr TrackerSamplerCSC_ctor(
+        struct TrackerSamplerCSC_Params parameters);
+
+extern "C"
+void TrackerSamplerCSC_dtor(
+        struct TrackerSamplerCSCPtr ptr);
+
+extern "C"
+void TrackerSamplerCSC_setMode(
+        struct TrackerSamplerCSCPtr ptr, int samplingMode);
+
+//TrackerSamplerPF
+
+extern "C"
+struct TrackerSamplerPFPtr {
+    void *ptr;
+
+    inline cv::TrackerSamplerPF * operator->() {
+        return static_cast<cv::TrackerSamplerPF *>(ptr);
+    }
+    inline TrackerSamplerPFPtr(cv::TrackerSamplerPF *ptr) {
+        this->ptr = ptr;
+    }
+};
+
+struct TrackerSamplerPF_Params
+{
+    int iterationNum;
+    int particlesNum;
+    double alpha;
+    double std_1;
+    double std_2;
+    double std_3;
+    double std_4;
+};
+
+extern "C"
+struct TrackerSamplerPFPtr TrackerSamplerPF_ctor(
+        struct TensorWrapper chosenRect, struct TrackerSamplerPF_Params parameters);
+
+extern "C"
+void TrackerSamplerPF_dtor(
+        struct TrackerSamplerPFPtr ptr);
