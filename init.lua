@@ -196,6 +196,11 @@ struct TensorArrayPlusVec3d {
     struct Vec3dWrapper vec3d;
 };
 
+struct SizePlusInt {
+    struct SizeWrapper size;
+    int val;
+};
+
 struct RectPlusInt {
     struct RectWrapper rect;
     int val;
