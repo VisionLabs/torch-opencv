@@ -1493,13 +1493,11 @@ function cv.drawMatchesKnn(t)
     assert(
         matchesMask == nil or
         torch.isTensor(matchesMask) and cv.tensorType(matchesMask) == cv.CV_8S)
-    assert(type(matches1to2) == 'table')
-
-    local matches1to2_CArray = cv.tableToDMatchArrayOfArrays(matches1to2)
+    assert(ffi.typeof(matches1to2) == ffi.typeof(ffi.new('struct DMatchArrayOfArrays')))
 
     return cv.unwrap_tensors(C.drawMatchesKnn(
-        cv.wrap_tensor(img1), keypoints1, cv.wrap_tensor(img2), keypoints2, matches1to2_CArray,
-        cv.wrap_tensor(outImg), matchColor, singlePointColor, cv.wrap_tensor(matchesMask), flags))
+        cv.wrap_tensor(img1), keypoints1, cv.wrap_tensor(img2), keypoints2, matches1to2,
+        cv.wrap_tensor(outImg), matchColor, singlePointColor, cv.wrap_tensors(matchesMask), flags))
 end
 
 function cv.evaluateFeatureDetector(t)
