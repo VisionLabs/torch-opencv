@@ -853,7 +853,7 @@ struct DMatchArrayOfArrays DescriptorMatcher_knnMatch_trainDescriptors(
         int k, struct TensorWrapper mask, bool compactResult) {
     std::vector<std::vector<cv::DMatch>> retval;
     ptr->knnMatch(
-            queryDescriptors.toMat(), trainDescriptors.toMat(),
+    		queryDescriptors.toMat(), trainDescriptors.toMat(),
             retval, k, TO_MAT_OR_NOARRAY(mask), compactResult);
     return DMatchArrayOfArrays(retval);
 }

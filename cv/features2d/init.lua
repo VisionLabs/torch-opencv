@@ -519,8 +519,8 @@ do
         }
         local image, mask, descriptors, useProvidedKeypoints = cv.argcheck(t, argRules)
 
-        local result = C.Feature2D_detectAndCompute(self.ptr, cv.wrap_tensors(image), cv.wrap_tensors(mask),
-                    cv.wrap_tensors(descriptors), useProvidedKeypoints)
+        local result = C.Feature2D_detectAndCompute(self.ptr, cv.wrap_tensor(image), cv.wrap_tensor(mask),
+                    cv.wrap_tensor(descriptors), useProvidedKeypoints)
         return cv.gcarray(result.keypoints), cv.unwrap_tensors(result.tensor)
     end
 
@@ -1386,21 +1386,16 @@ do
         local result
 
         if trainDescriptors then
-            result = cv.gcarray(C.DescriptorknnMatcher_knnMatch_trainDescriptors(self.ptr,
-                cv.wrap_tensor(queryDescriptors), cv.wrap_tensors(trainDescriptors),
-                k, cv.wrap_tensors(mask), compactResult))
+            result = cv.gcarray(C.DescriptorMatcher_knnMatch_trainDescriptors(self.ptr,
+                cv.wrap_tensor(queryDescriptors), cv.wrap_tensor(trainDescriptors),
+                k, cv.wrap_tensor(mask), compactResult))
         else
-            result = cv.gcarray(C.DescriptorknnMatcher_knnMatch(self.ptr,
+            result = cv.gcarray(C.DescriptorMatcher_knnMatch(self.ptr,
                 cv.wrap_tensor(queryDescriptors),
                 k, cv.wrap_tensors(mask), compactResult))
         end
 
-        local retval = {}
-        for i = 0, result.size-1 do
-            retval[i+1] = cv.gcarray(result[i])
-        end
-
-        return retval
+        return result
     end
 end
 
@@ -1432,7 +1427,7 @@ do
             {"indexParams", default = flann.KDTreeIndexParams{}},
             {"searchParams", default = flann.SearchParams{}}
         }
-        local normType, crossCheck = cv.argcheck(t, argRules)
+        local indexParams, searchParams = cv.argcheck(t, argRules)
 
         self.ptr = C.FlannBasedMatcher_ctor(indexParams.ptr, searchParams.ptr)
     end
