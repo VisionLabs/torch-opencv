@@ -41,8 +41,8 @@ void GraphSegmentation_setMinSize(struct GraphSegmentationPtr ptr, int min_size)
 extern "C"
 int GraphSegmentation_getMinSize(struct GraphSegmentationPtr ptr);
 
-// See #103
-#ifndef APPLE
+// See #103 and #95
+/*
 
 // SelectiveSearchSegmentationStrategy
 struct SelectiveSearchSegmentationStrategyPtr {
@@ -52,6 +52,7 @@ struct SelectiveSearchSegmentationStrategyPtr {
     inline cv::ximgproc::segmentation::SelectiveSearchSegmentationStrategy * operator*() { return static_cast<cv::ximgproc::segmentation::SelectiveSearchSegmentationStrategy *>(ptr); }
     inline SelectiveSearchSegmentationStrategyPtr(cv::ximgproc::segmentation::SelectiveSearchSegmentationStrategy *ptr) { this->ptr = ptr; }
 };
+
 //
 // extern "C"
 // struct SelectiveSearchSegmentationStrategyPtr SelectiveSearchSegmentationStrategyColor_ctor();
@@ -122,5 +123,4 @@ void SelectiveSearchSegmentation_clearStrategies(struct SelectiveSearchSegmentat
 
 extern "C"
 struct RectArray SelectiveSearchSegmentation_process(struct SelectiveSearchSegmentationPtr ptr);
-
-#endif
+*/

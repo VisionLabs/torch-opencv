@@ -3,11 +3,8 @@
 extern "C"
 struct TensorWrapper niBlackThreshold(struct TensorWrapper src, struct TensorWrapper dst, double maxValue, int type, int blockSize, double delta) {
 
-    cv::Mat dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMat();
-
+    MatT dst_mat = dst.toMatT();
     cv::ximgproc::niBlackThreshold(src.toMat(), dst_mat, maxValue, type, blockSize, delta);
-
     return TensorWrapper(dst_mat);
 }
 
@@ -62,8 +59,8 @@ int GraphSegmentation_getMinSize(struct GraphSegmentationPtr ptr) {
 }
 
 
-// See #103
-#ifndef APPLE
+// See #103 and #95
+/*
 
 // SelectiveSearchSegmentation
 
@@ -135,4 +132,4 @@ struct RectArray SelectiveSearchSegmentation_process(struct SelectiveSearchSegme
 
     return RectArray(result);
 }
-#endif
+*/
