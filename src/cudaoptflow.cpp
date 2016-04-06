@@ -4,8 +4,7 @@ struct TensorWrapper DenseOpticalFlow_calc(struct cutorchInfo info,
     struct DenseOpticalFlowPtr ptr, struct TensorWrapper I0, struct TensorWrapper I1,
     struct TensorWrapper flow)
 {
-    cuda::GpuMat retval;
-    if (!flow.isNull()) retval = flow.toGpuMat();
+    cuda::GpuMat retval = flow.toGpuMat();
     ptr->calc(I0.toGpuMat(), I1.toGpuMat(), retval, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -16,9 +15,9 @@ struct TensorArray SparseOpticalFlow_calc(struct cutorchInfo info,
     bool outputErr, struct TensorWrapper err)
 {
     std::vector<cuda::GpuMat> retval(3);
-    if (!nextPts.isNull()) retval[0] = nextPts.toGpuMat();
-    if (!status.isNull())  retval[1] = status.toGpuMat();
-    if (!err.isNull())     retval[2] = err.toGpuMat();
+    retval[0] = nextPts.toGpuMat();
+    retval[1] = status.toGpuMat();
+    retval[2] = err.toGpuMat();
 
     ptr->calc(prevImg.toGpuMat(), nextImg.toGpuMat(), prevPts.toGpuMat(),
             retval[0], retval[1], outputErr ? retval[2] : cv::noArray(), prepareStream(info));
@@ -327,7 +326,7 @@ int FarnebackOpticalFlow_getFlagsCuda(struct FarnebackOpticalFlowPtr ptr)
 
 extern "C"
 struct OpticalFlowDual_TVL1Ptr OpticalFlowDual_TVL1_ctorCuda(
-        double tau, double lambda, double theta, int nscales, int warps, double epsilon, 
+        double tau, double lambda, double theta, int nscales, int warps, double epsilon,
         int iterations, double scaleStep, double gamma, bool useInitialFlow)
 {
     return rescueObjectFromPtr(cuda::OpticalFlowDual_TVL1::create(
@@ -454,4 +453,3 @@ bool OpticalFlowDual_TVL1_getUseInitialFlowCuda(struct OpticalFlowDual_TVL1Ptr p
 {
     return ptr->getUseInitialFlow();
 }
-

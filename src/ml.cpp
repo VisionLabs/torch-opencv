@@ -3,8 +3,7 @@
 struct TensorWrapper randMVNormal(
         struct TensorWrapper mean, struct TensorWrapper cov, int nsamples, struct TensorWrapper samples)
 {
-    MatT samples_mat;
-    if(!samples.isNull()) samples_mat = samples.toMatT();
+    MatT samples_mat = samples.toMatT();
         ml::randMVNormal(mean.toMat(), cov.toMat(), nsamples, samples_mat);
         return TensorWrapper(samples_mat);
 }
@@ -13,8 +12,8 @@ struct TensorArray createConcentricSpheresTestSet(
         int nsamples, int nfeatures, int nclasses, struct TensorWrapper samples, struct TensorWrapper responses)
 {
     std::vector<MatT> retval(2);
-    if (!samples.isNull()) retval[0] = samples.toMatT();
-    if (!responses.isNull()) retval[1] = responses.toMatT();
+    retval[0] = samples.toMatT();
+    retval[1] = responses.toMatT();
 
     ml::createConcentricSpheresTestSet(nsamples, nfeatures, nclasses, retval[0], retval[1]);
     return TensorArray(retval);
@@ -319,8 +318,7 @@ struct TensorPlusFloat StatModel_calcError(
     cv::Ptr<ml::TrainData> dataPtr(static_cast<ml::TrainData *>(data));
     TensorPlusFloat retval;
 
-    MatT resp_mat;
-    if(!resp.isNull()) resp_mat = resp.toMatT();
+    MatT resp_mat = resp.toMatT();
     retval.val = ptr->calcError(dataPtr, test, resp_mat);
     new(&retval.tensor) TensorWrapper(resp_mat);
     rescueObjectFromPtr(dataPtr);
@@ -349,8 +347,8 @@ struct TensorArrayPlusFloat NormalBayesClassifier_predictProb(
 {
     TensorArrayPlusFloat retval;
     std::vector<MatT> result(2);
-    if (!outputs.isNull()) result[0] = outputs.toMatT();
-    if (!outputProbs.isNull())  result[1] = outputProbs.toMatT();
+    result[0] = outputs.toMatT();
+    result[1] = outputProbs.toMatT();
 
     retval.val = ptr->predictProb(
             inputs.toMat(), result[0], result[1], flags);
@@ -588,8 +586,8 @@ struct TensorArrayPlusDouble SVM_getDecisionFunction(
 {
     TensorArrayPlusDouble retval;
     std::vector<MatT> result;
-    if (!alpha.isNull()) result[0] = alpha.toMatT();
-    if (!svidx.isNull()) result[1] = svidx.toMatT();
+    result[0] = alpha.toMatT();
+    result[1] = svidx.toMatT();
 
     retval.val = ptr->getDecisionFunction(i, result[0], result[1]);
 

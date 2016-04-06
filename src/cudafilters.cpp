@@ -4,8 +4,7 @@ extern "C"
 struct TensorWrapper Filter_applyCuda(cutorchInfo info,
     struct FilterPtr ptr, struct TensorWrapper src, struct TensorWrapper dst)
 {
-    cuda::GpuMat retval;
-    if (!dst.isNull()) retval = dst.toGpuMat();
+    cuda::GpuMat retval = dst.toGpuMat();
     ptr->apply(src.toGpuMat(), retval, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }

@@ -144,7 +144,7 @@ extern "C"
 int detail_stitchingLogLevel()
 {
     return detail::stitchingLogLevel();
-}	
+}
 
 /****************** Classes ******************/
 
@@ -177,7 +177,7 @@ struct TensorWrapper CameraParams_K(
     return TensorWrapper(ptr->K());
 }
 
-//TODO need to add const CameraParams& detail::CameraParams::operator=(const CameraParams & other)	
+//TODO need to add const CameraParams& detail::CameraParams::operator=(const CameraParams & other)
 
 //DisjointSets
 
@@ -1140,8 +1140,8 @@ struct TensorArrayPlusRect RotationWarper_buildMaps(
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
@@ -1170,8 +1170,7 @@ struct TensorPlusPoint RotationWarper_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -1185,8 +1184,7 @@ struct TensorWrapper RotationWarper_warpBackward(
         int interp_mode, int border_mode, struct SizeWrapper dst_size,
         struct TensorWrapper dst)
 {
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     ptr->warpBackward(src.toMat(), K.toMat(), R.toMat(), interp_mode,
                       border_mode, dst_size, dst_mat);
     return TensorWrapper(dst_mat);
@@ -1226,8 +1224,8 @@ struct TensorArrayPlusRect RotationWarperBase_CompressedRectilinearPortraitProje
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
@@ -1256,8 +1254,7 @@ struct TensorPlusPoint RotationWarperBase_CompressedRectilinearPortraitProjector
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -1271,8 +1268,7 @@ struct TensorWrapper RotationWarperBase_CompressedRectilinearPortraitProjector_w
         int interp_mode, int border_mode, struct SizeWrapper dst_size,
         struct TensorWrapper dst)
 {
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     ptr->warpBackward(src.toMat(), K.toMat(), R.toMat(), interp_mode,
                       border_mode, dst_size, dst_mat);
     return TensorWrapper(dst_mat);
@@ -1311,8 +1307,8 @@ struct TensorArrayPlusRect RotationWarperBase_CompressedRectilinearProjector_bui
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
@@ -1341,8 +1337,7 @@ struct TensorPlusPoint RotationWarperBase_CompressedRectilinearProjector_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -1356,8 +1351,7 @@ struct TensorWrapper RotationWarperBase_CompressedRectilinearProjector_warpBackw
         int interp_mode, int border_mode, struct SizeWrapper dst_size,
         struct TensorWrapper dst)
 {
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     ptr->warpBackward(src.toMat(), K.toMat(), R.toMat(), interp_mode,
                       border_mode, dst_size, dst_mat);
     return TensorWrapper(dst_mat);
@@ -1397,8 +1391,8 @@ struct TensorArrayPlusRect RotationWarperBase_CylindricalPortraitProjector_build
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
@@ -1427,8 +1421,7 @@ struct TensorPlusPoint RotationWarperBase_CylindricalPortraitProjector_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -1442,8 +1435,7 @@ struct TensorWrapper RotationWarperBase_CylindricalPortraitProjector_warpBackwar
         int interp_mode, int border_mode, struct SizeWrapper dst_size,
         struct TensorWrapper dst)
 {
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     ptr->warpBackward(src.toMat(), K.toMat(), R.toMat(), interp_mode,
                       border_mode, dst_size, dst_mat);
     return TensorWrapper(dst_mat);
@@ -1482,8 +1474,8 @@ struct TensorArrayPlusRect RotationWarperBase_CylindricalProjector_buildMaps(
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
@@ -1512,8 +1504,7 @@ struct TensorPlusPoint RotationWarperBase_CylindricalProjector_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -1527,8 +1518,7 @@ struct TensorWrapper RotationWarperBase_CylindricalProjector_warpBackward(
         int interp_mode, int border_mode, struct SizeWrapper dst_size,
         struct TensorWrapper dst)
 {
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     ptr->warpBackward(src.toMat(), K.toMat(), R.toMat(), interp_mode,
                       border_mode, dst_size, dst_mat);
     return TensorWrapper(dst_mat);
@@ -1567,8 +1557,8 @@ struct TensorArrayPlusRect RotationWarperBase_FisheyeProjector_buildMaps(
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
@@ -1597,8 +1587,7 @@ struct TensorPlusPoint RotationWarperBase_FisheyeProjector_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -1612,8 +1601,7 @@ struct TensorWrapper RotationWarperBase_FisheyeProjector_warpBackward(
         int interp_mode, int border_mode, struct SizeWrapper dst_size,
         struct TensorWrapper dst)
 {
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     ptr->warpBackward(src.toMat(), K.toMat(), R.toMat(), interp_mode,
                       border_mode, dst_size, dst_mat);
     return TensorWrapper(dst_mat);
@@ -1652,8 +1640,8 @@ struct TensorArrayPlusRect RotationWarperBase_MercatorProjector_buildMaps(
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
@@ -1682,8 +1670,7 @@ struct TensorPlusPoint RotationWarperBase_MercatorProjector_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -1697,8 +1684,7 @@ struct TensorWrapper RotationWarperBase_MercatorProjector_warpBackward(
         int interp_mode, int border_mode, struct SizeWrapper dst_size,
         struct TensorWrapper dst)
 {
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     ptr->warpBackward(src.toMat(), K.toMat(), R.toMat(), interp_mode,
                       border_mode, dst_size, dst_mat);
     return TensorWrapper(dst_mat);
@@ -1737,8 +1723,8 @@ struct TensorArrayPlusRect RotationWarperBase_PaniniPortraitProjector_buildMaps(
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
@@ -1767,8 +1753,7 @@ struct TensorPlusPoint RotationWarperBase_PaniniPortraitProjector_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -1782,8 +1767,7 @@ struct TensorWrapper RotationWarperBase_PaniniPortraitProjector_warpBackward(
         int interp_mode, int border_mode, struct SizeWrapper dst_size,
         struct TensorWrapper dst)
 {
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     ptr->warpBackward(src.toMat(), K.toMat(), R.toMat(), interp_mode,
                       border_mode, dst_size, dst_mat);
     return TensorWrapper(dst_mat);
@@ -1822,8 +1806,8 @@ struct TensorArrayPlusRect RotationWarperBase_PaniniProjector_buildMaps(
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
@@ -1852,8 +1836,7 @@ struct TensorPlusPoint RotationWarperBase_PaniniProjector_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -1867,8 +1850,7 @@ struct TensorWrapper RotationWarperBase_PaniniProjector_warpBackward(
         int interp_mode, int border_mode, struct SizeWrapper dst_size,
         struct TensorWrapper dst)
 {
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     ptr->warpBackward(src.toMat(), K.toMat(), R.toMat(), interp_mode,
                       border_mode, dst_size, dst_mat);
     return TensorWrapper(dst_mat);
@@ -1907,8 +1889,8 @@ struct TensorArrayPlusRect RotationWarperBase_PlanePortraitProjector_buildMaps(
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
@@ -1937,8 +1919,7 @@ struct TensorPlusPoint RotationWarperBase_PlanePortraitProjector_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -1952,8 +1933,7 @@ struct TensorWrapper RotationWarperBase_PlanePortraitProjector_warpBackward(
         int interp_mode, int border_mode, struct SizeWrapper dst_size,
         struct TensorWrapper dst)
 {
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     ptr->warpBackward(src.toMat(), K.toMat(), R.toMat(), interp_mode,
                       border_mode, dst_size, dst_mat);
     return TensorWrapper(dst_mat);
@@ -1992,8 +1972,8 @@ struct TensorArrayPlusRect RotationWarperBase_PlaneProjector_buildMaps(
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
@@ -2022,8 +2002,7 @@ struct TensorPlusPoint RotationWarperBase_PlaneProjector_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -2037,8 +2016,7 @@ struct TensorWrapper RotationWarperBase_PlaneProjector_warpBackward(
         int interp_mode, int border_mode, struct SizeWrapper dst_size,
         struct TensorWrapper dst)
 {
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     ptr->warpBackward(src.toMat(), K.toMat(), R.toMat(), interp_mode,
                       border_mode, dst_size, dst_mat);
     return TensorWrapper(dst_mat);
@@ -2077,8 +2055,8 @@ struct TensorArrayPlusRect RotationWarperBase_SphericalPortraitProjector_buildMa
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
@@ -2107,8 +2085,7 @@ struct TensorPlusPoint RotationWarperBase_SphericalPortraitProjector_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -2122,8 +2099,7 @@ struct TensorWrapper RotationWarperBase_SphericalPortraitProjector_warpBackward(
         int interp_mode, int border_mode, struct SizeWrapper dst_size,
         struct TensorWrapper dst)
 {
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     ptr->warpBackward(src.toMat(), K.toMat(), R.toMat(), interp_mode,
                       border_mode, dst_size, dst_mat);
     return TensorWrapper(dst_mat);
@@ -2162,8 +2138,8 @@ struct TensorArrayPlusRect RotationWarperBase_SphericalProjector_buildMaps(
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
@@ -2192,8 +2168,7 @@ struct TensorPlusPoint RotationWarperBase_SphericalProjector_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -2207,8 +2182,7 @@ struct TensorWrapper RotationWarperBase_SphericalProjector_warpBackward(
         int interp_mode, int border_mode, struct SizeWrapper dst_size,
         struct TensorWrapper dst)
 {
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     ptr->warpBackward(src.toMat(), K.toMat(), R.toMat(), interp_mode,
                       border_mode, dst_size, dst_mat);
     return TensorWrapper(dst_mat);
@@ -2247,8 +2221,8 @@ struct TensorArrayPlusRect RotationWarperBase_StereographicProjector_buildMaps(
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
@@ -2277,8 +2251,7 @@ struct TensorPlusPoint RotationWarperBase_StereographicProjector_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -2292,8 +2265,7 @@ struct TensorWrapper RotationWarperBase_StereographicProjector_warpBackward(
         int interp_mode, int border_mode, struct SizeWrapper dst_size,
         struct TensorWrapper dst)
 {
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     ptr->warpBackward(src.toMat(), K.toMat(), R.toMat(), interp_mode,
                       border_mode, dst_size, dst_mat);
     return TensorWrapper(dst_mat);
@@ -2332,8 +2304,8 @@ struct TensorArrayPlusRect RotationWarperBase_TransverseMercatorProjector_buildM
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMatT(), map_mat[0], map_mat[1]);
     new(&result.tensors) TensorArray(map_mat);
@@ -2362,8 +2334,7 @@ struct TensorPlusPoint RotationWarperBase_TransverseMercatorProjector_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -2377,8 +2348,7 @@ struct TensorWrapper RotationWarperBase_TransverseMercatorProjector_warpBackward
         int interp_mode, int border_mode, struct SizeWrapper dst_size,
         struct TensorWrapper dst)
 {
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     ptr->warpBackward(src.toMat(), K.toMat(), R.toMat(), interp_mode,
                       border_mode, dst_size, dst_mat);
     return TensorWrapper(dst_mat);
@@ -2630,8 +2600,8 @@ struct TensorArrayPlusRect detail_CylindricalWarper_buildMaps(
 {
     TensorArrayPlusRect result;
     std::vector<MatT> vec(2);
-    if(!xmap.isNull()) vec[0] = xmap.toMatT();
-    if(!ymap.isNull()) vec[1] = ymap.toMatT();
+    vec[0] = xmap.toMatT();
+    vec[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMat(), vec[0], vec[1]);
     new(&result.tensors) TensorArray(vec);
@@ -2645,8 +2615,7 @@ struct TensorPlusPoint detail_CylindricalWarper_warp(
         int interp_mode, int border_mode, struct TensorWrapper dst)
 {
     TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(), interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
     return result;
@@ -2669,8 +2638,8 @@ struct TensorArrayPlusRect detail_CylindricalWarperGpu_buildMaps(
 {
     TensorArrayPlusRect result;
     std::vector<MatT> vec(2);
-    if(!xmap.isNull()) vec[0] = xmap.toMatT();
-    if(!ymap.isNull()) vec[1] = ymap.toMatT();
+    vec[0] = xmap.toMatT();
+    vec[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMat(), vec[0], vec[1]);
     new(&result.tensors) TensorArray(vec);
@@ -2684,8 +2653,7 @@ struct TensorPlusPoint detail_CylindricalWarperGpu_warp(
         int interp_mode, int border_mode, struct TensorWrapper dst)
 {
     TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(
             src.toMat(), K.toMat(), R.toMat(),
             interp_mode, border_mode, dst_mat);
@@ -2755,8 +2723,8 @@ struct TensorArrayPlusRect detail_PlaneWarper_buildMaps2(
 {
     TensorArrayPlusRect result;
     std::vector<MatT> vec(2);
-    if(!xmap.isNull()) vec[0] = xmap.toMatT();
-    if(!ymap.isNull()) vec[1] = ymap.toMatT();
+    vec[0] = xmap.toMatT();
+    vec[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMat(), vec[0], vec[1]);
     new(&result.tensors) TensorArray(vec);
@@ -2772,8 +2740,8 @@ struct TensorArrayPlusRect detail_PlaneWarper_buildMaps(
 {
     struct TensorArrayPlusRect result;
     std::vector<MatT> map_mat(2);
-    if(!xmap.isNull()) map_mat[0] = xmap.toMatT();
-    if(!ymap.isNull()) map_mat[1] = ymap.toMatT();
+    map_mat[0] = xmap.toMatT();
+    map_mat[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(
             src_size, K.toMat(),R.toMatT(),
@@ -2791,8 +2759,7 @@ struct TensorPlusPoint detail_PlaneWarper_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(), T.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -2806,8 +2773,7 @@ struct TensorPlusPoint detail_PlaneWarper_warp2(
         int interp_mode, int border_mode, struct TensorWrapper dst)
 {
     TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(), interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
     return result;
@@ -2873,8 +2839,8 @@ struct TensorArrayPlusRect detail_SphericalWarper_buildMaps(
 {
     TensorArrayPlusRect result;
     std::vector<MatT> vec(2);
-    if(!xmap.isNull()) vec[0] = xmap.toMatT();
-    if(!ymap.isNull()) vec[1] = ymap.toMatT();
+    vec[0] = xmap.toMatT();
+    vec[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMat(), vec[0], vec[1]);
     new(&result.tensors) TensorArray(vec);
@@ -2888,8 +2854,7 @@ struct TensorPlusPoint detail_SphericalWarper_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if(!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);
@@ -2913,8 +2878,8 @@ struct TensorArrayPlusRect detail_SphericalWarperGpu_buildMaps(
 {
     TensorArrayPlusRect result;
     std::vector<MatT> vec(2);
-    if(!xmap.isNull()) vec[0] = xmap.toMatT();
-    if(!ymap.isNull()) vec[1] = ymap.toMatT();
+    vec[0] = xmap.toMatT();
+    vec[1] = ymap.toMatT();
 
     result.rect = ptr->buildMaps(src_size, K.toMat(), R.toMat(), vec[0], vec[1]);
     new(&result.tensors) TensorArray(vec);
@@ -2928,8 +2893,7 @@ struct TensorPlusPoint detail_SphericalWarperGpu_warp(
         int border_mode, struct TensorWrapper dst)
 {
     struct TensorPlusPoint result;
-    MatT dst_mat;
-    if (!dst.isNull()) dst_mat = dst.toMatT();
+    MatT dst_mat = dst.toMatT();
     result.point = ptr->warp(src.toMat(), K.toMat(), R.toMat(),
                              interp_mode, border_mode, dst_mat);
     new(&result.tensor) TensorWrapper(dst_mat);

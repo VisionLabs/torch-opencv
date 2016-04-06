@@ -77,8 +77,7 @@ struct TensorPlusKeyPointArray Feature2D_compute(
 
     std::vector<cv::KeyPoint> keypointsVector(keypoints);
 
-    MatT descriptors_mat;
-    if(!descriptors.isNull()) descriptors_mat = descriptors.toMatT();
+    MatT descriptors_mat = descriptors.toMatT();
     ptr->compute(image.toMat(), keypointsVector, descriptors_mat);
 
     new (&retval.tensor) TensorWrapper(descriptors_mat);
@@ -94,8 +93,7 @@ struct TensorPlusKeyPointArray Feature2D_detectAndCompute(
     struct TensorPlusKeyPointArray retval;
     std::vector<cv::KeyPoint> keypointsVector;
 
-    MatT descriptors_mat;
-    if(descriptors.isNull()) descriptors_mat = descriptors.toMatT();
+    MatT descriptors_mat = descriptors.toMatT();
     ptr->detectAndCompute(
                 image.toMat(), mask.toMat(), keypointsVector,
                 descriptors_mat, useProvidedKeypoints);
@@ -141,9 +139,7 @@ extern "C"
 struct BRISKPtr BRISK_ctor2(struct TensorWrapper radiusList, struct TensorWrapper numberList,
                             float dMax, float dMin, struct TensorWrapper indexChange)
 {
-    std::vector<int> indexVec;
-    if (!indexChange.isNull())
-        indexVec = indexChange.toMat();
+    std::vector<int> indexVec = indexChange.toMat();
 
     return rescueObjectFromPtr(cv::BRISK::create(
             radiusList.toMat(), numberList.toMat(), dMax, dMin, indexVec));
@@ -818,8 +814,7 @@ struct DMatchArray DescriptorMatcher_match(struct DescriptorMatcherPtr ptr,
         struct TensorWrapper queryDescriptors, struct TensorWrapper mask)
 {
     std::vector<cv::DMatch> retval;
-    ptr->match(
-            queryDescriptors.toMat(), retval, TO_MAT_OR_NOARRAY(mask));
+    ptr->match(queryDescriptors.toMat(), retval, TO_MAT_OR_NOARRAY(mask));
     return retval;
 }
 
@@ -829,8 +824,8 @@ struct DMatchArray DescriptorMatcher_match_trainDescriptors(struct DescriptorMat
         struct TensorWrapper mask)
 {
     std::vector<cv::DMatch> retval;
-    ptr->match(
-            queryDescriptors.toMat(), trainDescriptors.toMat(), retval, TO_MAT_OR_NOARRAY(mask));
+    ptr->match(queryDescriptors.toMat(), trainDescriptors.toMat(),
+               retval, TO_MAT_OR_NOARRAY(mask));
     return retval;
 }
 
@@ -888,8 +883,7 @@ struct TensorWrapper drawKeypoints(
         struct TensorWrapper image, struct KeyPointArray keypoints, struct TensorWrapper outImage,
         struct ScalarWrapper color, int flags)
 {
-    MatT outImage_mat;
-    if(!outImage.isNull()) outImage_mat = outImage.toMatT();
+    MatT outImage_mat = outImage.toMatT();
     cv::drawKeypoints(image.toMat(), keypoints, outImage_mat, color, flags);
     return TensorWrapper(outImage_mat);
 }
@@ -912,8 +906,7 @@ struct TensorWrapper drawMatches(
                 matchesMaskVec.begin());
     }
 
-    MatT outImg_mat;
-    if(!outImg.isNull()) outImg_mat = outImg.toMatT();
+    MatT outImg_mat = outImg.toMatT();
     cv::drawMatches(
             img1.toMat(), keypoints1, img2.toMat(), keypoints2, matches1to2, outImg_mat,
             matchColor, singlePointColor, matchesMaskVec, flags);
@@ -941,8 +934,7 @@ struct TensorWrapper drawMatchesKnn(
         }
     }
 
-    MatT outImg_mat;
-    if(!outImg.isNull()) outImg_mat = outImg.toMatT();
+    MatT outImg_mat = outImg.toMatT();
     cv::drawMatches(
                 img1.toMat(), keypoints1, img2.toMat(), keypoints2, matches1to2, outImg_mat,
                 matchColor, singlePointColor, matchesMaskVec, flags);
@@ -1102,8 +1094,7 @@ struct TensorWrapper BOWImgDescriptorExtractor_compute(
 {
     std::vector<cv::KeyPoint> keypointsVec = keypoints;
 
-    cv::Mat imgDescriptor_mat;
-    if(!imgDescriptor.isNull()) imgDescriptor_mat = imgDescriptor.toMat();
+    cv::Mat imgDescriptor_mat = imgDescriptor.toMat();
     ptr->compute2(image.toMat(), keypointsVec, imgDescriptor_mat);
     return TensorWrapper(MatT(imgDescriptor_mat));
 }

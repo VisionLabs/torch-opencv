@@ -25,8 +25,7 @@ extern "C" struct TensorArrayPlusInt buildOpticalFlowPyramid(struct TensorWrappe
                         bool withDerivatives, int pyrBorder, int derivBorder,
                         bool tryReuseInputImage)
 {
-    std::vector<MatT> output;
-    if(!pyramid.isNull()) output = pyramid.toMatTList();
+    std::vector<MatT> output = pyramid.toMatTList();
     TensorArrayPlusInt retval;
     retval.val = cv::buildOpticalFlowPyramid(img.toMat(), output, winSize, maxLevel,
                     withDerivatives, pyrBorder, derivBorder, tryReuseInputImage);
@@ -41,8 +40,8 @@ extern "C" struct TensorArray calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
                         struct TermCriteriaWrapper criteria, int flags, double minEigThreshold)
 {
     std::vector<MatT> retval(3);
-    if (!status.isNull()) retval[1] = status.toMatT();
-    if (!err.isNull()) retval[2] = err.toMatT();
+    retval[1] = status.toMatT();
+    retval[2] = err.toMatT();
 
     cv::calcOpticalFlowPyrLK(prevImg.toMat(), nextImg.toMat(), prevPts.toMat(), nextPts.toMat(), retval[1],
                 retval[2], winSize, maxLevel,
@@ -88,8 +87,7 @@ extern "C" struct TensorPlusDouble findTransformECC(struct TensorWrapper templat
 extern "C" struct TensorWrapper BackgroundSubtractor_apply(struct BackgroundSubtractorPtr ptr,
                         struct TensorWrapper image, struct TensorWrapper fgmast, double learningRate)
 {
-    MatT fgmast_mat;
-    if(!fgmast.isNull()) fgmast_mat = fgmast.toMatT();
+    MatT fgmast_mat = fgmast.toMatT();
     ptr->apply(image.toMat(), fgmast_mat, learningRate);
     return TensorWrapper(fgmast_mat);
 }
@@ -98,8 +96,7 @@ extern "C" struct TensorWrapper BackgroundSubtractor_getBackgroundImage(
 		struct BackgroundSubtractorPtr ptr,
 		struct TensorWrapper backgroundImage)
 {
-    MatT backgroundImage_mat;
-    if(!backgroundImage.isNull()) backgroundImage_mat = backgroundImage.toMatT();
+    MatT backgroundImage_mat = backgroundImage.toMatT();
     ptr->getBackgroundImage(backgroundImage_mat);
     return TensorWrapper(backgroundImage_mat);
 }
@@ -352,8 +349,7 @@ extern "C" void KalmanFilter_init(struct KalmanFilterPtr ptr, int dynamParams, i
 extern "C" struct TensorWrapper KalmanFilter_predict(struct KalmanFilterPtr ptr,
                         struct TensorWrapper control)
 {
-    cv::Mat retval;
-    if (!control.isNull()) retval = control.toMat();
+    cv::Mat retval = control.toMat();
     cv::Mat result = ptr->predict(retval);
     return TensorWrapper(MatT(result));
 }

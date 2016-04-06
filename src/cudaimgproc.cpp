@@ -13,8 +13,7 @@ extern "C"
 struct TensorWrapper demosaicingCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst, int code, int dcn)
 {
-    cuda::GpuMat retval;
-    if (!dst.isNull()) retval = dst.toGpuMat();
+    cuda::GpuMat retval = dst.toGpuMat();
     cuda::demosaicing(src.toGpuMat(), retval, code, dcn, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -31,8 +30,7 @@ extern "C"
 struct TensorWrapper gammaCorrectionCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst, bool forward)
 {
-    cuda::GpuMat retval;
-    if (!dst.isNull()) retval = dst.toGpuMat();
+    cuda::GpuMat retval = dst.toGpuMat();
     cuda::gammaCorrection(src.toGpuMat(), retval, forward, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -42,8 +40,7 @@ struct TensorWrapper alphaCompCuda(struct cutorchInfo info,
         struct TensorWrapper img1, struct TensorWrapper img2,
         struct TensorWrapper dst, int alpha_op)
 {
-    cuda::GpuMat retval;
-    if (!dst.isNull()) retval = dst.toGpuMat();
+    cuda::GpuMat retval = dst.toGpuMat();
     cuda::alphaComp(img1.toGpuMat(), img2.toGpuMat(), retval, alpha_op, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -52,8 +49,7 @@ extern "C"
 struct TensorWrapper calcHistCuda(
         struct cutorchInfo info, struct TensorWrapper src, struct TensorWrapper hist)
 {
-    cuda::GpuMat retval;
-    if (!hist.isNull()) retval = hist.toGpuMat();
+    cuda::GpuMat retval = hist.toGpuMat();
     cuda::calcHist(src.toGpuMat(), retval, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -62,8 +58,7 @@ extern "C"
 struct TensorWrapper equalizeHistCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst)
 {
-    cuda::GpuMat retval;
-    if (!dst.isNull()) retval = dst.toGpuMat();
+    cuda::GpuMat retval = dst.toGpuMat();
     cuda::equalizeHist(src.toGpuMat(), retval);
     return TensorWrapper(retval, info.state);
 }
@@ -72,8 +67,7 @@ extern "C"
 struct TensorWrapper evenLevelsCuda(struct cutorchInfo info,
         struct TensorWrapper levels, int nLevels, int lowerLevel, int upperLevel)
 {
-    cuda::GpuMat retval;
-    if (!levels.isNull()) retval = levels.toGpuMat();
+    cuda::GpuMat retval = levels.toGpuMat();
     cuda::evenLevels(retval, nLevels, lowerLevel, upperLevel, prepareStream(info));
 }
 //
@@ -148,8 +142,7 @@ struct TensorWrapper CornernessCriteria_computeCuda(
         struct cutorchInfo info, struct CornernessCriteriaPtr ptr,
         struct TensorWrapper src, struct TensorWrapper dst)
 {
-    cuda::GpuMat retval;
-    if (!dst.isNull()) retval = dst.toGpuMat();
+    cuda::GpuMat retval = dst.toGpuMat();
     ptr->compute(src.toGpuMat(), retval, prepareStream(info));
 }
 
@@ -168,8 +161,7 @@ struct TensorWrapper CornersDetector_detectCuda(
         struct cutorchInfo info, struct CornersDetectorPtr ptr, struct TensorWrapper image,
         struct TensorWrapper corners, struct TensorWrapper mask)
 {
-    cuda::GpuMat retval;
-    if (!corners.isNull()) retval = corners.toGpuMat();
+    cuda::GpuMat retval = corners.toGpuMat();
     ptr->detect(image.toGpuMat(), retval, TO_GPUMAT_OR_NOARRAY(mask));
     return TensorWrapper(retval, info.state);
 }
@@ -187,8 +179,7 @@ struct TensorWrapper TemplateMatching_matchCuda(
         struct cutorchInfo info, struct TemplateMatchingPtr ptr, struct TensorWrapper image,
         struct TensorWrapper templ, struct TensorWrapper result)
 {
-    cuda::GpuMat retval;
-    if (!result.isNull()) retval = result.toGpuMat();
+    cuda::GpuMat retval = result.toGpuMat();
     ptr->match(image.toGpuMat(), templ.toGpuMat(), retval, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -198,8 +189,7 @@ struct TensorWrapper bilateralFilterCuda(struct cutorchInfo info,
         struct TensorWrapper src, struct TensorWrapper dst, int kernel_size,
         float sigma_color, float sigma_spatial, int borderMode)
 {
-    cuda::GpuMat retval;
-    if (!dst.isNull()) retval = dst.toGpuMat();
+    cuda::GpuMat retval = dst.toGpuMat();
     cuda::bilateralFilter(
             src.toGpuMat(), retval, kernel_size, sigma_color,
             sigma_color, borderMode, prepareStream(info));
@@ -208,11 +198,10 @@ struct TensorWrapper bilateralFilterCuda(struct cutorchInfo info,
 
 extern "C"
 struct TensorWrapper blendLinearCuda(struct cutorchInfo info,
-        struct TensorWrapper img1, struct TensorWrapper img2, struct TensorWrapper weights1, 
+        struct TensorWrapper img1, struct TensorWrapper img2, struct TensorWrapper weights1,
         struct TensorWrapper weights2, struct TensorWrapper result)
 {
-    cuda::GpuMat retval;
-    if (!result.isNull()) retval = result.toGpuMat();
+    cuda::GpuMat retval = result.toGpuMat();
     cuda::blendLinear(
             img1.toGpuMat(), img2.toGpuMat(), weights1.toGpuMat(), weights2.toGpuMat(),
             retval, prepareStream(info));
