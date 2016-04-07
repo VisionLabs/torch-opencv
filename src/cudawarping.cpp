@@ -64,8 +64,8 @@ struct TensorArray buildWarpAffineMapsCuda(
         struct SizeWrapper dsize, struct TensorWrapper xmap, struct TensorWrapper ymap)
 {
     std::vector<cuda::GpuMat> retval(2);
-    if (!xmap.isNull()) retval[0] = xmap.toGpuMat();
-    if (!ymap.isNull()) retval[1] = ymap.toGpuMat();
+    retval[0] = xmap.toGpuMat();
+    retval[1] = ymap.toGpuMat();
 
     cuda::buildWarpAffineMaps(M.toGpuMat(), inverse, dsize,
                               retval[0], retval[1], prepareStream(info));
@@ -102,8 +102,8 @@ struct TensorArray buildWarpPerspectiveMapsCuda(
         struct SizeWrapper dsize, struct TensorWrapper xmap, struct TensorWrapper ymap)
 {
     std::vector<cuda::GpuMat> retval(2);
-    if (!xmap.isNull()) retval[0] = xmap.toGpuMat();
-    if (!ymap.isNull()) retval[1] = ymap.toGpuMat();
+    retval[0] = xmap.toGpuMat();
+    retval[1] = ymap.toGpuMat();
 
     cuda::buildWarpPerspectiveMaps(M.toGpuMat(), inverse, dsize,
                                    retval[0], retval[1], prepareStream(info));
@@ -116,8 +116,7 @@ struct TensorWrapper rotateCuda(
         struct cutorchInfo info, struct TensorWrapper src, struct TensorWrapper dst,
         struct SizeWrapper dsize, double angle, double xShift, double yShift, int interpolation)
 {
-    cuda::GpuMat dstMat;
-    if (!dst.isNull()) dstMat = dst.toGpuMat();
+    cuda::GpuMat dstMat = dst.toGpuMat();
     cuda::rotate(src.toGpuMat(), dstMat, dsize, angle, xShift, yShift,
                  interpolation, prepareStream(info));
     return TensorWrapper(dstMat, info.state);

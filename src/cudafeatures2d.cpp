@@ -44,8 +44,7 @@ struct TensorWrapper DescriptorMatcher_matchCuda(
         struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
         struct TensorWrapper matches, struct TensorWrapper mask)
 {
-    cuda::GpuMat retval;
-    if (!matches.isNull()) retval = matches.toGpuMat();
+    cuda::GpuMat retval = matches.toGpuMat();
     ptr->matchAsync(
             queryDescriptors.toGpuMat(), trainDescriptors.toGpuMat(), retval,
             TO_GPUMAT_OR_NOARRAY(mask), prepareStream(info));
@@ -58,8 +57,7 @@ struct TensorWrapper DescriptorMatcher_match_masksCuda(
         struct TensorWrapper queryDescriptors, struct TensorWrapper matches,
         struct TensorArray masks)
 {
-    cuda::GpuMat retval;
-    if (!matches.isNull()) retval = matches.toGpuMat();
+    cuda::GpuMat retval = matches.toGpuMat();
     ptr->matchAsync(
             queryDescriptors.toGpuMat(), retval,
             TO_GPUMAT_LIST_OR_NOARRAY(masks), prepareStream(info));
@@ -81,8 +79,7 @@ struct TensorWrapper DescriptorMatcher_knnMatchCuda(
         struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
         struct TensorWrapper matches, int k, struct TensorWrapper mask)
 {
-    cuda::GpuMat retval;
-    if (!matches.isNull()) retval = matches.toGpuMat();
+    cuda::GpuMat retval = matches.toGpuMat();
     ptr->knnMatchAsync(
             queryDescriptors.toGpuMat(), trainDescriptors.toGpuMat(), retval,
             k, TO_GPUMAT_OR_NOARRAY(mask), prepareStream(info));
@@ -95,8 +92,7 @@ struct TensorWrapper DescriptorMatcher_knnMatch_masksCuda(
         struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
         struct TensorWrapper matches, int k, struct TensorArray masks)
 {
-    cuda::GpuMat retval;
-    if (!matches.isNull()) retval = matches.toGpuMat();
+    cuda::GpuMat retval = matches.toGpuMat();
     ptr->knnMatchAsync(
             queryDescriptors.toGpuMat(), trainDescriptors.toGpuMat(), retval,
             k, TO_GPUMAT_LIST_OR_NOARRAY(masks), prepareStream(info));
@@ -119,8 +115,7 @@ struct TensorWrapper DescriptorMatcher_radiusMatchCuda(
         struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
         struct TensorWrapper matches, float maxDistance, struct TensorWrapper mask)
 {
-    cuda::GpuMat retval;
-    if (!matches.isNull()) retval = matches.toGpuMat();
+    cuda::GpuMat retval = matches.toGpuMat();
     ptr->radiusMatchAsync(
             queryDescriptors.toGpuMat(), trainDescriptors.toGpuMat(),
             retval, maxDistance, TO_GPUMAT_OR_NOARRAY(mask), prepareStream(info));
@@ -133,8 +128,7 @@ struct TensorWrapper DescriptorMatcher_radiusMatch_masksCuda(
         struct TensorWrapper queryDescriptors, struct TensorWrapper trainDescriptors,
         struct TensorWrapper matches, float maxDistance, struct TensorArray masks)
 {
-    cuda::GpuMat retval;
-    if (!matches.isNull()) retval = matches.toGpuMat();
+    cuda::GpuMat retval = matches.toGpuMat();
     ptr->radiusMatchAsync(
             queryDescriptors.toGpuMat(), trainDescriptors.toGpuMat(),
             retval, maxDistance, TO_GPUMAT_LIST_OR_NOARRAY(masks), prepareStream(info));
@@ -162,8 +156,7 @@ struct TensorWrapper Feature2DAsync_detectAsyncCuda(
         struct cutorchInfo info, struct Feature2DAsyncPtr ptr, struct TensorWrapper image,
         struct TensorWrapper keypoints, struct TensorWrapper mask)
 {
-    cuda::GpuMat retval;
-    if (!keypoints.isNull()) retval = keypoints.toGpuMat();
+    cuda::GpuMat retval = keypoints.toGpuMat();
     ptr->detectAsync(image.toGpuMat(), retval, TO_GPUMAT_OR_NOARRAY(mask), prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -174,8 +167,8 @@ struct TensorArray Feature2DAsync_computeAsyncCuda(
         struct TensorWrapper keypoints, struct TensorWrapper descriptors)
 {
     std::vector<cuda::GpuMat> retval(2);
-    if (!keypoints.isNull()) retval[0] = keypoints.toGpuMat();
-    if (!descriptors.isNull()) retval[1] = descriptors.toGpuMat();
+    retval[0] = keypoints.toGpuMat();
+    retval[1] = descriptors.toGpuMat();
     ptr->computeAsync(image.toGpuMat(), retval[0], retval[1], prepareStream(info));
     return TensorArray(retval, info.state);
 }
@@ -187,8 +180,8 @@ struct TensorArray Feature2DAsync_detectAndComputeAsyncCuda(
         struct TensorWrapper descriptors, bool useProvidedKeypoints)
 {
     std::vector<cuda::GpuMat> retval(2);
-    if (!keypoints.isNull()) retval[0] = keypoints.toGpuMat();
-    if (!descriptors.isNull()) retval[1] = descriptors.toGpuMat();
+    retval[0] = keypoints.toGpuMat();
+    retval[1] = descriptors.toGpuMat();
     ptr->detectAndComputeAsync(
             image.toGpuMat(), mask.toGpuMat(), retval[0], retval[1],
             useProvidedKeypoints, prepareStream(info));
@@ -226,7 +219,7 @@ int FastFeatureDetector_getMaxNumPointsCuda(struct FastFeatureDetectorPtr ptr)
 
 extern "C"
 struct ORBPtr ORB_ctorCuda(
-        int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel, 
+        int nfeatures, float scaleFactor, int nlevels, int edgeThreshold, int firstLevel,
         int WTA_K, int scoreType, int patchSize, int fastThreshold, bool blurForDescriptor)
 {
     return rescueObjectFromPtr(

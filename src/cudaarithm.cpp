@@ -120,8 +120,8 @@ struct TensorArray cartToPolarCuda(
         struct TensorWrapper magnitude, struct TensorWrapper angle, bool angleInDegrees)
 {
     std::vector<cuda::GpuMat> result(2);
-    if (!magnitude.isNull()) result[0] = magnitude.toGpuMat();
-    if (!angle.isNull())     result[1] = angle.toGpuMat();
+    result[0] = magnitude.toGpuMat();
+    result[1] = angle.toGpuMat();
 
     cuda::cartToPolar(x.toGpuMat(), y.toGpuMat(), result[0], result[1], angleInDegrees, prepareStream(info));
 
@@ -134,8 +134,8 @@ struct TensorArray polarToCartCuda(
         struct TensorWrapper x, struct TensorWrapper y, bool angleInDegrees)
 {
     std::vector<cuda::GpuMat> result;
-    if (!x.isNull()) result[0] = x.toGpuMat();
-    if (!y.isNull()) result[1] = y.toGpuMat();
+    result[0] = x.toGpuMat();
+    result[1] = y.toGpuMat();
 
     cuda::polarToCart(magnitude.toGpuMat(), angle.toGpuMat(), result[0], result[1], angleInDegrees, prepareStream(info));
 

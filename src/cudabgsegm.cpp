@@ -13,8 +13,7 @@ struct TensorWrapper BackgroundSubtractorMOG_applyCuda(struct cutorchInfo info,
                                                     struct BackgroundSubtractorMOGPtr ptr, struct TensorWrapper image,
                                                     struct TensorWrapper fgmask, double learningRate)
 {
-    cuda::GpuMat retval;
-    if (!fgmask.isNull()) retval = fgmask.toGpuMat();
+    cuda::GpuMat retval = fgmask.toGpuMat();
     ptr->apply(image.toGpuMat(), retval, learningRate, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -24,8 +23,7 @@ struct TensorWrapper BackgroundSubtractorMOG_getBackgroundImageCuda(
         struct cutorchInfo info, struct BackgroundSubtractorMOGPtr ptr,
         struct TensorWrapper backgroundImage)
 {
-    cuda::GpuMat retval;
-    if (!backgroundImage.isNull()) retval = backgroundImage.toGpuMat();
+    cuda::GpuMat retval = backgroundImage.toGpuMat();
     ptr->getBackgroundImage(retval, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -91,8 +89,7 @@ struct TensorWrapper BackgroundSubtractorMOG2_applyCuda(struct cutorchInfo info,
         struct BackgroundSubtractorMOG2Ptr ptr, struct TensorWrapper image,
         struct TensorWrapper fgmask, double learningRate)
 {
-    cuda::GpuMat retval;
-    if (!fgmask.isNull()) retval = fgmask.toGpuMat();
+    cuda::GpuMat retval = fgmask.toGpuMat();
     ptr->apply(image.toGpuMat(), retval, learningRate, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -102,8 +99,7 @@ struct TensorWrapper BackgroundSubtractorMOG2_getBackgroundImageCuda(
         struct cutorchInfo info, struct BackgroundSubtractorMOG2Ptr ptr,
         struct TensorWrapper backgroundImage)
 {
-    cuda::GpuMat retval;
-    if (!backgroundImage.isNull()) retval = backgroundImage.toGpuMat();
+    cuda::GpuMat retval = backgroundImage.toGpuMat();
     ptr->getBackgroundImage(retval, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }

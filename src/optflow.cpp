@@ -5,8 +5,7 @@ struct TensorWrapper calcOpticalFlowSF(
         struct TensorWrapper from, struct TensorWrapper to, struct TensorWrapper flow,
         int layers, int averaging_block_size, int max_flow)
 {
-    MatT flow_mat;
-    if(!flow.isNull()) flow_mat = flow.toMatT();
+    MatT flow_mat = flow.toMatT();
     optflow::calcOpticalFlowSF(
                 from.toMat(), to.toMat(), flow_mat, layers, averaging_block_size, max_flow);
     return TensorWrapper(flow_mat);
@@ -21,8 +20,7 @@ struct TensorWrapper calcOpticalFlowSF_expanded(
         int upscale_averaging_radius, double upscale_sigma_dist,
         double upscale_sigma_color, double speed_up_thr)
 {
-    MatT flow_mat;
-    if(!flow.isNull()) flow_mat = flow.toMatT();
+    MatT flow_mat = flow.toMatT();
     optflow::calcOpticalFlowSF(
                 from.toMat(), to.toMat(), flow_mat, layers, averaging_block_size,
                 max_flow, sigma_dist, sigma_color, postprocess_window, sigma_dist_fix,
@@ -57,8 +55,8 @@ struct TensorArray calcMotionGradient(
         double delta1, double delta2, int apertureSize)
 {
     std::vector<MatT> retval(2);
-    if (!mask.isNull()) retval[0] = mask.toMatT();
-    if (!orientation.isNull()) retval[1] = orientation.toMatT();
+    retval[0] = mask.toMatT();
+    retval[1] = orientation.toMatT();
     motempl::calcMotionGradient(mhi.toMat(), retval[0], retval[1], delta1, delta2, apertureSize);
     return TensorArray(retval);
 }
@@ -80,8 +78,7 @@ struct TensorPlusRectArray segmentMotion(
     struct TensorPlusRectArray retval;
     std::vector<cv::Rect> rects;
 
-    MatT segmask_mat;
-    if(!segmask.isNull()) segmask_mat = segmask.toMatT();
+    MatT segmask_mat = segmask.toMatT();
     motempl::segmentMotion(mhi.toMat(), segmask_mat, rects, timestamp, segThresh);
     new(&retval.tensor) TensorWrapper(segmask_mat);
     new (&retval.rects) RectArray(rects);
@@ -115,8 +112,7 @@ struct TensorWrapper calcOpticalFlowSparseToDense(
         struct TensorWrapper from, struct TensorWrapper to, struct TensorWrapper flow,
         int grid_step, int k, float sigma, bool use_post_proc, float fgs_lambda, float fgs_sigma)
 {
-    MatT flow_mat;
-    if(!flow.isNull()) flow_mat = flow.toMatT();
+    MatT flow_mat = flow.toMatT();
     optflow::calcOpticalFlowSparseToDense(
                 from.toMat(), to.toMat(), flow_mat, grid_step, k,
                 sigma, use_post_proc, fgs_lambda, fgs_sigma);

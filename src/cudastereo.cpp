@@ -10,8 +10,7 @@ extern "C"
 struct TensorWrapper StereoBM_computeCuda(struct cutorchInfo info, struct StereoBMPtr ptr,
         struct TensorWrapper left, struct TensorWrapper right, struct TensorWrapper disparity)
 {
-    cuda::GpuMat retval;
-    if (!disparity.isNull()) retval = disparity.toGpuMat();
+    cuda::GpuMat retval = disparity.toGpuMat();
     ptr->compute(left.toGpuMat(), right.toGpuMat(), retval, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -29,8 +28,7 @@ struct TensorWrapper StereoBeliefPropagation_computeCuda(struct cutorchInfo info
         struct StereoBeliefPropagationPtr ptr, struct TensorWrapper left,
         struct TensorWrapper right, struct TensorWrapper disparity)
 {
-    cuda::GpuMat retval;
-    if (!disparity.isNull()) retval = disparity.toGpuMat();
+    cuda::GpuMat retval = disparity.toGpuMat();
     ptr->compute(left.toGpuMat(), right.toGpuMat(), retval, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -40,8 +38,7 @@ struct TensorWrapper StereoBeliefPropagation_compute2Cuda(struct cutorchInfo inf
         struct StereoBeliefPropagationPtr ptr, struct TensorWrapper data,
         struct TensorWrapper disparity)
 {
-    cuda::GpuMat retval;
-    if (!disparity.isNull()) retval = disparity.toGpuMat();
+    cuda::GpuMat retval = disparity.toGpuMat();
     ptr->compute(data.toGpuMat(), retval, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -185,8 +182,7 @@ struct TensorWrapper reprojectImageTo3DCuda(
         struct cutorchInfo info, struct TensorWrapper disp,
         struct TensorWrapper xyzw, struct TensorWrapper Q, int dst_cn)
 {
-    cuda::GpuMat retval;
-    if (!xyzw.isNull()) retval = xyzw.toGpuMat();
+    cuda::GpuMat retval = xyzw.toGpuMat();
     cuda::reprojectImageTo3D(disp.toGpuMat(), retval, Q.toGpuMat(), dst_cn, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
@@ -196,8 +192,7 @@ struct TensorWrapper drawColorDispCuda(
         struct cutorchInfo info, struct TensorWrapper src_disp,
         struct TensorWrapper dst_disp, int ndisp)
 {
-    cuda::GpuMat retval;
-    if (!dst_disp.isNull()) retval = dst_disp.toGpuMat();
+    cuda::GpuMat retval = dst_disp.toGpuMat();
     cuda::drawColorDisp(src_disp.toGpuMat(), retval, ndisp, prepareStream(info));
     return TensorWrapper(retval, info.state);
 }
