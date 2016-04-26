@@ -2,7 +2,6 @@
 #include <Classes.hpp>
 #include <opencv2/ximgproc.hpp>
 
-
 extern "C"
 struct TensorWrapper niBlackThreshold(struct TensorWrapper src, struct TensorWrapper dst, double maxValue, int type, int blockSize, double delta);
 
@@ -40,6 +39,38 @@ void GraphSegmentation_setMinSize(struct GraphSegmentationPtr ptr, int min_size)
 
 extern "C"
 int GraphSegmentation_getMinSize(struct GraphSegmentationPtr ptr);
+
+// SuperpixelSLIC
+struct SuperpixelSLICPtr {
+    void *ptr;
+
+    inline cv::ximgproc::SuperpixelSLIC * operator->() { return static_cast<cv::ximgproc::SuperpixelSLIC *>(ptr); }
+    inline cv::ximgproc::SuperpixelSLIC * operator*() { return static_cast<cv::ximgproc::SuperpixelSLIC *>(ptr); }
+    inline SuperpixelSLICPtr(cv::ximgproc::SuperpixelSLIC *ptr) { this->ptr = ptr; }
+};
+
+extern "C"
+struct SuperpixelSLICPtr SuperpixelSLIC_ctor(
+        struct TensorWrapper image, int algorithm,
+        int region_size, float ruler);
+
+extern "C"
+int SuperpixelSLIC_getNumberOfSuperpixels(struct SuperpixelSLICPtr ptr);
+
+extern "C"
+void SuperpixelSLIC_iterate(struct SuperpixelSLICPtr ptr, int num_iterations);
+
+extern "C"
+struct TensorWrapper SuperpixelSLIC_getLabels(
+        struct SuperpixelSLICPtr ptr, struct TensorWrapper labels_out);
+
+extern "C"
+struct TensorWrapper SuperpixelSLIC_getLabelContourMask(
+        struct SuperpixelSLICPtr ptr, struct TensorWrapper image, bool thick_line);
+
+extern "C"
+void SuperpixelSLIC_enforceLabelConnectivity(
+        struct SuperpixelSLICPtr ptr, int min_element_size);
 
 // See #103 and #95
 /*
