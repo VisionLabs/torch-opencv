@@ -75,7 +75,22 @@ void SelectiveSearchSegmentation_clearStrategies(struct PtrWrapper ptr);
 
 struct RectArray SelectiveSearchSegmentation_process(struct PtrWrapper ptr);
 
+struct PtrWrapper SuperpixelSLIC_ctor(
+        struct TensorWrapper image, int algorithm,
+        int region_size, float ruler);
 
+int SuperpixelSLIC_getNumberOfSuperpixels(struct PtrWrapper ptr);
+
+void SuperpixelSLIC_iterate(struct PtrWrapper ptr, int num_iterations);
+
+struct TensorWrapper SuperpixelSLIC_getLabels(
+        struct PtrWrapper ptr, struct TensorWrapper labels_out);
+
+struct TensorWrapper SuperpixelSLIC_getLabelContourMask(
+        struct PtrWrapper ptr, struct TensorWrapper image, bool thick_line);
+
+void SuperpixelSLIC_enforceLabelConnectivity(
+        struct PtrWrapper ptr, int min_element_size);
 ]]
 
 
@@ -131,8 +146,8 @@ do
 end
 
 do
-
-    local SelectiveSearchSegmentation = torch.class('cv.SelectiveSearchSegmentation', 'cv.Algorithm', cv)
+    local SelectiveSearchSegmentation = torch.class(
+        'cv.SelectiveSearchSegmentation', 'cv.Algorithm', cv)
 
     function SelectiveSearchSegmentation:__init()
 
@@ -218,7 +233,57 @@ do
     function SelectiveSearchSegmentation:process()
         return cv.gcarray(C.SelectiveSearchSegmentation_process(self.ptr))
     end
+end
 
+do
+    local SuperpixelSLIC = torch.class('cv.SuperpixelSLIC', 'cv.Algorithm', cv)
+
+    cv.SLIC = 100
+    cv.SLICO = 101
+
+    function SuperpixelSLIC:__init(t)
+        local argRules = {
+            {"image", required = true, operator = cv.wrap_tensor},
+            {"algorithm", default = cv.SLICO},
+            {"region_size", default = 10},
+            {"ruler", default = 10.0}
+        }
+        self.ptr = ffi.gc(C.SuperpixelSLIC_ctor(cv.argcheck(t, argRules)), Classes.Algorithm_dtor)
+    end
+
+    function SuperpixelSLIC:getNumberOfSuperpixels()
+        return C.SuperpixelSLIC_getNumberOfSuperpixels(self.ptr)
+    end
+
+    function SuperpixelSLIC:iterate(t)
+        local argRules = {
+            {"num_iterations", default = 10}
+        }
+        C.SuperpixelSLIC_iterate(self.ptr, cv.argcheck(t, argRules))
+    end
+
+    function SuperpixelSLIC:getLabels(t)
+        local argRules = {
+            {"labels_out", default = nil, operator = cv.wrap_tensor}
+        }
+        return cv.unwrap_tensors(C.SuperpixelSLIC_getLabels(self.ptr, cv.argcheck(t, argRules)))
+    end
+
+    function SuperpixelSLIC:getLabelContourMask(t)
+        local argRules = {
+            {"image", default = nil, operator = cv.wrap_tensor},
+            {"thick_line", default = true}
+        }
+        return cv.unwrap_tensors(
+            C.SuperpixelSLIC_getLabelContourMask(self.ptr, cv.argcheck(t, argRules)))
+    end
+
+    function SuperpixelSLIC:enforceLabelConnectivity(t)
+        local argRules = {
+            {"min_element_size", default = 25}
+        }
+        C.SuperpixelSLIC_enforceLabelConnectivity(self.ptr, cv.argcheck(t, argRules))
+    end
 end
 
 return cv

@@ -58,6 +58,47 @@ int GraphSegmentation_getMinSize(struct GraphSegmentationPtr ptr) {
     return ptr->getMinSize();
 }
 
+// SLIC
+
+extern "C"
+struct SuperpixelSLICPtr SuperpixelSLIC_ctor(
+        struct TensorWrapper image, int algorithm,
+        int region_size, float ruler) {
+    return rescueObjectFromPtr(cv::ximgproc::createSuperpixelSLIC(
+            image.toMat(), algorithm, region_size, ruler));
+}
+
+extern "C"
+int SuperpixelSLIC_getNumberOfSuperpixels(struct SuperpixelSLICPtr ptr) {
+    return ptr->getNumberOfSuperpixels();
+}
+
+extern "C"
+void SuperpixelSLIC_iterate(struct SuperpixelSLICPtr ptr, int num_iterations) {
+    ptr->iterate(num_iterations);
+}
+
+extern "C"
+struct TensorWrapper SuperpixelSLIC_getLabels(
+        struct SuperpixelSLICPtr ptr, struct TensorWrapper labels_out) {
+    MatT labels_outMat = labels_out.toMatT();
+    ptr->getLabels(labels_outMat);
+    return labels_outMat;
+}
+
+extern "C"
+struct TensorWrapper SuperpixelSLIC_getLabelContourMask(
+        struct SuperpixelSLICPtr ptr, struct TensorWrapper image, bool thick_line) {
+    MatT imageMat = image.toMatT();
+    ptr->getLabelContourMask(imageMat, thick_line);
+    return imageMat;
+}
+
+extern "C"
+void SuperpixelSLIC_enforceLabelConnectivity(
+        struct SuperpixelSLICPtr ptr, int min_element_size) {
+    ptr->enforceLabelConnectivity(min_element_size);
+}
 
 // See #103 and #95
 /*
