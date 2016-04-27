@@ -202,7 +202,7 @@ struct TensorArrayPlusInt estimateAffine3D(
     vec[1] = inliers.toMatT();
     result.val = cv::estimateAffine3D(
       src.toMat(), dst.toMat(), vec[0], vec[1], ransacThreshold, confidence);
-    new(&result.tensors) TensorArray(vec);
+    new (&result.tensors) TensorArray(vec);
     return result;
 }
 
@@ -211,13 +211,7 @@ void filterSpeckles(
 	struct TensorWrapper img, double newVal, int maxSpeckleSize,
 	double maxDiff, struct TensorWrapper buf)
 {
-    if(buf.isNull()) {
-        cv::filterSpeckles(img.toMat(), newVal, maxSpeckleSize,
-                           maxDiff, cv::noArray());
-    } else {
-        cv::filterSpeckles(img.toMat(), newVal, maxSpeckleSize,
-                           maxDiff, buf.toMat());
-    }
+    cv::filterSpeckles(img.toMat(), newVal, maxSpeckleSize, maxDiff, TO_MAT_OR_NOARRAY(buf));
 }
 
 //TODO InputOutputArray

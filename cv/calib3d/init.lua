@@ -391,7 +391,7 @@ function cv.correctMatches(t)
     local result = C.correctMatches(
 			cv.wrap_tensor(F), cv.wrap_tensor(points1), cv.wrap_tensor(points2),
 			cv.wrap_tensor(newPoints1), cv.wrap_tensor(newPoints2))
-    return unwrap_tensors(result)
+    return cv.unwrap_tensors(result)
 end
 
 function cv.decomposeEssentialMat(t)
@@ -403,7 +403,7 @@ function cv.decomposeEssentialMat(t)
     local E, R1, R2, t = cv.argcheck(t, argRules)
     local result = C.decomposeEssentialMat(cv.wrap_tensor(E), cv.wrap_tensor(R1),
 					   cv.wrap_tensor(R2), cv.wrap_tensor(t))
-    return unwrap_tensors(result)
+    return cv.unwrap_tensors(result)
 end
 
 function cv.decomposeHomographyMat(t)
@@ -418,8 +418,8 @@ function cv.decomposeHomographyMat(t)
 				cv.wrap_tensor(H), cv.wrap_tensor(K),
 				cv.wrap_tensors(rotations), cv.wrap_tensors(translations),
 				cv.wrap_tensors(normals))
-    return result.val, unwrap_tensors(result.rotations, true),
-           unwrap_tensors(result.translations, true), unwrap_tensors(result.normals, true)
+    return result.val, cv.unwrap_tensors(result.rotations, true),
+           cv.unwrap_tensors(result.translations, true), cv.unwrap_tensors(result.normals, true)
 end
 
 function cv.decomposeProjectionMatrix(t)
@@ -439,7 +439,7 @@ function cv.decomposeProjectionMatrix(t)
 			cv.wrap_tensor(rotMatrix), cv.wrap_tensor(transVect),
 			cv.wrap_tensor(rotMatrixX), cv.wrap_tensor(rotMatrixY),
 			cv.wrap_tensor(rotMatrixZ), cv.wrap_tensor(eulerAngles))
-    return unwrap_tensors(result)
+    return cv.unwrap_tensors(result)
 end 
 
 function cv.drawChessboardCorners(t)
@@ -461,10 +461,11 @@ function cv.estimateAffine3D(t)
         {"ransacThreshold", default = 3},
         {"confidence", default = 0.99}}
     local src, dst, out, inliers, ransacThreshold, confidence = cv.argcheck(t, argRules)
+
     local result = C.estimateAffine3D(
 				cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(out),
 				cv.wrap_tensor(inliers), ransacThreshold, confidence)
-    return unwrap_tensors(result)
+    return result.val, cv.unwrap_tensors(result.tensors)
 end 
 
 function cv.filterSpeckles(t)
@@ -968,7 +969,7 @@ function cv.fisheye.distortPoints(t)
         {"D", required = true},
         {"alpha", default = 0}}
     local undistorted, distorted, K, D, alpha = cv.argcheck(t, argRules)
-    return unwrap_tensors(
+    return cv.unwrap_tensors(
 		C.fisheye_distortPoints(
 			cv.wrap_tensor(undistorted), cv.wrap_tensor(distorted),
 			cv.wrap_tensor(K), cv.wrap_tensor(D), alpha))
