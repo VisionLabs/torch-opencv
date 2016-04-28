@@ -21,7 +21,7 @@ ENDIF()
 # Once (error-throwing) to check if OpenCV is present
 FIND_PACKAGE(OpenCV 3.1 REQUIRED)
 # Once more (silently) to look for the installed modules
-FIND_PACKAGE(OpenCV 3.1 OPTIONAL_COMPONENTS ${OPENCV_MODULES_TO_WRAP})
+FIND_PACKAGE(OpenCV 3.1 QUIET OPTIONAL_COMPONENTS ${OPENCV_MODULES_TO_WRAP})
 
 IF(LUAROCKS_PREFIX)
     MESSAGE(STATUS "Installing Torch through Luarocks")
@@ -81,6 +81,8 @@ IF (BUILD_CUDA)
     TARGET_LINK_LIBRARIES(CUDACommon Common)
 ENDIF()
 
+# The main loop. For each module check if it's present; if yes, add its wrappers to targets
+
 FOREACH(MODULE ${OPENCV_MODULES_TO_WRAP})
     STRING(TOUPPER ${MODULE} MODULE_UPPERCASE)
     IF (OPENCV_${MODULE_UPPERCASE}_FOUND)
@@ -95,8 +97,12 @@ FOREACH(MODULE ${OPENCV_MODULES_TO_WRAP})
             ADD_LIBRARY(${MODULE} SHARED "${SOURCE_DIR}/${MODULE}.cpp")
             TARGET_LINK_LIBRARIES(${MODULE} Common)
         ENDIF()
+
+        SET(RESULTING_MODULES_LIST "${MODULE}, ${RESULTING_MODULES_LIST}")
     ENDIF()
 ENDFOREACH()
+
+MESSAGE(STATUS "Modules to wrap: ${RESULTING_MODULES_LIST}")
 
 INSTALL(DIRECTORY "${CMAKE_BINARY_DIR}/lib" DESTINATION "${Torch_INSTALL_LUA_PATH_SUBDIR}/cv")
 
