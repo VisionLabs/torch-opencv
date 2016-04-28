@@ -218,7 +218,7 @@ do
         return C.VideoWriter_get(self.ptr, propId)
     end
 
-    function VideoWriter:fourcc(t)
+    function VideoWriter.fourcc(t)
         local argRules = {
             {"c1", required = true},
             {"c2", required = true},
