@@ -1620,7 +1620,7 @@ function cv.compareHist(t)
 end
 
 
-function cv.equializeHist(t)
+function cv.equalizeHist(t)
     local argRules = {
         {"src", required = true},
         {"dst", default = nil}
@@ -1628,7 +1628,7 @@ function cv.equializeHist(t)
     local src, dst = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
-        C.equializeHist(
+        C.equalizeHist(
             cv.wrap_tensor(src), cv.wrap_tensor(dst)))
 end
 
