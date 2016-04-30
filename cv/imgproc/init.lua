@@ -572,11 +572,10 @@ function cv.boxFilter(t)
         {"ddepth", required = true},
         {"ksize", required = true, operator = cv.Size},
         {"anchor", default = {-1, -1}, operator = cv.Point},
-        {"normalize", default = nil},
+        {"normalize", default = true},
         {"borderType", default = cv.BORDER_DEFAULT}
     }
     local src, dst, ddepth, ksize, anchor, normalize, borderType = cv.argcheck(t, argRules)
-    if normalize == nil then normalize = true end
 
     if dst then
         assert(dst:type() == src:type() and src:isSameSizeAs(dst))
@@ -584,8 +583,8 @@ function cv.boxFilter(t)
 
     return cv.unwrap_tensors(
         C.boxFilter(
-            cv.wrap_tensor(src), cv.wrap_tensor(dst), ddepth, ksize[1],
-            ksize[2], anchor, normalize, borderType))
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), ddepth, 
+            ksize, anchor, normalize, borderType))
 end
 
 function cv.sqrBoxFilter(t)
