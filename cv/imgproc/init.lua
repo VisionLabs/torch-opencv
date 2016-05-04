@@ -1556,6 +1556,36 @@ function cv.initWideAngleProjMap(t)
 end
 
 
+function cv.getDefaultNewCameraMatrix(t)
+    local argRules = {
+        {"cameraMatrix", required = true},
+        {"imgsize", default = {0,0}, operator = cv.Size},
+        {"centerPrincipalPoint", default = false}
+    }
+    local cameraMatrix, imgsize, centerPrincipalPoint = cv.argcheck(t, argRules)
+
+    return cv.unwrap_tensors(C.getDefaultNewCameraMatrix(
+        cv.wrap_tensor(cameraMatrix), imgsize, centerPrincipalPoint))
+end
+
+
+function cv.undistortPoints(t)
+    local argRules = {
+        {"src", required = true},
+        {"dst", default = nil},
+        {"cameraMatrix", required = true},
+        {"distCoeffs", default = nil},
+        {"R", default = nil},
+        {"P", default = nil}
+    }
+    local src, dst, cameraMatrix, distCoeffs, R, P = cv.argcheck(t, argRules)
+
+    return cv.unwrap_tensors(C.undistortPoints(
+        cv.wrap_tensor(src), cv.wrap_tensor(dst), cv.wrap_tensor(cameraMatrix),
+        cv.wrap_tensor(distCoeffs), cv.wrap_tensor(R), cv.wrap_tensor(P)))
+end
+
+
 function cv.calcHist(t)
     local argRules = {
         {"images", required = true},
