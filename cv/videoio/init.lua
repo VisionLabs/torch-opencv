@@ -156,11 +156,10 @@ do
             {"fourcc", required = true},
             {"fps", required = true},
             {"frameSize", required = true, operator = cv.Size},
-            {"isColor", default = nil}
+            {"isColor", default = true}
         }
         local filename, fourcc, fps, frameSize, isColor = cv.argcheck(t, argRules)
-        if t.filename then
-            if isColor == nil then isColor = true end
+        if t.filename or t[1] then
             self.ptr = ffi.gc(C.VideoWriter_ctor(
                 filename, fourcc, fps, frameSize, isColor),
                 C.VideoWriter_dtor)
