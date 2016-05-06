@@ -338,7 +338,7 @@ struct TensorWrapper pyrMeanShiftFiltering(
         double sp, double sr, int maxLevel, struct TermCriteriaWrapper termcrit);
 
 extern "C"
-void grabCut(
+struct TensorArray grabCut(
         struct TensorWrapper img, struct TensorWrapper mask,
         struct RectWrapper rect, struct TensorWrapper bgdModel,
         struct TensorWrapper fgdModel, int iterCount, int mode);

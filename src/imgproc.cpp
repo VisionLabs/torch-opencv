@@ -744,14 +744,21 @@ struct TensorWrapper pyrMeanShiftFiltering(
 }
 
 extern "C"
-void grabCut(
+struct TensorArray grabCut(
         struct TensorWrapper img, struct TensorWrapper mask,
         struct RectWrapper rect, struct TensorWrapper bgdModel,
         struct TensorWrapper fgdModel, int iterCount, int mode)
 {
+    std::vector<MatT> retval(3);
+    retval[0] = mask.toMatT();
+    retval[1] = bgdModel.toMatT();
+    retval[2] = fgdModel.toMatT();
+
     cv::grabCut(
-            img.toMat(), mask.toMat(), rect, bgdModel.toMat(),
-            fgdModel.toMat(), iterCount, mode);
+            img.toMat(), retval[0], rect, retval[1],
+            retval[2], iterCount, mode);
+
+    return TensorArray(retval);
 }
 
 extern "C"

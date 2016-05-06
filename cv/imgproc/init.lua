@@ -273,7 +273,7 @@ struct TensorWrapper pyrMeanShiftFiltering(
         struct TensorWrapper src, struct TensorWrapper dst,
         double sp, double sr, int maxLevel, struct TermCriteriaWrapper termcrit);
 
-void grabCut(
+struct TensorArray grabCut(
         struct TensorWrapper img, struct TensorWrapper mask,
         struct RectWrapper rect, struct TensorWrapper bgdModel,
         struct TensorWrapper fgdModel, int iterCount, int mode);
@@ -1714,8 +1714,8 @@ end
 function cv.grabCut(t)
     local argRules = {
         {"img", required = true},
-        {"mask", required = true},
-        {"rect", default = nil, operator = cv.Rect},
+        {"mask", default = nil},
+        {"rect", default = 0, operator = cv.Rect},
         {"bgdModel", required = true},
         {"fgdModel", required = true},
         {"iterCount", required = true},
@@ -1723,10 +1723,10 @@ function cv.grabCut(t)
     }
     local img, mask, rect, bgdModel, fgdModel, iterCount, mode = cv.argcheck(t, argRules)
 
-    C.grabCut(
+    return cv.unwrap_tensors(C.grabCut(
         cv.wrap_tensor(img), cv.wrap_tensor(mask), rect,
         cv.wrap_tensor(bgdModel), cv.wrap_tensor(fgdModel),
-        iterCount, mode)
+        iterCount, mode))
 end
 
 
