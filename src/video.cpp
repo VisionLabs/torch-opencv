@@ -25,11 +25,11 @@ extern "C" struct TensorArrayPlusInt buildOpticalFlowPyramid(struct TensorWrappe
                         bool withDerivatives, int pyrBorder, int derivBorder,
                         bool tryReuseInputImage)
 {
-    std::vector<MatT> output = pyramid.toMatTList();
     TensorArrayPlusInt retval;
-    retval.val = cv::buildOpticalFlowPyramid(img.toMat(), output, winSize, maxLevel,
+    std::vector<cv::Mat> retvalVec;
+    retval.val = cv::buildOpticalFlowPyramid(img.toMat(), retvalVec, winSize, maxLevel,
                     withDerivatives, pyrBorder, derivBorder, tryReuseInputImage);
-    new (&retval.tensors) TensorArray(output);
+    new (&retval.tensors) TensorArray(retvalVec);
     return retval;
 }
 
@@ -45,7 +45,7 @@ extern "C" struct TensorArray calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
 
     cv::calcOpticalFlowPyrLK(prevImg.toMat(), nextImg.toMat(), prevPts.toMat(), nextPts.toMat(), retval[1],
                 retval[2], winSize, maxLevel, criteria, flags, minEigThreshold);
-    retval[0] = MatT(nextPts);
+    retval[0] = MatT(2nextPts);
     return TensorArray(retval);
 }
 
