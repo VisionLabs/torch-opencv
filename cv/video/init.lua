@@ -552,7 +552,9 @@ function cv.calcOpticalFlowPyrLK(t)
         {"err", default = nil},
         {"winSize", default = {21, 21}, operator = cv.Size},
         {"maxLevel", default = 3},
-        {"criteria", default = 0, operator = cv.TermCriteria},
+        {"criteria",
+            default = {cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 30, 0.01},
+            operator = cv.TermCriteria},
         {"flags", default = 0},
         {"minEigThreshold", default = 1e-4}
     }
@@ -600,7 +602,9 @@ function cv.findTransformECC(t)
         {"inputImage", required = true},
         {"warpMatrix", required = true},
         {"motionType", default = cv.MOTION_AFFINE},
-        {"criteria", default = 0, operator = cv.TermCriteria},
+        {"criteria",
+            default = {cv.TERM_CRITERIA_COUNT+cv.TERM_CRITERIA_EPS, 50, 0.001},
+            operator = cv.TermCriteria},
         {"inputMask", default = nil}
     }
     local templateImage, inputImage, warpMatrix, motionType, criteria, inputMask = cv.argcheck(t, argRules)

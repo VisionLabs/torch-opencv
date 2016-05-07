@@ -1603,7 +1603,7 @@ do
     function BOWKMeansTrainer:__init(t)
         local argRules = {
             {"clusterCount", required = true},
-            {"termcrit", default = 0, operator = cv.TermCriteria},
+            {"termcrit", default = {0, 0, 0}, operator = cv.TermCriteria},
             {"attempts", default = 3},
             {"flags", default = cv.KMEANS_PP_CENTERS}
         }

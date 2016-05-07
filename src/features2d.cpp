@@ -1050,8 +1050,7 @@ struct BOWKMeansTrainerPtr BOWKMeansTrainer_ctor(
         int clusterCount, struct TermCriteriaWrapper termcrit,
         int attempts, int flags)
 {
-    return new cv::BOWKMeansTrainer(
-            clusterCount, termcrit.orDefault(cv::TermCriteria()), attempts, flags);
+    return new cv::BOWKMeansTrainer(clusterCount, termcrit, attempts, flags);
 }
 
 // BOWImgDescriptorExtractor

@@ -44,9 +44,7 @@ extern "C" struct TensorArray calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
     retval[2] = err.toMatT();
 
     cv::calcOpticalFlowPyrLK(prevImg.toMat(), nextImg.toMat(), prevPts.toMat(), nextPts.toMat(), retval[1],
-                retval[2], winSize, maxLevel,
-                criteria.orDefault(cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01)),
-                flags, minEigThreshold);
+                retval[2], winSize, maxLevel, criteria, flags, minEigThreshold);
     retval[0] = MatT(nextPts);
     return TensorArray(retval);
 }
@@ -74,10 +72,9 @@ extern "C" struct TensorPlusDouble findTransformECC(struct TensorWrapper templat
                         struct TensorWrapper inputMask)
 {
     struct TensorPlusDouble retval;
-    retval.val = cv::findTransformECC(templateImage.toMat(), inputImage.toMat(), warpMatrix.toMat(),
-                    motionType, criteria.orDefault(
-                                   cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 50, 0.001)),
-                    TO_MAT_OR_NOARRAY(inputMask));
+    retval.val = cv::findTransformECC(
+            templateImage.toMat(), inputImage.toMat(), warpMatrix.toMat(),
+            motionType, criteria, TO_MAT_OR_NOARRAY(inputMask));
     retval.tensor = warpMatrix;
     return retval;
 }

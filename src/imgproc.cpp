@@ -280,7 +280,7 @@ struct TensorWrapper erode(
 {
     MatT dst_mat = dst.toMatT();
     cv::erode(src.toMat(), dst_mat, kernel.toMat(), anchor, iterations,
-              borderType, borderValue.orDefault(cv::morphologyDefaultBorderValue()));
+              borderType, borderValue);
     return TensorWrapper(dst_mat);
 }
 
@@ -292,7 +292,7 @@ struct TensorWrapper dilate(
 {
     MatT dst_mat = dst.toMatT();
     cv::dilate(src.toMat(), dst_mat, kernel.toMat(), anchor, iterations,
-               borderType, borderValue.orDefault(cv::morphologyDefaultBorderValue()));
+               borderType, borderValue);
     return TensorWrapper(dst_mat);
 }
 
@@ -304,7 +304,7 @@ struct TensorWrapper morphologyEx(
 {
     MatT dst_mat = dst.toMatT();
     cv::morphologyEx(src.toMat(), dst_mat, op, kernel.toMat(), anchor, iterations,
-                     borderType, borderValue.orDefault(cv::morphologyDefaultBorderValue()));
+                     borderType, borderValue);
     return TensorWrapper(dst_mat);
 }
 
@@ -734,12 +734,7 @@ struct TensorWrapper pyrMeanShiftFiltering(
         double sp, double sr, int maxLevel, TermCriteriaWrapper termcrit)
 {
     MatT dst_mat = dst.toMatT();
-    cv::pyrMeanShiftFiltering(
-                src.toMat(), dst_mat,
-                sp, sr, maxLevel,
-                termcrit.orDefault(
-                        cv::TermCriteria(
-                                cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS, 5, 1)));
+    cv::pyrMeanShiftFiltering(src.toMat(), dst_mat, sp, sr, maxLevel, termcrit);
     return TensorWrapper(dst_mat);
 }
 

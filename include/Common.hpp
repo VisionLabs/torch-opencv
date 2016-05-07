@@ -134,9 +134,6 @@ struct TermCriteriaWrapper {
     TermCriteriaWrapper() {}
 
     inline operator cv::TermCriteria() { return cv::TermCriteria(type, maxCount, epsilon); }
-    inline cv::TermCriteria orDefault(cv::TermCriteria defaultVal) {
-        return (this->type == 0 ? defaultVal : *this);
-    }
     TermCriteriaWrapper(cv::TermCriteria && other);
 };
 
@@ -144,9 +141,6 @@ struct ScalarWrapper {
     double v0, v1, v2, v3;
 
     inline operator cv::Scalar() { return cv::Scalar(v0, v1, v2, v3); }
-    inline cv::Scalar orDefault(cv::Scalar defaultVal) {
-        return (isnan(this->v0) ? defaultVal : *this);
-    }
 };
 
 struct Vec2dWrapper {

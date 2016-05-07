@@ -974,17 +974,22 @@ function cv.goodFeaturesToTrack(t)
 end
 
 
+function cv.morphologyDefaultBorderValue()
+    return C.morphologyDefaultBorderValue()
+end
+
+
 function cv.erode(t)
     local argRules = {
         {"src", required = true},
         {"dst", default = nil},
         {"kernel", required = true},
         {"anchor", default = {-1, -1}, operator = cv.Point},
+        {"iterations", default = 1},
         {"borderType", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0,0,0,0} , operator = cv.Scalar}
+        {"borderValue", default = cv.morphologyDefaultBorderValue(), operator = cv.Scalar}
     }
-    local src, dst, kernel, anchor, borderType, borderValue = cv.argcheck(t, argRules)
-    local iterations = 1
+    local src, dst, kernel, anchor, iterations, borderType, borderValue = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.erode(
@@ -999,11 +1004,11 @@ function cv.dilate(t)
         {"dst", default = nil},
         {"kernel", required = true},
         {"anchor", default = {-1, -1}, operator = cv.Point},
+        {"iterations", default = 1},
         {"borderType", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0,0,0,0} , operator = cv.Scalar}
+        {"borderValue", default = cv.morphologyDefaultBorderValue(), operator = cv.Scalar}
     }
-    local src, dst, kernel, anchor, borderType, borderValue = cv.argcheck(t, argRules)
-    local iterations = 1
+    local src, dst, kernel, anchor, iterations, borderType, borderValue = cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.dilate(
@@ -1019,11 +1024,12 @@ function cv.morphologyEx(t)
         {"op", required = true},
         {"kernel", required = true},
         {"anchor", default = {-1, -1}, operator = cv.Point},
+        {"iterations", default = 1},
         {"borderType", default = cv.BORDER_CONSTANT},
-        {"borderValue", default = {0,0,0,0} , operator = cv.Scalar}
+        {"borderValue", default = cv.morphologyDefaultBorderValue(), operator = cv.Scalar}
     }
-    local src, dst, op, kernel, anchor, borderType, borderValue = cv.argcheck(t, argRules)
-    local iterations = 1
+    local src, dst, op, kernel, anchor, iterations, borderType, borderValue =
+        cv.argcheck(t, argRules)
 
     return cv.unwrap_tensors(
         C.morphologyEx(
@@ -1702,7 +1708,9 @@ function cv.pyrMeanShiftFiltering(t)
         {"sp", required = true},
         {"sr", required = true},
         {"maxLevel", default = 1},
-        {"termcrit", default = nil, operator = cv.TermCriteria}
+        {"termcrit",
+            default = {cv.TERM_CRITERIA_MAX_ITER+cv.TERM_CRITERIA_EPS, 5, 1},
+            operator = cv.TermCriteria}
     }
     local src, dst, sp, sr, maxLevel, termcrit = cv.argcheck(t, argRules)
 
