@@ -45,7 +45,7 @@ extern "C" struct TensorArray calcOpticalFlowPyrLK(struct TensorWrapper prevImg,
 
     cv::calcOpticalFlowPyrLK(prevImg.toMat(), nextImg.toMat(), prevPts.toMat(), nextPts.toMat(), retval[1],
                 retval[2], winSize, maxLevel, criteria, flags, minEigThreshold);
-    retval[0] = MatT(2nextPts);
+    retval[0] = MatT(nextPts);
     return TensorArray(retval);
 }
 
