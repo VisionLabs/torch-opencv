@@ -1,4 +1,5 @@
 #include <Common.hpp>
+#include <array>
 
 /***************** Tensor <=> Mat conversion *****************/
 

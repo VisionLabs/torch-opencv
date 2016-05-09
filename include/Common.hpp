@@ -14,7 +14,6 @@ class GpuMatT;
 #endif
 
 #include <iostream>
-#include <array>
 
 extern "C" int getIntMax() { return INT_MAX; }
 extern "C" float getFloatMax() { return FLT_MAX; }
