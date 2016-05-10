@@ -78,7 +78,7 @@ TARGET_LINK_LIBRARIES(Classes Common)
 
 IF (BUILD_CUDA)
     ADD_LIBRARY(CUDACommon SHARED "${SOURCE_DIR}/CUDACommon.cpp")
-    TARGET_LINK_LIBRARIES(CUDACommon Common)
+    TARGET_LINK_LIBRARIES(CUDACommon Common THC ${CUDA_LIBRARIES})
 ENDIF()
 
 # The main loop. For each module check if it's present; if yes, add its wrappers to targets
