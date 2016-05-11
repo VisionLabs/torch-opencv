@@ -379,7 +379,6 @@ Vec3dWrapper::Vec3dWrapper(const cv::Vec3d & other) {
    this->v1 = other[1];
    this->v2 = other[2];
 }
-   
 
 RectWrapper & RectWrapper::operator=(cv::Rect & other) {
     this->x = other.x;

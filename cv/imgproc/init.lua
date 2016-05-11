@@ -104,6 +104,8 @@ struct TensorWrapper goodFeaturesToTrack(
         int maxCorners, double qualityLevel, double minDistance,
         struct TensorWrapper mask, int blockSize, bool useHarrisDetector, double k);
 
+struct ScalarWrapper morphologyDefaultBorderValue();
+
 struct TensorWrapper erode(
         struct TensorWrapper src, struct TensorWrapper dst,
         struct TensorWrapper kernel, struct PointWrapper anchor,

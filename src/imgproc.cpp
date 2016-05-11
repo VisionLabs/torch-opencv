@@ -273,6 +273,11 @@ struct TensorWrapper goodFeaturesToTrack(
 }
 
 extern "C"
+struct ScalarWrapper morphologyDefaultBorderValue() {
+    return cv::morphologyDefaultBorderValue();
+}
+
+extern "C"
 struct TensorWrapper erode(
         struct TensorWrapper src, struct TensorWrapper dst,
         struct TensorWrapper kernel, struct PointWrapper anchor,

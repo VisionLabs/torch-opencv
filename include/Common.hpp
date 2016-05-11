@@ -113,16 +113,16 @@ std::string typeStr(cv::Mat & mat) {
 struct SizeWrapper {
     int width, height;
 
-    inline operator cv::Size() { return cv::Size(width, height); }
+    operator cv::Size() { return cv::Size(width, height); }
     SizeWrapper(const cv::Size & other);
-    inline SizeWrapper() {}
+    SizeWrapper() {}
 };
 
 struct Size2fWrapper {
     float width, height;
 
-    inline operator cv::Size2f() { return cv::Size2f(width, height); }
-    inline Size2fWrapper() {}
+    operator cv::Size2f() { return cv::Size2f(width, height); }
+    Size2fWrapper() {}
     Size2fWrapper(const cv::Size2f & other);
 };
 
@@ -132,21 +132,28 @@ struct TermCriteriaWrapper {
 
     TermCriteriaWrapper() {}
 
-    inline operator cv::TermCriteria() { return cv::TermCriteria(type, maxCount, epsilon); }
+    operator cv::TermCriteria() { return cv::TermCriteria(type, maxCount, epsilon); }
     TermCriteriaWrapper(cv::TermCriteria && other);
 };
 
 struct ScalarWrapper {
     double v0, v1, v2, v3;
 
-    inline operator cv::Scalar() { return cv::Scalar(v0, v1, v2, v3); }
+    operator cv::Scalar() { return cv::Scalar(v0, v1, v2, v3); }
+    ScalarWrapper(const cv::Scalar & other) {
+        this->v0 = other.val[0];
+        this->v1 = other.val[1];
+        this->v2 = other.val[2];
+        this->v3 = other.val[3];
+    }
+    ScalarWrapper() {}
 };
 
 struct Vec2dWrapper {
     double v0, v1;
 
-    inline operator cv::Vec2d() { return cv::Vec2d(v0, v1); }
-    inline Vec2dWrapper(const cv::Vec2d & other) {
+    operator cv::Vec2d() { return cv::Vec2d(v0, v1); }
+    Vec2dWrapper(const cv::Vec2d & other) {
         this->v0 = other.val[0];
         this->v1 = other.val[1];
     }
@@ -154,10 +161,11 @@ struct Vec2dWrapper {
 
 struct Vec3dWrapper {
     double v0, v1, v2;
-    inline operator cv::Vec3d() { return cv::Vec3d(v0, v1, v2); }
+    
+    operator cv::Vec3d() { return cv::Vec3d(v0, v1, v2); }
     Vec3dWrapper & operator=(cv::Vec3d & other);
     Vec3dWrapper (const cv::Vec3d & other);
-    inline Vec3dWrapper() {}
+    Vec3dWrapper() {}
 };
 
 struct Vec3fWrapper {
@@ -175,16 +183,16 @@ struct Vec4iWrapper {
 struct RectWrapper {
     int x, y, width, height;
 
-    inline operator cv::Rect() { return cv::Rect(x, y, width, height); }
+    operator cv::Rect() { return cv::Rect(x, y, width, height); }
     RectWrapper & operator=(cv::Rect & other);
     RectWrapper(const cv::Rect & other);
-    inline RectWrapper() {}
+    RectWrapper() {}
 };
 
 struct PointWrapper {
     int x, y;
 
-    inline operator cv::Point() { return cv::Point(x, y); }
+    operator cv::Point() { return cv::Point(x, y); }
 
     PointWrapper() {}
     PointWrapper(const cv::Point & other);
@@ -193,17 +201,17 @@ struct PointWrapper {
 struct Point2fWrapper {
     float x, y;
 
-    inline operator cv::Point2f() { return cv::Point2f(x, y); }
+    operator cv::Point2f() { return cv::Point2f(x, y); }
     Point2fWrapper(const cv::Point2f & other);
-    inline Point2fWrapper() {}
+    Point2fWrapper() {}
 };
 
 struct Point2dWrapper {
     double x, y;
 
-    inline operator cv::Point2d() { return cv::Point2d(x, y); }
+    operator cv::Point2d() { return cv::Point2d(x, y); }
     Point2dWrapper(const cv::Point2d & other);
-    inline Point2dWrapper() {}
+    Point2dWrapper() {}
 };
 
 struct RotatedRectWrapper {
@@ -213,7 +221,7 @@ struct RotatedRectWrapper {
 
     RotatedRectWrapper() {}
     RotatedRectWrapper(const cv::RotatedRect & other);
-    inline operator cv::RotatedRect() { return cv::RotatedRect(center, size, angle); }
+    operator cv::RotatedRect() { return cv::RotatedRect(center, size, angle); }
 };
 
 struct MomentsWrapper {
@@ -222,7 +230,7 @@ struct MomentsWrapper {
     double nu20, nu11, nu02, nu30, nu21, nu12, nu03;
 
     MomentsWrapper(const cv::Moments & other);
-    inline operator cv::Moments() {
+    operator cv::Moments() {
         return cv::Moments(m00, m10, m01, m20, m11, m02, m30, m21, m12, m03);
     }
 };
@@ -263,7 +271,7 @@ struct KeyPointWrapper {
     int octave, class_id;
 
     KeyPointWrapper(const cv::KeyPoint & other);
-    inline operator cv::KeyPoint() { return cv::KeyPoint(pt, size, angle, response, octave, class_id); }
+    operator cv::KeyPoint() { return cv::KeyPoint(pt, size, angle, response, octave, class_id); }
 };
 
 struct KeyPointArray {
