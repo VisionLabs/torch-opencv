@@ -1,6 +1,7 @@
 #include <cudaoptflow.hpp>
 
-struct TensorWrapper DenseOpticalFlow_calc(struct cutorchInfo info,
+extern "C"
+struct TensorWrapper DenseOpticalFlow_calcCuda(struct cutorchInfo info,
     struct DenseOpticalFlowPtr ptr, struct TensorWrapper I0, struct TensorWrapper I1,
     struct TensorWrapper flow)
 {
@@ -9,7 +10,8 @@ struct TensorWrapper DenseOpticalFlow_calc(struct cutorchInfo info,
     return TensorWrapper(retval, info.state);
 }
 
-struct TensorArray SparseOpticalFlow_calc(struct cutorchInfo info,
+extern "C"
+struct TensorArray SparseOpticalFlow_calcCuda(struct cutorchInfo info,
     struct SparseOpticalFlowPtr ptr, struct TensorWrapper prevImg, struct TensorWrapper nextImg,
     struct TensorWrapper prevPts, struct TensorWrapper nextPts, struct TensorWrapper status,
     bool outputErr, struct TensorWrapper err)
