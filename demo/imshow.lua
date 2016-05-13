@@ -8,5 +8,10 @@ if not arg[1] then
 end
 
 local im = cv.imread {arg[1] or 'demo/data/lena.jpg', cv.IMREAD_GRAYSCALE}
+if im:nDimension() == 0 then
+    print('Problem loading image\n')
+    os.exit(0)
+end
+
 cv.imshow {"Hello, Lua!", im}
 cv.waitKey {0}

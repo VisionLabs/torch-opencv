@@ -10,8 +10,8 @@ end
 
 local image = cv.imread{arg[1] or 'demo/data/lena.jpg'}
 
-if not image then
-    print("Problem loading image\n")
+if image:nDimension() == 0 then
+    print('Problem loading image\n')
     os.exit(0)
 end
 

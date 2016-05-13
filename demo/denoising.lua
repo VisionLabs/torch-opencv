@@ -10,5 +10,10 @@ end
     
 local image = cv.imread{arg[1] or 'demo/data/lena.jpg'}
 
+if image:nDimension() == 0 then
+    print('Problem loading image\n')
+    os.exit(0)
+end
+
 cv.imshow{"Denoised image", cv.fastNlMeansDenoising{image}}
 cv.waitKey{0}

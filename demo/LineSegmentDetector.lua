@@ -10,6 +10,11 @@ end
 
 local image = cv.imread{arg[1] or 'demo/data/lena.jpg', cv.IMREAD_GRAYSCALE}
 
+if image:nDimension() == 0 then
+    print('Problem loading image\n')
+    os.exit(0)
+end
+
 local detector = cv.LineSegmentDetector{}
 local lines = detector:detect{image}
 image = detector:drawSegments{image, lines}
