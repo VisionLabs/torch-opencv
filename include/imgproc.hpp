@@ -393,7 +393,7 @@ struct TensorArrayPlusInt connectedComponentsWithStats(
 
 extern "C"
 struct TensorArray findContours(
-        struct TensorWrapper image, bool withHierarchy, struct TensorWrapper hierarchy, int mode, int method, struct PointWrapper offset);
+        struct TensorWrapper image, bool withHierarchy, int mode, int method, struct PointWrapper offset);
 
 extern "C"
 struct TensorWrapper approxPolyDP(

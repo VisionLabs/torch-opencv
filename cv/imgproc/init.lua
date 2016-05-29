@@ -316,7 +316,7 @@ struct TensorArrayPlusInt connectedComponentsWithStats(
         struct TensorWrapper image, struct TensorArray outputTensors, int connectivity, int ltype);
 
 struct TensorArray findContours(
-        struct TensorWrapper image, bool withHierarchy, struct TensorWrapper hierarchy, int mode, int method, struct PointWrapper offset);
+        struct TensorWrapper image, bool withHierarchy, int mode, int method, struct PointWrapper offset);
 
 struct TensorWrapper approxPolyDP(
         struct TensorWrapper curve, struct TensorWrapper approxCurve, double epsilon, bool closed);
@@ -1902,19 +1902,18 @@ end
 function cv.findContours(t)
     local argRules = {
         {"image", required = true},
-        {"hierarchy", default = nil},
         {"withHierarchy", default = false},
         {"mode", required = true},
         {"method", required = true},
         {"offset", default = {0, 0}, operator = cv.Point}
     }
-    local image, hierarchy, withHierarchy, mode, method, offset = cv.argcheck(t, argRules)
+    local image, withHierarchy, mode, method, offset = cv.argcheck(t, argRules)
 
-    contours = cv.unwrap_tensors(
+    local contours = cv.unwrap_tensors(
         C.findContours(
-            cv.wrap_tensor(image), withHierarchy, cv.wrap_tensor(hierarchy), mode, method, offset), true)
+            cv.wrap_tensor(image), withHierarchy, mode, method, offset), true)
 
-    if withHierarchy and not hierarchy then
+    if withHierarchy then
         hierarchy = contours[#contours]
         contours[#contours] = nil
         return contours, hierarchy

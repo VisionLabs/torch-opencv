@@ -876,16 +876,18 @@ struct TensorArrayPlusInt connectedComponentsWithStats(
 
 extern "C"
 struct TensorArray findContours(
-        struct TensorWrapper image, bool withHierarchy, struct TensorWrapper hierarchy,
+        struct TensorWrapper image, bool withHierarchy,
         int mode, int method, struct PointWrapper offset)
 {
-    std::vector<MatT> retval(1);
+    std::vector<cv::Mat> retval;
+
     if (withHierarchy) {
-        MatT hierarchy_mat = hierarchy.toMatT();
-        cv::findContours(image.toMat(), retval[0], hierarchy_mat, mode, method, offset);
-        retval.push_back(hierarchy_mat);
+        cv::Mat hierarchy;
+        cv::findContours(image.toMat(), retval, hierarchy, mode, method, offset);
+
+        retval.push_back(hierarchy);
     } else {
-        cv::findContours(image.toMat(), retval[0], mode, method, offset);
+        cv::findContours(image.toMat(), retval, mode, method, offset);
     }
     return TensorArray(retval);
 }
