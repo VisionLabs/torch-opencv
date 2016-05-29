@@ -427,6 +427,10 @@ struct SizePlusInt getTextSize(
 struct TensorWrapper addWeighted(
         struct TensorWrapper src1, double alpha, struct TensorWrapper src2, double beta,
         double gamma, struct TensorWrapper dst, int dtype);
+
+struct TensorWrapper flip(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int mode);
 ]]
 
 
@@ -3109,6 +3113,19 @@ function cv.addWeighted(t)
     return cv.unwrap_tensors(C.addWeighted(
         cv.wrap_tensor(src1), alpha, cv.wrap_tensor(src2), 
         beta, gamma, cv.wrap_tensor(dst), dtype))
+end
+
+function cv.flip(t)
+    local argRules = {
+        {"src", required = true},
+        {"dst", default = nil},
+        {"flipCode", default = 0}
+    }
+    local src, dst, flipCode = cv.argcheck(t, argRules)
+
+    return cv.unwrap_tensors(
+        C.flip(
+            cv.wrap_tensor(src), cv.wrap_tensor(dst), flipCode))
 end
 
 return cv

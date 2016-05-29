@@ -1756,3 +1756,14 @@ struct TensorWrapper addWeighted(
     cv::addWeighted(src1.toMat(), alpha, src2.toMat(), beta, gamma, dstMat, dtype);
     return TensorWrapper(dstMat);
 }
+
+extern "C"
+struct TensorWrapper flip(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        int mode)
+{
+    MatT dst_mat = dst.toMatT();
+    cv::flip(src.toMat(), dst_mat, mode);
+    return TensorWrapper(dst_mat);
+}
+

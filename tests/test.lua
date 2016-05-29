@@ -3,10 +3,7 @@ local cv = require 'cv'
 require 'cv.imgcodecs'
 require 'cv.imgproc'
 
-local iterm = require 'iterm'
-
 local mytester = torch.Tester()
-
 local cvtest = torch.TestSuite()
 
 local lena_path = 'demo/data/lena.jpg'
@@ -39,6 +36,26 @@ function cvtest.resize()
       local cv_resized = cv.resize{src = cv_image, dsize = {M,M}, interpolation = method.cv}
       local diff = torch_resized - HWCBGR_2_CHWRGB(cv_resized)
       mytester:assertle(diff:float():abs():mean(), method.error, 'imread byte difference')
+   end
+end
+
+function cvtest.flip()
+   local torch_image = image.load(lena_path, 3, 'byte')
+   local cv_image = cv.imread{lena_path}
+
+   function image.hvflip(src)
+      return image.vflip(image.hflip(src))
+   end
+   
+   for i,v in ipairs{
+      {f='hflip', code=1},
+      {f='vflip', code=0},
+      {f='hvflip', code=-1},
+   } do
+      local torch_hflipped = image[v.f](torch_image)
+      local cv_hflipped = cv.flip{src = cv_image, flipCode = v.code}
+      local diff = torch_hflipped - HWCBGR_2_CHWRGB(cv_hflipped)
+      mytester:asserteq(diff:float():abs():max(), 0, 'imread byte difference')
    end
 end
 
