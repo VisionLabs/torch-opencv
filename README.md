@@ -1,5 +1,6 @@
 OpenCV bindings for LuaJIT+Torch
 =====================
+[![Build Status](https://travis-ci.org/VisionLabs/torch-opencv.svg?branch=master)](https://travis-ci.org/VisionLabs/torch-opencv)
 
 Installation:
 
