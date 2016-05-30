@@ -43,16 +43,16 @@ struct TensorWrapper warpAffineCuda(struct cutorchInfo info,
 {
     if (dst.isNull()) {
         cuda::GpuMat retval;
-        cuda::warpAffine(src.toGpuMat(), retval, M.toGpuMat(), dsize, flags,
+        cuda::warpAffine(src.toGpuMat(), retval, M.toMat(), dsize, flags,
                          borderMode, borderValue, prepareStream(info));
         return TensorWrapper(retval, info.state);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cuda::GpuMat source = src.toGpuMat();
-        cuda::warpAffine(source, source, M.toGpuMat(), dsize, flags, borderMode,
+        cuda::warpAffine(source, source, M.toMat(), dsize, flags, borderMode,
                          borderValue, prepareStream(info));
     } else {
-        cuda::warpAffine(src.toGpuMat(), dst.toGpuMat(), M.toGpuMat(), dsize,
+        cuda::warpAffine(src.toGpuMat(), dst.toGpuMat(), M.toMat(), dsize,
                          flags, borderMode, borderValue, prepareStream(info));
     }
     return dst;
