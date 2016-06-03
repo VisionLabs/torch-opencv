@@ -69,6 +69,7 @@ struct TensorWrapper evenLevelsCuda(struct cutorchInfo info,
 {
     cuda::GpuMat retval = levels.toGpuMat();
     cuda::evenLevels(retval, nLevels, lowerLevel, upperLevel, prepareStream(info));
+    return TensorWrapper(retval, info.state);
 }
 //
 //extern "C"
@@ -144,6 +145,7 @@ struct TensorWrapper CornernessCriteria_computeCuda(
 {
     cuda::GpuMat retval = dst.toGpuMat();
     ptr->compute(src.toGpuMat(), retval, prepareStream(info));
+    return TensorWrapper(retval, info.state);
 }
 
 extern "C"

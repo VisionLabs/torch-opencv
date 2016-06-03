@@ -753,7 +753,6 @@ struct TensorWrapper LineSegmentDetector_drawSegments(
         struct LineSegmentDetectorPtr ptr, struct TensorWrapper image, struct TensorWrapper lines);
 
 extern "C"
-extern "C"
 int LineSegmentDetector_compareSegments(struct LineSegmentDetectorPtr ptr, struct SizeWrapper size, struct TensorWrapper lines1,
                     struct TensorWrapper lines2, struct TensorWrapper image);
 

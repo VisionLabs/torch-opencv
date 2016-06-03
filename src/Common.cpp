@@ -473,6 +473,7 @@ StringArray::operator std::vector<cv::String>() {
     for (int i = 0; i < this->size; ++i) {
         retval[i] = this->data[i];
     }
+    return retval;
 }
 
 /***************** Helper functions *****************/
