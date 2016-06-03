@@ -300,15 +300,16 @@ extern "C"
 bool StatModel_train(struct StatModelPtr ptr, struct TrainDataPtr trainData, int flags)
 {
     cv::Ptr<ml::TrainData> trainDataPtr(static_cast<ml::TrainData *>(trainData));
-    ptr->train(trainDataPtr, flags);
+    bool result = ptr->train(trainDataPtr, flags);
     rescueObjectFromPtr(trainDataPtr);
+    return result;
 }
 
 extern "C"
 bool StatModel_train_Mat(
         struct StatModelPtr ptr, struct TensorWrapper samples, int layout, struct TensorWrapper responses)
 {
-    ptr->train(samples.toMat(), layout, responses.toMat());
+    return ptr->train(samples.toMat(), layout, responses.toMat());
 }
 
 extern "C"

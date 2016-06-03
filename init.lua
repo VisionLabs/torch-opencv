@@ -707,7 +707,7 @@ ffi.cdef[[
 void MatchesInfo_dtor(
         struct PtrWrapper other);
 
-struct PtrWrapper ImageFeatures_dtor(
+void ImageFeatures_dtor(
 	struct PtrWrapper ptr);
 
 void CameraParams_dtor(

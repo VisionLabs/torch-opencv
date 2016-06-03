@@ -356,7 +356,7 @@ struct PtrWrapper FeaturesFinder_call2(
 
 struct PtrWrapper ImageFeatures_ctor();
 
-struct PtrWrapper ImageFeatures_dtor(
+void ImageFeatures_dtor(
 	struct PtrWrapper ptr);
 
 struct PtrWrapper BestOf2NearestMatcher_ctor(

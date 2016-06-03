@@ -413,7 +413,7 @@ struct ImageFeaturesPtr ImageFeatures_ctor()
 }
 
 extern "C"
-struct ImageFeaturesPtr ImageFeatures_dtor(
+void ImageFeatures_dtor(
         struct ImageFeaturesPtr ptr)
 {
     delete static_cast<detail::ImageFeatures *>(ptr.ptr);
@@ -1197,6 +1197,7 @@ struct Point2fWrapper RotationWarper_warpPoint(
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -1204,7 +1205,7 @@ struct RectWrapper RotationWarper_warpRoi(
         struct RotationWarperPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 //RotationWarperBase_CompressedRectilinearPortraitProjector
@@ -1281,6 +1282,7 @@ struct Point2fWrapper RotationWarperBase_CompressedRectilinearPortraitProjector_
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -1288,7 +1290,7 @@ struct RectWrapper RotationWarperBase_CompressedRectilinearPortraitProjector_war
         struct RotationWarperBase_CompressedRectilinearPortraitProjectorPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 //RotationWarperBase_CompressedRectilinearProjector
@@ -1364,6 +1366,7 @@ struct Point2fWrapper RotationWarperBase_CompressedRectilinearProjector_warpPoin
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -1371,7 +1374,7 @@ struct RectWrapper RotationWarperBase_CompressedRectilinearProjector_warpRoi(
         struct RotationWarperBase_CompressedRectilinearProjectorPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 
@@ -1448,6 +1451,7 @@ struct Point2fWrapper RotationWarperBase_CylindricalPortraitProjector_warpPoint(
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -1455,7 +1459,7 @@ struct RectWrapper RotationWarperBase_CylindricalPortraitProjector_warpRoi(
         struct RotationWarperBase_CylindricalPortraitProjectorPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 //RotationWarperBase_CylindricalProjector
@@ -1531,6 +1535,7 @@ struct Point2fWrapper RotationWarperBase_CylindricalProjector_warpPoint(
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -1538,7 +1543,7 @@ struct RectWrapper RotationWarperBase_CylindricalProjector_warpRoi(
         struct RotationWarperBase_CylindricalProjectorPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 //RotationWarperBase_FisheyeProjector
@@ -1614,6 +1619,7 @@ struct Point2fWrapper RotationWarperBase_FisheyeProjector_warpPoint(
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -1621,7 +1627,7 @@ struct RectWrapper RotationWarperBase_FisheyeProjector_warpRoi(
         struct RotationWarperBase_FisheyeProjectorPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 //RotationWarperBase_MercatorProjector
@@ -1697,6 +1703,7 @@ struct Point2fWrapper RotationWarperBase_MercatorProjector_warpPoint(
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -1704,7 +1711,7 @@ struct RectWrapper RotationWarperBase_MercatorProjector_warpRoi(
         struct RotationWarperBase_MercatorProjectorPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 //RotationWarperBase_PaniniPortraitProjector
@@ -1780,6 +1787,7 @@ struct Point2fWrapper RotationWarperBase_PaniniPortraitProjector_warpPoint(
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -1787,7 +1795,7 @@ struct RectWrapper RotationWarperBase_PaniniPortraitProjector_warpRoi(
         struct RotationWarperBase_PaniniPortraitProjectorPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 //RotationWarperBase_PaniniProjector
@@ -1863,6 +1871,7 @@ struct Point2fWrapper RotationWarperBase_PaniniProjector_warpPoint(
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -1870,7 +1879,7 @@ struct RectWrapper RotationWarperBase_PaniniProjector_warpRoi(
         struct RotationWarperBase_PaniniProjectorPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 //RotationWarperBase_PlanePortraitProjector
@@ -1946,6 +1955,7 @@ struct Point2fWrapper RotationWarperBase_PlanePortraitProjector_warpPoint(
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -1953,7 +1963,7 @@ struct RectWrapper RotationWarperBase_PlanePortraitProjector_warpRoi(
         struct RotationWarperBase_PlanePortraitProjectorPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 //RotationWarperBase_PlaneProjector
@@ -2029,6 +2039,7 @@ struct Point2fWrapper RotationWarperBase_PlaneProjector_warpPoint(
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -2036,7 +2047,7 @@ struct RectWrapper RotationWarperBase_PlaneProjector_warpRoi(
         struct RotationWarperBase_PlaneProjectorPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 //RotationWarperBase_SphericalPortraitProjector
@@ -2112,6 +2123,7 @@ struct Point2fWrapper RotationWarperBase_SphericalPortraitProjector_warpPoint(
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -2119,7 +2131,7 @@ struct RectWrapper RotationWarperBase_SphericalPortraitProjector_warpRoi(
         struct RotationWarperBase_SphericalPortraitProjectorPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 //RotationWarperBase_SphericalProjector
@@ -2195,6 +2207,7 @@ struct Point2fWrapper RotationWarperBase_SphericalProjector_warpPoint(
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -2202,7 +2215,7 @@ struct RectWrapper RotationWarperBase_SphericalProjector_warpRoi(
         struct RotationWarperBase_SphericalProjectorPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 //RotationWarperBase_StereographicProjector
@@ -2278,6 +2291,7 @@ struct Point2fWrapper RotationWarperBase_StereographicProjector_warpPoint(
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -2285,7 +2299,7 @@ struct RectWrapper RotationWarperBase_StereographicProjector_warpRoi(
         struct RotationWarperBase_StereographicProjectorPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 //RotationWarperBase_TransverseMercatorProjector
@@ -2361,6 +2375,7 @@ struct Point2fWrapper RotationWarperBase_TransverseMercatorProjector_warpPoint(
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -2368,7 +2383,7 @@ struct RectWrapper RotationWarperBase_TransverseMercatorProjector_warpRoi(
         struct RotationWarperBase_TransverseMercatorProjectorPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 //WarperCreator
@@ -2786,6 +2801,7 @@ struct Point2fWrapper detail_PlaneWarper_warpPoint(
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat(), T.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -2795,6 +2811,7 @@ struct Point2fWrapper detail_PlaneWarper_warpPoint2(
 {
     cv::Point2f pt2 = pt;
     ptr->warpPoint(pt2, K.toMat(), R.toMat());
+    return Point2fWrapper(pt2);
 }
 
 extern "C"
@@ -2802,7 +2819,7 @@ struct RectWrapper detail_PlaneWarper_warpRoi(
         struct detail_PlaneWarperPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R, struct TensorWrapper T)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat(), T.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat(), T.toMat());
 }
 
 extern "C"
@@ -2810,7 +2827,7 @@ struct RectWrapper detail_PlaneWarper_warpRoi2(
         struct detail_PlaneWarperPtr ptr, struct SizeWrapper src_size,
         struct TensorWrapper K, struct TensorWrapper R)
 {
-    ptr->warpRoi(src_size, K.toMat(), R.toMat());
+    return ptr->warpRoi(src_size, K.toMat(), R.toMat());
 }
 
 //detail_SphericalPortraitWarper
@@ -3683,7 +3700,7 @@ extern "C"
 bool Stitcher_waveCorrection(
         struct StitcherPtr ptr)
 {
-    ptr->waveCorrection();
+    return ptr->waveCorrection();
 }
 
 extern "C"
