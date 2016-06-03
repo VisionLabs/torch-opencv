@@ -320,7 +320,7 @@ extern "C"
 struct ImageFeaturesPtr ImageFeatures_ctor();
 
 extern "C"
-struct ImageFeaturesPtr ImageFeatures_dtor(
+void ImageFeatures_dtor(
 		struct ImageFeaturesPtr ptr);
 
 //FeaturesMatcher
