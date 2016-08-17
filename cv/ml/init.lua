@@ -301,7 +301,7 @@ int SVM_getKernelType(struct PtrWrapper ptr);
 
 void SVM_setKernel(struct PtrWrapper ptr, int val);
 
-//void SVM_setCustomKernel(struct PtrWrapper ptr, struct KernelPtr val);
+//void SVM_setCustomKernel(struct PtrWrapper ptr, struct PtrWrapper val);
 
 bool SVM_trainAuto(
         struct PtrWrapper ptr, struct PtrWrapper data, int kFold, struct PtrWrapper Cgrid,
@@ -441,6 +441,8 @@ int RTrees_getActiveVarCount(struct PtrWrapper ptr);
 
 void RTrees_setTermCriteria(struct PtrWrapper ptr, struct TermCriteriaWrapper val);
 
+struct PtrWrapper RTrees_load(const char *filename, const char *objname);
+
 struct PtrWrapper Boost_ctor();
 
 void Boost_setBoostType(struct PtrWrapper ptr, int val);
@@ -528,6 +530,24 @@ void LogisticRegression_setTermCriteria(struct PtrWrapper ptr, struct TermCriter
 struct TermCriteriaWrapper LogisticRegression_getTermCriteria(struct PtrWrapper ptr);
 
 struct TensorWrapper LogisticRegression_get_learnt_thetas(struct PtrWrapper ptr);
+
+struct PtrWrapper ANN_MLP_load(const char *filename, const char *objname);
+
+struct PtrWrapper LogisticRegression_load(const char *filename, const char *objname);
+
+struct PtrWrapper Boost_load(const char *filename, const char *objname);
+
+struct PtrWrapper RTrees_load(const char *filename, const char *objname);
+
+struct PtrWrapper DTrees_load(const char *filename, const char *objname);
+
+struct PtrWrapper EM_load(const char *filename, const char *objname);
+
+struct PtrWrapper SVM_load(const char *filename, const char *objname);
+
+struct PtrWrapper KNearest_load(const char *filename, const char *objname);
+
+struct PtrWrapper NormalBayesClassifier_load(const char *filename, const char *objname);  
 ]]
 
 -- ParamGrid
@@ -573,10 +593,30 @@ do
         local samples, layout, responses, varIdx, sampleIdx, sampleWeights, varType
             = cv.argcheck(t, argRules)
 
-        self.ptr = C.TrainData_ctor(
-            cv.wrap_tensor(samples), layout, cv.wrap_tensor(responses), cv.wrap_tensor(varIdx),
-            cv.wrap_tensor(sampleIdx), cv.wrap_tensor(sampleWeights), cv.wrap_tensor(varType)
-        )
+        self.ptr = ffi.gc(
+            C.TrainData_ctor(
+                cv.wrap_tensor(samples), layout, cv.wrap_tensor(responses), cv.wrap_tensor(varIdx),
+                cv.wrap_tensor(sampleIdx), cv.wrap_tensor(sampleWeights), cv.wrap_tensor(varType)),
+            C.TrainData_dtor)
+    end
+
+    function TrainData:loadFromCSV(t)
+        local argRules = {
+            {"filename", required = true},
+            {"headerLineCount", required = true},
+            {"responseStartIdx", default = -1},
+            {"responseEndIdx", default = -1},
+            {"varTypeSpec", default = ''},
+            {"delimiter", default = ','},
+            {"missch", default = '?'}
+        }
+        local filename, headerLineCount, responseStartIdx, responseEndIdx, 
+            varTypeSpec, delimiter, missch = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(
+            C.TrainData_loadFromCSV(filename, headerLineCount, 
+                responseStartIdx, responseEndIdx, varTypeSpec, delimiter, missch),
+            C.TrainData_dtor)
     end
 
     function TrainData:getSubVector(t)
@@ -844,6 +884,16 @@ end
 do
 	local NormalBayesClassifier = torch.class('ml.NormalBayesClassifier', 'ml.StatModel', ml)
 
+    function NormalBayesClassifier:load(t)
+        local argRules = {
+            {"filename", required = true},
+            {"objname", default = ''}
+        }
+        local filename, objname = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.NormalBayesClassifier_load(filename, objname), Classes.Algorithm_dtor)
+    end
+
 	function NormalBayesClassifier:__init()
 		self.ptr = ffi.gc(C.NormalBayesClassifier_ctor(), Classes.Algorithm_dtor)
 	end
@@ -868,6 +918,16 @@ end
 
 do
     local KNearest = torch.class('ml.KNearest', 'ml.StatModel', ml)
+
+    function KNearest:load(t)
+        local argRules = {
+            {"filename", required = true},
+            {"objname", default = ''}
+        }
+        local filename, objname = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.KNearest_load(filename, objname), Classes.Algorithm_dtor)
+    end
 
     function KNearest:__init()
         self.ptr = ffi.gc(C.KNearest_ctor(), Classes.Algorithm_dtor)
@@ -944,6 +1004,16 @@ end
 
 do
 	local SVM = torch.class('ml.SVM', 'ml.StatModel', ml)
+
+    function SVM:load(t)
+        local argRules = {
+            {"filename", required = true},
+            {"objname", default = ''}
+        }
+        local filename, objname = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.SVM_load(filename, objname), Classes.Algorithm_dtor)
+    end
 
 	function SVM:__init()
 		self.ptr = ffi.gc(C.SVM_ctor(), Classes.Algorithm_dtor)
@@ -1140,6 +1210,16 @@ end
 do
     local EM = torch.class('ml.EM', 'ml.StatModel', ml)
 
+    function EM:load(t)
+        local argRules = {
+            {"filename", required = true},
+            {"objname", default = ''}
+        }
+        local filename, objname = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.EM_load(filename, objname), Classes.Algorithm_dtor)
+    end
+
     function EM:__init()
         self.ptr = ffi.gc(C.EM_ctor(), Classes.Algorithm_dtor)
     end
@@ -1258,6 +1338,16 @@ end
 
 do
     local DTrees = torch.class('ml.DTrees', 'ml.StatModel', ml)
+
+    function DTrees:load(t)
+        local argRules = {
+            {"filename", required = true},
+            {"objname", default = ''}
+        }
+        local filename, objname = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.DTrees_load(filename, objname), Classes.Algorithm_dtor)
+    end
 
     function DTrees:__init()
         self.ptr = ffi.gc(C.DTrees_ctor(), Classes.Algorithm_dtor)
@@ -1397,14 +1487,32 @@ do
     function DTrees:getSubsets()
         return cv.unwrap_tensors(C.DTrees_getSubsets(self.ptr))
     end
-
-
 end
 
 -- RTrees
 
 do
     local RTrees = torch.class('ml.RTrees', 'ml.DTrees', ml)
+
+    function RTrees:load(t)
+        local argRules = {
+            {"filename", required = true},
+            {"objname", default = ''}
+        }
+        local filename, objname = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.RTrees_load(filename, objname), Classes.Algorithm_dtor)
+    end
+
+    function RTrees:load(t)
+        local argRules = {
+            {"filename", required = true},
+            {"objname", default = ''}
+        }
+        local filename, objname = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.RTrees_load(filename, objname), Classes.Algorithm_dtor)
+    end
 
     function RTrees:__init()
         self.ptr = ffi.gc(C.RTrees_ctor(), Classes.Algorithm_dtor)
@@ -1459,6 +1567,16 @@ end
 do
     local Boost = torch.class('ml.Boost', 'ml.DTrees', ml)
 
+    function Boost:load(t)
+        local argRules = {
+            {"filename", required = true},
+            {"objname", default = ''}
+        }
+        local filename, objname = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.Boost_load(filename, objname), Classes.Algorithm_dtor)
+    end
+
     function Boost:__init()
         self.ptr = ffi.gc(C.Boost_ctor(), Classes.Algorithm_dtor)
     end
@@ -1507,6 +1625,16 @@ end
 
 do
     local ANN_MLP = torch.class('ml.ANN_MLP', 'ml.StatModel', ml)
+
+    function ANN_MLP:load(t)
+        local argRules = {
+            {"filename", required = true},
+            {"objname", default = ''}
+        }
+        local filename, objname = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.ANN_MLP_load(filename, objname), Classes.Algorithm_dtor)
+    end
 
     function ANN_MLP:__init()
         self.ptr = ffi.gc(C.ANN_MLP_ctor(), Classes.Algorithm_dtor)
@@ -1677,6 +1805,16 @@ end
 
 do
     local LogisticRegression = torch.class('ml.LogisticRegression', 'ml.StatModel', ml)
+
+    function LogisticRegression:load(t)
+        local argRules = {
+            {"filename", required = true},
+            {"objname", default = ''}
+        }
+        local filename, objname = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.LogisticRegression_load(filename, objname), Classes.Algorithm_dtor)
+    end
 
     function LogisticRegression:__init()
         self.ptr = ffi.gc(C.LogisticRegression_ctor(), Classes.Algorithm_dtor)

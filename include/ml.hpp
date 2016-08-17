@@ -190,6 +190,9 @@ struct NormalBayesClassifierPtr {
 };
 
 extern "C"
+struct NormalBayesClassifierPtr NormalBayesClassifier_load(const char *filename, const char *objname);
+
+extern "C"
 struct NormalBayesClassifierPtr NormalBayesClassifier_ctor();
 
 extern "C"
@@ -203,6 +206,9 @@ struct KNearestPtr {
     inline ml::KNearest * operator->() { return static_cast<ml::KNearest *>(ptr); }
     inline KNearestPtr(ml::KNearest *ptr) { this->ptr = ptr; }
 };
+
+extern "C"
+struct KNearestPtr KNearest_load(const char *filename, const char *objname);
 
 extern "C"
 struct KNearestPtr KNearest_ctor();
@@ -243,6 +249,9 @@ struct SVMPtr {
     inline ml::SVM * operator->() { return static_cast<ml::SVM *>(ptr); }
     inline SVMPtr(ml::SVM *ptr) { this->ptr = ptr; }
 };
+
+extern "C"
+struct SVMPtr SVM_load(const char *filename, const char *objname);
 
 extern "C"
 struct SVMPtr SVM_ctor();
@@ -334,6 +343,9 @@ struct EMPtr {
 };
 
 extern "C"
+struct EMPtr EM_load(const char *filename, const char *objname);
+
+extern "C"
 struct EMPtr EM_ctor();
 
 extern "C"
@@ -405,6 +417,9 @@ struct ConstSplitArray {
 
 extern "C"
 struct DTreesPtr DTrees_ctor();
+
+extern "C"
+struct DTreesPtr DTrees_load(const char *filename, const char *objname);
 
 extern "C"
 void DTrees_setMaxCategories(struct DTreesPtr ptr, int val);
@@ -480,6 +495,9 @@ struct RTreesPtr {
 };
 
 extern "C"
+struct RTreesPtr RTrees_load(const char *filename, const char *objname);
+
+extern "C"
 struct RTreesPtr RTrees_ctor();
 
 extern "C"
@@ -503,6 +521,9 @@ struct BoostPtr {
     inline ml::Boost * operator->() { return static_cast<ml::Boost *>(ptr); }
     inline BoostPtr(ml::Boost *ptr) { this->ptr = ptr; }
 };
+
+extern "C"
+struct BoostPtr Boost_load(const char *filename, const char *objname);
 
 extern "C"
 struct BoostPtr Boost_ctor();
@@ -531,6 +552,9 @@ struct ANN_MLPPtr {
     inline ml::ANN_MLP * operator->() { return static_cast<ml::ANN_MLP *>(ptr); }
     inline ANN_MLPPtr(ml::ANN_MLP *ptr) { this->ptr = ptr; }
 };
+
+extern "C"
+struct ANN_MLPPtr ANN_MLP_load(const char *filename, const char *objname);
 
 extern "C"
 struct ANN_MLPPtr ANN_MLP_ctor();
@@ -607,6 +631,9 @@ struct LogisticRegressionPtr {
     inline ml::LogisticRegression * operator->() { return static_cast<ml::LogisticRegression *>(ptr); }
     inline LogisticRegressionPtr(ml::LogisticRegression *ptr) { this->ptr = ptr; }
 };
+
+extern "C"
+struct LogisticRegressionPtr LogisticRegression_load(const char *filename, const char *objname);
 
 extern "C"
 struct LogisticRegressionPtr LogisticRegression_ctor();

@@ -53,6 +53,22 @@ struct TrainDataPtr TrainData_ctor(
 }
 
 extern "C"
+void TrainData_dtor(struct TrainDataPtr ptr)
+{
+    delete static_cast<ml::TrainData *>(ptr.ptr);
+}
+
+extern "C"
+struct TrainDataPtr TrainData_loadFromCSV(
+        const char *filename, int headerLineCount, int responseStartIdx,
+        int responseEndIdx, const char *varTypeSpec, char delimiter, char missch)
+{
+    return rescueObjectFromPtr(ml::TrainData::loadFromCSV(
+            filename, headerLineCount, responseStartIdx,
+            responseEndIdx, varTypeSpec, delimiter, missch));
+}
+
+extern "C"
 struct TensorWrapper TrainData_getSubVector(
         struct TensorWrapper vec, struct TensorWrapper idx)
 {
@@ -336,6 +352,11 @@ float StatModel_predict(
 // NormalBayesClassifier
 
 extern "C"
+struct NormalBayesClassifierPtr NormalBayesClassifier_load(const char *filename, const char *objname) {
+    return rescueObjectFromPtr(cv::Algorithm::load<ml::NormalBayesClassifier>(filename, objname));
+}
+
+extern "C"
 struct NormalBayesClassifierPtr NormalBayesClassifier_ctor()
 {
     return rescueObjectFromPtr(ml::NormalBayesClassifier::create());
@@ -360,6 +381,11 @@ struct TensorArrayPlusFloat NormalBayesClassifier_predictProb(
 }
 
 // KNearest
+
+extern "C"
+struct KNearestPtr KNearest_load(const char *filename, const char *objname) {
+    return rescueObjectFromPtr(cv::Algorithm::load<ml::KNearest>(filename, objname));
+}
 
 extern "C"
 struct KNearestPtr KNearest_ctor()
@@ -427,6 +453,11 @@ float KNearest_findNearest(
 }
 
 // SVM
+
+extern "C"
+struct SVMPtr SVM_load(const char *filename, const char *objname) {
+    return rescueObjectFromPtr(cv::Algorithm::load<ml::SVM>(filename, objname));
+}
 
 extern "C"
 struct SVMPtr SVM_ctor()
@@ -607,6 +638,11 @@ struct ParamGridPtr SVM_getDefaultGrid(struct SVMPtr ptr, int param_id)
 // EM
 
 extern "C"
+struct EMPtr EM_load(const char *filename, const char *objname) {
+    return rescueObjectFromPtr(cv::Algorithm::load<ml::EM>(filename, objname));
+}
+
+extern "C"
 struct EMPtr EM_ctor()
 {
     return rescueObjectFromPtr(ml::EM::create());
@@ -714,6 +750,11 @@ bool EM_trainM(
 // DTrees: Node
 
 // DTrees
+
+extern "C"
+struct DTreesPtr DTrees_load(const char *filename, const char *objname) {
+    return rescueObjectFromPtr(cv::Algorithm::load<ml::DTrees>(filename, objname));
+}
 
 extern "C"
 struct DTreesPtr DTrees_ctor()
@@ -864,6 +905,11 @@ struct TensorWrapper DTrees_getSubsets(struct DTreesPtr ptr)
 // RTrees
 
 extern "C"
+struct RTreesPtr RTrees_load(const char *filename, const char *objname) {
+    return rescueObjectFromPtr(cv::Algorithm::load<ml::RTrees>(filename, objname));
+}
+
+extern "C"
 struct RTreesPtr RTrees_ctor()
 {
     return rescueObjectFromPtr(ml::RTrees::create());
@@ -914,6 +960,11 @@ struct TensorWrapper RTrees_getVarImportance(struct RTreesPtr ptr)
 // Boost
 
 extern "C"
+struct BoostPtr Boost_load(const char *filename, const char *objname) {
+    return rescueObjectFromPtr(cv::Algorithm::load<ml::Boost>(filename, objname));
+}
+
+extern "C"
 struct BoostPtr Boost_ctor()
 {
     return rescueObjectFromPtr(ml::Boost::create());
@@ -956,6 +1007,11 @@ double Boost_getWeightTrimRate(struct BoostPtr ptr)
 }
 
 // ANN_MLP
+
+extern "C"
+struct ANN_MLPPtr ANN_MLP_load(const char *filename, const char *objname) {
+    return rescueObjectFromPtr(cv::Algorithm::load<ml::ANN_MLP>(filename, objname));
+}
 
 extern "C"
 struct ANN_MLPPtr ANN_MLP_ctor()
@@ -1096,6 +1152,11 @@ struct TensorWrapper ANN_MLP_getWeights(struct ANN_MLPPtr ptr, int layerIdx)
 }
 
 // LogisticRegression
+
+extern "C"
+struct LogisticRegressionPtr LogisticRegression_load(const char *filename, const char *objname) {
+    return rescueObjectFromPtr(cv::Algorithm::load<ml::LogisticRegression>(filename, objname));
+}
 
 extern "C"
 struct LogisticRegressionPtr LogisticRegression_ctor()
