@@ -2559,6 +2559,8 @@ int GeneralizedHoughGuil_getPosThresh(struct PtrWrapper ptr);
 
 struct PtrWrapper CLAHE_ctor();
 
+struct TensorWrapper CLAHE_apply(struct PtrWrapper ptr, struct TensorWrapper src, struct TensorWrapper dst);
+
 void CLAHE_setClipLimit(struct PtrWrapper ptr, double ClipLimit);
 
 double CLAHE_getClipLimit(struct PtrWrapper ptr);
@@ -2865,6 +2867,17 @@ do
 
     function CLAHE:__init()
         self.ptr = ffi.gc(C.CLAHE_ctor(), Classes.Algorithm_dtor)
+    end
+
+    function CLAHE:apply(t)
+        local argRules = {
+            {"src", required = true},
+            {"dst", default = nil}
+        }
+        local src, dst = cv.argcheck(t, argRules)
+
+        return cv.unwrap_tensors(
+            C.CLAHE_apply(self.ptr, cv.wrap_tensor(src), cv.wrap_tensor(dst)))
     end
 
     function CLAHE:setClipLimit(clipLimit)
