@@ -168,7 +168,8 @@ TensorWrapper::operator cv::Mat() {
 
     int numberOfDims = tensorPtr->nDimension;
     // THTensor stores its dimensions sizes under long *.
-    // In a constructor for cv::Mat, we need const int *.
+    // In a constructor for cv::Mat,
+    // we need const int *.
     // We can't guarantee int and long to be equal.
     // So we somehow need to static_cast THTensor sizes.
     // TODO: get rid of array allocation

@@ -102,6 +102,19 @@ FOREACH(MODULE ${OPENCV_MODULES_TO_WRAP})
     ENDIF()
 ENDFOREACH()
 
+if (NOT EXISTS "${DLIB_DIR}/dlib/dlib_include_path_tutorial.txt")
+    set(DLIB_DIR DLIB_DIR-NOTFOUND)
+endif()
+
+find_path(DLIB_DIR dlib/dlib_include_path_tutorial.txt NO_DEFAULT_PATH)
+
+if (NOT DLIB_DIR)
+    message(FATAL_ERROR "Dlib not found!")
+endif()
+
+target_include_directories(imgproc PUBLIC ${DLIB_DIR})
+target_sources(imgproc PUBLIC ${DLIB_DIR}/dlib/all/source.cpp)
+
 MESSAGE(STATUS "Modules to wrap: ${RESULTING_MODULES_LIST}")
 
 INSTALL(DIRECTORY "${CMAKE_BINARY_DIR}/lib" DESTINATION "${Torch_INSTALL_LUA_PATH_SUBDIR}/cv")

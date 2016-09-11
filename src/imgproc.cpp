@@ -1769,3 +1769,63 @@ struct TensorWrapper flip(
     return TensorWrapper(dst_mat);
 }
 
+extern "C"
+struct LandmarkDetectorPtr LandmarkDetector_ctor(const char *path)
+{
+    auto retval = new dlib::shape_predictor;
+    dlib::deserialize(path) >> (*retval);
+    return retval;
+}
+
+extern "C"
+void LandmarkDetector_dtor(struct LandmarkDetectorPtr ptr)
+{
+    delete static_cast<dlib::shape_predictor*>(ptr.ptr);
+}
+
+extern "C"
+struct TensorWrapper LandmarkDetector_detect(struct LandmarkDetectorPtr ptr,
+    struct TensorWrapper img, struct RectWrapper rect)
+{
+    dlib::rectangle rectDlib(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height);
+    auto landmarks = ptr->operator()(dlib::cv_image<float>(img.toMat()), rectDlib);
+
+    cv::Mat retval(landmarks.num_parts(), 2, CV_32FC1);
+    for (int i = 0; i < landmarks.num_parts(); ++i) {
+        auto landmark = landmarks.part(i);
+        retval.at<float>(i, 0) = landmark.x();
+        retval.at<float>(i, 1) = landmark.y();
+    }
+
+    return TensorWrapper(retval);
+}
+
+extern "C"
+struct FaceDetectorPtr FaceDetector_ctor()
+{
+    dlib::frontal_face_detector *detector = new dlib::frontal_face_detector;
+    *detector = dlib::get_frontal_face_detector();
+    return detector;
+}
+
+extern "C"
+void FaceDetector_dtor(struct FaceDetectorPtr ptr)
+{
+    delete static_cast<dlib::frontal_face_detector*>(ptr.ptr);
+}
+
+extern "C"
+struct RectArray FaceDetector_detect(struct FaceDetectorPtr ptr, struct TensorWrapper img)
+{
+    auto dets = ptr->operator()(dlib::cv_image<float>(img.toMat()));
+    std::vector<cv::Rect> detsCV(dets.size());
+    for (int i = 0; i < dets.size(); ++i) {
+        detsCV[i].x = dets[i].left();
+        detsCV[i].width = dets[i].right() - dets[i].left();
+        detsCV[i].y = dets[i].top();
+        detsCV[i].height = dets[i].bottom() - dets[i].top();
+    }
+
+    std::cout << dets.size() << std::endl;
+    return RectArray(detsCV);
+}

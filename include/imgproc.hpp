@@ -588,6 +588,24 @@ struct LineIteratorPtr {
     inline LineIteratorPtr(cv::LineIterator *ptr) { this->ptr = ptr; }
 };
 
+#include <dlib/image_processing.h>
+#include <dlib/image_processing/frontal_face_detector.h>
+#include <dlib/opencv.h>
+
+struct LandmarkDetectorPtr {
+    void *ptr;
+
+    inline dlib::shape_predictor * operator->() { return static_cast<dlib::shape_predictor *>(ptr); }
+    inline LandmarkDetectorPtr(dlib::shape_predictor *ptr) { this->ptr = ptr; }
+};
+
+struct FaceDetectorPtr {
+    void *ptr;
+
+    inline dlib::frontal_face_detector * operator->() { return static_cast<dlib::frontal_face_detector *>(ptr); }
+    inline FaceDetectorPtr(dlib::frontal_face_detector *ptr) { this->ptr = ptr; }
+};
+
 extern "C"
 void GeneralizedHough_setTemplate(
         GeneralizedHoughPtr ptr, struct TensorWrapper templ, struct PointWrapper templCenter);
@@ -831,3 +849,22 @@ extern "C"
 struct TensorWrapper addWeighted(
         struct TensorWrapper src1, double alpha, struct TensorWrapper src2, double beta,
         double gamma, struct TensorWrapper dst, int dtype);
+
+extern "C"
+struct LandmarkDetectorPtr LandmarkDetector_ctor(const char *path);
+
+extern "C"
+void LandmarkDetector_dtor(struct LandmarkDetectorPtr ptr);
+
+extern "C"
+struct TensorWrapper LandmarkDetector_detect(struct LandmarkDetectorPtr ptr,
+                                             struct TensorWrapper img, struct RectWrapper rect);
+
+extern "C"
+struct FaceDetectorPtr FaceDetector_ctor();
+
+extern "C"
+void FaceDetector_dtor(struct FaceDetectorPtr ptr);
+
+extern "C"
+struct RectArray FaceDetector_detect(struct FaceDetectorPtr ptr, struct TensorWrapper img);

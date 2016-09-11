@@ -3140,4 +3140,63 @@ function cv.flip(t)
             cv.wrap_tensor(src), cv.wrap_tensor(dst), flipCode))
 end
 
+-- dlib
+
+ffi.cdef[[
+struct PtrWrapper LandmarkDetector_ctor(const char *path);
+
+void LandmarkDetector_dtor(struct PtrWrapper ptr);
+
+struct TensorWrapper LandmarkDetector_detect(struct PtrWrapper ptr,
+                                             struct TensorWrapper img, struct RectWrapper rect);
+
+struct PtrWrapper FaceDetector_ctor();
+
+void FaceDetector_dtor(struct PtrWrapper ptr);
+
+struct RectArray FaceDetector_detect(struct PtrWrapper ptr, struct TensorWrapper img);
+]]
+
+do
+    local LandmarkDetector = torch.class('cv.LandmarkDetector', cv)
+
+    function LandmarkDetector:__init(t)
+        local argRules = {
+            {"path", required = true}
+        }
+        local path = cv.argcheck(t, argRules)
+
+        self.ptr = ffi.gc(C.LandmarkDetector_ctor(path), C.LandmarkDetector_dtor)
+    end
+
+    function LandmarkDetector:detect(t)
+        local argRules = {
+            {"img", required = true},
+            {"rect", required = true, operator = cv.Rect}
+        }
+        local img, rect = cv.argcheck(t, argRules)
+
+        return cv.unwrap_tensors(C.LandmarkDetector_detect(self.ptr,
+            cv.wrap_tensor(img), rect))
+    end
+end
+
+do
+    local FaceDetector = torch.class('cv.FaceDetector', cv)
+
+    function FaceDetector:__init()
+        self.ptr = ffi.gc(C.FaceDetector_ctor(), C.FaceDetector_dtor)
+    end
+
+    function FaceDetector:detect(t)
+        local argRules = {
+            {"img", required = true}
+        }
+        local img = cv.argcheck(t, argRules)
+
+        return cv.gcarray(C.FaceDetector_detect(self.ptr,
+            cv.wrap_tensor(img)))
+    end
+end
+
 return cv
