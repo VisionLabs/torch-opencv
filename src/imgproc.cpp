@@ -1826,6 +1826,5 @@ struct RectArray FaceDetector_detect(struct FaceDetectorPtr ptr, struct TensorWr
         detsCV[i].height = dets[i].bottom() - dets[i].top();
     }
 
-    std::cout << dets.size() << std::endl;
     return RectArray(detsCV);
 }
