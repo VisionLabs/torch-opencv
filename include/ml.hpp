@@ -50,6 +50,9 @@ struct TrainDataPtr TrainData_ctor(
         struct TensorWrapper sampleWeights, struct TensorWrapper varType);
 
 extern "C"
+void TrainData_dtor(struct TrainDataPtr ptr);
+
+extern "C"
 struct TensorWrapper TrainData_getSubVector(struct TensorWrapper vec, struct TensorWrapper idx);
 
 extern "C"
@@ -333,7 +336,7 @@ struct TensorArrayPlusDouble SVM_getDecisionFunction(
         struct SVMPtr ptr, int i, struct TensorWrapper alpha, struct TensorWrapper svidx);
 
 extern "C"
-struct ParamGridPtr SVM_getDefaultGrid(struct SVMPtr ptr, int param_id);
+struct ParamGridPtr SVM_getDefaultGrid(int param_id);
 
 struct EMPtr {
     void *ptr;

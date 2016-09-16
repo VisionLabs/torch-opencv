@@ -628,10 +628,10 @@ struct TensorArrayPlusDouble SVM_getDecisionFunction(
 }
 
 extern "C"
-struct ParamGridPtr SVM_getDefaultGrid(struct SVMPtr ptr, int param_id)
+struct ParamGridPtr SVM_getDefaultGrid(int param_id)
 {
     ml::ParamGrid *result = new ml::ParamGrid;
-    *result = ptr->getDefaultGrid(param_id);
+    *result = ml::SVM::getDefaultGrid(param_id);
     return result;
 }
 

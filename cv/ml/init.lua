@@ -139,6 +139,8 @@ struct PtrWrapper TrainData_ctor(
         struct TensorWrapper varIdx, struct TensorWrapper sampleIdx,
         struct TensorWrapper sampleWeights, struct TensorWrapper varType);
 
+void TrainData_dtor(struct PtrWrapper ptr);
+
 struct TensorWrapper TrainData_getSubVector(struct TensorWrapper vec, struct TensorWrapper idx);
 
 int TrainData_getLayout(struct PtrWrapper ptr);
@@ -313,7 +315,7 @@ struct TensorWrapper SVM_getSupportVectors(struct PtrWrapper ptr);
 struct TensorArrayPlusDouble SVM_getDecisionFunction(
         struct PtrWrapper ptr, int i, struct TensorWrapper alpha, struct TensorWrapper svidx);
 
-struct PtrWrapper SVM_getDefaultGrid(struct PtrWrapper ptr, int param_id);
+struct PtrWrapper SVM_getDefaultGrid(int param_id);
 
 struct PtrWrapper EM_ctor();
 
@@ -558,6 +560,7 @@ do
     function ParamGrid:__init(t)
     	if type(t) ~= 'table' then
     		self.ptr = t
+            return
     	end
 
         if t[1] or t._minVal then
@@ -1163,12 +1166,12 @@ do
 		local argRules = {
 			{"data", required = true},
 			{"kFold", default = 10},
-			{"Cgrid", default = SVM.getDefaultGrid(ml.SVM_C)},
-			{"gammaGrid", default = SVM.getDefaultGrid(ml.SVM_GAMMA)},
-			{"pGrid", default = SVM.getDefaultGrid(ml.SVM_P)},
-			{"nuGrid", default = SVM.getDefaultGrid(ml.SVM_NU)},
-			{"coeffGrid", default = SVM.getDefaultGrid(ml.SVM_COEF)},
-			{"degreeGrid", default = SVM.getDefaultGrid(ml.SVM_DEGREE)},
+			{"Cgrid", default = SVM.getDefaultGrid{ml.SVM_C}},
+			{"gammaGrid", default = SVM.getDefaultGrid{ml.SVM_GAMMA}},
+			{"pGrid", default = SVM.getDefaultGrid{ml.SVM_P}},
+			{"nuGrid", default = SVM.getDefaultGrid{ml.SVM_NU}},
+			{"coeffGrid", default = SVM.getDefaultGrid{ml.SVM_COEF}},
+			{"degreeGrid", default = SVM.getDefaultGrid{ml.SVM_DEGREE}},
 			{"balanced", default = false}
 		}
 		local data, kFold, Cgrid, gammaGrid, pGrid, nuGrid, coeffGrid, degreeGrid, balanced
@@ -1195,13 +1198,13 @@ do
 	    return result.val, cv.unwrap_tensors(result.tensors)
 	end
 
-	function SVM:getDefaultGrid(t)
+	function SVM.getDefaultGrid(t)
 		local argRules = {
 	        {"param_id", required = true}
 	    }
 	    local param_id = cv.argcheck(t, argRules)
 
-	    return cv.ParamGrid(C.SVM_getDefaultGrid(self.ptr, param_id))
+	    return ml.ParamGrid(C.SVM_getDefaultGrid(param_id))
 	end
 end
 
