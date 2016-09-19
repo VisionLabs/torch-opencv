@@ -144,7 +144,7 @@ extern "C" struct TensorArray pencilSketch(struct TensorWrapper src, struct Tens
     std::vector<MatT> retval(2);
     retval[0] = dst1.toMatT();
     retval[1] = dst2.toMatT();
-    cv::pencilSketch(src.toMat(), retval[1], retval[2], sigma_s, sigma_r, shade_factor);
+    cv::pencilSketch(src.toMat(), retval[0], retval[1], sigma_s, sigma_r, shade_factor);
     return TensorArray(retval);
 }
 
