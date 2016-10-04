@@ -344,6 +344,6 @@ void FakeStackAllocator::free(cuda::GpuMat* mat) {
 
 cuda::Stream & prepareStream(cutorchInfo info) {
     cuda::setDevice(info.deviceID - 1);
-    fakeStream.impl_ = cv::makePtr<FakeStreamImpl>(info.state->currentStream);
+    fakeStream.impl_ = cv::makePtr<FakeStreamImpl>(THCState_getCurrentStream(info.state));
     return *reinterpret_cast<cuda::Stream *>(&fakeStream);
 }
