@@ -269,6 +269,10 @@ void transfer_tensor(THByteTensor *dst, struct TensorWrapper srcWrapper) {
 
     THByteTensor *src = srcWrapper.tensorPtr;
 
+    if (src == nullptr) {
+        return;
+    }
+
     dst->nDimension = src->nDimension;
     dst->refcount = src->refcount;
 
