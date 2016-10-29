@@ -15,6 +15,14 @@ IF (BUILD_CUDA)
         cudafilters cudaoptflow cudabgsegm cudafeatures2d cudaimgproc cudastereo cudaobjdetect)
 ENDIF()
 
+IF (DEFINED ENV{DONT_WRAP})
+    SET(DONT_WRAP $ENV{DONT_WRAP})
+ENDIF()
+
+IF (DONT_WRAP)
+    LIST(REMOVE_ITEM OPENCV_MODULES_TO_WRAP ${DONT_WRAP})
+ENDIF()
+
 # Unfortunately, OpenCVConfig.cmake doesn't make use of FIND_PACKAGE's "OPTIONAL_COMPONENTS"
 # So let's invoke FIND_PACKAGE twice:
 
