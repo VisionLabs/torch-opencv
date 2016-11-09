@@ -1,6 +1,7 @@
 #include <cudaobjdetect.hpp>
 
-struct HOGPtr HOG_ctor(
+extern "C"
+struct HOGPtr HOG_ctorCuda(
         struct SizeWrapper win_size, struct SizeWrapper block_size,
         struct SizeWrapper block_stride, struct SizeWrapper cell_size, int nbins)
 {

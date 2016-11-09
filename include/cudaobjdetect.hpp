@@ -20,7 +20,8 @@ struct CascadeClassifierPtr {
     inline cuda::CascadeClassifier & operator*() { return *static_cast<cuda::CascadeClassifier *>(this->ptr); }
 };
 
-struct HOGPtr HOG_ctor(
+extern "C"
+struct HOGPtr HOG_ctorCuda(
         struct SizeWrapper win_size, struct SizeWrapper block_size,
         struct SizeWrapper block_stride, struct SizeWrapper cell_size, int nbins);
 
