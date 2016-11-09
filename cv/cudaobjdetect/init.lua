@@ -111,7 +111,7 @@ local Classes = ffi.load(cv.libPath('Classes'))
 do
     local HOG = torch.class('cuda.HOG', 'cv.Algorithm', cv.cuda)
 
-    function HOG:__init()
+    function HOG:__init(t)
         local argRules = {
             {"win_size", default = {64, 128}, operator = cv.Size},
             {"block_size", default = {16, 16}, operator = cv.Size},
