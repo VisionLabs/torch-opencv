@@ -237,7 +237,7 @@ do
     end
 
     function HOG:getDefaultPeopleDetector()
-        return C.HOG_getDefaultPeopleDetectorCuda(self.ptr)
+        return cv.unwrap_tensors(C.HOG_getDefaultPeopleDetectorCuda(self.ptr))
     end
 
     function HOG:detect(t)
