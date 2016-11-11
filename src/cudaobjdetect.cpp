@@ -168,7 +168,11 @@ struct TensorPlusRectArray HOG_detectMultiScaleCuda(
     cuda::GpuMat imgMatByte;
     imgMat.convertTo(imgMatByte, CV_8U, 255.0); // Sorry guys :( #156
 
-    ptr->detectMultiScale(imgMatByte, found_locations, &confidences);
+    if (ptr->getGroupThreshold() == 0) {
+        ptr->detectMultiScale(imgMatByte, found_locations, &confidences);
+    } else {
+        ptr->detectMultiScale(imgMatByte, found_locations, nullptr);
+    }
 
     TensorPlusRectArray retval;
     new (&retval.rects) RectArray(found_locations);
