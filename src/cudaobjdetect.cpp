@@ -147,7 +147,10 @@ struct TensorPlusPointArray HOG_detectCuda(
 {
     std::vector<cv::Point> found_locations;
     std::vector<double> confidences;
-    ptr->detect(img.toGpuMat(), found_locations, &confidences);
+    cuda::GpuMat imgMat = img.toGpuMat();
+    cuda::GpuMat imgMatByte;
+    imgMat.convertTo(imgMatByte, CV_8U, 255.0); // Sorry guys :( #156
+    ptr->detect(imgMatByte, found_locations, &confidences);
 
     TensorPlusPointArray retval;
     new (&retval.points) PointArray(found_locations);
@@ -161,7 +164,11 @@ struct TensorPlusRectArray HOG_detectMultiScaleCuda(
 {
     std::vector<cv::Rect> found_locations;
     std::vector<double> confidences;
-    ptr->detectMultiScale(img.toGpuMat(), found_locations, &confidences);
+    cuda::GpuMat imgMat = img.toGpuMat();
+    cuda::GpuMat imgMatByte;
+    imgMat.convertTo(imgMatByte, CV_8U, 255.0); // Sorry guys :( #156
+
+    ptr->detectMultiScale(imgMatByte, found_locations, &confidences);
 
     TensorPlusRectArray retval;
     new (&retval.rects) RectArray(found_locations);
@@ -175,7 +182,11 @@ struct TensorWrapper HOG_computeCuda(
         struct TensorWrapper descriptors)
 {
     GpuMatT descriptorsMat = descriptors.toGpuMatT();
-    ptr->compute(img.toGpuMat(), descriptorsMat, prepareStream(info));
+    cuda::GpuMat imgMat = img.toGpuMat();
+    cuda::GpuMat imgMatByte;
+    imgMat.convertTo(imgMatByte, CV_8U, 255.0); // Sorry guys :( #156
+
+    ptr->compute(imgMatByte, descriptorsMat, prepareStream(info));
     return TensorWrapper(descriptorsMat, info.state);
 }
 
