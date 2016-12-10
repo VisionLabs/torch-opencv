@@ -46,12 +46,17 @@ struct TensorWrapper alphaCompCuda(struct cutorchInfo info,
 }
 
 extern "C"
-struct TensorWrapper calcHistCuda(
-        struct cutorchInfo info, struct TensorWrapper src, struct TensorWrapper hist)
+struct TensorWrapper calcHistCuda(struct cutorchInfo info, 
+	struct TensorWrapper src, struct TensorWrapper hist)
 {
     cuda::GpuMat retval = hist.toGpuMat();
-    cuda::calcHist(src.toGpuMat(), retval, prepareStream(info));
-    return TensorWrapper(retval, info.state);
+	cuda::GpuMat retvalMat;
+	cuda::GpuMat srcMat = src.toGpuMat();
+	cuda::GpuMat srcByteMat;
+	srcMat.convertTo(srcByteMat, CV_8U);
+    cuda::calcHist(srcByteMat, retval, prepareStream(info));
+	retval.convertTo(retvalMat, CV_32F);	
+    return TensorWrapper(retvalMat, info.state);
 }
 
 extern "C"
