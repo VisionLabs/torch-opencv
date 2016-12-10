@@ -1793,8 +1793,8 @@ function cv.floodFill(t)
     local image, mask, seedPoint, newVal, loDiff, upDiff, flags = cv.argcheck(t, argRules)
 
     local result = C.floodFill(
-        cv.wrap_tensor(image), cv.wrap_tensor(mask), seedPoint[1],
-        seedPoint[2], newVal, loDiff, upDiff, flags)
+        cv.wrap_tensor(image), cv.wrap_tensor(mask),
+        seedPoint, newVal, loDiff, upDiff, flags)
     return result.val, result.rect
 end
 
