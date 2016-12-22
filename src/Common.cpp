@@ -1,4 +1,5 @@
 #include <Common.hpp>
+#include <stddef.h>
 #include <array>
 
 /***************** Tensor <=> Mat conversion *****************/
@@ -22,14 +23,14 @@ static long getAllocSize(void *ptr) {
 #endif
 }
 
-static void *OpenCVMalloc(void */*allocatorContext*/, long size) {
-    return cv::fastMalloc(size);
+static void *OpenCVMalloc(void */*allocatorContext*/, ptrdiff_t size) {
+    return cv::fastMalloc(static_cast<size_t>(size));
 }
 
-static void *OpenCVRealloc(void */*allocatorContext*/, void *ptr, long size) {
+static void *OpenCVRealloc(void */*allocatorContext*/, void *ptr, ptrdiff_t size) {
     // https://github.com/Itseez/opencv/blob/master/modules/core/src/alloc.cpp#L62
     void *oldMem = ((unsigned char**)ptr)[-1];
-    void *newMem = cv::fastMalloc(size);
+    void *newMem = cv::fastMalloc(static_cast<size_t>(size));
     memcpy(newMem, oldMem, getAllocSize(oldMem));
     return newMem;
 }
