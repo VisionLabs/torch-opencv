@@ -267,7 +267,6 @@ function cv.cuda.bilateralFilter(t)
         {"kernel_size", required = true},
         {"sigma_color", required = true},
         {"sigma_spatial", required = true},
-        {"kernel_size", required = true},
         {"borderMode", default = cv.BORDER_DEFAULT}
     }
     return cv.unwrap_tensors(C.bilateralFilterCuda(cv.cuda._info(), cv.argcheck(t, argRules)))
