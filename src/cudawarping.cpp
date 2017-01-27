@@ -81,16 +81,16 @@ struct TensorWrapper warpPerspectiveCuda(struct cutorchInfo info,
 {
     if (dst.isNull()) {
         cuda::GpuMat retval;
-        cuda::warpPerspective(src.toGpuMat(), retval, M.toGpuMat(), dsize,
+        cuda::warpPerspective(src.toGpuMat(), retval, M.toMat(), dsize,
                               flags, borderMode, borderValue, prepareStream(info));
         return TensorWrapper(retval, info.state);
     } else if (dst.tensorPtr == src.tensorPtr) {
         // in-place
         cuda::GpuMat source = src.toGpuMat();
-        cuda::warpPerspective(source, source, M.toGpuMat(), dsize, flags,
+        cuda::warpPerspective(source, source, M.toMat(), dsize, flags,
                               borderMode, borderValue, prepareStream(info));
     } else {
-        cuda::warpPerspective(src.toGpuMat(), dst.toGpuMat(), M.toGpuMat(),
+        cuda::warpPerspective(src.toGpuMat(), dst.toGpuMat(), M.toMat(),
                               dsize, flags, borderMode, borderValue, prepareStream(info));
     }
     return dst;
