@@ -10,8 +10,16 @@ struct TensorWrapper xphoto_bm3dDenoising(
         int step, int transformType);
 
 extern "C"
-struct TensorWrapper xphoto_balanceWhite(
-        struct TensorWrapper src, struct TensorWrapper dst, int algorithmType);
+struct TensorWrapper xphoto_SimpleWB(
+        struct TensorWrapper src, struct TensorWrapper dst);
+
+extern "C"
+struct TensorWrapper xphoto_GrayworldWB(
+        struct TensorWrapper src, struct TensorWrapper dst);
+
+extern "C"
+struct TensorWrapper xphoto_LearningBasedWB(
+        struct TensorWrapper src, struct TensorWrapper dst);
 
 extern "C"
 struct TensorWrapper xphoto_dctDenoising(

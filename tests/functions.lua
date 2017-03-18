@@ -332,9 +332,9 @@ do
     local trainingDataMat = torch.FloatTensor{ {501, 10}, {255, 10}, {501, 255}, {10, 501} }
 
     local svm = cv.ml.SVM()
-    svm:setType  		{cv.ml.SVM_C_SVC}
-    svm:setKernel		{cv.ml.SVM_POLY}
-    svm:setDegree 		{2}
+    svm:setType         {cv.ml.SVM_C_SVC}
+    svm:setKernel       {cv.ml.SVM_POLY}
+    svm:setDegree       {2}
     svm:setTermCriteria {cv.TermCriteria{cv.TermCriteria_MAX_ITER, 100, 1e-6}}
 
     svm:train{trainingDataMat, cv.ml.ROW_SAMPLE, labelsMat}
@@ -387,17 +387,17 @@ print("OK")
 -------------------------------
 print('>')
 
-print('cv.xphoto.autowbGrayworld testing...')
+print('cv.xphoto.GrayworldWB testing...')
 local memory_before = collectgarbage("count")
 do
     local src = image:clone()
     local dst2 = torch.ByteTensor(src:size(1), src:size(2), src:size(3))
 
-    local dst = cv.xphoto.autowbGrayworld{src = src}
+    local dst = cv.xphoto.GrayworldWB{src = src}
 
-    cv.xphoto.autowbGrayworld{src = src, dst = dst2}
+    cv.xphoto.GrayworldWB{src = src, dst = dst2}
 
-    cv.xphoto.autowbGrayworld{src = src, dst = src}
+    cv.xphoto.GrayworldWB{src = src, dst = src}
 
     assert((src:eq(dst) - 1):sum() == 0)
     assert((src:eq(dst2) - 1):sum() == 0)
