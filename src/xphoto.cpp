@@ -21,6 +21,20 @@ struct TensorWrapper xphoto_balanceWhite(
 }
 
 extern "C"
+struct TensorWrapper xphoto_bm3dDenoising(
+        struct TensorWrapper src, struct TensorWrapper dst,
+        float h, int templateWindowSize, int searchWindowSize, int blockMatchingStep1,
+        int blockMatchingStep2, int groupSize, int slidingStep, float beta, int normType,
+        int step, int transformType)
+{   
+
+    MatT dst_mat = dst.toMatT();
+    cv::xphoto::bm3dDenoising(src.toMat(), dst_mat.mat, h, templateWindowSize, searchWindowSize,
+        blockMatchingStep1, blockMatchingStep2, groupSize, slidingStep, beta, normType, step, transformType);
+    return TensorWrapper(dst_mat);
+}
+
+extern "C"
 struct TensorWrapper xphoto_dctDenoising(
         struct TensorWrapper src, struct TensorWrapper dst, double sigma, int psize)
 {
