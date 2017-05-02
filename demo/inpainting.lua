@@ -13,8 +13,7 @@ local image = cv.imread{arg[1] or 'demo/data/lena.jpg', cv.IMREAD_COLOR}
 local mask = cv.imread{arg[2] or 'demo/data/inpainting/lena_mask.jpg', cv.IMREAD_GRAYSCALE}
 
 if image:nDimension() == 0 or mask:nDimension() == 0 then
-    print('Problem loading image\n')
-    os.exit(0)
+    error('Couldn\'t load image or mask')
 end
 
 cv.namedWindow{"Display"}

@@ -14,9 +14,8 @@ local imgPrefixPath = 'demo/data/trackbar/'
 local src1 = cv.imread{imgPrefixPath..  'LinuxLogo.png'}
 local src2 = cv.imread{imgPrefixPath..'WindowsLogo.png'}
 
-if not src1 or not src2 then
-    print('Error loading images')
-    os.exit(-1)
+if src1:nElement() == 0 or src2:nElement() == 0 then
+    error('Couldn\'t load images')
 end
 
 assert(src1:isSameSizeAs(src2))

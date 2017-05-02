@@ -7,10 +7,11 @@ if not arg[1] then
     print('Now using demo/data/lena.jpg')
 end
 
-local im = cv.imread {arg[1] or 'demo/data/lena.jpg', cv.IMREAD_GRAYSCALE}
-if im:nDimension() == 0 then
-    print('Problem loading image\n')
-    os.exit(0)
+local path = arg[1] or 'demo/data/lena.jpg'
+local im = cv.imread {path, cv.IMREAD_GRAYSCALE}
+
+if im:nElement() == 0 then
+    error('Couldn\'t load ' .. path)
 end
 
 cv.imshow {"Hello, Lua!", im}

@@ -131,10 +131,9 @@ TensorWrapper::TensorWrapper(cv::Mat & matArg) {
 
     outputPtr->storageOffset = 0;
 
-    // Prevent OpenCV from deallocating Mat memory
-    if (mat.u) {
-        mat.addref();
-    }
+    // Of course we want that matArg object itself to be deallocated if needed,
+    // but anyway we have to prevent OpenCV from deallocating the memory
+    mat.u->flags |= cv::UMatData::USER_ALLOCATED;
 
     this->tensorPtr = outputPtr;
 }

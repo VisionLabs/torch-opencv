@@ -5,21 +5,22 @@ require 'cv.stitching'
 
 cv.namedWindow{'Display'}
 
-local imgs = {}
+local images = {}
 for i = 1,5 do
-    imgs[i] = cv.imread{'demo/data/stitch/s' .. i .. '.jpg' }
-    cv.imshow{'Display', imgs[i]}
-    cv.waitKey{0}
-    if imgs[i]:nDimension() == 0 then
-        print('Problem loading image')
-        os.exit(0)
+    local pathToImage = ('demo/data/stitch/s%d.jpg'):format(i)
+    images[i] = cv.imread{pathToImage}
+    if images[i]:nElement() == 0 then
+        error('Couldn\'t load ' .. pathToImage)
     end
+
+    cv.imshow{'Display', images[i]}
+    cv.waitKey{0}
 end
 
 local stitcher = cv.Stitcher{}
 
 local timer = torch.Timer()
-local status, pano = stitcher:stitch{imgs}
+local status, pano = stitcher:stitch{images}
 print('Processing time: ' .. timer:time().real .. ' seconds')
 
 cv.setWindowTitle{'Display', 'Panorama'}
@@ -27,5 +28,5 @@ if status == 0 then
     cv.imshow{'Display', pano}
     cv.waitKey{0}
 else
-    print('Stitching fail')
+    error('Stitching fail')
 end

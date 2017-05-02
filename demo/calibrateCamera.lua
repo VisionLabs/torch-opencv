@@ -12,7 +12,12 @@ local imagesPathPrefix = 'demo/data/calibrateCamera/'
 local img = {}
 
 for i = 1, numImages do
-    img[i] = cv.imread{imagesPathPrefix..'template'..i..'.jpg'}
+    local path = imagesPathPrefix..'template'..i..'.jpg'
+    img[i] = cv.imread{path}
+
+    if img[i]:nElement() == 0 then
+        error('Couldn\'t load ' .. imagesPathPrefix..'template'..i..'.jpg')
+    end
 end
 
 local corners = {}
