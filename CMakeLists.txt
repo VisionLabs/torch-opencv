@@ -27,9 +27,9 @@ ENDIF()
 # So let's invoke FIND_PACKAGE twice:
 
 # Once (error-throwing) to check if OpenCV is present
-FIND_PACKAGE(OpenCV 3.1 REQUIRED)
+FIND_PACKAGE(OpenCV 3.1 EXACT REQUIRED)
 # Once more (silently) to look for the installed modules
-FIND_PACKAGE(OpenCV 3.1 QUIET OPTIONAL_COMPONENTS ${OPENCV_MODULES_TO_WRAP})
+FIND_PACKAGE(OpenCV 3.1 EXACT QUIET OPTIONAL_COMPONENTS ${OPENCV_MODULES_TO_WRAP})
 
 IF(LUAROCKS_PREFIX)
     MESSAGE(STATUS "Installing Torch through Luarocks")
