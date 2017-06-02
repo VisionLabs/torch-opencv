@@ -2375,7 +2375,7 @@ function cv.drawContours(t)
         {"lineType", default = cv.LINE_8},
         {"hierarchy", default = nil},
         {"maxLevel", default = cv.INT_MAX},
-        {"offset", default = cv.Point}
+        {"offset", default = {0,0}, operator = cv.Point}
     }
     local image, contours, contourIdx, color, thickness, lineType, hierarchy, maxLevel, offset = cv.argcheck(t, argRules)
 
