@@ -170,9 +170,9 @@ struct TensorWrapper rectStdDevCuda(
         struct TensorWrapper dst, struct RectWrapper rect)
 {
     if (dst.isNull()) {
-        cv::Mat result;
+        cuda::GpuMat result;
         cuda::rectStdDev(src.toGpuMat(), sqr.toGpuMat(), result, rect, prepareStream(info));
-        return TensorWrapper(result);
+        return TensorWrapper(result, info.state);
     } else {
         cuda::rectStdDev(src.toGpuMat(), sqr.toGpuMat(), dst.toGpuMat(), rect, prepareStream(info));
         return dst;
@@ -185,10 +185,10 @@ struct TensorWrapper normalizeCuda(
         double alpha, double beta, int norm_type, int dtype, struct TensorWrapper mask)
 {
     if (dst.isNull()) {
-        cv::Mat result;
+        cuda::GpuMat result;
         cuda::normalize(src.toGpuMat(), result, alpha, beta, norm_type,
                         dtype, TO_MAT_OR_NOARRAY(mask), prepareStream(info));
-        return TensorWrapper(result);
+        return TensorWrapper(result, info.state);
     } else {
         cuda::normalize(src.toGpuMat(), dst.toGpuMat(), alpha, beta, norm_type,
                         dtype, TO_MAT_OR_NOARRAY(mask), prepareStream(info));
@@ -201,9 +201,9 @@ struct TensorWrapper integralCuda(
         struct cutorchInfo info, struct TensorWrapper src, struct TensorWrapper sum)
 {
     if (sum.isNull()) {
-        cv::Mat result;
+        cuda::GpuMat result;
         cuda::integral(src.toGpuMat(), result, prepareStream(info));
-        return TensorWrapper(result);
+        return TensorWrapper(result, info.state);
     } else {
         cuda::integral(src.toGpuMat(), sum.toGpuMat(), prepareStream(info));
         return sum;
@@ -215,9 +215,9 @@ struct TensorWrapper sqrIntegralCuda(
         struct cutorchInfo info, struct TensorWrapper src, struct TensorWrapper sum)
 {
     if (sum.isNull()) {
-        cv::Mat result;
+        cuda::GpuMat result;
         cuda::sqrIntegral(src.toGpuMat(), result, prepareStream(info));
-        return TensorWrapper(result);
+        return TensorWrapper(result, info.state);
     } else {
         cuda::sqrIntegral(src.toGpuMat(), sum.toGpuMat(), prepareStream(info));
         return sum;
@@ -260,9 +260,9 @@ struct TensorWrapper dftCuda(
         struct TensorWrapper dst, struct SizeWrapper dft_size, int flags)
 {
     if (dst.isNull()) {
-        cv::Mat result;
+        cuda::GpuMat result;
         cuda::dft(src.toGpuMat(), result, dft_size, flags, prepareStream(info));
-        return TensorWrapper(result);
+        return TensorWrapper(result, info.state);
     } else {
         cuda::dft(src.toGpuMat(), dst.toGpuMat(), dft_size, flags, prepareStream(info));
         return dst;
