@@ -305,6 +305,9 @@ cv.NULLPTR = ffi.new('void *', nil)
 --- ***************** Argument checking & unpacking *****************
 
 function cv.argcheck(t, rules)
+    assert(type(t) == 'table',
+        'Use curly braces {} for calling OpenCV functions, not parentheses ()')
+
     local retval = {}
     for i, argument in ipairs(rules) do
         local userInputArg = t[argument[1]]

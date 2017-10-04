@@ -2341,7 +2341,6 @@ function cv.fillPoly(t)
         {"offset", default = {0,0}, operator = cv.Point}
     }
     local img, pts, color, lineType, shift, offset = cv.argcheck(t, argRules)
-    assert(type(pts) == 'table')
 
     C.fillPoly(cv.wrap_tensor(img), cv.wrap_tensors(pts), color, lineType, shift, offset)
 end
@@ -2358,8 +2357,6 @@ function cv.polylines(t)
         {"shift", default = 0}
     }
     local img, pts, isClosed, color, thickness, lineType, shift = cv.argcheck(t, argRules)
-
-    assert(type(pts) == 'table')
 
     C.polylines(cv.wrap_tensor(img), cv.wrap_tensors(pts), isClosed, color, thickness, lineType, shift)
 end
@@ -2378,8 +2375,6 @@ function cv.drawContours(t)
         {"offset", default = {0,0}, operator = cv.Point}
     }
     local image, contours, contourIdx, color, thickness, lineType, hierarchy, maxLevel, offset = cv.argcheck(t, argRules)
-
-    assert(type(contours) == 'table')
 
     C.drawContours(cv.wrap_tensor(image), cv.wrap_tensors(contours), contourIdx, color, thickness, lineType, cv.wrap_tensor(hierarchy), maxLevel, offset)
 end
