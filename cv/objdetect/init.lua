@@ -199,7 +199,8 @@ do
             {"maxSize", default = {0, 0}, operator = cv.Size},
             {"outputRejectLevels", default = false}
         }
-        local image, scaleFactor, minNeighbors, flags, minSize, maxSize = cv.argcheck(t, argRules)
+        local image, scaleFactor, minNeighbors, flags, minSize, maxSize, outputRejectLevels 
+            = cv.argcheck(t, argRules)
 
         local result = C.CascadeClassifier_detectMultiScale3(self.ptr, cv.wrap_tensor(image),
             scaleFactor, minNeighbors, flags, minSize, maxSize, outputRejectLevels)
