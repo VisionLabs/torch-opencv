@@ -2560,9 +2560,9 @@ void CLAHE_setClipLimit(struct PtrWrapper ptr, double ClipLimit);
 
 double CLAHE_getClipLimit(struct PtrWrapper ptr);
 
-void CLAHE_setTileGridSize(struct PtrWrapper ptr, struct SizeWrapper TilesGridSize);
+void CLAHE_setTilesGridSize(struct PtrWrapper ptr, struct SizeWrapper TilesGridSize);
 
-struct SizeWrapper CLAHE_getTileGridSize(struct PtrWrapper ptr);
+struct SizeWrapper CLAHE_getTilesGridSize(struct PtrWrapper ptr);
 
 void CLAHE_collectGarbage(struct PtrWrapper ptr);
 
@@ -2883,12 +2883,12 @@ do
         return C.CLAHE_getClipLimit(self.ptr)
     end
 
-    function CLAHE:setTileGridSize(tileGridSize)
-        C.CLAHE_setTileGridSize(self.ptr, tileGridSize)
+    function CLAHE:setTilesGridSize(tilesGridSize)
+        C.CLAHE_setTilesGridSize(self.ptr, tilesGridSize)
     end
 
-    function CLAHE:getTileGridSize()
-        return C.CLAHE_getTileGridSize(self.ptr)
+    function CLAHE:getTilesGridSize()
+        return C.CLAHE_getTilesGridSize(self.ptr)
     end
 
     function CLAHE:collectGarbage()
