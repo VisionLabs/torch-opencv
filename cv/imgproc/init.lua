@@ -1621,7 +1621,7 @@ function cv.calcHist(t)
     return cv.unwrap_tensors(
         C.calcHist(
             cv.wrap_tensors(images), cv.wrap_tensor(channels), cv.wrap_tensor(mask),
-            cv.wrap_tensor(hist), dims, histSize, cv.wrap_tensor(ranges), uniform, accumulate))
+            cv.wrap_tensor(hist), dims, cv.wrap_tensor(histSize), cv.wrap_tensor(ranges), uniform, accumulate))
 end
 
 
