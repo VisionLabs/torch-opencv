@@ -764,4 +764,6 @@ function cv.refcount(tensor)
     C.refcount(tensor:cdata())
 end
 
+require 'cv.core'
+
 return cv

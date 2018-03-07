@@ -7,7 +7,7 @@ OPTION(BUILD_CUDA    "Wrap CUDA packages"           ON)
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 SET(OPENCV_MODULES_TO_WRAP
-        imgcodecs highgui features2d flann imgproc ml optflow photo superres videoio video
+        core imgcodecs highgui features2d flann imgproc ml optflow photo superres videoio video
         objdetect calib3d ximgproc stitching xphoto)
 
 IF (BUILD_CUDA)
