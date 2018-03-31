@@ -15,6 +15,21 @@ struct cutorchInfo {
     THCState *state;
 };
 
+/**************** A custom allocator that uses Torch memory management for Mats ****************/
+ 
+class TorchCompatibleAllocator: public cuda::GpuMat::Allocator {
+public:
+    THCState *cutorchState;
+
+    bool allocate(cuda::GpuMat* mat, int rows, int cols, size_t elemSize);
+    void free(cuda::GpuMat* mat);
+};
+
+extern "C"
+void initAllocatorCUDA(cutorchInfo info);
+
+/****************************************** GpuMatT ********************************************/
+
 class GpuMatT {
 public:
     cuda::GpuMat mat;
@@ -43,8 +58,9 @@ GpuMatT TensorWrapper::toGpuMatT() {
     return retval;
 }
 
-/************************ Fake OpenCV/CUDA classes *************************/
+/************* Fake "custom memory stack impl for OpenCV" to use cutorch streams *************/
 
+// Description below
 class FakeMemoryPool;
 class FakeMemoryStack;
 class FakeStackAllocator;

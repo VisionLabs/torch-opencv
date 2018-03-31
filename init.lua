@@ -31,6 +31,7 @@ struct TensorArray {
 };
 
 void initAllocator();
+void initAllocatorCUDA(struct cutorchInfo info);
 
 void *malloc(size_t size);
 void free(void *ptr);
@@ -333,6 +334,10 @@ end
 --- ***************** Tensor <=> Mat conversion *****************
 
 C.initAllocator()
+if CUDACommon_C then
+    cv.cuda = cv.cuda or require 'cv._env_cuda'
+    CUDACommon_C.initAllocatorCUDA(cv.cuda._info())
+end
 
 local tensor_CV_code_by_letter = {
     [ 66] = cv.CV_8U  , -- B : Byte

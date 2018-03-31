@@ -5,9 +5,10 @@ struct TensorWrapper DenseOpticalFlow_calcCuda(struct cutorchInfo info,
     struct DenseOpticalFlowPtr ptr, struct TensorWrapper I0, struct TensorWrapper I1,
     struct TensorWrapper flow)
 {
-    cuda::GpuMat retval = flow.toGpuMat();
-    ptr->calc(I0.toGpuMat(), I1.toGpuMat(), retval, prepareStream(info));
-    return TensorWrapper(retval, info.state);
+    GpuMatT flowMat = flow.toGpuMatT();
+    ptr->calc(I0.toGpuMat(), I1.toGpuMat(), flowMat, prepareStream(info));
+    
+    return TensorWrapper(flowMat, info.state);
 }
 
 extern "C"

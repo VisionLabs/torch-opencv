@@ -292,7 +292,7 @@ struct TensorWrapper CascadeClassifier_detectMultiScaleCuda(
     GpuMatT objectsMat = objects.toGpuMatT();
     cuda::GpuMat imageMat = image.toGpuMat();
     cuda::GpuMat imageByte;
-    imageMat.convertTo(imageByte, CV_8U, 255.0); // Sorry guys :(
+    imageMat.convertTo(imageByte, CV_8U, 255.0); // Sorry guys :( #160
     ptr->detectMultiScale(imageByte, objectsMat, prepareStream(info));
     return TensorWrapper(objectsMat, info.state);
 }

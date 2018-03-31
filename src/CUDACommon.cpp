@@ -1,5 +1,57 @@
 #include <CUDACommon.hpp>
 
+bool TorchCompatibleAllocator::allocate(cuda::GpuMat* mat, int rows, int cols, size_t elemSize) {
+
+    if (rows * cols == 0) {
+        THError("You tried to allocate a Tensor with zero rows or columns");
+        return false;
+    }
+
+    // See https://github.com/torch/cutorch/blob/master/lib/THC/generic/THCStorage.c#L69
+    THCState *state = this->cutorchState;
+    const THCDeviceAllocator *allocator = state->cudaDeviceAllocator;
+    void *allocatorContext = state->cudaDeviceAllocator->state;
+    
+    THCHeapUpdate(state, rows * cols * elemSize);
+    cudaError_t err = (*allocator->malloc)(
+        allocatorContext,
+        (void **) &(mat->data),
+        rows * cols * elemSize,
+        THCState_getCurrentStream(state));
+
+    if (err != cudaSuccess) {
+        THCHeapUpdate(state, -rows * cols * elemSize);
+        THCudaCheck(err);
+        return false;
+    }
+    THCudaCheck(err);
+
+    mat->step = elemSize * cols;
+    mat->refcount = (int*) cv::fastMalloc(sizeof(int));
+
+    return true;
+}
+
+void TorchCompatibleAllocator::free(cuda::GpuMat* mat) {
+    // See https://github.com/torch/cutorch/blob/master/lib/THC/generic/THCStorage.c#L180
+    THCState *state = this->cutorchState;
+    const THCDeviceAllocator *allocator = state->cudaDeviceAllocator;
+    void *allocatorContext = state->cudaDeviceAllocator->state;
+
+    THCHeapUpdate(state, -mat->step * mat->rows);
+    THCudaCheck((*allocator->free)(allocatorContext, mat->data));
+
+    cv::fastFree(mat->refcount);
+}
+
+static TorchCompatibleAllocator torchCompatibleAllocator;
+
+extern "C"
+void initAllocatorCUDA(cutorchInfo info) {
+    torchCompatibleAllocator.cutorchState = info.state;
+    cuda::GpuMat::setDefaultAllocator(&torchCompatibleAllocator);
+}
+
 GpuMatT::GpuMatT(cuda::GpuMat & mat) {
     this->mat = mat;
     this->tensor = nullptr;
@@ -158,7 +210,7 @@ std::vector<cv::cuda::GpuMat> TensorArray::toGpuMatList() {
     return retval;
 }
 
-/************************ Fake OpenCV/CUDA classes *************************/
+/************* Fake "custom memory stack impl for OpenCV" to use cutorch streams *************/
 
 FakeDefaultDeviceInitializer initializer;
 
