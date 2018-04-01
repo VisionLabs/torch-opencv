@@ -56,7 +56,7 @@ before_script:
 - cd opencv
 - git checkout tags/3.1.0
 - mkdir -p build && cd build
-- cmake -DWITH_PYTHON=OFF .. && make
+- cmake -DWITH_PYTHON=OFF -DWITH_OPENCL=OFF -DWITH_QUICKTIME=OFF -DWITH_GSTREAMER=OFF -DWITH_FFMPEG=OFF -DCMAKE_BUILD_TYPE=Release .. && make
 - cd $ROOT_TRAVIS_DIR
 - git clone https://github.com/VisionLabs/torch-opencv
 script: 
