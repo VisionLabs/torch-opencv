@@ -294,7 +294,7 @@ void refcount(void *x);
 ]]
 
 local C = ffi.load(cv.libPath('Common'))
-local _, CUDACommon_C = pcall(ffi.load, cv.libPath('CUDACommon'))
+local WITH_CUDA, CUDACommon_C = pcall(ffi.load, cv.libPath('CUDACommon'))
 
 require 'cv.constants'
 
@@ -324,8 +324,7 @@ function cv.argcheck(t, rules)
             end
         end
 
-        local
-        function identity(...) return ... end
+        local function identity(...) return ... end
         retval[i] = (argument.operator or identity)(userInputArg)
     end
     return table.unpack(retval, 1, #rules)
@@ -334,7 +333,7 @@ end
 --- ***************** Tensor <=> Mat conversion *****************
 
 C.initAllocator()
-if CUDACommon_C then
+if WITH_CUDA then
     cv.cuda = cv.cuda or require 'cv._env_cuda'
     CUDACommon_C.initAllocatorCUDA(cv.cuda._info())
 end
