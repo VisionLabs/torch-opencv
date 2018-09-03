@@ -2068,9 +2068,7 @@ function cv.convexHull(t)
 				clockwise, returnPoints))
     if not returnPoints then
         -- correct the 0-based indexing
-        for i = 1,#retval do
-            retval[i] = retval[i] + 1
-        end
+        retval:add(1)
     end
     return retval
 end
